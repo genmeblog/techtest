@@ -24,7 +24,6 @@
 
 ;; --------- Clojure
 
-;; TODO: add support for loading from the net (issue: #33)
 (def flights (ds/->dataset "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv"))
 
 ;; # Taking the shape of loaded data
@@ -91,8 +90,6 @@ DT
 
 ;; # Subset rows
 
-;; TODO: maybe add head/tail for rows instead of calling `select-rows`
-
 ;; --------- R
 
 (def ans (r/bra R-flights '(& (== origin "JFK")
@@ -112,6 +109,7 @@ DT
 (def ans (ds/filter #(and (= (get % "origin") "JFK")
                           (= (get % "month") 6)) flights))
 
+;; TODO: maybe add head/tail for rows? or accept positive number (for head) and negative number (for tail) `
 (ds/select-rows ans (range 6))
 ;; => https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv [6 11]:
 ;;    | year | month | day | dep_delay | arr_delay | carrier | origin | dest | air_time | distance | hour |
@@ -193,7 +191,7 @@ ans
 
 ;; --------- R
 
-;; this should work...
+;; this should work but we have a bug in `clojisr` (addressed)
 ;; (def ans (r/bra R-flights nil 'arr_delay))
 (def ans (r '(bra ~R-flights nil arr_delay)))
 
@@ -279,6 +277,7 @@ ans
 
 ;; --------- Clojure
 
+
 (def ans (ds/select-columns flights ["arr_delay" "dep_delay"]))
 
 (ds/select-rows ans (range 6))
@@ -310,7 +309,6 @@ ans
 ;; --------- Clojure
 
 ;; TODO: Propose to do as in R, when you provide a map to `select` names will be changed
-
 (def ans (-> (ds/select-columns flights ["arr_delay" "dep_delay"])
              (ds/rename-columns  {"arr_delay" "delay_arr"
                                   "dep_delay" "delay_dep"})))
@@ -930,7 +928,6 @@ ans
 ;; --------- Clojure
 
 ;; TODO: group by inline transformation on several columns
-
 (def ans (->> (-> flights
                   (ds/add-column (col/new-column :pos_dep_delay (dfn/> (flights "dep_delay") 0)))
                   (ds/add-column (col/new-column :pos_arr_delay (dfn/> (flights "arr_delay") 0))))
@@ -1138,6 +1135,7 @@ DT
 
 ;; --------- Clojure
 
+;; TODO: reshape?
 (ds/concat (-> (ds/select-columns DT [:ID :a])
                (ds/rename-columns {:a :val}))
            (-> (ds/select-columns DT [:ID :b])
@@ -1182,6 +1180,7 @@ DT
 
 ;; or
 
+;; TODO: printing should realize sequences
 (group-by-columns-and-aggregate [:ID]
                                 {:val #(vec (concat (seq (% :a)) (seq (% :b))))}
                                 DT)
