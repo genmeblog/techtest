@@ -20,11 +20,11 @@
 
 ;; --------- R
 
-(def R-flights (dt/fread "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv"))
+(def R-flights (time (dt/fread "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv")))
 
 ;; --------- Clojure
 
-(def flights (ds/->dataset "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv"))
+(def flights (time (ds/->dataset "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv")))
 
 ;; # Taking the shape of loaded data
 
@@ -928,9 +928,10 @@ ans
 ;; --------- Clojure
 
 ;; TODO: group by inline transformation on several columns
+;; changed to `new-column`
 (def ans (->> (-> flights
-                  (ds/add-column (col/new-column :pos_dep_delay (dfn/> (flights "dep_delay") 0)))
-                  (ds/add-column (col/new-column :pos_arr_delay (dfn/> (flights "arr_delay") 0))))
+                  (ds/new-column :pos_dep_delay (dfn/> (flights "dep_delay") 0))
+                  (ds/new-column :pos_arr_delay (dfn/> (flights "arr_delay") 0)))
               (group-by-columns-and-aggregate [:pos_dep_delay :pos_arr_delay]
                                               {"N" ds/row-count})))
 
@@ -1190,4 +1191,3 @@ DT
 ;;    |   a |        [6 12] |
 ;;    |   b | [1 2 3 7 8 9] |
 ;;    |   c |   [4 5 10 11] |
-
