@@ -18,6 +18,9 @@
 
 ;; # Read data from URL
 
+;; input <- "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv"
+;; flights <- fread(input)
+
 ;; --------- R
 
 (def R-flights (time (dt/fread "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv")))
@@ -27,6 +30,8 @@
 (def flights (time (ds/->dataset "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv")))
 
 ;; # Taking the shape of loaded data
+
+;; dim(flights)
 
 ;; --------- R
 
@@ -44,6 +49,15 @@
 ;; # Basics
 
 ;; ## What is `data.table`?
+
+;; DT = data.table(
+;;   ID = c("b","b","b","a","a","c"),
+;;   a = 1:6,
+;;   b = 7:12,
+;;   c = 13:18
+;; )
+;; 
+;; class(DT$ID)
 
 ;; --------- R
 
@@ -90,6 +104,10 @@ DT
 
 ;; # Subset rows
 
+;; ## Get all the flights with “JFK” as the origin airport in the month of June.
+
+;; ans <- flights[origin == "JFK" & month == 6L]
+
 ;; --------- R
 
 (def ans (r/bra R-flights '(& (== origin "JFK")
@@ -121,7 +139,9 @@ DT
 ;;    | 2014 |     6 |   1 |        -4 |       -45 |      AA |    JFK |  LAX |      326 |     2475 |   18 |
 ;;    | 2014 |     6 |   1 |        -6 |       -23 |      AA |    JFK |  LAX |      329 |     2475 |   14 |
 
-;; # Get first two rows from `flights`
+;; ## Get first two rows from `flights`
+
+;; ans <- flights[1:2]
 
 ;; --------- R
 
@@ -143,7 +163,9 @@ ans
 ;;    | 2014 |     1 |   1 |        14 |        13 |      AA |    JFK |  LAX |      359 |     2475 |    9 |
 ;;    | 2014 |     1 |   1 |        -3 |        13 |      AA |    JFK |  LAX |      363 |     2475 |   11 |
 
-;; # Sort `flights` first by column `origin` in ascending order, and then by `dest` in descending order
+;; ## Sort `flights` first by column `origin` in ascending order, and then by `dest` in descending order
+
+;; ans <- flights[order(origin, -dest)]
 
 ;; --------- R
 
@@ -189,6 +211,8 @@ ans
 
 ;; ## Select `arr_delay` column, but return it as a vector.
 
+;; ans <- flights[, arr_delay]
+
 ;; --------- R
 
 ;; this should work but we have a bug in `clojisr` (addressed)
@@ -213,6 +237,8 @@ ans
 ;; => (13 13 9 -26 1 0)
 
 ;; ## Select `arr_delay` column, but return as a data.table instead
+
+;; ans <- flights[, list(arr_delay)]
 
 ;; --------- R
 
@@ -249,6 +275,9 @@ ans
 
 ;; ## Select both `arr_delay` and `dep_delay` columns
 
+;; ans <- flights[, .(arr_delay, dep_delay)]
+;; ans <- flights[, list(arr_delay, dep_delay)]
+
 ;; --------- R
 
 (def ans (r '(bra ~R-flights nil (. arr_delay dep_delay))))
@@ -277,7 +306,6 @@ ans
 
 ;; --------- Clojure
 
-
 (def ans (ds/select-columns flights ["arr_delay" "dep_delay"]))
 
 (ds/select-rows ans (range 6))
@@ -292,6 +320,8 @@ ans
 ;;    |         0 |         4 |
 
 ;; ## Select both `arr_delay` and `dep_delay` columns and rename them to `delay_arr` and `delay_dep`
+
+;; ans <- flights[, .(delay_arr = arr_delay, delay_dep = dep_delay)]
 
 ;; --------- R
 
@@ -326,6 +356,8 @@ ans
 
 ;; ## How many trips have had total delay < 0?
 
+;; ans <- flights[, sum( (arr_delay + dep_delay) < 0 )]
+
 ;; --------- R
 
 (def ans (r '(bra ~R-flights nil (sum (< (+ arr_delay dep_delay) 0)))))
@@ -345,6 +377,9 @@ ans
 ;; => 141814
 
 ;; ## Calculate the average arrival and departure delay for all flights with “JFK” as the origin airport in the month of June.
+
+;; ans <- flights[origin == "JFK" & month == 6L,
+;;                .(m_arr = mean(arr_delay), m_dep = mean(dep_delay))]
 
 ;; --------- R
 
@@ -373,11 +408,11 @@ ans
 ;; or
 
 (defn aggregate
-  ([agg-fns-map ds]
-   (aggregate {} agg-fns-map ds))
-  ([m agg-fns-map ds]
-   (into m (map (fn [[k agg-fn]]
-                  [k (agg-fn ds)]) agg-fns-map))))
+([agg-fns-map ds]
+ (aggregate {} agg-fns-map ds))
+([m agg-fns-map ds]
+ (into m (map (fn [[k agg-fn]]
+                [k (agg-fn ds)]) agg-fns-map))))
 
 (def aggregate->dataset (comp ds/->dataset vector aggregate))
 
@@ -394,6 +429,9 @@ ans
 ;;    |  5.839 |  9.808 |
 
 ;; ## How many trips have been made in 2014 from “JFK” airport in the month of June?
+
+;; ans <- flights[origin == "JFK" & month == 6L, length(dest)]
+;; ans <- flights[origin == "JFK" & month == 6L, .N]
 
 ;; --------- R
 
@@ -427,6 +465,11 @@ ans
 ;; ## Select both arr_delay and dep_delay columns the data.frame way.
 ;; ## Select columns named in a variable using the .. prefix
 ;; ## Select columns named in a variable using with = FALSE
+
+;; ans <- flights[, c("arr_delay", "dep_delay")]
+;; select_cols = c("arr_delay", "dep_delay")
+;;   flights[ , ..select_cols]
+;; flights[ , select_cols, with = FALSE]
 
 ;; --------- R
 
@@ -511,6 +554,9 @@ ans
 
 ;; ## Deselect columns
 
+;; ans <- flights[, !c("arr_delay", "dep_delay")]
+;; ans <- flights[, -c("arr_delay", "dep_delay")]
+
 ;; --------- R
 
 (r '(bra ~R-flights nil (! ["arr_delay" "dep_delay"])))
@@ -585,6 +631,9 @@ ans
 
 ;; ## How can we get the number of trips corresponding to each origin airport?
 
+;; ans <- flights[, .(.N), by = .(origin)]
+;; ans <- flights[, .(.N), by = "origin"]
+
 ;; --------- R
 
 (def ans (r '(bra ~R-flights nil (. .N) :by (. origin))))
@@ -652,6 +701,8 @@ ans
 
 ;; ## How can we calculate the number of trips for each origin airport for carrier code "AA"?
 
+;; ans <- flights[carrier == "AA", .N, by = origin]
+
 ;; --------- R
 
 (def ans (r/bra R-flights '(== carrier "AA") '.N :by 'origin))
@@ -677,6 +728,8 @@ ans
 ;;    |    JFK | 11923 |
 
 ;; ## How can we get the total number of trips for each origin, dest pair for carrier code "AA"?
+
+;; ans <- flights[carrier == "AA", .N, by = .(origin, dest)]
 
 ;; --------- R
 
@@ -722,6 +775,10 @@ ans
 ;;    |    JFK |  MCO |  597 |
 
 ;; ## How can we get the average arrival and departure delay for each orig,dest pair for each month for carrier code "AA"?
+
+;; ans <- flights[carrier == "AA",
+;;                .(mean(arr_delay), mean(dep_delay)),
+;;                by = .(origin, dest, month)]
 
 ;; --------- R
 
@@ -782,6 +839,10 @@ ans
 ;;    |    JFK |  STT |     6 |  0.9667 |  -4.667 |
 
 ;; ## So how can we directly order by all the grouping variables?
+
+;; ans <- flights[carrier == "AA",
+;;                .(mean(arr_delay), mean(dep_delay)),
+;;                keyby = .(origin, dest, month)]
 
 ;; --------- R
 
@@ -863,6 +924,11 @@ ans
 
 ;; ## How can we order ans using the columns origin in ascending order, and dest in descending order?
 
+;; ans <- flights[carrier == "AA", .N, by = .(origin, dest)]
+;; ans <- ans[order(origin, -dest)]
+;;
+;; ans <- flights[carrier == "AA", .N, by = .(origin, dest)][order(origin, -dest)]
+
 ;; --------- R
 
 (def ans (r/bra R-flights '(== carrier "AA") '.N :by '(. origin dest)))
@@ -913,6 +979,8 @@ ans
 
 ;; ## Can by accept expressions as well or does it just take columns
 
+;; ans <- flights[, .N, .(dep_delay>0, arr_delay>0)]
+
 ;; --------- R
 
 (def ans (r '(bra ~R-flights nil .N (. (> dep_delay 0)
@@ -945,6 +1013,10 @@ ans
 ;;    |           true |           true |  72836 |
 
 ;; ## Do we have to compute mean() for each column individually?
+
+;; DT
+;; DT[, print(.SD), by = ID]
+;; DT[, lapply(.SD, mean), by = ID]
 
 ;; --------- R
 
@@ -1022,6 +1094,11 @@ DT
 
 ;; ## How can we specify just the columns we would like to compute the mean() on?
 
+;; flights[carrier == "AA",                       ## Only on trips with carrier "AA"
+;;         lapply(.SD, mean),                     ## compute the mean
+;;         by = .(origin, dest, month),           ## for every 'origin,dest,month'
+;;         .SDcols = c("arr_delay", "dep_delay")] ## for just those specified in .SDcols
+
 ;; --------- R
 
 (r/bra R-flights
@@ -1083,6 +1160,8 @@ DT
 
 ;; ## How can we return the first two rows for each month?
 
+;; ans <- flights[, head(.SD, 2), by = month]
+
 ;; --------- R
 
 (def ans (r '(bra ~R-flights nil (head .SD 2) :by month)))
@@ -1116,6 +1195,8 @@ DT
 ;;    |        -4 |    LGA |      113 |    8 |        -2 |  BNA |      764 | 2014 |     4 |   1 |      MQ |
 
 ;; ## How can we concatenate columns a and b for each group in ID?
+
+;; DT[, .(val = c(a,b)), by = ID]
 
 ;; --------- R
 
@@ -1160,6 +1241,8 @@ DT
 ;; ## What if we would like to have all the values of column a and b concatenated, but returned as a list column?
 
 ;; --------- R
+
+;; DT[, .(val = list(c(a,b))), by = ID]
 
 (r '(bra ~R-DT nil (. :val (list [a b])) :by ID))
 ;; =>    ID         val
