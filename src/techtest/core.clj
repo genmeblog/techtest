@@ -5,6 +5,9 @@
             [clojisr.v1.r :as r :refer [r]]
             [clojisr.v1.require :refer [require-r]]))
 
+;; created with tech.ml.dataset version "2.0-beta-24"
+;; further versions may simplify some things
+
 ;; Working thrugh R `data.table` type and confronting with tech.ml.dataset
 ;; https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html
 
@@ -112,6 +115,7 @@ DT
 
 (def ans (r/bra R-flights '(& (== origin "JFK")
                               (== month 6))))
+
 
 (r.utils/head ans)
 ;; =>    year month day dep_delay arr_delay carrier origin dest air_time distance hour
@@ -1274,3 +1278,4 @@ DT
 ;;    |   a |        [6 12] |
 ;;    |   b | [1 2 3 7 8 9] |
 ;;    |   c |   [4 5 10 11] |
+
