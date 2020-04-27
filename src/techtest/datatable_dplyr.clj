@@ -3,8 +3,7 @@
             [tech.ml.dataset.column :as col]
             [tech.v2.datatype.functional :as dfn]
             [fastmath.core :as m]
-            [clojisr.v1.r :as r :refer [r r->clj]]
-            [clojisr.v1.require :refer [require-r]]))
+            [clojure.string :as str]))
 
 ;; Comparizon of tech.ml.dataset with datatable and dplyr
 ;; Based on article "A data.table and dplyr tour" by Atrebas dated March 3, 2019
@@ -19,6 +18,10 @@
 ;; # Preparation
 
 ;; load R package
+
+(require '[clojisr.v1.r :as r :refer [r r->clj]]
+         '[clojisr.v1.require :refer [require-r]])
+
 (require-r '[base]
            '[utils]
            '[stats]
@@ -391,31 +394,30 @@ DS
 
 ;; ---- tech.ml.dataset
 
-;; TODO (tech.ml.dataset): keep the order
 (ds/unique-by identity DS :column-name-seq (ds/column-names DS))
 ;; => _unnamed [9 4]:
 ;;    | :V1 | :V2 |    :V3 | :V4 |
 ;;    |-----+-----+--------+-----|
-;;    |   2 |   8 |  1.000 |   B |
+;;    |   1 |   1 | 0.5000 |   A |
+;;    |   2 |   2 |  1.000 |   B |
+;;    |   1 |   3 |  1.500 |   C |
+;;    |   2 |   4 | 0.5000 |   A |
 ;;    |   1 |   5 |  1.000 |   B |
 ;;    |   2 |   6 |  1.500 |   C |
-;;    |   1 |   3 |  1.500 |   C |
-;;    |   2 |   2 |  1.000 |   B |
-;;    |   2 |   4 | 0.5000 |   A |
-;;    |   1 |   1 | 0.5000 |   A |
 ;;    |   1 |   7 | 0.5000 |   A |
+;;    |   2 |   8 |  1.000 |   B |
 ;;    |   1 |   9 |  1.500 |   C |
 
 (ds/unique-by identity DS :column-name-seq [:V1 :V4])
 ;; => _unnamed [6 4]:
 ;;    | :V1 | :V2 |    :V3 | :V4 |
 ;;    |-----+-----+--------+-----|
-;;    |   2 |   6 |  1.500 |   C |
 ;;    |   1 |   1 | 0.5000 |   A |
-;;    |   1 |   5 |  1.000 |   B |
+;;    |   2 |   2 |  1.000 |   B |
 ;;    |   1 |   3 |  1.500 |   C |
 ;;    |   2 |   4 | 0.5000 |   A |
-;;    |   2 |   2 |  1.000 |   B |
+;;    |   1 |   5 |  1.000 |   B |
+;;    |   2 |   6 |  1.500 |   C |
 
 ;; ### Discard rows with missing values
 
@@ -846,10 +848,9 @@ DS
 ;;    8     2     4   0.5 A    
 ;;    9     2     2   1   B    
 
-;; tech.ml.dataset
+;; ---- tech.ml.dataset
 
-;; TODO: improve sorting
-
+;; TODO: improve sorting in general
 (defn asc-desc-comparator
   [orders]
   (if (every? #(= % :asc) orders)
@@ -883,3 +884,1073 @@ DS
 ;;    |   2 |   6 |  1.500 |   C |
 ;;    |   2 |   4 | 0.5000 |   A |
 ;;    |   2 |   2 |  1.000 |   B |
+
+;; ## Select columns
+
+;; ### Select one column using an index (not recommended)
+
+;; ---- data.table
+
+;; DT[[3]] # returns a vector
+;; DT[, 3]  # returns a data.table
+
+(r/brabra DT 3)
+;; => [1] 0.5 1.0 1.5 0.5 1.0 1.5 0.5 1.0 1.5
+
+(r '(bra ~DT nil 3))
+;; =>     V3
+;;    1: 0.5
+;;    2: 1.0
+;;    3: 1.5
+;;    4: 0.5
+;;    5: 1.0
+;;    6: 1.5
+;;    7: 0.5
+;;    8: 1.0
+;;    9: 1.5
+
+;; ---- dplyr
+
+;; DF[[3]] # returns a vector
+;; DF[3]   # returns a tibble
+
+(r/brabra DF 3)
+;; => [1] 0.5 1.0 1.5 0.5 1.0 1.5 0.5 1.0 1.5
+
+(r/bra DF 3)
+;; => # A tibble: 9 x 1
+;;         V3
+;;      <dbl>
+;;    1   0.5
+;;    2   1  
+;;    3   1.5
+;;    4   0.5
+;;    5   1  
+;;    6   1.5
+;;    7   0.5
+;;    8   1  
+;;    9   1.5
+
+;; ---- tech.ml.dataset
+
+;; NOTE: indices start at 0
+(nth (seq DS) 2)
+;; => #tech.ml.dataset.column<float64>[9]
+;;    :V3
+;;    [0.5000, 1.000, 1.500, 0.5000, 1.000, 1.500, 0.5000, 1.000, 1.500, ]
+
+;; NOTE: column is seqable
+(seq (nth (seq DS) 2))
+;; => (0.5 1.0 1.5 0.5 1.0 1.5 0.5 1.0 1.5)
+
+(ds/new-dataset [(nth (seq DS) 2)])
+;; => _unnamed [9 1]:
+;;    |    :V3 |
+;;    |--------|
+;;    | 0.5000 |
+;;    |  1.000 |
+;;    |  1.500 |
+;;    | 0.5000 |
+;;    |  1.000 |
+;;    |  1.500 |
+;;    | 0.5000 |
+;;    |  1.000 |
+;;    |  1.500 |
+
+;; ### Select one column using column name
+
+;; DT[, list(V2)] # returns a data.table
+;; DT[, .(V2)]    # returns a data.table
+;; # . is an alias for list
+;; DT[, "V2"]     # returns a data.table
+;; DT[, V2]       # returns a vector
+;; DT[["V2"]]     # returns a vector
+
+;; ---- data.table
+
+(r '(bra ~DT nil [:!list V2]))
+;; =>    V2
+;;    1:  1
+;;    2:  2
+;;    3:  3
+;;    4:  4
+;;    5:  5
+;;    6:  6
+;;    7:  7
+;;    8:  8
+;;    9:  9
+
+(r '(bra ~DT nil (. V2)))
+;; =>    V2
+;;    1:  1
+;;    2:  2
+;;    3:  3
+;;    4:  4
+;;    5:  5
+;;    6:  6
+;;    7:  7
+;;    8:  8
+;;    9:  9
+
+(r '(bra ~DT nil "V2"))
+;; =>    V2
+;;    1:  1
+;;    2:  2
+;;    3:  3
+;;    4:  4
+;;    5:  5
+;;    6:  6
+;;    7:  7
+;;    8:  8
+;;    9:  9
+
+(r '(bra ~DT nil V2))
+;; => [1] 1 2 3 4 5 6 7 8 9
+
+(r/brabra DT "V2")
+;; => [1] 1 2 3 4 5 6 7 8 9
+
+;; ---- dplyr
+
+;; select(DF, V2) # returns a tibble
+;; pull(DF, V2)   # returns a vector
+;; DF[, "V2"]        # returns a tibble
+;; DF[["V2"]]        # returns a vector
+
+(dpl/select DF 'V2)
+;; => # A tibble: 9 x 1
+;;         V2
+;;      <int>
+;;    1     1
+;;    2     2
+;;    3     3
+;;    4     4
+;;    5     5
+;;    6     6
+;;    7     7
+;;    8     8
+;;    9     9
+
+(dpl/pull DF 'V2)
+;; => [1] 1 2 3 4 5 6 7 8 9
+
+(r '(bra ~DF nil "V2"))
+;; => # A tibble: 9 x 1
+;;         V2
+;;      <int>
+;;    1     1
+;;    2     2
+;;    3     3
+;;    4     4
+;;    5     5
+;;    6     6
+;;    7     7
+;;    8     8
+;;    9     9
+
+(r/brabra DF "V2")
+;; => [1] 1 2 3 4 5 6 7 8 9
+
+;; ---- tech.ml.dataset
+
+;; NOTE: returns dataset
+(ds/select-columns DS [:V2])
+;; => _unnamed [9 1]:
+;;    | :V2 |
+;;    |-----|
+;;    |   1 |
+;;    |   2 |
+;;    |   3 |
+;;    |   4 |
+;;    |   5 |
+;;    |   6 |
+;;    |   7 |
+;;    |   8 |
+;;    |   9 |
+
+;; NOTE: returns dataset
+(ds/select DS [:V2] :all)
+;; => _unnamed [9 1]:
+;;    | :V2 |
+;;    |-----|
+;;    |   1 |
+;;    |   2 |
+;;    |   3 |
+;;    |   4 |
+;;    |   5 |
+;;    |   6 |
+;;    |   7 |
+;;    |   8 |
+;;    |   9 |
+
+;; NOTE: returns column (seqable)
+(DS :V2)
+;; => #tech.ml.dataset.column<int64>[9]
+;;    :V2
+;;    [1, 2, 3, 4, 5, 6, 7, 8, 9, ]
+
+;; NOTE: column as sequence
+(seq (DS :V2))
+;; => (1 2 3 4 5 6 7 8 9)
+
+;; NOTE: returns column
+(ds/column DS :V2)
+;; => #tech.ml.dataset.column<int64>[9]
+;;    :V2
+;;    [1, 2, 3, 4, 5, 6, 7, 8, 9, ]
+
+;; ### Select several columns
+
+;; ---- data.table
+
+;; DT[, .(V2, V3, V4)]
+;; DT[, list(V2, V3, V4)]
+;; DT[, V2:V4] # select columns between V2 and V4
+
+(r '(bra ~DT nil (. V2 V3 V4)))
+;; =>    V2  V3 V4
+;;    1:  1 0.5  A
+;;    2:  2 1.0  B
+;;    3:  3 1.5  C
+;;    4:  4 0.5  A
+;;    5:  5 1.0  B
+;;    6:  6 1.5  C
+;;    7:  7 0.5  A
+;;    8:  8 1.0  B
+;;    9:  9 1.5  C
+
+(r '(bra ~DT nil (:!list V2 V3 V4)))
+;; =>    V2  V3 V4
+;;    1:  1 0.5  A
+;;    2:  2 1.0  B
+;;    3:  3 1.5  C
+;;    4:  4 0.5  A
+;;    5:  5 1.0  B
+;;    6:  6 1.5  C
+;;    7:  7 0.5  A
+;;    8:  8 1.0  B
+;;    9:  9 1.5  C
+
+(r '(bra ~DT nil (colon V2 V4)))
+;; =>    V2  V3 V4
+;;    1:  1 0.5  A
+;;    2:  2 1.0  B
+;;    3:  3 1.5  C
+;;    4:  4 0.5  A
+;;    5:  5 1.0  B
+;;    6:  6 1.5  C
+;;    7:  7 0.5  A
+;;    8:  8 1.0  B
+;;    9:  9 1.5  C
+
+;; ---- dplyr
+
+;; select(DF, V2, V3, V4)
+;; select(DF, V2:V4) # select columns between V2 and V4
+
+(dpl/select DF 'V2 'V3 'V4)
+;; => # A tibble: 9 x 3
+;;         V2    V3 V4   
+;;      <int> <dbl> <chr>
+;;    1     1   0.5 A    
+;;    2     2   1   B    
+;;    3     3   1.5 C    
+;;    4     4   0.5 A    
+;;    5     5   1   B    
+;;    6     6   1.5 C    
+;;    7     7   0.5 A    
+;;    8     8   1   B    
+;;    9     9   1.5 C
+
+(dpl/select DF '(colon V2 V4))
+;; => # A tibble: 9 x 3
+;;         V2    V3 V4   
+;;      <int> <dbl> <chr>
+;;    1     1   0.5 A    
+;;    2     2   1   B    
+;;    3     3   1.5 C    
+;;    4     4   0.5 A    
+;;    5     5   1   B    
+;;    6     6   1.5 C    
+;;    7     7   0.5 A    
+;;    8     8   1   B    
+;;    9     9   1.5 C
+
+;; ---- tech.ml.dataset
+
+(ds/select-columns DS [:V2 :V3 :V4])
+;; => _unnamed [9 3]:
+;;    | :V2 |    :V3 | :V4 |
+;;    |-----+--------+-----|
+;;    |   1 | 0.5000 |   A |
+;;    |   2 |  1.000 |   B |
+;;    |   3 |  1.500 |   C |
+;;    |   4 | 0.5000 |   A |
+;;    |   5 |  1.000 |   B |
+;;    |   6 |  1.500 |   C |
+;;    |   7 | 0.5000 |   A |
+;;    |   8 |  1.000 |   B |
+;;    |   9 |  1.500 |   C |
+
+(ds/select DS [:V2 :V3 :V4] :all)
+;; => _unnamed [9 3]:
+;;    | :V2 |    :V3 | :V4 |
+;;    |-----+--------+-----|
+;;    |   1 | 0.5000 |   A |
+;;    |   2 |  1.000 |   B |
+;;    |   3 |  1.500 |   C |
+;;    |   4 | 0.5000 |   A |
+;;    |   5 |  1.000 |   B |
+;;    |   6 |  1.500 |   C |
+;;    |   7 | 0.5000 |   A |
+;;    |   8 |  1.000 |   B |
+;;    |   9 |  1.500 |   C |
+
+;; NOTE: range is not available
+
+;; ### Exclude columns
+
+;; ---- data.table
+
+;; DT[, !c("V2", "V3")]
+
+(r '(bra ~DT nil (! ["V2" "V3"])))
+;; =>    V1 V4
+;;    1:  1  A
+;;    2:  2  B
+;;    3:  1  C
+;;    4:  2  A
+;;    5:  1  B
+;;    6:  2  C
+;;    7:  1  A
+;;    8:  2  B
+;;    9:  1  C
+
+;; ---- dplyr
+
+;; select(DF, -V2, -V3)
+
+(dpl/select DF '(- V2) '(- V3))
+;; => # A tibble: 9 x 2
+;;         V1 V4   
+;;      <dbl> <chr>
+;;    1     1 A    
+;;    2     2 B    
+;;    3     1 C    
+;;    4     2 A    
+;;    5     1 B    
+;;    6     2 C    
+;;    7     1 A    
+;;    8     2 B    
+;;    9     1 C    
+
+;; ---- tech.ml.dataset
+
+(ds/drop-columns DS [:V2 :V3])
+;; => _unnamed [9 2]:
+;;    | :V1 | :V4 |
+;;    |-----+-----|
+;;    |   1 |   A |
+;;    |   2 |   B |
+;;    |   1 |   C |
+;;    |   2 |   A |
+;;    |   1 |   B |
+;;    |   2 |   C |
+;;    |   1 |   A |
+;;    |   2 |   B |
+;;    |   1 |   C |
+
+;; ### Select/Exclude columns using a character vector
+
+;; ---- data.table
+
+;; cols <- c("V2", "V3")
+;; DT[, ..cols] # .. prefix means 'one-level up'
+;; DT[, !..cols] # or DT[, -..cols]
+
+(def cols (r.base/<- 'cols ["V2" "V3"]))
+
+(r '(bra ~DT nil ..cols))
+;; =>    V2  V3
+;;    1:  1 0.5
+;;    2:  2 1.0
+;;    3:  3 1.5
+;;    4:  4 0.5
+;;    5:  5 1.0
+;;    6:  6 1.5
+;;    7:  7 0.5
+;;    8:  8 1.0
+;;    9:  9 1.5
+
+(r '(bra ~DT nil !..cols))
+;; =>    V1 V4
+;;    1:  1  A
+;;    2:  2  B
+;;    3:  1  C
+;;    4:  2  A
+;;    5:  1  B
+;;    6:  2  C
+;;    7:  1  A
+;;    8:  2  B
+;;    9:  1  C
+
+(r '(bra ~DT nil -..cols))
+;; =>    V1 V4
+;;    1:  1  A
+;;    2:  2  B
+;;    3:  1  C
+;;    4:  2  A
+;;    5:  1  B
+;;    6:  2  C
+;;    7:  1  A
+;;    8:  2  B
+;;    9:  1  C
+
+;; ---- dplyr
+
+;; cols <- c("V2", "V3")
+;; select(DF, !!cols) # unquoting
+;; select(DF, -!!cols)
+
+(def cols (r.base/<- 'cols ["V2" "V3"]))
+
+(dpl/select DF '!!cols)
+;; => # A tibble: 9 x 2
+;;         V2    V3
+;;      <int> <dbl>
+;;    1     1   0.5
+;;    2     2   1  
+;;    3     3   1.5
+;;    4     4   0.5
+;;    5     5   1  
+;;    6     6   1.5
+;;    7     7   0.5
+;;    8     8   1  
+;;    9     9   1.5
+
+(dpl/select DF '-!!cols)
+;; => # A tibble: 9 x 2
+;;         V1 V4   
+;;      <dbl> <chr>
+;;    1     1 A    
+;;    2     2 B    
+;;    3     1 C    
+;;    4     2 A    
+;;    5     1 B    
+;;    6     2 C    
+;;    7     1 A    
+;;    8     2 B    
+;;    9     1 C    
+
+;; ---- tech.ml.dataset
+
+(def cols [:V2 :V3])
+
+(ds/select-columns DS cols)
+;; => _unnamed [9 2]:
+;;    | :V2 |    :V3 |
+;;    |-----+--------|
+;;    |   1 | 0.5000 |
+;;    |   2 |  1.000 |
+;;    |   3 |  1.500 |
+;;    |   4 | 0.5000 |
+;;    |   5 |  1.000 |
+;;    |   6 |  1.500 |
+;;    |   7 | 0.5000 |
+;;    |   8 |  1.000 |
+;;    |   9 |  1.500 |
+
+(ds/drop-columns DS cols)
+;; => _unnamed [9 2]:
+;;    | :V1 | :V4 |
+;;    |-----+-----|
+;;    |   1 |   A |
+;;    |   2 |   B |
+;;    |   1 |   C |
+;;    |   2 |   A |
+;;    |   1 |   B |
+;;    |   2 |   C |
+;;    |   1 |   A |
+;;    |   2 |   B |
+;;    |   1 |   C |
+
+;; ### Other selections
+
+;; ---- data.table
+
+;; cols <- paste0("V", 1:2)
+;; cols <- union("V4", names(DT))
+;; cols <- grep("V",   names(DT))
+;; cols <- grep("3$",  names(DT))
+;; cols <- grep(".2",  names(DT))
+;; cols <- grep("^V1|X$",  names(DT))
+;; cols <- grep("^(?!V2)", names(DT), perl = TRUE)
+;; DT[, ..cols]
+
+(r.base/<- 'cols (r.base/paste0 "V" (r/colon 1 2)))
+;; => [1] "V1" "V2"
+(r '(bra ~DT nil ..cols))
+;; =>    V1 V2
+;;    1:  1  1
+;;    2:  2  2
+;;    3:  1  3
+;;    4:  2  4
+;;    5:  1  5
+;;    6:  2  6
+;;    7:  1  7
+;;    8:  2  8
+;;    9:  1  9
+
+(r.base/<- 'cols (r.base/union "V4" (r.base/names DT)))
+;; => [1] "V4" "V1" "V2" "V3"
+(r '(bra ~DT nil ..cols))
+;; =>    V4 V1 V2  V3
+;;    1:  A  1  1 0.5
+;;    2:  B  2  2 1.0
+;;    3:  C  1  3 1.5
+;;    4:  A  2  4 0.5
+;;    5:  B  1  5 1.0
+;;    6:  C  2  6 1.5
+;;    7:  A  1  7 0.5
+;;    8:  B  2  8 1.0
+;;    9:  C  1  9 1.5
+
+(r.base/<- 'cols (r.base/grep "V" (r.base/names DT)))
+;; => [1] 1 2 3 4
+(r '(bra ~DT nil ..cols))
+;; =>    V1 V2  V3 V4
+;;    1:  1  1 0.5  A
+;;    2:  2  2 1.0  B
+;;    3:  1  3 1.5  C
+;;    4:  2  4 0.5  A
+;;    5:  1  5 1.0  B
+;;    6:  2  6 1.5  C
+;;    7:  1  7 0.5  A
+;;    8:  2  8 1.0  B
+;;    9:  1  9 1.5  C
+
+(r.base/<- 'cols (r.base/grep "3$" (r.base/names DT)))
+;; => [1] 3
+(r '(bra ~DT nil ..cols))
+;; =>     V3
+;;    1: 0.5
+;;    2: 1.0
+;;    3: 1.5
+;;    4: 0.5
+;;    5: 1.0
+;;    6: 1.5
+;;    7: 0.5
+;;    8: 1.0
+;;    9: 1.5
+
+(r.base/<- 'cols (r.base/grep ".2" (r.base/names DT)))
+;; => [1] 2
+(r '(bra ~DT nil ..cols))
+;; =>    V2
+;;    1:  1
+;;    2:  2
+;;    3:  3
+;;    4:  4
+;;    5:  5
+;;    6:  6
+;;    7:  7
+;;    8:  8
+;;    9:  9
+
+(r.base/<- 'cols (r.base/grep "^V1|X$" (r.base/names DT)))
+;; => [1] 1
+(r '(bra ~DT nil ..cols))
+;; =>    V1
+;;    1:  1
+;;    2:  2
+;;    3:  1
+;;    4:  2
+;;    5:  1
+;;    6:  2
+;;    7:  1
+;;    8:  2
+;;    9:  1
+
+(r.base/<- 'cols (r.base/grep "^(?!V2)" (r.base/names DT) :perl true))
+;; => [1] 1 3 4
+(r '(bra ~DT nil ..cols))
+;; =>    V1  V3 V4
+;;    1:  1 0.5  A
+;;    2:  2 1.0  B
+;;    3:  1 1.5  C
+;;    4:  2 0.5  A
+;;    5:  1 1.0  B
+;;    6:  2 1.5  C
+;;    7:  1 0.5  A
+;;    8:  2 1.0  B
+;;    9:  1 1.5  C
+
+;; ---- dplyr
+
+;; select(DF, num_range("V", 1:2))
+;; select(DF, V4, everything()) # reorder columns
+;; select(DF, contains("V"))
+;; select(DF, ends_with("3"))
+;; select(DF, matches(".2"))
+;; select(DF, one_of(c("V1", "X")))
+;; select(DF, -starts_with("V2"))
+
+(dpl/select DF '(num_range "V" (colon 1 2)))
+;; => # A tibble: 9 x 2
+;;         V1    V2
+;;      <dbl> <int>
+;;    1     1     1
+;;    2     2     2
+;;    3     1     3
+;;    4     2     4
+;;    5     1     5
+;;    6     2     6
+;;    7     1     7
+;;    8     2     8
+;;    9     1     9
+
+(dpl/select DF 'V4 '(everything))
+;; => # A tibble: 9 x 4
+;;      V4       V1    V2    V3
+;;      <chr> <dbl> <int> <dbl>
+;;    1 A         1     1   0.5
+;;    2 B         2     2   1  
+;;    3 C         1     3   1.5
+;;    4 A         2     4   0.5
+;;    5 B         1     5   1  
+;;    6 C         2     6   1.5
+;;    7 A         1     7   0.5
+;;    8 B         2     8   1  
+;;    9 C         1     9   1.5
+
+(dpl/select DF '(contains "V"))
+;; => # A tibble: 9 x 4
+;;         V1    V2    V3 V4   
+;;      <dbl> <int> <dbl> <chr>
+;;    1     1     1   0.5 A    
+;;    2     2     2   1   B    
+;;    3     1     3   1.5 C    
+;;    4     2     4   0.5 A    
+;;    5     1     5   1   B    
+;;    6     2     6   1.5 C    
+;;    7     1     7   0.5 A    
+;;    8     2     8   1   B    
+;;    9     1     9   1.5 C
+
+(dpl/select DF '(ends_with "3"))
+;; => # A tibble: 9 x 1
+;;         V3
+;;      <dbl>
+;;    1   0.5
+;;    2   1  
+;;    3   1.5
+;;    4   0.5
+;;    5   1  
+;;    6   1.5
+;;    7   0.5
+;;    8   1  
+;;    9   1.5
+
+(dpl/select DF '(matches ".2"))
+;; => # A tibble: 9 x 1
+;;         V2
+;;      <int>
+;;    1     1
+;;    2     2
+;;    3     3
+;;    4     4
+;;    5     5
+;;    6     6
+;;    7     7
+;;    8     8
+;;    9     9
+
+(dpl/select DF '(one_of ["V1" "X"]))
+;; => # A tibble: 9 x 1
+;;         V1
+;;      <dbl>
+;;    1     1
+;;    2     2
+;;    3     1
+;;    4     2
+;;    5     1
+;;    6     2
+;;    7     1
+;;    8     2
+;;    9     1
+
+(dpl/select DF '(- (starts_with "V2")))
+;; => # A tibble: 9 x 3
+;;         V1    V3 V4   
+;;      <dbl> <dbl> <chr>
+;;    1     1   0.5 A    
+;;    2     2   1   B    
+;;    3     1   1.5 C    
+;;    4     2   0.5 A    
+;;    5     1   1   B    
+;;    6     2   1.5 C    
+;;    7     1   0.5 A    
+;;    8     2   1   B    
+;;    9     1   1.5 C    
+
+;; ---- tech.ml.dataset
+
+;; NOTE: we are using pure Clojure machinery to generate column names
+
+(->> (map (comp keyword str) (repeat "V") (range 1 3))
+     (ds/select-columns DS))
+;; => _unnamed [9 2]:
+;;    | :V1 | :V2 |
+;;    |-----+-----|
+;;    |   1 |   1 |
+;;    |   2 |   2 |
+;;    |   1 |   3 |
+;;    |   2 |   4 |
+;;    |   1 |   5 |
+;;    |   2 |   6 |
+;;    |   1 |   7 |
+;;    |   2 |   8 |
+;;    |   1 |   9 |
+
+(->> (distinct (conj (ds/column-names DS) :V4))
+     (ds/select-columns DS))
+;; => _unnamed [9 4]:
+;;    | :V4 | :V1 | :V2 |    :V3 |
+;;    |-----+-----+-----+--------|
+;;    |   A |   1 |   1 | 0.5000 |
+;;    |   B |   2 |   2 |  1.000 |
+;;    |   C |   1 |   3 |  1.500 |
+;;    |   A |   2 |   4 | 0.5000 |
+;;    |   B |   1 |   5 |  1.000 |
+;;    |   C |   2 |   6 |  1.500 |
+;;    |   A |   1 |   7 | 0.5000 |
+;;    |   B |   2 |   8 |  1.000 |
+;;    |   C |   1 |   9 |  1.500 |
+
+(->> (ds/column-names DS)
+     (filter #(str/starts-with? (name %) "V"))
+     (ds/select-columns DS))
+;; => _unnamed [9 4]:
+;;    | :V1 | :V2 |    :V3 | :V4 |
+;;    |-----+-----+--------+-----|
+;;    |   1 |   1 | 0.5000 |   A |
+;;    |   2 |   2 |  1.000 |   B |
+;;    |   1 |   3 |  1.500 |   C |
+;;    |   2 |   4 | 0.5000 |   A |
+;;    |   1 |   5 |  1.000 |   B |
+;;    |   2 |   6 |  1.500 |   C |
+;;    |   1 |   7 | 0.5000 |   A |
+;;    |   2 |   8 |  1.000 |   B |
+;;    |   1 |   9 |  1.500 |   C |
+
+(->> (ds/column-names DS)
+     (filter #(str/ends-with? (name %) "3"))
+     (ds/select-columns DS))
+;; => _unnamed [9 1]:
+;;    |    :V3 |
+;;    |--------|
+;;    | 0.5000 |
+;;    |  1.000 |
+;;    |  1.500 |
+;;    | 0.5000 |
+;;    |  1.000 |
+;;    |  1.500 |
+;;    | 0.5000 |
+;;    |  1.000 |
+;;    |  1.500 |
+
+(->> (ds/column-names DS)
+     (filter #(re-matches #".2" (name %)))
+     (ds/select-columns DS))
+;; => _unnamed [9 1]:
+;;    | :V2 |
+;;    |-----|
+;;    |   1 |
+;;    |   2 |
+;;    |   3 |
+;;    |   4 |
+;;    |   5 |
+;;    |   6 |
+;;    |   7 |
+;;    |   8 |
+;;    |   9 |
+
+(->> (ds/column-names DS)
+     (filter #{:V1 :X})
+     (ds/select-columns DS))
+;; => _unnamed [9 1]:
+;;    | :V1 |
+;;    |-----|
+;;    |   1 |
+;;    |   2 |
+;;    |   1 |
+;;    |   2 |
+;;    |   1 |
+;;    |   2 |
+;;    |   1 |
+;;    |   2 |
+;;    |   1 |
+
+(->> (ds/column-names DS)
+     (remove #(str/starts-with? (name %) "V2"))
+     (ds/select-columns DS))
+;; => _unnamed [9 3]:
+;;    | :V1 |    :V3 | :V4 |
+;;    |-----+--------+-----|
+;;    |   1 | 0.5000 |   A |
+;;    |   2 |  1.000 |   B |
+;;    |   1 |  1.500 |   C |
+;;    |   2 | 0.5000 |   A |
+;;    |   1 |  1.000 |   B |
+;;    |   2 |  1.500 |   C |
+;;    |   1 | 0.5000 |   A |
+;;    |   2 |  1.000 |   B |
+;;    |   1 |  1.500 |   C |
+
+;; ## Summarise data
+
+;; ### Summarise one column
+
+;; ---- data.table
+
+;; DT[, sum(V1)]    # returns a vector
+;; DT[, .(sum(V1))] # returns a data.table
+;; DT[, .(sumV1 = sum(V1))] # returns a data.table
+
+(r '(bra ~DT nil (sum V1)))
+;; => [1] 13
+
+(r '(bra ~DT nil (. (sum V1))))
+;; =>    V1
+;;    1: 13
+
+(r '(bra ~DT nil (. :sumV1 (sum V1))))
+;; =>    sumV1
+;;    1:    13
+
+;; ---- dplyr
+
+;; summarise(DF, sum(V1)) # returns a tibble
+;; summarise(DF, sumV1 = sum(V1)) # returns a tibble
+
+(dpl/summarise DF '(sum V1))
+;; => # A tibble: 1 x 1
+;;      `sum(V1)`
+;;          <dbl>
+;;    1        13
+
+(dpl/summarise DF :sumV1 '(sum V1))
+;; => # A tibble: 1 x 1
+;;      sumV1
+;;      <dbl>
+;;    1    13
+
+;; ---- tech.ml.dataset
+
+;; NOTE: using optimized datatype function 
+(dfn/sum (DS :V1))
+;; => 13.0
+
+;; NOTE: using reduce
+(reduce + (DS :V1))
+;; => 13
+
+;; NOTE: custom aggregation function to get back dataset (issue filled)
+;; TODO: aggregate->dataset
+(defn aggregate
+  ([agg-fns-map ds]
+   (aggregate {} agg-fns-map ds))
+  ([m agg-fns-map-or-vector ds]
+   (into m (map (fn [[k agg-fn]]
+                  [k (agg-fn ds)]) (if (map? agg-fns-map-or-vector)
+                                     agg-fns-map-or-vector
+                                     (map-indexed vector agg-fns-map-or-vector))))))
+
+(def aggregate->dataset (comp ds/->dataset vector aggregate))
+
+(aggregate->dataset [#(dfn/sum (% :V1))] DS)
+;; => _unnamed [1 1]:
+;;    |     0 |
+;;    |-------|
+;;    | 13.00 |
+
+(aggregate->dataset {:sumV1 #(dfn/sum (% :V1))} DS)
+;; => _unnamed [1 1]:
+;;    | :sumV1 |
+;;    |--------|
+;;    |  13.00 |
+
+;; ### Summarise several columns
+
+;; ---- data.table
+
+;; DT[, .(sum(V1), sd(V3))]
+
+(r '(bra ~DT nil (. (sum V1) (sd V3))))
+;; =>    V1        V2
+;;    1: 13 0.4330127
+
+;; ---- dplyr
+
+;; summarise(DF, sum(V1), sd(V3))
+
+(dpl/summarise DF '(sum V1) '(sd V3))
+;; => # A tibble: 1 x 2
+;;      `sum(V1)` `sd(V3)`
+;;          <dbl>    <dbl>
+;;    1        13    0.433
+
+;; ---- tech.ml.dataset
+
+(aggregate->dataset [#(dfn/sum (% :V1))
+                     #(dfn/standard-deviation (% :V3))] DS)
+;; => _unnamed [1 2]:
+;;    |     0 |      1 |
+;;    |-------+--------|
+;;    | 13.00 | 0.4330 |
+
+;; ### Summarise several columns and assign column names
+
+;; ---- data.table
+
+;; DT[, .(sumv1 = sum(V1),
+;;        sdv3  = sd(V3))]
+
+(r '(bra ~DT nil (. :sumv1 (sum V1) :sdv3 (sd V3))))
+;; =>    sumv1      sdv3
+;;    1:    13 0.4330127
+
+;; ---- dplyr
+
+;; DF %>%
+;;   summarise(sumv1 = sum(V1),
+;;             sdv3  = sd(V3))
+
+(-> DF
+    (dpl/summarise :sumv1 '(sum V1)
+                   :sdv3 '(sd V3)))
+;; => # A tibble: 1 x 2
+;;      sumv1  sdv3
+;;      <dbl> <dbl>
+;;    1    13 0.433
+
+;; ---- tech.ml.dataset
+
+(aggregate->dataset {:sumv1 #(dfn/sum (% :V1))
+                     :sdv3 #(dfn/standard-deviation (% :V3))} DS)
+;; => _unnamed [1 2]:
+;;    | :sumv1 |  :sdv3 |
+;;    |--------+--------|
+;;    |  13.00 | 0.4330 |
+
+;; ### Summarise a subset of rows
+
+;; ---- data.table
+
+;; DT[1:4, sum(V1)]
+
+(r/bra DT (r/colon 1 4) '(sum V1))
+;; => [1] 6
+
+;; ---- dplyr
+
+;; DF %>%
+;;   slice(1:4) %>%
+;;   summarise(sum(V1))
+
+(-> DF
+    (dpl/slice (r/colon 1 4))
+    (dpl/summarise '(sum V1)))
+;; => # A tibble: 1 x 1
+;;      `sum(V1)`
+;;          <dbl>
+;;    1         6
+
+;; ---- tech.ml.dataset
+
+(-> DS
+    (ds/select-rows (range 4))
+    (->> (aggregate->dataset [#(dfn/sum (% :V1))])))
+;; => _unnamed [1 1]:
+;;    |     0 |
+;;    |-------|
+;;    | 6.000 |
+
+;; ### additional
+
+;; ---- data.table
+
+;; DT[, data.table::first(V3)]
+;; DT[, data.table::last(V3)]
+;; DT[5, V3]
+;; DT[, uniqueN(V4)]
+;; uniqueN(DT)
+
+(r '(bra ~DT nil (~(r/rsymbol 'data.table 'first) V3)))
+;; => [1] 0.5
+
+(r '(bra ~DT nil (~(r/rsymbol 'data.table 'last) V3)))
+;; => [1] 1.5
+
+(r/bra DT 5 'V3)
+;; => [1] 1
+
+(r '(bra ~DT nil (uniqueN V4)))
+;; => [1] 3
+
+(dt/uniqueN DT)
+;; => [1] 9
+
+;; ---- dplyr
+
+;; summarise(DF, dplyr::first(V3))
+;; summarise(DF, dplyr::last(V3))
+;; summarise(DF, nth(V3, 5))
+;; summarise(DF, n_distinct(V4))
+;; n_distinct(DF)
+
+(dpl/summarise DF '(~(r/rsymbol 'dplyr 'first) V3))
+;; => # A tibble: 1 x 1
+;;      `.MEM$xbe90f85917d240e2(V3)`
+;;                             <dbl>
+;;    1                          0.5
+
+(dpl/summarise DF '(~(r/rsymbol 'dplyr 'last) V3))
+;; => # A tibble: 1 x 1
+;;      `.MEM$xb424c47d0f6d40d8(V3)`
+;;                             <dbl>
+;;    1                          1.5
+
+(dpl/summarise DF '(nth V3 5))
+;; => # A tibble: 1 x 1
+;;      `nth(V3, 5)`
+;;             <dbl>
+;;    1            1
+
+(dpl/summarise DF '(n_distinct V4))
+;; => # A tibble: 1 x 1
+;;      `n_distinct(V4)`
+;;                 <int>
+;;    1                3
+
+(dpl/n_distinct DF)
+;; => [1] 9
+
+;; ---- tech.ml.dataset
+
+(first (DS :V3))
+;; => 0.5
+
+(last (DS :V3))
+;; => 1.5
+
+(nth (DS :V3) 5)
+;; => 1.5
+
+(count (col/unique (DS :V3)))
+;; => 3
+
+(ds/row-count (ds/unique-by identity DS))
+;; => 9
+
+;;

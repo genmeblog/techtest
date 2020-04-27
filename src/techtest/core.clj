@@ -1,9 +1,7 @@
 (ns techtest.core
   (:require [tech.ml.dataset :as ds]
             [tech.ml.dataset.column :as col]
-            [tech.v2.datatype.functional :as dfn]
-            [clojisr.v1.r :as r :refer [r]]
-            [clojisr.v1.require :refer [require-r]]))
+            [tech.v2.datatype.functional :as dfn]            ))
 
 ;; created with tech.ml.dataset version "2.0-beta-24"
 ;; further versions may simplify some things
@@ -12,6 +10,9 @@
 ;; https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html
 
 ;; # Preparation
+
+(require '[clojisr.v1.r :as r :refer [r]]
+         '[clojisr.v1.require :refer [require-r]])
 
 ;; load R package
 (require-r '[base]
