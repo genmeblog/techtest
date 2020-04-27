@@ -2,6 +2,7 @@
   (:require [tech.ml.dataset :as ds]
             [tech.ml.dataset.column :as col]
             [tech.v2.datatype.functional :as dfn]
+            [tech.v2.datatype :as dtype]
             [fastmath.core :as m]
             [clojure.string :as str]))
 
@@ -244,7 +245,7 @@ DS
 ;;    4:  1  9 1.5  C
 
 ;; TODO (clojisr): add %chin% as binary operation
-(r/bra DT '(~(r/rsymbol "%chin%") V4 ["A" "C"]))
+(r/bra DT '((rsymbol "%chin%") V4 ["A" "C"]))
 ;; =>    V1 V2  V3 V4
 ;;    1:  1  1 0.5  A
 ;;    2:  1  3 1.5  C
@@ -551,8 +552,8 @@ DS
 ;;    |   2 |   6 | 1.500 |   C |
 ;;    |   1 |   9 | 1.500 |   C |
 
-;; note: here we use `fastmath` to calculate rank. There is no `dense` method but `min` makes a work.
-;;       We need to translate rank to indices.
+;; NOTE: Here we use `fastmath` to calculate rank. 
+;;       We need also to translate rank to indices.
 
 (defn filter-by-rank-indices
   [pred rank]
@@ -581,23 +582,23 @@ DS
 ;; DT[data.table::between(V2, 3, 5, incbounds = FALSE)]
 ;; DT[V2 %inrange% list(-1:1, 1:3)] # see also ?inrange
 
-(r/bra DT '(~(r/rsymbol "%like%") V4 "^B"))
+(r/bra DT '((rsymbol "%like%") V4 "^B"))
 ;; =>    V1 V2 V3 V4
 ;;    1:  2  2  1  B
 ;;    2:  1  5  1  B
 ;;    3:  2  8  1  B
 
-(r/bra DT '(~(r/rsymbol "%between%") V2 [3 5]))
+(r/bra DT '((rsymbol "%between%") V2 [3 5]))
 ;; =>    V1 V2  V3 V4
 ;;    1:  1  3 1.5  C
 ;;    2:  2  4 0.5  A
 ;;    3:  1  5 1.0  B
 
-(r/bra DT '(~(r/rsymbol 'data.table 'between) V2 3 5 :incbounds false))
+(r/bra DT '((rsymbol data.table between) V2 3 5 :incbounds false))
 ;; =>    V1 V2  V3 V4
 ;;    1:  2  4 0.5  A
 
-(r/bra DT '(~(r/rsymbol "%inrange%") V2 [:!list (colon -1 1) (colon 1 3)]))
+(r/bra DT '((rsymbol "%inrange%") V2 [:!list (colon -1 1) (colon 1 3)]))
 ;; =>    V1 V2  V3 V4
 ;;    1:  1  1 0.5  A
 ;;    2:  2  2 1.0  B
@@ -618,7 +619,7 @@ DS
 ;;    2     1     5     1 B    
 ;;    3     2     8     1 B
 
-(dpl/filter DF '(~(r/rsymbol 'dplyr 'between) V2 3 5))
+(dpl/filter DF '((rsymbol dplyr between) V2 3 5))
 ;; => # A tibble: 3 x 4
 ;;         V1    V2    V3 V4   
 ;;      <dbl> <int> <dbl> <chr>
@@ -1092,6 +1093,10 @@ DS
 ;; NOTE: column as sequence
 (seq (DS :V2))
 ;; => (1 2 3 4 5 6 7 8 9)
+
+;; NOTE: efficient access to data via reader
+(dtype/->reader (DS :V2))
+;; => [1 2 3 4 5 6 7 8 9]
 
 ;; NOTE: returns column
 (ds/column DS :V2)
@@ -1886,10 +1891,10 @@ DS
 ;; DT[, uniqueN(V4)]
 ;; uniqueN(DT)
 
-(r '(bra ~DT nil (~(r/rsymbol 'data.table 'first) V3)))
+(r '(bra ~DT nil ((rsymbol data.table first) V3)))
 ;; => [1] 0.5
 
-(r '(bra ~DT nil (~(r/rsymbol 'data.table 'last) V3)))
+(r '(bra ~DT nil ((rsymbol data.table last) V3)))
 ;; => [1] 1.5
 
 (r/bra DT 5 'V3)
@@ -1909,17 +1914,17 @@ DS
 ;; summarise(DF, n_distinct(V4))
 ;; n_distinct(DF)
 
-(dpl/summarise DF '(~(r/rsymbol 'dplyr 'first) V3))
+(dpl/summarise DF '((rsymbol dplyr first) V3))
 ;; => # A tibble: 1 x 1
-;;      `.MEM$xbe90f85917d240e2(V3)`
-;;                             <dbl>
-;;    1                          0.5
+;;      `dplyr::first(V3)`
+;;                   <dbl>
+;;    1                0.5
 
-(dpl/summarise DF '(~(r/rsymbol 'dplyr 'last) V3))
+(dpl/summarise DF '((rsymbol dplyr last) V3))
 ;; => # A tibble: 1 x 1
-;;      `.MEM$xb424c47d0f6d40d8(V3)`
-;;                             <dbl>
-;;    1                          1.5
+;;      `dplyr::last(V3)`
+;;                  <dbl>
+;;    1               1.5
 
 (dpl/summarise DF '(nth V3 5))
 ;; => # A tibble: 1 x 1
@@ -1952,5 +1957,328 @@ DS
 
 (ds/row-count (ds/unique-by identity DS))
 ;; => 9
+
+;; ## Add/update/delete columns
+
+;; ### Modify a column
+
+;; ---- data.table
+
+;; DT[, V1 := V1^2]
+;; DT
+
+;; TODO (clojisr): another tricky binary operator
+(r '(bra ~DT nil ((rsymbol ":=") V1 (** V1 2))))
+;; =>    V1 V2  V3 V4
+;;    1:  1  1 0.5  A
+;;    2:  4  2 1.0  B
+;;    3:  1  3 1.5  C
+;;    4:  4  4 0.5  A
+;;    5:  1  5 1.0  B
+;;    6:  4  6 1.5  C
+;;    7:  1  7 0.5  A
+;;    8:  4  8 1.0  B
+;;    9:  1  9 1.5  C
+
+;; ---- dplyr
+
+;; DF <- DF %>% mutate(V1 = V1^2)
+;; DF
+
+(def DF (-> DF (dpl/mutate :V1 '(** V1 2))))
+DF
+;; => # A tibble: 9 x 4
+;;         V1    V2    V3 V4   
+;;      <dbl> <int> <dbl> <chr>
+;;    1     1     1   0.5 A    
+;;    2     4     2   1   B    
+;;    3     1     3   1.5 C    
+;;    4     4     4   0.5 A    
+;;    5     1     5   1   B    
+;;    6     4     6   1.5 C    
+;;    7     1     7   0.5 A    
+;;    8     4     8   1   B    
+;;    9     1     9   1.5 C
+
+;; ---- tech.ml.dataset
+
+(ds/update-column DS :V1 #(map (fn [v] (m/pow v 2)) %))
+;; => _unnamed [9 4]:
+;;    |   :V1 | :V2 |    :V3 | :V4 |
+;;    |-------+-----+--------+-----|
+;;    | 1.000 |   1 | 0.5000 |   A |
+;;    | 4.000 |   2 |  1.000 |   B |
+;;    | 1.000 |   3 |  1.500 |   C |
+;;    | 4.000 |   4 | 0.5000 |   A |
+;;    | 1.000 |   5 |  1.000 |   B |
+;;    | 4.000 |   6 |  1.500 |   C |
+;;    | 1.000 |   7 | 0.5000 |   A |
+;;    | 4.000 |   8 |  1.000 |   B |
+;;    | 1.000 |   9 |  1.500 |   C |
+
+;; NOTE: using reader (optimized)
+(def DS (ds/update-column DS :V1 #(-> (dtype/->reader % :float64)
+                                      (dfn/pow 2))))
+DS
+;; => _unnamed [9 4]:
+;;    |   :V1 | :V2 |    :V3 | :V4 |
+;;    |-------+-----+--------+-----|
+;;    | 1.000 |   1 | 0.5000 |   A |
+;;    | 4.000 |   2 |  1.000 |   B |
+;;    | 1.000 |   3 |  1.500 |   C |
+;;    | 4.000 |   4 | 0.5000 |   A |
+;;    | 1.000 |   5 |  1.000 |   B |
+;;    | 4.000 |   6 |  1.500 |   C |
+;;    | 1.000 |   7 | 0.5000 |   A |
+;;    | 4.000 |   8 |  1.000 |   B |
+;;    | 1.000 |   9 |  1.500 |   C |
+
+;; ### Add one column
+
+;; ---- data.table
+
+;; DT[, v5 := log(V1)][] # adding [] prints the result
+
+(r '(bra (bra ~DT nil ((rsymbol ":=") v5 (log V1)))))
+;; =>    V1 V2  V3 V4       v5
+;;    1:  1  1 0.5  A 0.000000
+;;    2:  4  2 1.0  B 1.386294
+;;    3:  1  3 1.5  C 0.000000
+;;    4:  4  4 0.5  A 1.386294
+;;    5:  1  5 1.0  B 0.000000
+;;    6:  4  6 1.5  C 1.386294
+;;    7:  1  7 0.5  A 0.000000
+;;    8:  4  8 1.0  B 1.386294
+;;    9:  1  9 1.5  C 0.000000
+
+;; ---- dplyr
+
+(def DF (dpl/mutate DF :v5 '(log V1)))
+DF
+;; => # A tibble: 9 x 5
+;;         V1    V2    V3 V4       v5
+;;      <dbl> <int> <dbl> <chr> <dbl>
+;;    1     1     1   0.5 A      0   
+;;    2     4     2   1   B      1.39
+;;    3     1     3   1.5 C      0   
+;;    4     4     4   0.5 A      1.39
+;;    5     1     5   1   B      0   
+;;    6     4     6   1.5 C      1.39
+;;    7     1     7   0.5 A      0   
+;;    8     4     8   1   B      1.39
+;;    9     1     9   1.5 C      0   
+
+;; ---- tech.ml.dataset
+
+(def DS (ds/add-or-update-column DS :v5 (dfn/log (DS :V1))))
+DS
+;; => _unnamed [9 5]:
+;;    |   :V1 | :V2 |    :V3 | :V4 |   :v5 |
+;;    |-------+-----+--------+-----+-------|
+;;    | 1.000 |   1 | 0.5000 |   A | 0.000 |
+;;    | 4.000 |   2 |  1.000 |   B | 1.386 |
+;;    | 1.000 |   3 |  1.500 |   C | 0.000 |
+;;    | 4.000 |   4 | 0.5000 |   A | 1.386 |
+;;    | 1.000 |   5 |  1.000 |   B | 0.000 |
+;;    | 4.000 |   6 |  1.500 |   C | 1.386 |
+;;    | 1.000 |   7 | 0.5000 |   A | 0.000 |
+;;    | 4.000 |   8 |  1.000 |   B | 1.386 |
+;;    | 1.000 |   9 |  1.500 |   C | 0.000 |
+
+;; ### Add several columns
+
+;; ---- data.table
+
+;; DT[, c("v6", "v7") := .(sqrt(V1), "X")]
+;; DT[, ':='(v6 = sqrt(V1),
+;;           v7 = "X")]     # same, functional form
+
+(r '(bra ~DT nil ((rsymbol ":=") ["v6" "v7"] (. (sqrt V1) "X"))))
+;; =>    V1 V2  V3 V4       v5 v6 v7
+;;    1:  1  1 0.5  A 0.000000  1  X
+;;    2:  4  2 1.0  B 1.386294  2  X
+;;    3:  1  3 1.5  C 0.000000  1  X
+;;    4:  4  4 0.5  A 1.386294  2  X
+;;    5:  1  5 1.0  B 0.000000  1  X
+;;    6:  4  6 1.5  C 1.386294  2  X
+;;    7:  1  7 0.5  A 0.000000  1  X
+;;    8:  4  8 1.0  B 1.386294  2  X
+;;    9:  1  9 1.5  C 0.000000  1  X
+
+(r '(bra ~DT nil ((rsymbol ":=") :v6 (sqrt V1) :v7 "X")))
+;; =>    V1 V2  V3 V4       v5 v6 v7
+;;    1:  1  1 0.5  A 0.000000  1  X
+;;    2:  4  2 1.0  B 1.386294  2  X
+;;    3:  1  3 1.5  C 0.000000  1  X
+;;    4:  4  4 0.5  A 1.386294  2  X
+;;    5:  1  5 1.0  B 0.000000  1  X
+;;    6:  4  6 1.5  C 1.386294  2  X
+;;    7:  1  7 0.5  A 0.000000  1  X
+;;    8:  4  8 1.0  B 1.386294  2  X
+;;    9:  1  9 1.5  C 0.000000  1  X
+
+;; ---- dplyr
+
+;; DF <- mutate(DF, v6 = sqrt(V1), v7 = "X")
+
+(def DF (dpl/mutate DF :v6 '(sqrt V1) :v7 "X"))
+DF
+;; => # A tibble: 9 x 7
+;;         V1    V2    V3 V4       v5    v6 v7   
+;;      <dbl> <int> <dbl> <chr> <dbl> <dbl> <chr>
+;;    1     1     1   0.5 A      0        1 X    
+;;    2     4     2   1   B      1.39     2 X    
+;;    3     1     3   1.5 C      0        1 X    
+;;    4     4     4   0.5 A      1.39     2 X    
+;;    5     1     5   1   B      0        1 X    
+;;    6     4     6   1.5 C      1.39     2 X    
+;;    7     1     7   0.5 A      0        1 X    
+;;    8     4     8   1   B      1.39     2 X    
+;;    9     1     9   1.5 C      0        1 X    
+
+;; ---- tech.ml.dataset
+
+(def DS (-> DS
+            (ds/add-or-update-column :v6 (dfn/sqrt (DS :V1)))
+            (ds/add-or-update-column :v7 (take (ds/row-count DS) (repeat "X")))))
+DS
+;; => _unnamed [9 7]:
+;;    |   :V1 | :V2 |    :V3 | :V4 |   :v5 |   :v6 | :v7 |
+;;    |-------+-----+--------+-----+-------+-------+-----|
+;;    | 1.000 |   1 | 0.5000 |   A | 0.000 | 1.000 |   X |
+;;    | 4.000 |   2 |  1.000 |   B | 1.386 | 2.000 |   X |
+;;    | 1.000 |   3 |  1.500 |   C | 0.000 | 1.000 |   X |
+;;    | 4.000 |   4 | 0.5000 |   A | 1.386 | 2.000 |   X |
+;;    | 1.000 |   5 |  1.000 |   B | 0.000 | 1.000 |   X |
+;;    | 4.000 |   6 |  1.500 |   C | 1.386 | 2.000 |   X |
+;;    | 1.000 |   7 | 0.5000 |   A | 0.000 | 1.000 |   X |
+;;    | 4.000 |   8 |  1.000 |   B | 1.386 | 2.000 |   X |
+;;    | 1.000 |   9 |  1.500 |   C | 0.000 | 1.000 |   X |
+
+;; ### Create one column and remove the others
+
+;; ---- data.table
+
+;; DT[, .(v8 = V3 + 1)]
+
+(r '(bra ~DT nil (. :v8 (+ V3 1))))
+;; =>     v8
+;;    1: 1.5
+;;    2: 2.0
+;;    3: 2.5
+;;    4: 1.5
+;;    5: 2.0
+;;    6: 2.5
+;;    7: 1.5
+;;    8: 2.0
+;;    9: 2.5
+
+;; ---- dplyr
+
+;; transmute(DF, v8 = V3 + 1)
+
+(dpl/transmute DF :v8 '(+ V3 1))
+;; => # A tibble: 9 x 1
+;;         v8
+;;      <dbl>
+;;    1   1.5
+;;    2   2  
+;;    3   2.5
+;;    4   1.5
+;;    5   2  
+;;    6   2.5
+;;    7   1.5
+;;    8   2  
+;;    9   2.5
+
+;; ---- tech.ml.dataset
+
+(ds/new-dataset [(col/new-column :v8 (dfn/+ (DS :V3) 1))])
+;; => _unnamed [9 1]:
+;;    |   :v8 |
+;;    |-------|
+;;    | 1.500 |
+;;    | 2.000 |
+;;    | 2.500 |
+;;    | 1.500 |
+;;    | 2.000 |
+;;    | 2.500 |
+;;    | 1.500 |
+;;    | 2.000 |
+;;    | 2.500 |
+
+;; ### Remove one column
+
+;; ---- data.table
+
+;; DT[, v5 := NULL]
+
+(r '(bra ~DT nil ((rsymbol ":=") v5 nil)))
+;; =>    V1 V2  V3 V4 v6 v7
+;;    1:  1  1 0.5  A  1  X
+;;    2:  4  2 1.0  B  2  X
+;;    3:  1  3 1.5  C  1  X
+;;    4:  4  4 0.5  A  2  X
+;;    5:  1  5 1.0  B  1  X
+;;    6:  4  6 1.5  C  2  X
+;;    7:  1  7 0.5  A  1  X
+;;    8:  4  8 1.0  B  2  X
+;;    9:  1  9 1.5  C  1  X
+
+;; ---- dplyr
+
+;; DF <- select(DF, -v5)
+
+(def DF (dpl/select DF '(- v5)))
+DF
+;; => # A tibble: 9 x 6
+;;         V1    V2    V3 V4       v6 v7   
+;;      <dbl> <int> <dbl> <chr> <dbl> <chr>
+;;    1     1     1   0.5 A         1 X    
+;;    2     4     2   1   B         2 X    
+;;    3     1     3   1.5 C         1 X    
+;;    4     4     4   0.5 A         2 X    
+;;    5     1     5   1   B         1 X    
+;;    6     4     6   1.5 C         2 X    
+;;    7     1     7   0.5 A         1 X    
+;;    8     4     8   1   B         2 X    
+;;    9     1     9   1.5 C         1 X
+
+;; ---- tech.ml.dataset
+
+(def DS (ds/remove-column DS :v5))
+DS
+;; => _unnamed [9 6]:
+;;    |   :V1 | :V2 |    :V3 | :V4 |   :v6 | :v7 |
+;;    |-------+-----+--------+-----+-------+-----|
+;;    | 1.000 |   1 | 0.5000 |   A | 1.000 |   X |
+;;    | 4.000 |   2 |  1.000 |   B | 2.000 |   X |
+;;    | 1.000 |   3 |  1.500 |   C | 1.000 |   X |
+;;    | 4.000 |   4 | 0.5000 |   A | 2.000 |   X |
+;;    | 1.000 |   5 |  1.000 |   B | 1.000 |   X |
+;;    | 4.000 |   6 |  1.500 |   C | 2.000 |   X |
+;;    | 1.000 |   7 | 0.5000 |   A | 1.000 |   X |
+;;    | 4.000 |   8 |  1.000 |   B | 2.000 |   X |
+;;    | 1.000 |   9 |  1.500 |   C | 1.000 |   X |
+
+;; ### Remove several columns
+
+;; ---- data.table
+
+;; DT[, c("v6", "v7") := NULL]
+
+(r '(bra ~DT nil ((rsymbol ":=") ["v6" "v7"] nil)))
+;; =>    V1 V2  V3 V4
+;;    1:  1  1 0.5  A
+;;    2:  4  2 1.0  B
+;;    3:  1  3 1.5  C
+;;    4:  4  4 0.5  A
+;;    5:  1  5 1.0  B
+;;    6:  4  6 1.5  C
+;;    7:  1  7 0.5  A
+;;    8:  4  8 1.0  B
+;;    9:  1  9 1.5  C
+
+;; ---- dplyr
 
 ;;
