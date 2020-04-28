@@ -32,6 +32,54 @@
 (r.base/options :width 160)
 (r.base/set-seed 1)
 
+;; HELPER functions
+
+(defn aggregate
+  ([agg-fns-map ds]
+   (aggregate {} agg-fns-map ds))
+  ([m agg-fns-map-or-vector ds]
+   (into m (map (fn [[k agg-fn]]
+                  [k (agg-fn ds)]) (if (map? agg-fns-map-or-vector)
+                                     agg-fns-map-or-vector
+                                     (map-indexed vector agg-fns-map-or-vector))))))
+
+(def aggregate->dataset (comp ds/->dataset vector aggregate))
+
+(defn group-by-columns-or-fn-and-aggregate
+  [key-fn-or-gr-colls agg-fns-map ds]
+  (->> (if (fn? key-fn-or-gr-colls)
+         (ds/group-by key-fn-or-gr-colls ds)
+         (ds/group-by identity ds key-fn-or-gr-colls))
+       (map (fn [[group-idx group-ds]]
+              (let [group-idx-m (if (map? group-idx)
+                                  group-idx
+                                  {:_fn group-idx})]
+                (aggregate group-idx-m agg-fns-map group-ds))))
+       ds/->dataset))
+
+(defn asc-desc-comparator
+  [orders]
+  (if (every? #(= % :asc) orders)
+    compare
+    (let [mults (map #(if (= % :asc) 1 -1) orders)]
+      (fn [v1 v2]
+        (reduce (fn [_ [a b ^long mult]]
+                  (let [c (compare a b)]
+                    (if-not (zero? c)
+                      (reduced (* mult c))
+                      c))) 0 (map vector v1 v2 mults))))))
+
+(defn sort-by-columns-with-orders
+  ([cols ds]
+   (sort-by-columns-with-orders cols (repeat (count cols) :asc) ds))
+  ([cols orders ds]
+   (let [sel (apply juxt (map #(fn [ds] (get ds %)) cols))
+         comp-fn (asc-desc-comparator orders)]
+     (ds/sort-by sel comp-fn ds))))
+
+(defn map-v [f coll]
+  (reduce-kv (fn [m k v] (assoc m k (f v))) (empty coll) coll))
+
 ;; # Create example data
 
 ;; ---- data.table
@@ -281,7 +329,7 @@ DS
 
 ;; ---- tech.ml.dataset
 
-(ds/filter-column #(> % 5) :V2 DS)
+(ds/filter-column #(> ^long % 5) :V2 DS)
 ;; => _unnamed [4 4]:
 ;;    | :V1 | :V2 |    :V3 | :V4 |
 ;;    |-----+-----+--------+-----|
@@ -563,7 +611,7 @@ DS
        (map first)))
 
 (->> (m/rank (map - (DS :V1)) :dense)
-     (filter-by-rank-indices #(< % 1))
+     (filter-by-rank-indices #(< ^long % 1))
      (ds/select-rows DS))
 ;; => _unnamed [4 4]:
 ;;    | :V1 | :V2 |    :V3 | :V4 |
@@ -852,26 +900,6 @@ DS
 ;; ---- tech.ml.dataset
 
 ;; TODO: improve sorting in general
-(defn asc-desc-comparator
-  [orders]
-  (if (every? #(= % :asc) orders)
-    compare
-    (let [mults (map #(if (= % :asc) 1 -1) orders)]
-      (fn [v1 v2]
-        (reduce (fn [_ [a b mult]]
-                  (let [c (compare a b)]
-                    (if-not (zero? c)
-                      (reduced (* mult c))
-                      c))) 0 (map vector v1 v2 mults))))))
-
-(defn sort-by-columns-with-orders
-  ([cols ds]
-   (sort-by-columns-with-orders cols (repeat (count cols) :asc) ds))
-  ([cols orders ds]
-   (let [sel (apply juxt (map #(fn [ds] (get ds %)) cols))
-         comp-fn (asc-desc-comparator orders)]
-     (ds/sort-by sel comp-fn ds))))
-
 (sort-by-columns-with-orders [:V1 :V2] [:asc :desc] DS)
 ;; => _unnamed [9 4]:
 ;;    | :V1 | :V2 |    :V3 | :V4 |
@@ -1762,17 +1790,6 @@ DS
 
 ;; NOTE: custom aggregation function to get back dataset (issue filled)
 ;; TODO: aggregate->dataset
-(defn aggregate
-  ([agg-fns-map ds]
-   (aggregate {} agg-fns-map ds))
-  ([m agg-fns-map-or-vector ds]
-   (into m (map (fn [[k agg-fn]]
-                  [k (agg-fn ds)]) (if (map? agg-fns-map-or-vector)
-                                     agg-fns-map-or-vector
-                                     (map-indexed vector agg-fns-map-or-vector))))))
-
-(def aggregate->dataset (comp ds/->dataset vector aggregate))
-
 (aggregate->dataset [#(dfn/sum (% :V1))] DS)
 ;; => _unnamed [1 1]:
 ;;    |     0 |
@@ -2281,4 +2298,487 @@ DS
 
 ;; ---- dplyr
 
-;;
+;; DF <- select(DF, -v6, -v7)
+
+(def DF (dpl/select DF '(- v6) '(- v7)))
+DF
+;; => # A tibble: 9 x 4
+;;         V1    V2    V3 V4   
+;;      <dbl> <int> <dbl> <chr>
+;;    1     1     1   0.5 A    
+;;    2     4     2   1   B    
+;;    3     1     3   1.5 C    
+;;    4     4     4   0.5 A    
+;;    5     1     5   1   B    
+;;    6     4     6   1.5 C    
+;;    7     1     7   0.5 A    
+;;    8     4     8   1   B    
+;;    9     1     9   1.5 C
+
+;; ---- tech.ml.dataset
+
+(def DS (ds/drop-columns DS '[:v6 :v7]))
+DS
+;; => _unnamed [9 4]:
+;;    |   :V1 | :V2 |    :V3 | :V4 |
+;;    |-------+-----+--------+-----|
+;;    | 1.000 |   1 | 0.5000 |   A |
+;;    | 4.000 |   2 |  1.000 |   B |
+;;    | 1.000 |   3 |  1.500 |   C |
+;;    | 4.000 |   4 | 0.5000 |   A |
+;;    | 1.000 |   5 |  1.000 |   B |
+;;    | 4.000 |   6 |  1.500 |   C |
+;;    | 1.000 |   7 | 0.5000 |   A |
+;;    | 4.000 |   8 |  1.000 |   B |
+;;    | 1.000 |   9 |  1.500 |   C |
+
+;; ### Remove columns using a vector of colnames
+
+;; ---- data.table
+
+;; cols <- c("V3")
+;; DT[, (cols) := NULL] # ! not DT[, cols := NULL]
+
+(def cols (r.base/<- 'cols ["V3"]))
+;; TODO (clojisr): enable wrapping into parantheses
+;; hacking below
+(r (str (:object-name DT) "[, (cols) := NULL]"))
+;; =>    V1 V2 V4
+;;    1:  1  1  A
+;;    2:  4  2  B
+;;    3:  1  3  C
+;;    4:  4  4  A
+;;    5:  1  5  B
+;;    6:  4  6  C
+;;    7:  1  7  A
+;;    8:  4  8  B
+;;    9:  1  9  C
+
+;; ---- dplyr
+
+;; cols <- c("V3")
+;; DF <- select(DF, -one_of(cols))
+
+(def cols ["V3"])
+(def DF (dpl/select DF '(- (one_of ~cols))))
+DF
+;; => # A tibble: 9 x 3
+;;         V1    V2 V4   
+;;      <dbl> <int> <chr>
+;;    1     1     1 A    
+;;    2     4     2 B    
+;;    3     1     3 C    
+;;    4     4     4 A    
+;;    5     1     5 B    
+;;    6     4     6 C    
+;;    7     1     7 A    
+;;    8     4     8 B    
+;;    9     1     9 C    
+
+;; ---- tech.ml.dataset
+
+(def cols [:V3])
+(def DS (ds/drop-columns DS cols))
+DS
+;; => _unnamed [9 3]:
+;;    |   :V1 | :V2 | :V4 |
+;;    |-------+-----+-----|
+;;    | 1.000 |   1 |   A |
+;;    | 4.000 |   2 |   B |
+;;    | 1.000 |   3 |   C |
+;;    | 4.000 |   4 |   A |
+;;    | 1.000 |   5 |   B |
+;;    | 4.000 |   6 |   C |
+;;    | 1.000 |   7 |   A |
+;;    | 4.000 |   8 |   B |
+;;    | 1.000 |   9 |   C |
+
+;; ### Replace values for rows matching a condition
+
+;; ---- data.table
+
+;; DT[V2 < 4, V2 := 0L]
+
+(r/bra DT '(< V2 4) '((rsymbol ":=") V2 0))
+;; =>    V1 V2 V4
+;;    1:  1  0  A
+;;    2:  4  0  B
+;;    3:  1  0  C
+;;    4:  4  4  A
+;;    5:  1  5  B
+;;    6:  4  6  C
+;;    7:  1  7  A
+;;    8:  4  8  B
+;;    9:  1  9  C
+
+;; ---- dplyr
+
+;; DF <- mutate(DF, V2 = base::replace(V2, V2 < 4, 0L))
+
+(def DF (dpl/mutate DF '(= V2 ((rsymbol base replace) V2 (< V2 4) 0))))
+DF
+;; => # A tibble: 9 x 3
+;;         V1    V2 V4   
+;;      <dbl> <dbl> <chr>
+;;    1     1     0 A    
+;;    2     4     0 B    
+;;    3     1     0 C    
+;;    4     4     4 A    
+;;    5     1     5 B    
+;;    6     4     6 C    
+;;    7     1     7 A    
+;;    8     4     8 B    
+;;    9     1     9 C
+
+;; tech.ml.dataset
+
+(def DS (ds/update-column DS :V2 #(map (fn [^long v]
+                                         (if (< v 4) 0 v)) %)))
+DS
+;; => _unnamed [9 3]:
+;;    |   :V1 |   :V2 | :V4 |
+;;    |-------+-------+-----|
+;;    | 1.000 | 0.000 |   A |
+;;    | 4.000 | 0.000 |   B |
+;;    | 1.000 | 0.000 |   C |
+;;    | 4.000 | 4.000 |   A |
+;;    | 1.000 | 5.000 |   B |
+;;    | 4.000 | 6.000 |   C |
+;;    | 1.000 | 7.000 |   A |
+;;    | 4.000 | 8.000 |   B |
+;;    | 1.000 | 9.000 |   C |
+
+;; ## by
+
+;; ### By group
+
+;; ---- data.table
+
+;; # one-liner:
+;; DT[, .(sumV2 = sum(V2)), by = "V4"]
+;; # reordered and indented:
+;; DT[, by = V4,
+;;    .(sumV2 = sum(V2))]
+
+(r '(bra ~DT nil (. :sumV2 (sum V2)) :by "V4"))
+;; =>    V4 sumV2
+;;    1:  A    11
+;;    2:  B    13
+;;    3:  C    15
+
+(r '(bra ~DT nil :by "V4" (. :sumV2 (sum V2))))
+;; =>    V4 sumV2
+;;    1:  A    11
+;;    2:  B    13
+;;    3:  C    15
+
+;; ---- dplyr
+
+;; DF %>%
+;;    group_by(V4) %>%
+;;    summarise(sumV2 = sum(V2))
+
+(-> DF
+    (dpl/group_by 'V4)
+    (dpl/summarise :sumV2 '(sum V2)))
+;; => # A tibble: 3 x 2
+;;      V4    sumV2
+;;      <chr> <dbl>
+;;    1 A        11
+;;    2 B        13
+;;    3 C        15
+
+;; ---- tech.ml.dataset
+
+;; TODO: group-by and aggragete -> dataset
+(group-by-columns-or-fn-and-aggregate [:V4] {:sumV2 #(dfn/sum (% :V2))} DS)
+;; => _unnamed [3 2]:
+;;    | :V4 | :sumV2 |
+;;    |-----+--------|
+;;    |   B |  13.00 |
+;;    |   C |  15.00 |
+;;    |   A |  11.00 |
+
+;; ### By several groups
+
+;; ---- data.table
+
+;; DT[, keyby = .(V4, V1),
+;;    .(sumV2 = sum(V2))]
+
+(r '(bra ~DT nil :keyby (. V4 V1) (. :sumV2 (sum V2))))
+;; =>    V4 V1 sumV2
+;;    1:  A  1     7
+;;    2:  A  4     4
+;;    3:  B  1     5
+;;    4:  B  4     8
+;;    5:  C  1     9
+;;    6:  C  4     6
+
+;; ---- dplyr
+
+;; DF %>%
+;;   group_by(V4, V1) %>%
+;;   summarise(sumV2 = sum(V2))
+
+(-> DF
+    (dpl/group_by 'V4 'V1)
+    (dpl/summarise :sumV2 '(sum V2)))
+;; => # A tibble: 6 x 3
+;;    # Groups:   V4 [3]
+;;      V4       V1 sumV2
+;;      <chr> <dbl> <dbl>
+;;    1 A         1     7
+;;    2 A         4     4
+;;    3 B         1     5
+;;    4 B         4     8
+;;    5 C         1     9
+;;    6 C         4     6
+
+;; ---- tech.ml.dataset
+
+(->> (group-by-columns-or-fn-and-aggregate [:V4 :V1] {:sumV2 #(dfn/sum (% :V2))} DS)
+     (sort-by-columns-with-orders [:V4 :V1]))
+;; => _unnamed [6 3]:
+;;    | :V4 |   :V1 | :sumV2 |
+;;    |-----+-------+--------|
+;;    |   A | 1.000 |  7.000 |
+;;    |   A | 4.000 |  4.000 |
+;;    |   B | 1.000 |  5.000 |
+;;    |   B | 4.000 |  8.000 |
+;;    |   C | 1.000 |  9.000 |
+;;    |   C | 4.000 |  6.000 |
+
+;; ### Calling function in by
+
+;; ---- data.table
+
+;; DT[, by = tolower(V4),
+;;   .(sumV1 = sum(V1))]
+
+(r '(bra ~DT nil :by (tolower V4) (. :sumV1 (sum V1))))
+;; =>    tolower sumV1
+;;    1:       a     6
+;;    2:       b     9
+;;    3:       c     6
+
+;; ---- dplyr
+
+;; DF %>%
+;;   group_by(tolower(V4)) %>%
+;;   summarise(sumV1 = sum(V1))
+
+(-> DF
+    (dpl/group_by '(tolower V4))
+    (dpl/summarise :sumV1 '(sum V1)))
+;; => # A tibble: 3 x 2
+;;      `tolower(V4)` sumV1
+;;      <chr>         <dbl>
+;;    1 a                 6
+;;    2 b                 9
+;;    3 c                 6
+
+;; ---- tech.ml.dataset
+
+(->> (ds/update-column DS :V4 #(map str/lower-case %))
+     (group-by-columns-or-fn-and-aggregate [:V4] {:sumV1 #(dfn/sum (% :V1))})
+     (ds/sort-by-column :V4))
+;; => _unnamed [3 2]:
+;;    | :V4 | :sumV1 |
+;;    |-----+--------|
+;;    |   a |  6.000 |
+;;    |   b |  9.000 |
+;;    |   c |  6.000 |
+
+;; ### Assigning column name in by
+
+;; ---- data.table
+
+;; DT[, keyby = .(abc = tolower(V4)),
+;; .(sumV1 = sum(V1))]
+
+(r '(bra ~DT nil :keyby (. :abc (tolower V4)) (. :sumV1 (sum V1))))
+;; =>    abc sumV1
+;;    1:   a     6
+;;    2:   b     9
+;;    3:   c     6
+
+;; ---- dplyr
+
+;; DF %>%
+;;   group_by(abc = tolower(V4)) %>%
+;;   summarise(sumV1 = sum(V1))
+
+(-> DF
+    (dpl/group_by :abc '(tolower V4))
+    (dpl/summarise :sumV1 '(sum V1)))
+;; => # A tibble: 3 x 2
+;;      abc   sumV1
+;;      <chr> <dbl>
+;;    1 a         6
+;;    2 b         9
+;;    3 c         6
+
+;; ---- tech.ml.dataset
+
+(-> (ds/update-column DS :V4 #(map str/lower-case %))
+    (ds/rename-columns {:V4 :abc})
+    (->> (group-by-columns-or-fn-and-aggregate [:abc] {:sumV1 #(dfn/sum (% :V1))})
+         (ds/sort-by-column :abc)))
+;; => _unnamed [3 2]:
+;;    | :abc | :sumV1 |
+;;    |------+--------|
+;;    |    a |  6.000 |
+;;    |    b |  9.000 |
+;;    |    c |  6.000 |
+
+;; ### Using a condition in by
+
+;; ---- data.table
+
+;; DT[, keyby = V4 == "A", sum(V1)]
+
+(r '(bra ~DT nil :keyby (== V4 "A") (sum V1)))
+;; =>       V4 V1
+;;    1: FALSE 15
+;;    2:  TRUE  6
+
+;; ---- dplyr
+
+;; DF %>%
+;;   group_by(V4 == "A") %>%
+;;   summarise(sum(V1))
+
+(-> DF
+    (dpl/group_by '(== V4 "A"))
+    (dpl/summarise '(sum V1)))
+;; => # A tibble: 2 x 2
+;;      `(V4 == "A")` `sum(V1)`
+;;      <lgl>             <dbl>
+;;    1 FALSE                15
+;;    2 TRUE                  6
+
+;; ---- tech.ml.dataset
+
+(group-by-columns-or-fn-and-aggregate #(= (% :V4) \A)
+                                      {:sumV1 #(dfn/sum (% :V1))}
+                                      DS)
+;; => _unnamed [2 2]:
+;;    |  :_fn | :sumV1 |
+;;    |-------+--------|
+;;    | false |  15.00 |
+;;    |  true |  6.000 |
+
+;; ### By on a subset of rows
+
+;; ---- data.table
+
+;; DT[1:5,                # i
+;;    .(sumV1 = sum(V1)), # j
+;;    by = V4]            # by
+;; ## complete DT[i, j, by] expression!
+
+(r/bra DT (r/colon 1 5) '(. :sumV1 (sum V1)) :by 'V4)
+;; =>    V4 sumV1
+;;    1:  A     5
+;;    2:  B     5
+;;    3:  C     1
+
+;; ---- dplyr
+
+;; DF %>%
+;;   slice(1:5) %>%
+;;   group_by(V4) %>%
+;;   summarise(sumV1 = sum(V1))
+
+(-> DF
+    (dpl/slice (r/colon 1 5))
+    (dpl/group_by 'V4)
+    (dpl/summarise :sumV1 '(sum V1)))
+;; => # A tibble: 3 x 2
+;;      V4    sumV1
+;;      <chr> <dbl>
+;;    1 A         5
+;;    2 B         5
+;;    3 C         1
+
+;; ---- tech.ml.dataset
+
+(->> (ds/select-rows DS (range 5))
+     (group-by-columns-or-fn-and-aggregate [:V4] {:sumV1 #(dfn/sum (% :V1))})
+     (ds/sort-by-column :V4))
+;; => _unnamed [3 2]:
+;;    | :V4 | :sumV1 |
+;;    |-----+--------|
+;;    |   A |  5.000 |
+;;    |   B |  5.000 |
+;;    |   C |  1.000 |
+
+;; ### Count number of observations for each group
+
+;; ---- data.table
+
+;; DT[, .N, by = V4]
+
+(r '(bra ~DT nil .N :by V4))
+;; =>    V4 N
+;;    1:  A 3
+;;    2:  B 3
+;;    3:  C 3
+
+;; ---- dplyr
+
+;; count(DF, V4)
+;; DF %>%
+;;   group_by(V4) %>%
+;;   tally()
+;; DF %>%
+;;   group_by(V4) %>%
+;;   summarise(n())
+;; DF %>%
+;;   group_by(V4) %>%
+;;   group_size() # returns a vector
+
+(dpl/count DF 'V4)
+;; => # A tibble: 3 x 2
+;;      V4        n
+;;      <chr> <int>
+;;    1 A         3
+;;    2 B         3
+;;    3 C         3
+
+(-> DF (dpl/group_by 'V4) (dpl/tally))
+;; => # A tibble: 3 x 2
+;;      V4        n
+;;      <chr> <int>
+;;    1 A         3
+;;    2 B         3
+;;    3 C         3
+
+(-> DF (dpl/group_by 'V4) (dpl/summarise '(n)))
+;; => # A tibble: 3 x 2
+;;      V4    `n()`
+;;      <chr> <int>
+;;    1 A         3
+;;    2 B         3
+;;    3 C         3
+
+(-> DF (dpl/group_by 'V4) (dpl/group_size))
+;; => [1] 3 3 3
+
+;; ---- tech.ml.dataset
+
+(group-by-columns-or-fn-and-aggregate [:V4] {:N ds/row-count} DS)
+;; => _unnamed [3 2]:
+;;    | :V4 | :N |
+;;    |-----+----|
+;;    |   B |  3 |
+;;    |   C |  3 |
+;;    |   A |  3 |
+
+(map-v ds/row-count (ds/group-by-column :V4 DS))
+;; => {\A 3, \B 3, \C 3}
+
+(->> (vals (ds/group-by-column :V4 DS))
+     (map ds/row-count))
+;; => (3 3 3)
