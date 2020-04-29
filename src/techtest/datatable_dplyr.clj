@@ -2782,3 +2782,190 @@ DS
 (->> (vals (ds/group-by-column :V4 DS))
      (map ds/row-count))
 ;; => (3 3 3)
+
+;; ### Add a column with number of observations for each group
+
+;; ---- data.table
+
+;; DT[, n := .N, by = V1][]
+;; DT[, n := NULL] # rm column for consistency
+
+(r '(bra ~DT nil ((rsymbol ":=") n .N) :by V1))
+;; =>    V1 V2 V4 n
+;;    1:  1  0  A 5
+;;    2:  4  0  B 4
+;;    3:  1  0  C 5
+;;    4:  4  4  A 4
+;;    5:  1  5  B 5
+;;    6:  4  6  C 4
+;;    7:  1  7  A 5
+;;    8:  4  8  B 4
+;;    9:  1  9  C 5
+
+;; cleaning
+(r '(bra ~DT nil ((rsymbol ":=") n nil)))
+;; =>    V1 V2 V4
+;;    1:  1  0  A
+;;    2:  4  0  B
+;;    3:  1  0  C
+;;    4:  4  4  A
+;;    5:  1  5  B
+;;    6:  4  6  C
+;;    7:  1  7  A
+;;    8:  4  8  B
+;;    9:  1  9  C
+
+;; ---- dplyr
+
+;; add_count(DF, V1)
+;; DF %>%
+;;   group_by(V1) %>%
+;;   add_tally()
+
+(dpl/add_count DF 'V1)
+;; => # A tibble: 9 x 4
+;;         V1    V2 V4        n
+;;      <dbl> <dbl> <chr> <int>
+;;    1     1     0 A         5
+;;    2     4     0 B         4
+;;    3     1     0 C         5
+;;    4     4     4 A         4
+;;    5     1     5 B         5
+;;    6     4     6 C         4
+;;    7     1     7 A         5
+;;    8     4     8 B         4
+;;    9     1     9 C         5
+
+(-> DF
+    (dpl/group_by 'V1)
+    (dpl/add_tally))
+;; => # A tibble: 9 x 4
+;;    # Groups:   V1 [2]
+;;         V1    V2 V4        n
+;;      <dbl> <dbl> <chr> <int>
+;;    1     1     0 A         5
+;;    2     4     0 B         4
+;;    3     1     0 C         5
+;;    4     4     4 A         4
+;;    5     1     5 B         5
+;;    6     4     6 C         4
+;;    7     1     7 A         5
+;;    8     4     8 B         4
+;;    9     1     9 C         5
+
+;; ---- tech.ml.dataset
+
+;; TODO: how to do this optimally and keep order?
+(->> (ds/group-by identity DS [:V1])
+     (vals)
+     (map (fn [ds]
+            (let [rcnt (ds/row-count ds)]
+              (ds/new-column ds :n (repeat rcnt rcnt)))))
+     (apply ds/concat)
+     (sort-by-columns-with-orders [:V2 :V4]))
+;; => _unnamed [9 4]:
+;;    |   :V1 |   :V2 | :V4 |    :n |
+;;    |-------+-------+-----+-------|
+;;    | 1.000 | 0.000 |   A | 5.000 |
+;;    | 4.000 | 0.000 |   B | 4.000 |
+;;    | 1.000 | 0.000 |   C | 5.000 |
+;;    | 4.000 | 4.000 |   A | 4.000 |
+;;    | 1.000 | 5.000 |   B | 5.000 |
+;;    | 4.000 | 6.000 |   C | 4.000 |
+;;    | 1.000 | 7.000 |   A | 5.000 |
+;;    | 4.000 | 8.000 |   B | 4.000 |
+;;    | 1.000 | 9.000 |   C | 5.000 |
+
+;; ### Retrieve the first/last/nth observation for each group
+
+;; ---- data.table
+
+;; DT[, data.table::first(V2), by = V4]
+;; DT[, data.table::last(V2), by = V4]
+;; DT[, V2[2], by = V4]
+
+(r '(bra ~DT nil ((rsymbol data.table first) V2) :by V4))
+;; =>    V4 V1
+;;    1:  A  0
+;;    2:  B  0
+;;    3:  C  0
+
+(r '(bra ~DT nil ((rsymbol data.table last) V2) :by V4))
+;; =>    V4 V1
+;;    1:  A  7
+;;    2:  B  8
+;;    3:  C  9
+
+(r '(bra ~DT nil (bra V2 2) :by V4))
+;; =>    V4 V1
+;;    1:  A  4
+;;    2:  B  5
+;;    3:  C  6
+
+;; ---- dplyr
+
+;; DF %>%
+;;   group_by(V4) %>%
+;;   summarise(dplyr::first(V2))
+;; DF %>%
+;;   group_by(V4) %>%
+;;   summarise(dplyr::last(V2))
+;; DF %>%
+;;   group_by(V4) %>%
+;;   summarise(dplyr::nth(V2, 2))
+
+(-> DF (dpl/group_by 'V4) (dpl/summarise '((rsymbol dplyr first) V2)))
+;; => # A tibble: 3 x 2
+;;      V4    `dplyr::first(V2)`
+;;      <chr>              <dbl>
+;;    1 A                      0
+;;    2 B                      0
+;;    3 C                      0
+
+(-> DF (dpl/group_by 'V4) (dpl/summarise '((rsymbol dplyr last) V2)))
+;; => # A tibble: 3 x 2
+;;      V4    `dplyr::last(V2)`
+;;      <chr>             <dbl>
+;;    1 A                     7
+;;    2 B                     8
+;;    3 C                     9
+
+(-> DF (dpl/group_by 'V4) (dpl/summarise '((rsymbol dplyr nth) V2 2)))
+;; => # A tibble: 3 x 2
+;;      V4    `dplyr::nth(V2, 2)`
+;;      <chr>               <dbl>
+;;    1 A                       4
+;;    2 B                       5
+;;    3 C                       6
+
+;; ---- tech.ml.dataset
+
+(->> (group-by-columns-or-fn-and-aggregate [:V4] {:v #(first (% :V2))} DS)
+     (ds/sort-by-column :V4))
+;; => _unnamed [3 2]:
+;;    | :V4 |    :v |
+;;    |-----+-------|
+;;    |   A | 0.000 |
+;;    |   B | 0.000 |
+;;    |   C | 0.000 |
+
+(->> (group-by-columns-or-fn-and-aggregate [:V4] {:v #(last (% :V2))} DS)
+     (ds/sort-by-column :V4))
+;; => _unnamed [3 2]:
+;;    | :V4 |    :v |
+;;    |-----+-------|
+;;    |   A | 7.000 |
+;;    |   B | 8.000 |
+;;    |   C | 9.000 |
+
+(->> (group-by-columns-or-fn-and-aggregate [:V4] {:v #(nth (% :V2) 1)} DS)
+     (ds/sort-by-column :V4))
+;; => _unnamed [3 2]:
+;;    | :V4 |    :v |
+;;    |-----+-------|
+;;    |   A | 4.000 |
+;;    |   B | 5.000 |
+;;    |   C | 6.000 |
+
+
+;; -------------------------------
