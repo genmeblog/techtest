@@ -80,6 +80,13 @@
 (defn map-v [f coll]
   (reduce-kv (fn [m k v] (assoc m k (f v))) (empty coll) coll))
 
+(defn filter-by-external-values->indices
+  [pred values]
+  (->> values
+       (map-indexed vector)
+       (filter (comp pred second))
+       (map first)))
+
 ;; # Create example data
 
 ;; ---- data.table
@@ -603,15 +610,8 @@ DS
 ;; NOTE: Here we use `fastmath` to calculate rank. 
 ;;       We need also to translate rank to indices.
 
-(defn filter-by-rank-indices
-  [pred rank]
-  (->> rank
-       (map-indexed vector)
-       (filter (comp pred second))
-       (map first)))
-
 (->> (m/rank (map - (DS :V1)) :dense)
-     (filter-by-rank-indices #(< ^long % 1))
+     (filter-by-external-values->indices #(< ^long % 1))
      (ds/select-rows DS))
 ;; => _unnamed [4 4]:
 ;;    | :V1 | :V2 |    :V3 | :V4 |
@@ -2317,7 +2317,7 @@ DF
 
 ;; ---- tech.ml.dataset
 
-(def DS (ds/drop-columns DS '[:v6 :v7]))
+(def DS (ds/drop-columns DS [:v6 :v7]))
 DS
 ;; => _unnamed [9 4]:
 ;;    |   :V1 | :V2 |    :V3 | :V4 |
