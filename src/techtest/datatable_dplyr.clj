@@ -87,6 +87,24 @@
        (filter (comp pred second))
        (map first)))
 
+(defn my-max [xs] (reduce #(if (pos? (compare %1 %2)) %1 %2) xs))
+(defn my-min [xs] (reduce #(if (pos? (compare %2 %1)) %1 %2) xs))
+
+(defn- ensure-seq
+  [v]
+  (if (seqable? v) v [v]))
+
+(defn apply-to-columns
+  [f columns ds]
+  (let [columns (if (= :all columns)
+                  (ds/column-names ds)
+                  columns)]
+    (->> columns
+         (map (comp ensure-seq f ds))
+         (zipmap columns)
+         (ds/name-values-seq->dataset))))
+
+
 ;; # Create example data
 
 ;; ---- data.table
@@ -2967,5 +2985,366 @@ DS
 ;;    |   B | 5.000 |
 ;;    |   C | 6.000 |
 
-
 ;; -------------------------------
+
+;; # Going further
+
+;; ## Advanced columns manipulation
+
+;; ### Summarise all the columns
+
+;; ---- data.table
+
+;; DT[, lapply(.SD, max)]
+
+(r '(bra ~DT nil (lapply .SD max)))
+;; =>    V1 V2 V4
+;;    1:  4  9  C
+
+;; ---- dplyr
+
+;; summarise_all(DF, max)
+
+(dpl/summarise_all DF r.base/max)
+;; => # A tibble: 1 x 3
+;;         V1    V2 V4   
+;;      <dbl> <dbl> <chr>
+;;    1     4     9 C
+
+;; ---- tech.ml.dataset
+
+;; TODO: dfn/max doesn't work
+
+(apply-to-columns my-max :all DS)
+;; => _unnamed [1 3]:
+;;    |   :V1 |   :V2 | :V4 |
+;;    |-------+-------+-----|
+;;    | 4.000 | 9.000 |   C |
+
+;; ### Summarise several columns
+
+;; ---- data.table
+
+;; DT[, lapply(.SD, mean),
+;;    .SDcols = c("V1", "V2")]
+;; # .SDcols is like "_at"
+
+(r '(bra ~DT nil (lapply .SD mean) :.SDcols ["V1" "V2"]))
+;; =>          V1       V2
+;;    1: 2.333333 4.333333
+
+;; ---- dplyr
+
+;; summarise_at(DF, c("V1", "V2"), mean)
+
+(dpl/summarise_at DF ["V1" "V2"] r.base/mean)
+;; => # A tibble: 1 x 2
+;;         V1    V2
+;;      <dbl> <dbl>
+;;    1  2.33  4.33
+
+;; ---- tech.ml.dataset
+
+(apply-to-columns dfn/mean [:V1 :V2] DS)
+;; => _unnamed [1 2]:
+;;    |   :V1 |   :V2 |
+;;    |-------+-------|
+;;    | 2.333 | 4.333 |
+
+;; ### Summarise several columns by group
+
+;; ---- data.table
+
+;; DT[, by = V4,
+;;    lapply(.SD, mean),
+;;    .SDcols = c("V1", "V2")]
+;; ## using patterns (regex)
+;; DT[, by = V4,
+;;    lapply(.SD, mean),
+;;    .SDcols = patterns("V1|V2")]
+
+(r '(bra ~DT nil :by V4 (lapply .SD mean) :.SDcols ["V1" "V2"]))
+;; =>    V4 V1       V2
+;;    1:  A  2 3.666667
+;;    2:  B  3 4.333333
+;;    3:  C  2 5.000000
+
+(r '(bra ~DT nil :by V4 (lapply .SD mean) :.SDcols (patterns "V1|V2")))
+;; =>    V4 V1       V2
+;;    1:  A  2 3.666667
+;;    2:  B  3 4.333333
+;;    3:  C  2 5.000000
+
+;; ---- dplyr
+
+;; DF %>%
+;;   group_by(V4) %>%
+;;   summarise_at(c("V1", "V2"), mean)
+;; ## using select helpers
+;; DF %>%
+;;   group_by(V4) %>%
+;;   summarise_at(vars(one_of("V1", "V2")), mean)
+
+(-> DF (dpl/group_by 'V4) (dpl/summarise_at ["V1" "V2"] r.base/mean))
+;; => # A tibble: 3 x 3
+;;      V4       V1    V2
+;;      <chr> <dbl> <dbl>
+;;    1 A         2  3.67
+;;    2 B         3  4.33
+;;    3 C         2  5
+
+(-> DF (dpl/group_by 'V4) (dpl/summarise_at '(vars (one_of "V1" "V2")) r.base/mean))
+;; => # A tibble: 3 x 3
+;;      V4       V1    V2
+;;      <chr> <dbl> <dbl>
+;;    1 A         2  3.67
+;;    2 B         3  4.33
+;;    3 C         2  5
+
+;; ---- tech.ml.dataset
+
+(->> DS
+     (group-by-columns-or-fn-and-aggregate [:V4] {:V1 #(dfn/mean (% :V1))
+                                                  :V2 #(dfn/mean (% :V2))})
+     (ds/sort-by-column :V4))
+;; => _unnamed [3 3]:
+;;    | :V4 |   :V2 |   :V1 |
+;;    |-----+-------+-------|
+;;    |   A | 3.667 | 2.000 |
+;;    |   B | 4.333 | 3.000 |
+;;    |   C | 5.000 | 2.000 |
+
+;; ### Summarise with more than one function by group
+
+;; ---- data.table
+
+;; DT[, by = V4, 
+;;    c(lapply(.SD, sum),
+;;    lapply(.SD, mean))]
+
+(r '(bra ~DT nil :by V4 [(lapply .SD sum)
+                         (lapply .SD mean)]))
+;; =>    V4 V1 V2 V1       V2
+;;    1:  A  6 11  2 3.666667
+;;    2:  B  9 13  3 4.333333
+;;    3:  C  6 15  2 5.000000
+
+;; ---- dplyr
+
+;; DF %>%
+;;   group_by(V4) %>%
+;;   summarise_all(list(sum, mean))
+
+(-> DF (dpl/group_by 'V4) (dpl/summarise_all [:!list 'sum 'mean]))
+;; => # A tibble: 3 x 5
+;;      V4    V1_fn1 V2_fn1 V1_fn2 V2_fn2
+;;      <chr>  <dbl>  <dbl>  <dbl>  <dbl>
+;;    1 A          6     11      2   3.67
+;;    2 B          9     13      3   4.33
+;;    3 C          6     15      2   5
+
+;; tech.ml.dataset
+
+(->> DS
+     (group-by-columns-or-fn-and-aggregate [:V4] {:V1-mean #(dfn/mean (% :V1))
+                                                  :V2-mean #(dfn/mean (% :V2))
+                                                  :V1-sum #(dfn/sum (% :V1))
+                                                  :V2-sum #(dfn/sum (% :V2))})
+     (ds/sort-by-column :V4))
+;; => _unnamed [3 5]:
+;;    | :V4 | :V2-sum | :V1-mean | :V1-sum | :V2-mean |
+;;    |-----+---------+----------+---------+----------|
+;;    |   A |   11.00 |    2.000 |   6.000 |    3.667 |
+;;    |   B |   13.00 |    3.000 |   9.000 |    4.333 |
+;;    |   C |   15.00 |    2.000 |   6.000 |    5.000 |
+
+;; ### Summarise using a condition
+
+;; ---- data.table
+
+;; cols <- names(DT)[sapply(DT, is.numeric)]
+;; DT[, lapply(.SD, mean),
+;;    .SDcols = cols]
+
+(def cols (r/bra (r.base/names DT) (r.base/sapply DT r.base/is-numeric)))
+(r '(bra ~DT nil (lapply .SD mean) :.SDcols ~cols))
+;; =>          V1       V2
+;;    1: 2.333333 4.333333
+
+;; ---- dplyr
+
+;; summarise_if(DF, is.numeric, mean)
+
+(dpl/summarise_if DF r.base/is-numeric r.base/mean)
+;; => # A tibble: 1 x 2
+;;         V1    V2
+;;      <dbl> <dbl>
+;;    1  2.33  4.33
+
+;; ---- tech.ml.dataset
+
+(def cols (->> DS
+               (ds/columns)
+               (map meta)
+               (filter (comp #{:float64} :datatype))
+               (map :name)))
+
+(apply-to-columns dfn/mean cols DS)
+;; => _unnamed [1 2]:
+;;    |   :V1 |   :V2 |
+;;    |-------+-------|
+;;    | 2.333 | 4.333 |
+
+;; ### Modify all the columns
+
+;; ---- data.table
+
+;; DT[, lapply(.SD, rev)]
+
+(r '(bra ~DT nil (lapply .SD rev)))
+;; =>    V1 V2 V4
+;;    1:  1  9  C
+;;    2:  4  8  B
+;;    3:  1  7  A
+;;    4:  4  6  C
+;;    5:  1  5  B
+;;    6:  4  4  A
+;;    7:  1  0  C
+;;    8:  4  0  B
+;;    9:  1  0  A
+
+;; ---- dplyr
+
+;; mutate_all(DF, rev)
+;; # transmute_all(DF, rev)
+
+(dpl/mutate_all DF r.base/rev)
+;; => # A tibble: 9 x 3
+;;         V1    V2 V4   
+;;      <dbl> <dbl> <chr>
+;;    1     1     9 C    
+;;    2     4     8 B    
+;;    3     1     7 A    
+;;    4     4     6 C    
+;;    5     1     5 B    
+;;    6     4     4 A    
+;;    7     1     0 C    
+;;    8     4     0 B    
+;;    9     1     0 A
+
+;; ---- tech.ml.dataset
+
+(ds/update-columns DS (ds/column-names DS) reverse)
+;; => _unnamed [9 3]:
+;;    |   :V1 |   :V2 | :V4 |
+;;    |-------+-------+-----|
+;;    | 1.000 | 9.000 |   C |
+;;    | 4.000 | 8.000 |   B |
+;;    | 1.000 | 7.000 |   A |
+;;    | 4.000 | 6.000 |   C |
+;;    | 1.000 | 5.000 |   B |
+;;    | 4.000 | 4.000 |   A |
+;;    | 1.000 | 0.000 |   C |
+;;    | 4.000 | 0.000 |   B |
+;;    | 1.000 | 0.000 |   A |
+
+;; ### Modify several columns (dropping the others)
+
+;; ---- data.table
+
+;; DT[, lapply(.SD, sqrt),
+;;    .SDcols = V1:V2]
+;; DT[, lapply(.SD, exp),
+;;    .SDcols = !"V4"]
+
+(r '(bra ~DT nil (lapply .SD sqrt) :.SDcols (colon V1 V2)))
+;; =>    V1       V2
+;;    1:  1 0.000000
+;;    2:  2 0.000000
+;;    3:  1 0.000000
+;;    4:  2 2.000000
+;;    5:  1 2.236068
+;;    6:  2 2.449490
+;;    7:  1 2.645751
+;;    8:  2 2.828427
+;;    9:  1 3.000000
+
+(r '(bra ~DT nil (lapply .SD exp) :.SDcols (! "V4")))
+;; =>           V1         V2
+;;    1:  2.718282    1.00000
+;;    2: 54.598150    1.00000
+;;    3:  2.718282    1.00000
+;;    4: 54.598150   54.59815
+;;    5:  2.718282  148.41316
+;;    6: 54.598150  403.42879
+;;    7:  2.718282 1096.63316
+;;    8: 54.598150 2980.95799
+;;    9:  2.718282 8103.08393
+
+;; ---- dplyr
+
+;; transmute_at(DF, c("V1", "V2"), sqrt)
+;; transmute_at(DF, vars(-V4), exp)
+
+(dpl/transmute_at DF ["V1" "V2"] 'sqrt)
+;; => # A tibble: 9 x 2
+;;         V1    V2
+;;      <dbl> <dbl>
+;;    1     1  0   
+;;    2     2  0   
+;;    3     1  0   
+;;    4     2  2   
+;;    5     1  2.24
+;;    6     2  2.45
+;;    7     1  2.65
+;;    8     2  2.83
+;;    9     1  3
+
+(dpl/transmute_at DF '(vars (- V4)) 'exp)
+;; => # A tibble: 9 x 2
+;;         V1     V2
+;;      <dbl>  <dbl>
+;;    1  2.72    1  
+;;    2 54.6     1  
+;;    3  2.72    1  
+;;    4 54.6    54.6
+;;    5  2.72  148. 
+;;    6 54.6   403. 
+;;    7  2.72 1097. 
+;;    8 54.6  2981. 
+;;    9  2.72 8103.
+
+;; ---- tech.ml. dataset
+
+(->> (ds/select-columns DS [:V1 :V2])
+     (apply-to-columns dfn/sqrt :all))
+;; => _unnamed [9 2]:
+;;    |   :V1 |   :V2 |
+;;    |-------+-------|
+;;    | 1.000 | 0.000 |
+;;    | 2.000 | 0.000 |
+;;    | 1.000 | 0.000 |
+;;    | 2.000 | 2.000 |
+;;    | 1.000 | 2.236 |
+;;    | 2.000 | 2.449 |
+;;    | 1.000 | 2.646 |
+;;    | 2.000 | 2.828 |
+;;    | 1.000 | 3.000 |
+
+(->> (ds/drop-columns DS [:V4])
+     (apply-to-columns dfn/exp :all))
+;; => _unnamed [9 2]:
+;;    |   :V1 |   :V2 |
+;;    |-------+-------|
+;;    | 2.718 | 1.000 |
+;;    | 54.60 | 1.000 |
+;;    | 2.718 | 1.000 |
+;;    | 54.60 | 54.60 |
+;;    | 2.718 | 148.4 |
+;;    | 54.60 | 403.4 |
+;;    | 2.718 |  1097 |
+;;    | 54.60 |  2981 |
+;;    | 2.718 |  8103 |
+
+;; ### Modify several columns (keeping the others)
+
