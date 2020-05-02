@@ -49,7 +49,7 @@
   [key-fn-or-gr-colls agg-fns-map ds]
   (->> (if (fn? key-fn-or-gr-colls)
          (ds/group-by key-fn-or-gr-colls ds)
-         (ds/group-by identity ds key-fn-or-gr-colls))
+         (ds/group-by identity key-fn-or-gr-colls ds))
        (map (fn [[group-idx group-ds]]
               (let [group-idx-m (if (map? group-idx)
                                   group-idx
@@ -96,14 +96,16 @@
 
 (defn apply-to-columns
   [f columns ds]
-  (let [columns (if (= :all columns)
-                  (ds/column-names ds)
-                  columns)]
-    (->> columns
-         (map (comp ensure-seq f ds))
-         (zipmap columns)
+  (let [names (ds/column-names ds)
+        columns (set (if (= :all columns) names columns))
+        ff (fn [col]
+             (if (columns (col/column-name col))
+               (f col)
+               col))]
+    (->> names
+         (map (comp ensure-seq ff ds))
+         (zipmap names)
          (ds/name-values-seq->dataset))))
-
 
 ;; # Create example data
 
@@ -468,7 +470,7 @@ DS
 
 ;; ---- tech.ml.dataset
 
-(ds/unique-by identity DS :column-name-seq (ds/column-names DS))
+(ds/unique-by identity {:column-name-seq (ds/column-names DS)} DS)
 ;; => _unnamed [9 4]:
 ;;    | :V1 | :V2 |    :V3 | :V4 |
 ;;    |-----+-----+--------+-----|
@@ -482,7 +484,7 @@ DS
 ;;    |   2 |   8 |  1.000 |   B |
 ;;    |   1 |   9 |  1.500 |   C |
 
-(ds/unique-by identity DS :column-name-seq [:V1 :V4])
+(ds/unique-by identity {:column-name-seq [:V1 :V4]} DS)
 ;; => _unnamed [6 4]:
 ;;    | :V1 | :V2 |    :V3 | :V4 |
 ;;    |-----+-----+--------+-----|
@@ -2874,7 +2876,7 @@ DS
 ;; ---- tech.ml.dataset
 
 ;; TODO: how to do this optimally and keep order?
-(->> (ds/group-by identity DS [:V1])
+(->> (ds/group-by identity [:V1] DS)
      (vals)
      (map (fn [ds]
             (let [rcnt (ds/row-count ds)]
@@ -3045,7 +3047,8 @@ DS
 
 ;; ---- tech.ml.dataset
 
-(apply-to-columns dfn/mean [:V1 :V2] DS)
+(->> (ds/select-columns DS [:V1 :V2])
+     (apply-to-columns dfn/mean [:V1 :V2]))
 ;; => _unnamed [1 2]:
 ;;    |   :V1 |   :V2 |
 ;;    |-------+-------|
@@ -3189,7 +3192,8 @@ DS
                (filter (comp #{:float64} :datatype))
                (map :name)))
 
-(apply-to-columns dfn/mean cols DS)
+(->> (ds/select-columns DS cols)
+     (apply-to-columns dfn/mean cols))
 ;; => _unnamed [1 2]:
 ;;    |   :V1 |   :V2 |
 ;;    |-------+-------|
@@ -3347,4 +3351,337 @@ DS
 ;;    | 2.718 |  8103 |
 
 ;; ### Modify several columns (keeping the others)
+
+;; ---- data.table
+
+;; DT[, c("V1", "V2") := lapply(.SD, sqrt),
+;;    .SDcols = c("V1", "V2")]
+
+;; cols <- setdiff(names(DT), "V4")
+;; DT[, (cols) := lapply(.SD, "^", 2L),
+;;    .SDcols = cols]
+
+(r '(bra ~DT nil ((rsymbol ":=") ["V1" "V2"] (lapply .SD sqrt))
+         :.SDcols ["V1" "V2"]))
+;; =>    V1       V2 V4
+;;    1:  1 0.000000  A
+;;    2:  2 0.000000  B
+;;    3:  1 0.000000  C
+;;    4:  2 2.000000  A
+;;    5:  1 2.236068  B
+;;    6:  2 2.449490  C
+;;    7:  1 2.645751  A
+;;    8:  2 2.828427  B
+;;    9:  1 3.000000  C
+
+(def cols (r.base/<- 'cols (r.base/setdiff (r.base/names DT) "V4")))
+(r (str (:object-name DT) "[, (cols) := lapply(.SD, \"^\", 2L), .SDcols = cols]"))
+;; =>    V1 V2 V4
+;;    1:  1  0  A
+;;    2:  4  0  B
+;;    3:  1  0  C
+;;    4:  4  4  A
+;;    5:  1  5  B
+;;    6:  4  6  C
+;;    7:  1  7  A
+;;    8:  4  8  B
+;;    9:  1  9  C
+
+;; ---- dplyr
+
+;; DF <- mutate_at(DF, c("V1", "V2"), sqrt)
+;; DF <- mutate_at(DF, vars(-V4), "^", 2L)
+
+(def DF (dpl/mutate_at DF ["V1" "V2"] 'sqrt))
+;; => # A tibble: 9 x 3
+;;         V1    V2 V4   
+;;      <dbl> <dbl> <chr>
+;;    1     1  0    A    
+;;    2     2  0    B    
+;;    3     1  0    C    
+;;    4     2  2    A    
+;;    5     1  2.24 B    
+;;    6     2  2.45 C    
+;;    7     1  2.65 A    
+;;    8     2  2.83 B    
+;;    9     1  3    C
+
+(def DF (dpl/mutate_at DF '(vars (- V4)) "^" 2))
+;; => # A tibble: 9 x 3
+;;         V1    V2 V4   
+;;      <dbl> <dbl> <chr>
+;;    1     1  0    A    
+;;    2     4  0    B    
+;;    3     1  0    C    
+;;    4     4  4    A    
+;;    5     1  5.   B    
+;;    6     4  6.00 C    
+;;    7     1  7.   A    
+;;    8     4  8.   B    
+;;    9     1  9    C
+
+;; ---- tech.ml.dataset
+
+(def DS (apply-to-columns dfn/sqrt [:V1 :V2] DS))
+;; => _unnamed [9 3]:
+;;    |   :V1 |   :V2 | :V4 |
+;;    |-------+-------+-----|
+;;    | 1.000 | 0.000 |   A |
+;;    | 2.000 | 0.000 |   B |
+;;    | 1.000 | 0.000 |   C |
+;;    | 2.000 | 2.000 |   A |
+;;    | 1.000 | 2.236 |   B |
+;;    | 2.000 | 2.449 |   C |
+;;    | 1.000 | 2.646 |   A |
+;;    | 2.000 | 2.828 |   B |
+;;    | 1.000 | 3.000 |   C |
+
+(def DS (apply-to-columns #(dfn/pow % 2.0) [:V1 :V2] DS))
+;; => _unnamed [9 3]:
+;;    |   :V1 |   :V2 | :V4 |
+;;    |-------+-------+-----|
+;;    | 1.000 | 0.000 |   A |
+;;    | 4.000 | 0.000 |   B |
+;;    | 1.000 | 0.000 |   C |
+;;    | 4.000 | 4.000 |   A |
+;;    | 1.000 | 5.000 |   B |
+;;    | 4.000 | 6.000 |   C |
+;;    | 1.000 | 7.000 |   A |
+;;    | 4.000 | 8.000 |   B |
+;;    | 1.000 | 9.000 |   C |
+
+;; ### Modify columns using a condition (dropping the others)
+
+;; ---- data.table
+
+;; cols <- names(DT)[sapply(DT, is.numeric)]
+;; DT[, .SD - 1,
+;;    .SDcols = cols]
+
+(def cols (r/bra (r.base/names DT) (r.base/sapply DT r.base/is-numeric)))
+
+(r '(bra ~DT nil (- .SD 1) :.SDcols ~cols))
+;; =>    V1 V2
+;;    1:  0 -1
+;;    2:  3 -1
+;;    3:  0 -1
+;;    4:  3  3
+;;    5:  0  4
+;;    6:  3  5
+;;    7:  0  6
+;;    8:  3  7
+;;    9:  0  8
+
+
+;; ---- dplyr
+
+;; transmute_if(DF, is.numeric, list(~ '-'(., 1L)))
+
+(dpl/transmute_if DS r.base/is-numeric [:!list '(formula nil (- . 1))])
+;; =>   V1 V2
+;;    1  0 -1
+;;    2  3 -1
+;;    3  0 -1
+;;    4  3  3
+;;    5  0  4
+;;    6  3  5
+;;    7  0  6
+;;    8  3  7
+;;    9  0  8
+
+;; ---- tech.ml.dataset
+
+(def cols (->> DS
+               (ds/columns)
+               (map meta)
+               (filter (comp #(= :float64 %) :datatype))
+               (map :name)))
+
+(->> (ds/select-columns DS cols)
+     (apply-to-columns #(dfn/- % 1) cols))
+;; => _unnamed [9 2]:
+;;    |   :V1 |    :V2 |
+;;    |-------+--------|
+;;    | 0.000 | -1.000 |
+;;    | 3.000 | -1.000 |
+;;    | 0.000 | -1.000 |
+;;    | 3.000 |  3.000 |
+;;    | 0.000 |  4.000 |
+;;    | 3.000 |  5.000 |
+;;    | 0.000 |  6.000 |
+;;    | 3.000 |  7.000 |
+;;    | 0.000 |  8.000 |
+
+;; ### Modify columns using a condition (keeping the others)
+
+;; ---- data.table
+
+;; DT[, (cols) := lapply(.SD, as.integer),
+;; .SDcols = cols]
+
+(def cols (r.base/<- 'cols (r.base/setdiff (r.base/names DT) "V4")))
+(r (str (:object-name DT) "[, (cols) := lapply(.SD, as.integer), .SDcols = cols]"))
+;; =>    V1 V2 V4
+;;    1:  1  0  A
+;;    2:  4  0  B
+;;    3:  1  0  C
+;;    4:  4  4  A
+;;    5:  1  5  B
+;;    6:  4  5  C
+;;    7:  1  7  A
+;;    8:  4  8  B
+;;    9:  1  9  C
+
+;; ---- dplyr
+
+;; DF <- mutate_if(DF, is.numeric, as.integer)
+
+(def DF (dpl/mutate_if DF r.base/is-numeric r.base/as-integer))
+;; => # A tibble: 9 x 3
+;;         V1    V2 V4   
+;;      <int> <int> <chr>
+;;    1     1     0 A    
+;;    2     4     0 B    
+;;    3     1     0 C    
+;;    4     4     4 A    
+;;    5     1     5 B    
+;;    6     4     5 C    
+;;    7     1     7 A    
+;;    8     4     8 B    
+;;    9     1     9 C
+
+;; ----tech.ml.dataset
+
+;; TODO: easier cast to given type
+(def DS (apply-to-columns #(dtype/->reader % :int64) [:V1 :V2] DS))
+;; => _unnamed [9 3]:
+;;    | :V1 | :V2 | :V4 |
+;;    |-----+-----+-----|
+;;    |   1 |   0 |   A |
+;;    |   4 |   0 |   B |
+;;    |   1 |   0 |   C |
+;;    |   4 |   4 |   A |
+;;    |   1 |   5 |   B |
+;;    |   4 |   5 |   C |
+;;    |   1 |   7 |   A |
+;;    |   4 |   8 |   B |
+;;    |   1 |   9 |   C |
+
+;; ### Use a complex expression
+
+;; ---- data.table
+
+;; DT[, by = V4, .(V1[1:2], "X")]
+
+(r '(bra ~DT nil :by V4 (. (bra V1 (colon 1 2)) "X")))
+;; =>    V4 V1 V2
+;;    1:  A  1  X
+;;    2:  A  4  X
+;;    3:  B  4  X
+;;    4:  B  1  X
+;;    5:  C  1  X
+;;    6:  C  4  X
+
+;; ---- dplyr
+
+;; DF %>%
+;;   group_by(V4) %>%
+;;   slice(1:2) %>%
+;;   transmute(V1 = V1,
+;;             V2 = "X")
+
+(-> DF
+    (dpl/group_by 'V4)
+    (dpl/slice (r/colon 1 2))
+    (dpl/transmute :V1 'V1 :V2 "X"))
+;; => # A tibble: 6 x 3
+;;    # Groups:   V4 [3]
+;;      V4       V1 V2   
+;;      <chr> <int> <chr>
+;;    1 A         1 X    
+;;    2 A         4 X    
+;;    3 B         4 X    
+;;    4 B         1 X    
+;;    5 C         1 X    
+;;    6 C         4 X    
+
+;; ---- tech.ml.dataset
+
+(->> (ds/group-by-column :V4 DS)
+     (vals)
+     (map #(ds/head 2 %))
+     (map #(ds/add-or-update-column % :V2 (repeat (ds/row-count %) "X")))
+     (apply ds/concat))
+;; => null [6 3]:
+;;    | :V1 | :V2 | :V4 |
+;;    |-----+-----+-----|
+;;    |   1 |   X |   A |
+;;    |   4 |   X |   A |
+;;    |   4 |   X |   B |
+;;    |   1 |   X |   B |
+;;    |   1 |   X |   C |
+;;    |   4 |   X |   C |
+
+;; ### Use multiple expressions (with DT[,{j}])
+
+;; ---- data.table
+
+;; DT[, {print(V1) #  comments here!
+;;       print(summary(V1))
+;;       x <- V1 + sum(V2)
+;;       .(A = 1:.N, B = x) # last list returned as a data.table
+;;       }]
+
+(r (str (:object-name DT)
+        "[, {print(V1) #  comments here!
+             print(summary(V1))
+             x <- V1 + sum(V2)
+             .(A = 1:.N, B = x)}]"))
+;; =>    A  B
+;;    1: 1 39
+;;    2: 2 42
+;;    3: 3 39
+;;    4: 4 42
+;;    5: 5 39
+;;    6: 6 42
+;;    7: 7 39
+;;    8: 8 42
+;;    9: 9 39
+
+;; printed:
+;;   [1] 1 4 1 4 1 4 1 4 1
+;;   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+;;   1.000   1.000   1.000   2.333   4.000   4.000 
+
+;; ---- dplyr
+
+;; no provided implementation
+
+;; ---- tech.ml.dataset
+
+(let [x (dfn/+ (DS :V1) (dfn/sum (DS :V2)))]
+  (println (DS :V1))
+  (println (dfn/descriptive-stats (DS :V2)))
+  (ds/name-values-seq->dataset {:A (map inc (range (ds/row-count DS)))
+                                :B x}))
+;; => _unnamed [9 2]:
+;;    | :A |    :B |
+;;    |----+-------|
+;;    |  1 | 39.00 |
+;;    |  2 | 42.00 |
+;;    |  3 | 39.00 |
+;;    |  4 | 42.00 |
+;;    |  5 | 39.00 |
+;;    |  6 | 42.00 |
+;;    |  7 | 39.00 |
+;;    |  8 | 42.00 |
+;;    |  9 | 39.00 |
+
+;; printed:
+
+;; #tech.ml.dataset.column<int64>[9]
+;; :V1
+;; [1, 4, 1, 4, 1, 4, 1, 4, 1, ]
+;; {:min 0.0, :mean 4.222222222222222, :skew -0.1481546009077147, :ecount 9, :standard-deviation 3.527668414752787, :median 5.0, :max 9.0}
+
 
