@@ -42,6 +42,7 @@
   * single value
   * map of values or sequences
   * sequence of maps
+  * sequence of columns
   * file"
   ([ds]
    (dataset ds nil))
@@ -52,6 +53,8 @@
      (and (sequential+? ds)
           (every? sequential+? ds)
           (every? #(= 2 (count %)) ds)) (dataset (into {} ds) options)
+     (and (sequential+? ds)
+          (every? col/is-column? ds)) (ds/new-dataset options ds)
      (not (seqable? ds)) (ds/->dataset [{:$value ds}] options)
      :else (ds/->dataset ds options))))
 
