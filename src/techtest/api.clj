@@ -265,16 +265,15 @@
   - fn with predicate"
   ([f ds rows-selector] (select-or-drop-rows f ds rows-selector nil))
   ([f ds rows-selector {:keys [limit-columns pre]
-                        :or {pre identity}
                         :as options}]
    (if (grouped? ds)
-     (let [pre-ds (map pre (ds :data))
+     (let [pre-ds (map #(add-or-update-columns % pre) (ds :data))
            indices (map #(find-indices % rows-selector limit-columns) pre-ds)]
        (as-> ds ds
          (ds/add-or-update-column ds :data (map #(select-or-drop-rows f %1 %2) (ds :data) indices))
          ;; (ds/add-or-update-column ds :indexes (map #(mapv %1 %2) (ds :indexes) indices))
          (ds/add-or-update-column ds :count (map ds/row-count (ds :data)))))
-     (f ds (find-indices (pre ds) rows-selector limit-columns)))))
+     (f ds (find-indices (add-or-update-columns ds pre) rows-selector limit-columns)))))
 
 (def select-rows (partial select-or-drop-rows ds/select-rows))
 (def drop-rows (partial select-or-drop-rows ds/drop-rows))
@@ -464,13 +463,18 @@
 (select-rows DS [true nil nil true])
 (drop-rows DS [true nil nil true])
 
-(ungroup (select-rows (group-ds-by DS :V1) 0 {:pre #(add-or-update-column % :mean (dfn/mean (% :V2)))}))
+(ungroup (select-rows (group-ds-by DS :V1) 0))
 (ungroup (drop-rows (group-ds-by DS :V1) 0))
 
-(select-rows DS (fn [row] (<= (:V2 row) (:mean row))) {:pre #(add-or-update-column % :mean (dfn/mean (% :V2)))})
+;; select rows :V2 values are lower than column mean
+(let [mean (dfn/mean (DS :V2))]
+  (select-rows DS (fn [row] (< (:V2 row) mean))))
+
+;; select rows of grouped (by :V4) :V2, lower than :V2 mean.
+;; pre option adds columns according to provided map before row selecting 
 (ungroup (select-rows (group-ds-by DS :V4)
                       (fn [row] (< (:V2 row) (:mean row)))
-                      {:pre #(add-or-update-column % :mean (dfn/mean (% :V2)))}))
+                      {:pre {:mean #(dfn/mean (% :V2))}}))
 
 (aggregate DS [#(dfn/mean (% :V3)) (fn [ds] {:mean-v1 (dfn/mean (ds :V1))
                                             :mean-v2 (dfn/mean (ds :V2))})])
@@ -518,3 +522,4 @@
 ;;    | 10.00 |    EWR |  DFW |           18.81 |           18.89 |
 ;;    | 1.000 |    EWR |  LAX |           1.367 |           7.500 |
 ;;    | 2.000 |    EWR |  LAX |           10.33 |           4.111 |
+
