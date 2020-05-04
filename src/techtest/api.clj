@@ -466,12 +466,12 @@
 (ungroup (select-rows (group-ds-by DS :V1) 0))
 (ungroup (drop-rows (group-ds-by DS :V1) 0))
 
-;; select rows :V2 values are lower than column mean
+;; select rows where :V2 values are lower than column mean
 (let [mean (dfn/mean (DS :V2))]
   (select-rows DS (fn [row] (< (:V2 row) mean))))
 
-;; select rows of grouped (by :V4) :V2, lower than :V2 mean.
-;; pre option adds columns according to provided map before row selecting 
+;; select rows of grouped (by :V4) where :V2 values are lower than :V2 mean.
+;; pre option adds temporary columns according to provided map before row selecting 
 (ungroup (select-rows (group-ds-by DS :V4)
                       (fn [row] (< (:V2 row) (:mean row)))
                       {:pre {:mean #(dfn/mean (% :V2))}}))
