@@ -52,22 +52,8 @@
      (and (sequential+? ds)
           (every? sequential+? ds)
           (every? #(= 2 (count %)) ds)) (dataset (into {} ds) options)
-     (not (seqable? ds)) (ds/->dataset [{0 ds}] options)
+     (not (seqable? ds)) (ds/->dataset [{:$value ds}] options)
      :else (ds/->dataset ds options))))
-
-(dataset 999)
-(dataset [[:A 33]])
-(dataset {:A 33})
-(dataset {:A [1 2 3]})
-(dataset {:A [3 4 5] :B "X"})
-(dataset [[:A [3 4 5]] [:B "X"]])
-(dataset [{:a 1 :b 3} {:b 2 :a 99}])
-;; https://archive.ics.uci.edu/ml/machine-learning-databases/kddcup98-mld/epsilon_mirror/
-;; (time (def ds (dataset "cup98LRN.txt.gz")))
-(def DS (dataset {:V1 (take 9 (cycle [1 2]))
-                  :V2 (range 1 10)
-                  :V3 (take 9 (cycle [0.5 1.0 1.5]))
-                  :V4 (take 9 (cycle [\A \B \C]))}))
 
 ;;;;;;;;;;;;;
 ;; GROUPING
@@ -105,8 +91,7 @@
   - name - group name
   - group-id - id of the group (int)
   - count - number of rows in group
-  - data - group as dataset
-  - indexes - group as seq of row indexes"
+  - data - group as dataset"
   ([ds key-fn-or-columns-or-map] (group-ds-by ds key-fn-or-columns-or-map nil))
   ([ds key-fn-or-columns-or-map {:keys [limit-columns result-type]
                                  :or {result-type :as-dataset}
@@ -124,16 +109,11 @@
                                {:name k
                                 :group-id id
                                 :count (count idxs)
-                                :data (ds/select ds :all idxs)
-                                :indexes (vec idxs)})))
+                                :data (ds/set-dataset-name (ds/select ds :all idxs) k)
+                                ;; :indexes (vec idxs)
+                                })))
            (dataset options)
            (mark-as-group))))))
-
-(group-ds-by DS :V1 {:result-type :as-map})
-(group-ds-by DS [:V1 :V3])
-(group-ds-by DS (juxt :V1 :V4))
-(group-ds-by DS #(< (:V2 %) 4))
-(group-ds-by DS (comp #{\B} :V4))
 
 (defn ungroup
   "Concat groups into dataset"
@@ -143,32 +123,29 @@
    (let [prepared-ds (->> ds
                           (ds/mapseq-reader)
                           (map (fn [{:keys [name group-id count data] :as ds}]
-                                 (let [data (if add-group-as-column
-                                              (ds/add-or-update-column data :_group-name_ (repeat count name))
-                                              (if add-group-id-as-column
-                                                (ds/add-or-update-column data :_group-id_ (repeat count group-id))
-                                                data))]
-                                   (assoc ds :data data)))))
+                                 (if (or add-group-as-column add-group-id-as-column)
+                                   (let [col1 (if add-group-as-column
+                                                (col/new-column :$group-name (repeat count name)))
+                                         col2 (if add-group-id-as-column
+                                                (col/new-column :$group-id (repeat count group-id)))]
+                                     (->> data
+                                          (ds/columns)
+                                          (concat [col1 col2])
+                                          (remove nil?)
+                                          (ds/new-dataset)
+                                          (assoc ds :data)))
+                                   ds))))
          ordered-ds (condp = order
                       :by-group (sort-by :name prepared-ds)
                       :by-group-id (sort-by :group-id prepared-ds)
                       prepared-ds)]
-     (-> (apply ds/concat (map :data ordered-ds))
+     (-> (reduce ds/concat (map :data ordered-ds))
          (ds/set-dataset-name dataset-name)))))
-
-
-(ungroup (group-ds-by DS :V1) {:dataset-name "ungrouped"})
-(ungroup (group-ds-by DS [:V1 :V3]) {:add-group-id-as-column true})
-(ungroup (group-ds-by DS (juxt :V1 :V4)) {:add-group-as-column true})
-(ungroup (group-ds-by DS #(< (:V2 %) 4)) {:add-group-as-column true})
-(ungroup (group-ds-by DS (comp #{\B \C} :V4)) {:add-group-as-column true})
 
 (defn group-as-map
   [ds]
   (assert (grouped? ds) "Apply on grouped dataset only")
   (zipmap (ds :name) (ds :data)))
-
-(group-as-map (group-ds-by DS (juxt :V1 :V4)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; COLUMNS OPERATIONS
@@ -183,11 +160,17 @@
   - function which filter names (via column metadata)"
   [f ds cols-selector]
   (if (grouped? ds)
+
     (ds/add-or-update-column ds :data (map #(select-or-drop-columns f % cols-selector) (ds :data)))
+
     (f ds (cond
             (or (map? cols-selector)
                 (sequential+? cols-selector)) cols-selector
-            (fn? cols-selector) (map :name (filter cols-selector (map meta (ds/columns ds))))
+            (fn? cols-selector) (->> ds
+                                     (ds/columns)
+                                     (map meta)
+                                     (filter cols-selector)
+                                     (map :name))
             :else [cols-selector]))))
 
 (def select-columns (partial select-or-drop-columns ds/select-columns))
@@ -197,22 +180,6 @@
   (if (grouped? ds)
     (ds/add-or-update-column ds :data (map #(ds/rename-columns % col-map) (ds :data)))
     (ds/rename-columns ds col-map)))
-
-(select-columns DS :V1)
-(select-columns DS [:V1 :V2])
-(select-columns DS {:V1 "v1"
-                    :V2 "v2"})
-(select-columns DS (comp #{:int64} :datatype))
-
-(drop-columns DS :V1)
-(drop-columns DS [:V1 :V2])
-(drop-columns DS (comp #{:int64} :datatype))
-
-(rename-columns DS {:V1 "v1"
-                    :V2 "v2"})
-
-(ungroup (select-columns (group-ds-by DS :V1) {:V1 "v1"}))
-(ungroup (drop-columns (group-ds-by DS [:V4]) (comp #{:int64} :datatype)))
 
 (defn- fix-column-size
   [col-or-seq strategy cnt]
@@ -245,24 +212,10 @@
    (reduce (fn [ds [k v]]
              (add-or-update-column ds k v options)) ds map-of-cols)))
 
-(add-or-update-column DS :abc [1 2] {:count-strategy :na})
-(add-or-update-column DS :abc [1 2] {:count-strategy :cycle})
-(add-or-update-column DS :abc "X")
-(add-or-update-columns DS {:abc "X"
-                           :xyz [1 2 3]})
-(add-or-update-column DS :abc (fn [ds] (dfn/+ (ds :V1) (ds :V2))))
 
-(add-or-update-columns DS {:abc "X"
-                           :xyz [1 2 3]} {:count-strategy :na})
-
-(ungroup (add-or-update-column (group-ds-by DS :V4) :abc #(let [mean (dfn/mean (% :V2))
-                                                                stddev (dfn/standard-deviation (% :V2))]
-                                                            (dfn// (dfn/- (% :V2) mean)
-                                                                   stddev))))
-
-
-(ungroup (add-or-update-columns (group-ds-by DS :V4) {:abc "X"
-                                                      :xyz [-1]} {:count-strategy :na}))
+(defn convert-column-type
+  [ds colname new-type]
+  (ds/add-or-update-column ds colname (dtype/->reader (ds colname) new-type)))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; ROWS OPERATIONS
@@ -306,14 +259,186 @@
    (if (grouped? ds)
      (let [pre-ds (map pre (ds :data))
            indices (map #(find-indices % rows-selector limit-columns) pre-ds)]
-       (-> ds
-           (ds/add-or-update-column :data (map #(select-or-drop-rows f %1 %2) (ds :data) indices))
-           (ds/add-or-update-column :indexes (map #(mapv %1 %2) (ds :indexes) indices))
-           (ds/add-or-update-column :count (map ds/row-count (ds :data)))))
+       (as-> ds ds
+         (ds/add-or-update-column ds :data (map #(select-or-drop-rows f %1 %2) (ds :data) indices))
+         ;; (ds/add-or-update-column ds :indexes (map #(mapv %1 %2) (ds :indexes) indices))
+         (ds/add-or-update-column ds :count (map ds/row-count (ds :data)))))
      (f ds (find-indices (pre ds) rows-selector limit-columns)))))
 
 (def select-rows (partial select-or-drop-rows ds/select-rows))
 (def drop-rows (partial select-or-drop-rows ds/drop-rows))
+
+;;;;;;;;;;;;;;;;
+;; AGGREGATING
+;;;;;;;;;;;;;;;;
+
+(defn- add-agg-result
+  [tot-res k agg-res]
+  (cond
+    (map? agg-res) (reduce conj tot-res agg-res)
+    (sequential+? agg-res) (reduce (fn [b [id v]]
+                                     (conj b [(keyword (str (name k) "-" id)) v])) tot-res (map-indexed vector agg-res))
+    :else (conj tot-res [k agg-res])))
+
+(defn aggregate
+  "Aggregate dataset by providing:
+
+  - aggregation function
+  - map with column names and functions
+  - sequence of aggregation functions
+
+  Aggregation functions can return:
+  - single value
+  - seq of values
+  - map of values with column names"
+  ([ds fn-map-or-seq] (aggregate ds fn-map-or-seq nil))
+  ([ds fn-map-or-seq options]
+   (if (grouped? ds)
+     (as-> ds ds
+       (ds/add-or-update-column ds :data (map #(aggregate % fn-map-or-seq options) (ds :data)))
+       (ds/add-or-update-column ds :count (map ds/row-count (ds :data)))
+       (ungroup ds {:add-group-as-column true}))
+     (cond
+       (fn? fn-map-or-seq) (aggregate ds {:summary fn-map-or-seq})
+       (sequential+? fn-map-or-seq) (->> fn-map-or-seq
+                                         (zipmap (map #(keyword (str "summary-" %)) (range)))
+                                         (aggregate ds))
+       :else (dataset (reduce (fn [res [k f]]
+                                (add-agg-result res k (f ds))) [] fn-map-or-seq) options)))))
+
+
+
+;;;;;;;;;;;;;
+;; ORDERING
+;;;;;;;;;;;;;
+
+(defn- comparator->fn
+  [c]
+  (cond
+    (fn? c) c
+    (= :desc c) (comp - compare)
+    :else compare))
+
+(defn asc-desc-comparator
+  [orders]
+  (if-not (sequential+? orders)
+    (comparator->fn orders)
+    (if (every? #(= % :asc) orders)
+      compare
+      (let [comparators (map comparator->fn orders)]
+        (fn [v1 v2]
+          (reduce (fn [_ [a b cmptr]]
+                    (let [c (cmptr a b)]
+                      (if-not (zero? c)
+                        (reduced c)
+                        c))) 0 (map vector v1 v2 comparators)))))))
+
+(defn order-ds-by
+  "Order dataset by:
+
+  - column name
+  - columns (as sequence of names)
+  - key-fn
+  - sequence of columns / key-fn
+
+  Additionally you can ask the order by:
+  - :asc
+  - :desc
+  - custom comparator function"
+  ([ds col-or-cols-or-fn]
+   (order-ds-by ds col-or-cols-or-fn (if (sequential+? col-or-cols-or-fn)
+                                       (repeat (count col-or-cols-or-fn) :asc)
+                                       [:asc])))
+  ([ds col-or-cols-or-fn order-or-comparators]
+   (if (grouped? ds)
+
+     (ds/add-or-update-column ds :data (map #(order-ds-by % col-or-cols-or-fn order-or-comparators) (ds :data)))
+     
+     (cond
+       (sequential+? col-or-cols-or-fn) (let [sel (apply juxt (map #(if (fn? %)
+                                                                      %
+                                                                      (fn [ds] (get ds %))) col-or-cols-or-fn))
+                                              comp-fn (asc-desc-comparator order-or-comparators)]
+                                          (ds/sort-by sel comp-fn ds))
+       (fn? col-or-cols-or-fn) (ds/sort-by col-or-cols-or-fn
+                                           (asc-desc-comparator order-or-comparators)
+                                           ds)
+       :else (ds/sort-by-column col-or-cols-or-fn (asc-desc-comparator order-or-comparators) ds)))))
+
+
+
+;;;;;;;;;;;;;;
+;; USE CASES
+;;;;;;;;;;;;;;
+
+(dataset 999)
+(dataset [[:A 33]])
+(dataset {:A 33})
+(dataset {:A [1 2 3]})
+(dataset {:A [3 4 5] :B "X"})
+(dataset [[:A [3 4 5]] [:B "X"]])
+(dataset [{:a 1 :b 3} {:b 2 :a 99}])
+
+;; https://archive.ics.uci.edu/ml/machine-learning-databases/kddcup98-mld/epsilon_mirror/
+;; (time (def ds (dataset "cup98LRN.txt.gz")))
+(def DS (dataset {:V1 (take 9 (cycle [1 2]))
+                  :V2 (range 1 10)
+                  :V3 (take 9 (cycle [0.5 1.0 1.5]))
+                  :V4 (take 9 (cycle [\A \B \C]))}))
+
+(group-ds-by DS :V1 {:result-type :as-map})
+(group-ds-by DS [:V1 :V3])
+(group-ds-by DS (juxt :V1 :V4))
+(group-ds-by DS #(< (:V2 %) 4))
+(group-ds-by DS (comp #{\B} :V4))
+
+(grouped? DS)
+(grouped? (group-ds-by DS [:V1 :V3]))
+
+(ungroup (group-ds-by DS :V1) {:dataset-name "ungrouped"})
+(ungroup (group-ds-by DS [:V1 :V3]) {:add-group-id-as-column true})
+(ungroup (group-ds-by DS (juxt :V1 :V4)) {:add-group-as-column true})
+(ungroup (group-ds-by DS #(< (:V2 %) 4)) {:add-group-as-column true})
+(ungroup (group-ds-by DS (comp #{\B \C} :V4)) {:add-group-as-column true})
+
+(group-as-map (group-ds-by DS (juxt :V1 :V4)))
+
+(select-columns DS :V1)
+(select-columns DS [:V1 :V2])
+(select-columns DS {:V1 "v1"
+                    :V2 "v2"})
+(select-columns DS (comp #{:int64} :datatype))
+
+(drop-columns DS :V1)
+(drop-columns DS [:V1 :V2])
+(drop-columns DS (comp #{:int64} :datatype))
+
+(rename-columns DS {:V1 "v1"
+                    :V2 "v2"})
+
+(ungroup (select-columns (group-ds-by DS :V1) {:V1 "v1"}))
+(ungroup (drop-columns (group-ds-by DS [:V4]) (comp #{:int64} :datatype)))
+
+(add-or-update-column DS :abc [1 2] {:count-strategy :na})
+(add-or-update-column DS :abc [1 2] {:count-strategy :cycle})
+(add-or-update-column DS :abc "X")
+(add-or-update-columns DS {:abc "X"
+                           :xyz [1 2 3]})
+(add-or-update-column DS :abc (fn [ds] (dfn/+ (ds :V1) (ds :V2))))
+
+(add-or-update-columns DS {:abc "X"
+                           :xyz [1 2 3]} {:count-strategy :na})
+
+(ungroup (add-or-update-column (group-ds-by DS :V4) :abc #(let [mean (dfn/mean (% :V2))
+                                                                stddev (dfn/standard-deviation (% :V2))]
+                                                            (dfn// (dfn/- (% :V2) mean)
+                                                                   stddev))))
+
+
+(ungroup (add-or-update-columns (group-ds-by DS :V4) {:abc "X"
+                                                      :xyz [-1]} {:count-strategy :na}))
+
+(convert-column-type DS :V1 :float64)
 
 (select-rows DS 3)
 (drop-rows DS 3)
@@ -335,19 +460,22 @@
                       (fn [row] (< (:V2 row) (:mean row)))
                       {:pre #(add-or-update-column % :mean (dfn/mean (% :V2)))}))
 
+(aggregate DS [#(dfn/mean (% :V3)) (fn [ds] {:mean-v1 (dfn/mean (ds :V1))
+                                            :mean-v2 (dfn/mean (ds :V2))})])
 
-;;;;;;;;;;;;;;;;
-;; AGGREGATING
-;;;;;;;;;;;;;;;;
+(aggregate (group-ds-by DS :V4) [#(dfn/mean (% :V3)) (fn [ds] {:mean-v1 (dfn/mean (ds :V1))
+                                                              :mean-v2 (dfn/mean (ds :V2))})])
 
-(defn aggregate
-  [ds fn-map-or-seq]
-  (cond
-    (fn? fn-map-or-seq) (aggregate ds {:summary fn-map-or-seq})
-    (sequential+? fn-map-or-seq) (zipmap (map #(keyword (str "summary-" %)) (range)) fn-map-or-seq)
-    :else (dataset (map-v #(% ds) fn-map-or-seq))))
+(order-ds-by DS :V1)
+(order-ds-by DS :V1 :desc)
 
+(order-ds-by DS [:V1 :V2])
+(order-ds-by DS [:V1 :V2] [:asc :desc])
+(order-ds-by DS [:V1 :V2] [:desc :desc])
+(order-ds-by DS [:V3 :V1] [:desc :asc])
 
-;;;;;;;;;;;;;
-;; ORDERING
-;;;;;;;;;;;;;
+(order-ds-by DS [:V4 (fn [row] (* (:V1 row)
+                                 (:V2 row)
+                                 (:V3 row)))] [#(if (= %1 %2) -1 0) :asc])
+
+(ungroup (order-ds-by (group-ds-by DS :V4) [:V1 :V2] [:desc :desc]))
