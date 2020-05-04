@@ -3,7 +3,8 @@
             [tech.ml.dataset.column :as col]
             [tech.v2.datatype.functional :as dfn]
             [tech.v2.datatype :as dtype]
-            [tech.ml.protocols.dataset :as prot]))
+            [tech.ml.protocols.dataset :as prot])
+  (:refer-clojure :exclude [group-by]))
 
 ;; attempt to reorganized api
 
@@ -75,7 +76,7 @@
   (vary-meta ds assoc :grouped? true))
 
 ;; TODO: maybe make possible nested grouping and ungrouping?
-(defn group-ds-by
+(defn group-by
   "Group dataset by:
 
   - column name
@@ -95,7 +96,7 @@
   - group-id - id of the group (int)
   - count - number of rows in group
   - data - group as dataset"
-  ([ds key-fn-or-columns-or-map] (group-ds-by ds key-fn-or-columns-or-map nil))
+  ([ds key-fn-or-columns-or-map] (group-by ds key-fn-or-columns-or-map nil))
   ([ds key-fn-or-columns-or-map {:keys [limit-columns result-type]
                                  :or {result-type :as-dataset}
                                  :as options}]
@@ -344,7 +345,7 @@
                         (reduced c)
                         c))) 0 (map vector v1 v2 comparators)))))))
 
-(defn order-ds-by
+(defn order-by
   "Order dataset by:
 
   - column name
@@ -357,13 +358,13 @@
   - :desc
   - custom comparator function"
   ([ds col-or-cols-or-fn]
-   (order-ds-by ds col-or-cols-or-fn (if (sequential+? col-or-cols-or-fn)
-                                       (repeat (count col-or-cols-or-fn) :asc)
-                                       [:asc])))
+   (order-by ds col-or-cols-or-fn (if (sequential+? col-or-cols-or-fn)
+                                    (repeat (count col-or-cols-or-fn) :asc)
+                                    [:asc])))
   ([ds col-or-cols-or-fn order-or-comparators]
    (if (grouped? ds)
 
-     (ds/add-or-update-column ds :data (map #(order-ds-by % col-or-cols-or-fn order-or-comparators) (ds :data)))
+     (ds/add-or-update-column ds :data (map #(order-by % col-or-cols-or-fn order-or-comparators) (ds :data)))
      
      (cond
        (sequential+? col-or-cols-or-fn) (let [sel (apply juxt (map #(if (fn? %)
@@ -376,7 +377,36 @@
                                            ds)
        :else (ds/sort-by-column col-or-cols-or-fn (asc-desc-comparator order-or-comparators) ds)))))
 
+;;;;;;;;;;;
+;; UNIQUE
+;;;;;;;;;;;
 
+(defn- strategy-first [k idxs] (first idxs))
+(defn- strategy-last [k idxs] (last idxs))
+(defn- strategy-random [k idxs] (rand-nth idxs))
+
+(def ^:private strategies
+  {:first strategy-first
+   :last strategy-last
+   :random strategy-random})
+
+(defn unique-by
+  ([ds] (unique-by ds (ds/column-names ds)))
+  ([ds row-selector] (unique-by ds row-selector nil))
+  ([ds row-selector {:keys [strategy limit-columns]
+                     :or {strategy :first}
+                     :as options}]
+   (let [local-options {:keep-fn (get strategies strategy :first)}]
+     (if (grouped? ds)
+       (as-> ds ds
+         (ds/add-or-update-column ds :data (map #(unique-by % row-selector options) (ds :data)))
+         (ds/add-or-update-column ds :count (map ds/row-count (ds :data))))
+       (cond
+         (sequential+? row-selector) (ds/unique-by identity (assoc local-options :column-name-seq row-selector) ds)
+         (fn? row-selector) (ds/unique-by row-selector (if limit-columns
+                                                         (assoc local-options :column-name-seq limit-columns)
+                                                         local-options) ds)
+         :else (ds/unique-by-column row-selector local-options ds))))))
 
 ;;;;;;;;;;;;;;
 ;; USE CASES
@@ -397,22 +427,22 @@
                   :V3 (take 9 (cycle [0.5 1.0 1.5]))
                   :V4 (take 9 (cycle [\A \B \C]))}))
 
-(group-ds-by DS :V1 {:result-type :as-map})
-(group-ds-by DS [:V1 :V3])
-(group-ds-by DS (juxt :V1 :V4))
-(group-ds-by DS #(< (:V2 %) 4))
-(group-ds-by DS (comp #{\B} :V4))
+(group-by DS :V1 {:result-type :as-map})
+(group-by DS [:V1 :V3])
+(group-by DS (juxt :V1 :V4))
+(group-by DS #(< (:V2 %) 4))
+(group-by DS (comp #{\B} :V4))
 
 (grouped? DS)
-(grouped? (group-ds-by DS [:V1 :V3]))
+(grouped? (group-by DS [:V1 :V3]))
 
-(ungroup (group-ds-by DS :V1) {:dataset-name "ungrouped"})
-(ungroup (group-ds-by DS [:V1 :V3]) {:add-group-id-as-column true})
-(ungroup (group-ds-by DS (juxt :V1 :V4)) {:add-group-as-column true})
-(ungroup (group-ds-by DS #(< (:V2 %) 4)) {:add-group-as-column true})
-(ungroup (group-ds-by DS (comp #{\B \C} :V4)) {:add-group-as-column true})
+(ungroup (group-by DS :V1) {:dataset-name "ungrouped"})
+(ungroup (group-by DS [:V1 :V3]) {:add-group-id-as-column true})
+(ungroup (group-by DS (juxt :V1 :V4)) {:add-group-as-column true})
+(ungroup (group-by DS #(< (:V2 %) 4)) {:add-group-as-column true})
+(ungroup (group-by DS (comp #{\B \C} :V4)) {:add-group-as-column true})
 
-(group-as-map (group-ds-by DS (juxt :V1 :V4)))
+(group-as-map (group-by DS (juxt :V1 :V4)))
 
 (select-columns DS :V1)
 (select-columns DS [:V1 :V2])
@@ -427,8 +457,8 @@
 (rename-columns DS {:V1 "v1"
                     :V2 "v2"})
 
-(ungroup (select-columns (group-ds-by DS :V1) {:V1 "v1"}))
-(ungroup (drop-columns (group-ds-by DS [:V4]) (comp #{:int64} :datatype)))
+(ungroup (select-columns (group-by DS :V1) {:V1 "v1"}))
+(ungroup (drop-columns (group-by DS [:V4]) (comp #{:int64} :datatype)))
 
 (add-or-update-column DS :abc [1 2] {:count-strategy :na})
 (add-or-update-column DS :abc [1 2] {:count-strategy :cycle})
@@ -440,13 +470,13 @@
 (add-or-update-columns DS {:abc "X"
                            :xyz [1 2 3]} {:count-strategy :na})
 
-(ungroup (add-or-update-column (group-ds-by DS :V4) :abc #(let [mean (dfn/mean (% :V2))
+(ungroup (add-or-update-column (group-by DS :V4) :abc #(let [mean (dfn/mean (% :V2))
                                                                 stddev (dfn/standard-deviation (% :V2))]
                                                             (dfn// (dfn/- (% :V2) mean)
                                                                    stddev))))
 
 
-(ungroup (add-or-update-columns (group-ds-by DS :V4) {:abc "X"
+(ungroup (add-or-update-columns (group-by DS :V4) {:abc "X"
                                                       :xyz [-1]} {:count-strategy :na}))
 
 (convert-column-type DS :V1 :float64)
@@ -463,8 +493,8 @@
 (select-rows DS [true nil nil true])
 (drop-rows DS [true nil nil true])
 
-(ungroup (select-rows (group-ds-by DS :V1) 0))
-(ungroup (drop-rows (group-ds-by DS :V1) 0))
+(ungroup (select-rows (group-by DS :V1) 0))
+(ungroup (drop-rows (group-by DS :V1) 0))
 
 ;; select rows where :V2 values are lower than column mean
 (let [mean (dfn/mean (DS :V2))]
@@ -472,29 +502,43 @@
 
 ;; select rows of grouped (by :V4) where :V2 values are lower than :V2 mean.
 ;; pre option adds temporary columns according to provided map before row selecting 
-(ungroup (select-rows (group-ds-by DS :V4)
+(ungroup (select-rows (group-by DS :V4)
                       (fn [row] (< (:V2 row) (:mean row)))
                       {:pre {:mean #(dfn/mean (% :V2))}}))
 
 (aggregate DS [#(dfn/mean (% :V3)) (fn [ds] {:mean-v1 (dfn/mean (ds :V1))
                                             :mean-v2 (dfn/mean (ds :V2))})])
 
-(aggregate (group-ds-by DS :V4) [#(dfn/mean (% :V3)) (fn [ds] {:mean-v1 (dfn/mean (ds :V1))
+(aggregate (group-by DS :V4) [#(dfn/mean (% :V3)) (fn [ds] {:mean-v1 (dfn/mean (ds :V1))
                                                               :mean-v2 (dfn/mean (ds :V2))})])
 
-(order-ds-by DS :V1)
-(order-ds-by DS :V1 :desc)
+(order-by DS :V1)
+(order-by DS :V1 :desc)
 
-(order-ds-by DS [:V1 :V2])
-(order-ds-by DS [:V1 :V2] [:asc :desc])
-(order-ds-by DS [:V1 :V2] [:desc :desc])
-(order-ds-by DS [:V3 :V1] [:desc :asc])
+(order-by DS [:V1 :V2])
+(order-by DS [:V1 :V2] [:asc :desc])
+(order-by DS [:V1 :V2] [:desc :desc])
+(order-by DS [:V3 :V1] [:desc :asc])
 
-(order-ds-by DS [:V4 (fn [row] (* (:V1 row)
-                                 (:V2 row)
-                                 (:V3 row)))] [#(if (= %1 %2) -1 0) :asc])
+(order-by DS [:V4 (fn [row] (* (:V1 row)
+                              (:V2 row)
+                              (:V3 row)))] [#(if (= %1 %2) -1 0) :asc])
 
-(ungroup (order-ds-by (group-ds-by DS :V4) [:V1 :V2] [:desc :desc]))
+(ungroup (order-by (group-by DS :V4) [:V1 :V2] [:desc :desc]))
+
+(unique-by DS)
+
+(unique-by DS :V1)
+(unique-by DS :V1 {:strategy :last})
+(unique-by DS :V1 {:strategy :random})
+
+(unique-by DS [:V1 :V4])
+(unique-by DS [:V1 :V4] {:strategy :last})
+
+(unique-by DS (fn [m] (mod (:V2 m) 3)))
+(unique-by DS (fn [m] (mod (:V2 m) 3)) {:strategy :last :limit-columns [:V2]})
+
+(ungroup (unique-by (group-by DS :V4) [:V1 :V3]))
 
 ;;;;
 
@@ -502,10 +546,10 @@
 
 (-> flights ;; take dataset (loaded from the net
     (select-rows #(= "AA" (get % "carrier"))) ;; filter rows by carrier="AA"
-    (group-ds-by ["origin" "dest" "month"]) ;; group by several columns
+    (group-by ["origin" "dest" "month"]) ;; group by several columns
     (aggregate {:arr-delay-mean #(dfn/mean (% "arr_delay")) ;; calculate mean of arr_delay...
                 :dep-delay-mean #(dfn/mean (% "dep_delay"))}) ;; ...and dep_delay
-    (order-ds-by ["origin" "dest" "month"]) ;; order by some columns
+    (order-by ["origin" "dest" "month"]) ;; order by some columns
     (select-rows (range 12))) ;; take first 12 rows
 ;; => _unnamed [12 5]:
 ;;    | month | origin | dest | :arr-delay-mean | :dep-delay-mean |
