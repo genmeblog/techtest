@@ -118,6 +118,11 @@
            (dataset options)
            (mark-as-group))))))
 
+(defn- group-name-map->cols
+  [name count]
+  (map (fn [[n v]]
+         (col/new-column n (repeat count v))) name))
+
 (defn ungroup
   "Concat groups into dataset"
   ([ds] (ungroup ds nil))
@@ -126,14 +131,17 @@
    (let [prepared-ds (->> ds
                           (ds/mapseq-reader)
                           (map (fn [{:keys [name group-id count data] :as ds}]
-                                 (if (or add-group-as-column add-group-id-as-column)
+                                 (if (or add-group-as-column
+                                         add-group-id-as-column)
                                    (let [col1 (if add-group-as-column
-                                                (col/new-column :$group-name (repeat count name)))
+                                                (if (map? name)
+                                                  (group-name-map->cols name count)
+                                                  [(col/new-column :$group-name (repeat count name))]))
                                          col2 (if add-group-id-as-column
-                                                (col/new-column :$group-id (repeat count group-id)))]
+                                                [(col/new-column :$group-id (repeat count group-id))])]
                                      (->> data
                                           (ds/columns)
-                                          (concat [col1 col2])
+                                          (concat col1 col2)
                                           (remove nil?)
                                           (ds/new-dataset)
                                           (assoc ds :data)))
@@ -300,7 +308,8 @@
      (as-> ds ds
        (ds/add-or-update-column ds :data (map #(aggregate % fn-map-or-seq options) (ds :data)))
        (ds/add-or-update-column ds :count (map ds/row-count (ds :data)))
-       (ungroup ds {:add-group-as-column true}))
+       (ungroup ds {:add-group-as-columns true
+                    :add-group-as-column true}))
      (cond
        (fn? fn-map-or-seq) (aggregate ds {:summary fn-map-or-seq})
        (sequential+? fn-map-or-seq) (->> fn-map-or-seq
@@ -482,3 +491,30 @@
                                  (:V3 row)))] [#(if (= %1 %2) -1 0) :asc])
 
 (ungroup (order-ds-by (group-ds-by DS :V4) [:V1 :V2] [:desc :desc]))
+
+;;;;
+
+(def flights (dataset "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv"))
+
+(-> flights ;; take dataset (loaded from the net
+    (select-rows #(= "AA" (get % "carrier"))) ;; filter rows by carrier="AA"
+    (group-ds-by ["origin" "dest" "month"]) ;; group by several columns
+    (aggregate {:arr-delay-mean #(dfn/mean (% "arr_delay")) ;; calculate mean of arr_delay...
+                :dep-delay-mean #(dfn/mean (% "dep_delay"))}) ;; ...and dep_delay
+    (order-ds-by ["origin" "dest" "month"]) ;; order by some columns
+    (select-rows (range 12))) ;; take first 12 rows
+;; => _unnamed [12 5]:
+;;    | month | origin | dest | :arr-delay-mean | :dep-delay-mean |
+;;    |-------+--------+------+-----------------+-----------------|
+;;    | 1.000 |    EWR |  DFW |           6.428 |           10.01 |
+;;    | 2.000 |    EWR |  DFW |           10.54 |           11.35 |
+;;    | 3.000 |    EWR |  DFW |           12.87 |           8.080 |
+;;    | 4.000 |    EWR |  DFW |           17.79 |           12.92 |
+;;    | 5.000 |    EWR |  DFW |           18.49 |           18.68 |
+;;    | 6.000 |    EWR |  DFW |           37.01 |           38.74 |
+;;    | 7.000 |    EWR |  DFW |           20.25 |           21.15 |
+;;    | 8.000 |    EWR |  DFW |           16.94 |           22.07 |
+;;    | 9.000 |    EWR |  DFW |           5.865 |           13.06 |
+;;    | 10.00 |    EWR |  DFW |           18.81 |           18.89 |
+;;    | 1.000 |    EWR |  LAX |           1.367 |           7.500 |
+;;    | 2.000 |    EWR |  LAX |           10.33 |           4.111 |
