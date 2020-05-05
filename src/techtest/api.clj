@@ -234,14 +234,16 @@
 
 (defn- select-or-drop-columns
   "Select or drop columns."
-  [f ds cols-selector]
-  (if (grouped? ds)
-    (ds/add-or-update-column ds :data (map #(select-or-drop-columns f % cols-selector) (ds :data)))
-    (f ds (cond
-            (or (map? cols-selector)
-                (sequential+? cols-selector)) cols-selector
-            (fn? cols-selector) (filter-column-names cols-selector ds)
-            :else [cols-selector]))))
+  ([f ds] (select-or-drop-columns f ds :all))
+  ([f ds cols-selector]
+   (if (grouped? ds)
+     (ds/add-or-update-column ds :data (map #(select-or-drop-columns f % cols-selector) (ds :data)))
+     (f ds (cond
+             (= :all cols-selector) (ds/column-names ds)
+             (or (map? cols-selector)
+                 (sequential+? cols-selector)) cols-selector
+             (fn? cols-selector) (filter-column-names cols-selector ds)
+             :else [cols-selector])))))
 
 (defn- select-or-drop-colums-docstring
   [op]
@@ -517,6 +519,31 @@
 ;; MISSING
 ;;;;;;;;;;;;
 
+(defn select-or-drop-missing
+  "Select rows with missing values"
+  ([f ds] (select-or-drop-missing f ds nil))
+  ([f ds cols-selector]
+   (if (grouped? ds)
+     (as-> ds ds
+       (ds/add-or-update-column ds :data (map #(select-missing f % cols-selector) (ds :data)))
+       (ds/add-or-update-column ds :count (map ds/row-count (ds :data))))
+     (let [ds- (if cols-selector
+                 (select-columns ds cols-selector)
+                 ds)]
+       (f ds (ds/missing ds-))))))
+
+(defn- select-or-drop-missing-docstring
+  [op]
+  (str op " rows with missing values
+
+ `cols-selector` selects columns to look at missing values"))
+
+(def ^{:doc (select-or-drop-missing-docstring "Select")}
+  select-missing (partial select-or-drop-missing ds/select-rows))
+
+(def ^{:doc (select-or-drop-missing-docstring "Drop")}
+  drop-missing (partial select-or-drop-missing ds/drop-rows))
+
 ;;;;;;;;;;;;;;
 ;; USE CASES
 ;;;;;;;;;;;;;;
@@ -535,6 +562,11 @@
                   :V2 (range 1 10)
                   :V3 (take 9 (cycle [0.5 1.0 1.5]))
                   :V4 (take 9 (cycle [\A \B \C]))}))
+
+(def DSm (dataset {:V1 (take 9 (cycle [1 2 nil]))
+                   :V2 (range 1 10)
+                   :V3 (take 9 (cycle [0.5 1.0 nil 1.5]))
+                   :V4 (take 9 (cycle [\A \B \C]))}))
 
 (group-by DS :V1 {:result-type :as-map})
 (group-by DS [:V1 :V3])
@@ -648,6 +680,12 @@
 (unique-by DS (fn [m] (mod (:V2 m) 3)) {:strategy :last :limit-columns [:V2]})
 
 (ungroup (unique-by (group-by DS :V4) [:V1 :V3]))
+
+(select-missing DSm)
+(drop-missing DSm)
+
+(select-missing DSm :V1)
+(drop-missing DSm :V1)
 
 ;;;;
 
