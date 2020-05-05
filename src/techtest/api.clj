@@ -692,12 +692,14 @@
 (defonce flights (dataset "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv"))
 
 (-> flights ;; take dataset (loaded from the net
+    (drop-missing) ;; remove rows with missing values
     (select-rows #(= "AA" (get % "carrier"))) ;; filter rows by carrier="AA"
     (group-by ["origin" "dest" "month"]) ;; group by several columns
     (aggregate {:arr-delay-mean #(dfn/mean (% "arr_delay")) ;; calculate mean of arr_delay...
                 :dep-delay-mean #(dfn/mean (% "dep_delay"))}) ;; ...and dep_delay
     (order-by ["origin" "dest" "month"]) ;; order by some columns
-    (select-rows (range 12))) ;; take first 12 rows
+    (select-rows (range 12)) ;; take first 12 rows
+    )
 ;; => _unnamed [12 5]:
 ;;    | month | origin | dest | :arr-delay-mean | :dep-delay-mean |
 ;;    |-------+--------+------+-----------------+-----------------|
@@ -713,4 +715,3 @@
 ;;    | 10.00 |    EWR |  DFW |           18.81 |           18.89 |
 ;;    | 1.000 |    EWR |  LAX |           1.367 |           7.500 |
 ;;    | 2.000 |    EWR |  LAX |           10.33 |           4.111 |
-
