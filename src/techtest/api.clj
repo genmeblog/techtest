@@ -4,7 +4,7 @@
             [tech.v2.datatype.functional :as dfn]
             [tech.v2.datatype :as dtype]
             [tech.ml.protocols.dataset :as prot])
-  (:refer-clojure :exclude [group-by]))
+  (:refer-clojure :exclude [group-by drop]))
 
 ;; attempt to reorganized api
 
@@ -378,6 +378,25 @@
 (def ^{:doc (select-or-drop-rows-docstring "Drop")}
   drop-rows (partial select-or-drop-rows ds/drop-rows))
 
+;;;;;;;;;;;;;;;;;;;;;;;;
+;; COMBINED OPERATIONS
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn- select-or-drop
+  "Select columns and rows"
+  [fc fs ds cols-selector rows-selector]
+  (let [ds (if (and cols-selector
+                    (not= :all cols-selector))
+             (fc ds cols-selector)
+             ds)]
+    (if (and rows-selector
+             (not= :all rows-selector))
+      (fs ds rows-selector)
+      ds)))
+
+(def select (partial select-or-drop select-columns select-rows))
+(def drop (partial select-or-drop drop-columns drop-rows))
+
 ;;;;;;;;;;;;;;;;
 ;; AGGREGATING
 ;;;;;;;;;;;;;;;;
@@ -525,7 +544,7 @@
   ([f ds cols-selector]
    (if (grouped? ds)
      (as-> ds ds
-       (ds/add-or-update-column ds :data (map #(select-missing f % cols-selector) (ds :data)))
+       (ds/add-or-update-column ds :data (map #(select-or-drop-missing f % cols-selector) (ds :data)))
        (ds/add-or-update-column ds :count (map ds/row-count (ds :data))))
      (let [ds- (if cols-selector
                  (select-columns ds cols-selector)
@@ -686,6 +705,10 @@
 
 (select-missing DSm :V1)
 (drop-missing DSm :V1)
+
+;; doesn't work currently! (issue #61 in tech.ml.dataset)
+(ungroup (select-missing (group-by DSm :V4)))
+(ungroup (drop-missing (group-by DSm :V4)))
 
 ;;;;
 
