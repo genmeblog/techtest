@@ -344,11 +344,6 @@
      (sequential+? rows-selector) (find-indexes-from-seq ds rows-selector)
      (fn? rows-selector) (find-indexes-from-fn ds rows-selector limit-columns))))
 
-(find-indexes DS 1)
-(find-indexes DS [2 3])
-(find-indexes DS [true nil nil true])
-(find-indexes DS (comp #(< 1 %) :V1))
-
 (defn- select-or-drop-rows
   "Select or drop rows."
   ([f ds rows-selector] (select-or-drop-rows f ds rows-selector nil))
@@ -709,6 +704,15 @@
 ;; doesn't work currently! (issue #61 in tech.ml.dataset)
 (ungroup (select-missing (group-by DSm :V4)))
 (ungroup (drop-missing (group-by DSm :V4)))
+
+;;;;
+
+;; private tests
+
+(find-indexes DS 1)
+(find-indexes DS [2 3])
+(find-indexes DS [true nil nil true])
+(find-indexes DS (comp #(< 1 %) :V1))
 
 ;;;;
 
