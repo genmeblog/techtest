@@ -3,6 +3,7 @@
             [tech.ml.dataset.column :as col]
             [tech.v2.datatype.functional :as dfn]
             [tech.v2.datatype :as dtype]
+            [tech.v2.datatype.datetime.operations :as dtype-dt-ops]
             [tech.ml.dataset.pipeline :as pipe]
             [tech.ml.protocols.dataset :as prot])
   (:refer-clojure :exclude [group-by drop]))
@@ -44,12 +45,17 @@
             1)]
     (map-v #(if (sequential+? %) % (repeat c %)) map-ds)))
 
-(defn- unroll-ds
-  [ds unroll-options]
+(defn unroll
+  "Unroll columns if they are sequences. Selector can be one of:
+
+  - column name
+  - seq of column names
+  - map: column name -> column type"
+  [ds columns-selector]
   (cond
-    (map? unroll-options) (reduce #(ds/unroll-column %1 (first %2) {:datatype (second %2)}) ds unroll-options)
-    (sequential+? unroll-options) (reduce #(ds/unroll-column %1 %2) ds unroll-options)
-    :else (ds/unroll-column ds unroll-options)))
+    (map? columns-selector) (reduce #(ds/unroll-column %1 (first %2) {:datatype (second %2)}) ds columns-selector)
+    (sequential+? columns-selector) (reduce #(ds/unroll-column %1 %2) ds columns-selector)
+    :else (ds/unroll-column ds columns-selector)))
 
 (defn dataset
   "Create `dataset`.
@@ -60,10 +66,12 @@
   * map of values and/or sequences
   * sequence of maps
   * sequence of columns
-  * file or url"
+  * file or url
+
+  If `unroll` is set, `unroll` function is called."
   ([data]
    (dataset data nil))
-  ([data {:keys [single-value-name unroll]
+  ([data {:keys [single-value-name]
           :or {single-value-name :$value}
           :as options}]
    (let [ds (cond
@@ -76,7 +84,9 @@
                    (every? col/is-column? data)) (ds/new-dataset options data)
               (not (seqable? data)) (ds/->dataset [{single-value-name data}] options)
               :else (ds/->dataset data options))]
-     (if unroll (unroll-ds ds unroll) ds))))
+     (if-let [unroll-selector (:unroll options)]
+       (unroll ds unroll-selector)
+       ds))))
 
 ;;;;;;;;;;;;;
 ;; GROUPING
@@ -584,6 +594,13 @@
 (dataset [{:a 1 :b [1 2 3]} {:a 2 :b [3 4]}] {:unroll [:b]})
 (dataset [{:a 1 :b [1 2 3] :c 2} {:a 2 :b [3 4] :c 1} {:a 3 :b 3 :c [2 3]}] {:unroll [:b :c]})
 
+;; unroll
+
+(unroll (dataset [{:a 1 :b [1 2 3]} {:a 2 :b [3 4]}]) :b)
+(unroll (dataset [{:a 1 :b [1 2 3]} {:a 2 :b [3 4]}]) [:b])
+(unroll (dataset [{:a 1 :b [1 2 3]} {:a 2 :b [3 4]}]) {:b :float32})
+
+
 ;; https://archive.ics.uci.edu/ml/machine-learning-databases/kddcup98-mld/epsilon_mirror/
 ;; (time (def ds (dataset "cup98LRN.txt.gz")))
 (def DS (dataset {:V1 (take 9 (cycle [1 2]))
@@ -757,3 +774,50 @@
 ;;    | 2.000 |    EWR |  LAX |           10.33 |           4.111 |
 
 
+;;; stocks aggregation
+
+(defonce stocks (dataset "https://raw.githubusercontent.com/techascent/tech.ml.dataset/master/test/data/stocks.csv" {:key-fn keyword}))
+
+(-> stocks
+    (group-by (fn [row]
+                {:symbol (:symbol row)
+                 :year (dtype-dt-ops/get-years (:date row))}))
+    (aggregate #(dfn/mean (% :price)))
+    (order-by [:symbol :year])
+    (select-rows (range 12)))
+;; => _unnamed [12 3]:
+;;    | :symbol | :year | :summary |
+;;    |---------+-------+----------|
+;;    |    AAPL |  2000 |    21.75 |
+;;    |    AAPL |  2001 |    10.18 |
+;;    |    AAPL |  2002 |    9.408 |
+;;    |    AAPL |  2003 |    9.347 |
+;;    |    AAPL |  2004 |    18.72 |
+;;    |    AAPL |  2005 |    48.17 |
+;;    |    AAPL |  2006 |    72.04 |
+;;    |    AAPL |  2007 |    133.4 |
+;;    |    AAPL |  2008 |    138.5 |
+;;    |    AAPL |  2009 |    150.4 |
+;;    |    AAPL |  2010 |    206.6 |
+;;    |    AMZN |  2000 |    43.93 |
+
+(-> stocks
+    (group-by (juxt :symbol #(dtype-dt-ops/get-years (% :date))))
+    (aggregate #(dfn/mean (% :price)))
+    (order-by :$group-name)
+    (select-rows (range 12)))
+;; => _unnamed [12 2]:
+;;    |  :$group-name | :summary |
+;;    |---------------+----------|
+;;    | ["AAPL" 2000] |    21.75 |
+;;    | ["AAPL" 2001] |    10.18 |
+;;    | ["AAPL" 2002] |    9.408 |
+;;    | ["AAPL" 2003] |    9.347 |
+;;    | ["AAPL" 2004] |    18.72 |
+;;    | ["AAPL" 2005] |    48.17 |
+;;    | ["AAPL" 2006] |    72.04 |
+;;    | ["AAPL" 2007] |    133.4 |
+;;    | ["AAPL" 2008] |    138.5 |
+;;    | ["AAPL" 2009] |    150.4 |
+;;    | ["AAPL" 2010] |    206.6 |
+;;    | ["AMZN" 2000] |    43.93 |
