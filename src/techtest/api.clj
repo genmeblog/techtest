@@ -3,6 +3,7 @@
             [tech.ml.dataset.column :as col]
             [tech.v2.datatype.functional :as dfn]
             [tech.v2.datatype :as dtype]
+            [tech.ml.dataset.pipeline :as pipe]
             [tech.ml.protocols.dataset :as prot])
   (:refer-clojure :exclude [group-by drop]))
 
@@ -43,6 +44,13 @@
             1)]
     (map-v #(if (sequential+? %) % (repeat c %)) map-ds)))
 
+(defn- unroll-ds
+  [ds unroll-options]
+  (cond
+    (map? unroll-options) (reduce #(ds/unroll-column %1 (first %2) {:datatype (second %2)}) ds unroll-options)
+    (sequential+? unroll-options) (reduce #(ds/unroll-column %1 %2) ds unroll-options)
+    :else (ds/unroll-column ds unroll-options)))
+
 (defn dataset
   "Create `dataset`.
   
@@ -55,19 +63,20 @@
   * file or url"
   ([data]
    (dataset data nil))
-  ([data {:keys [single-value-name]
+  ([data {:keys [single-value-name unroll]
           :or {single-value-name :$value}
           :as options}]
-   (cond
-     (dataset? data) data
-     (map? data) (apply ds/name-values-seq->dataset (fix-map-dataset data) options)
-     (and (sequential+? data)
-          (every? sequential+? data)
-          (every? #(= 2 (count %)) data)) (dataset (into {} data) options)
-     (and (sequential+? data)
-          (every? col/is-column? data)) (ds/new-dataset options data)
-     (not (seqable? data)) (ds/->dataset [{single-value-name data}] options)
-     :else (ds/->dataset data options))))
+   (let [ds (cond
+              (dataset? data) data
+              (map? data) (apply ds/name-values-seq->dataset (fix-map-dataset data) options)
+              (and (sequential+? data)
+                   (every? sequential+? data)
+                   (every? #(= 2 (count %)) data)) (dataset (into {} data) options)
+              (and (sequential+? data)
+                   (every? col/is-column? data)) (ds/new-dataset options data)
+              (not (seqable? data)) (ds/->dataset [{single-value-name data}] options)
+              :else (ds/->dataset data options))]
+     (if unroll (unroll-ds ds unroll) ds))))
 
 ;;;;;;;;;;;;;
 ;; GROUPING
@@ -570,6 +579,11 @@
 (dataset [[:A [3 4 5]] [:B "X"]])
 (dataset [{:a 1 :b 3} {:b 2 :a 99}])
 
+(dataset [{:a 1 :b [1 2 3]} {:a 2 :b [3 4]}])
+(dataset [{:a 1 :b [1 2 3]} {:a 2 :b [3 4]}] {:unroll {:b :float64}})
+(dataset [{:a 1 :b [1 2 3]} {:a 2 :b [3 4]}] {:unroll [:b]})
+(dataset [{:a 1 :b [1 2 3] :c 2} {:a 2 :b [3 4] :c 1} {:a 3 :b 3 :c [2 3]}] {:unroll [:b :c]})
+
 ;; https://archive.ics.uci.edu/ml/machine-learning-databases/kddcup98-mld/epsilon_mirror/
 ;; (time (def ds (dataset "cup98LRN.txt.gz")))
 (def DS (dataset {:V1 (take 9 (cycle [1 2]))
@@ -701,7 +715,6 @@
 (select-missing DSm :V1)
 (drop-missing DSm :V1)
 
-;; doesn't work currently! (issue #61 in tech.ml.dataset)
 (ungroup (select-missing (group-by DSm :V4)))
 (ungroup (drop-missing (group-by DSm :V4)))
 
@@ -742,3 +755,5 @@
 ;;    | 10.00 |    EWR |  DFW |           18.81 |           18.89 |
 ;;    | 1.000 |    EWR |  LAX |           1.367 |           7.500 |
 ;;    | 2.000 |    EWR |  LAX |           10.33 |           4.111 |
+
+
