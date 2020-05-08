@@ -4,8 +4,11 @@
             [tech.v2.datatype.functional :as dfn]
             [tech.v2.datatype :as dtype]
             [tech.v2.datatype.datetime.operations :as dtype-dt-ops]
+            [tech.v2.datatype.readers.const :as const-rdr]
+            [tech.v2.datatype.readers.concat :as concat-rdr]
             [tech.ml.dataset.pipeline :as pipe]
-            [tech.ml.protocols.dataset :as prot])
+            [tech.ml.protocols.dataset :as prot]
+            [clojure.string :as str])
   (:refer-clojure :exclude [group-by drop]))
 
 ;; attempt to reorganized api
@@ -164,6 +167,11 @@
                     (into {}))
        (group-by->dataset ds group-indexes options)))))
 
+(defn- correct-group-count
+  "Correct count for each group"
+  [ds]
+  (ds/add-or-update-column ds :count (map ds/row-count (ds :data))))
+
 (defn group-as-map
   "Convert grouped dataset to the map of groups"
   [ds]
@@ -199,7 +207,7 @@
   "Convert group id to as seq of columns"
   [add-group-id-as-column? count group-id]
   (if add-group-id-as-column?
-    [(col/new-column :$group-id (repeat count group-id))]))
+    [(col/new-column :$group-id (const-rdr/make-const-reader group-id :int64 count))]))
 
 (defn- prepare-ds-for-ungrouping
   "Add optional group name and/or group-id as columns to a result of ungrouping."
@@ -244,25 +252,32 @@
 
 (defn- filter-column-names
   "Filter column names"
-  [cols-selector ds]
+  [ds cols-selector meta-field]
   (->> ds
        (ds/columns)
        (map meta)
-       (filter cols-selector)
+       (filter (comp cols-selector meta-field))
        (map :name)))
+
+(defn- select-column-names
+  ([ds cols-selector] (select-column-names ds cols-selector :name))
+  ([ds cols-selector meta-field]
+   (cond
+     (= :all cols-selector) (ds/column-names ds)
+     (or (map? cols-selector)
+         (sequential+? cols-selector)) cols-selector
+     (fn? cols-selector) (filter-column-names ds cols-selector meta-field)
+     :else [cols-selector])))
 
 (defn- select-or-drop-columns
   "Select or drop columns."
   ([f ds] (select-or-drop-columns f ds :all))
-  ([f ds cols-selector]
+  ([f ds cols-selector] (select-or-drop-columns f ds cols-selector nil))
+  ([f ds cols-selector {:keys [meta-field]
+                        :or {meta-field :name}}]
    (if (grouped? ds)
      (ds/add-or-update-column ds :data (map #(select-or-drop-columns f % cols-selector) (ds :data)))
-     (f ds (cond
-             (= :all cols-selector) (ds/column-names ds)
-             (or (map? cols-selector)
-                 (sequential+? cols-selector)) cols-selector
-             (fn? cols-selector) (filter-column-names cols-selector ds)
-             :else [cols-selector])))))
+     (f ds (select-column-names ds cols-selector meta-field)))))
 
 (defn- select-or-drop-colums-docstring
   [op]
@@ -293,7 +308,9 @@
       (> seq-cnt cnt) (take cnt col-or-seq)
       (< seq-cnt cnt) (if (= strategy :cycle)
                         (take cnt (cycle col-or-seq))
-                        (concat col-or-seq (repeat (- cnt seq-cnt) nil)))
+                        (if (col/is-column? col-or-seq)
+                          (col/extend-column-with-empty col-or-seq (- cnt seq-cnt))
+                          (concat col-or-seq (repeat (- cnt seq-cnt) nil))))
       :else col-or-seq)))
 
 (defn add-or-update-column
@@ -371,9 +388,9 @@
    (if (grouped? ds)
      (let [pre-ds (map #(add-or-update-columns % pre) (ds :data))
            indices (map #(find-indexes % rows-selector limit-columns) pre-ds)]
-       (as-> ds ds
-         (ds/add-or-update-column ds :data (map #(select-or-drop-rows f %1 %2) (ds :data) indices))
-         (ds/add-or-update-column ds :count (map ds/row-count (ds :data)))))
+       (-> ds
+           (ds/add-or-update-column :data (map #(select-or-drop-rows f %1 %2) (ds :data) indices))
+           (correct-group-count)))
      
      (f ds (find-indexes (add-or-update-columns ds pre) rows-selector limit-columns)))))
 
@@ -441,10 +458,10 @@
                       :or {default-column-name-prefix "summary"}
                       :as options}]
    (if (grouped? ds)
-     (as-> ds ds
-       (ds/add-or-update-column ds :data (map #(aggregate % fn-map-or-seq options) (ds :data)))
-       (ds/add-or-update-column ds :count (map ds/row-count (ds :data)))
-       (ungroup ds {:add-group-as-column? true}))
+     (-> ds
+         (ds/add-or-update-column :data (map #(aggregate % fn-map-or-seq options) (ds :data)))
+         (correct-group-count)
+         (ungroup {:add-group-as-column? true}))
      (cond
        (fn? fn-map-or-seq) (aggregate ds {:summary fn-map-or-seq})
        (sequential+? fn-map-or-seq) (->> fn-map-or-seq
@@ -537,9 +554,10 @@
                      :or {strategy :first}
                      :as options}]
    (if (grouped? ds)
-     (as-> ds ds
-       (ds/add-or-update-column ds :data (map #(unique-by % row-selector options) (ds :data)))
-       (ds/add-or-update-column ds :count (map ds/row-count (ds :data))))
+     (-> ds
+         (ds/add-or-update-column :data (map #(unique-by % row-selector options) (ds :data)))
+         (correct-group-count))
+     
      (let [local-options {:keep-fn (get strategies strategy :first)}]
        (cond
          (sequential+? row-selector) (ds/unique-by identity (assoc local-options :column-name-seq row-selector) ds)
@@ -557,9 +575,9 @@
   ([f ds] (select-or-drop-missing f ds nil))
   ([f ds cols-selector]
    (if (grouped? ds)
-     (as-> ds ds
-       (ds/add-or-update-column ds :data (map #(select-or-drop-missing f % cols-selector) (ds :data)))
-       (ds/add-or-update-column ds :count (map ds/row-count (ds :data))))
+     (-> ds
+         (ds/add-or-update-column :data (map #(select-or-drop-missing f % cols-selector) (ds :data)))
+         (correct-group-count))
      (let [ds- (if cols-selector
                  (select-columns ds cols-selector)
                  ds)]
@@ -576,6 +594,10 @@
 
 (def ^{:doc (select-or-drop-missing-docstring "Drop")}
   drop-missing (partial select-or-drop-missing ds/drop-rows))
+
+;;;;;;;;;;;;
+;; RESHAPE
+;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;
 ;; USE CASES
@@ -634,11 +656,11 @@
 (select-columns DS [:V1 :V2])
 (select-columns DS {:V1 "v1"
                     :V2 "v2"})
-(select-columns DS (comp #{:int64} :datatype))
+(select-columns DS #(= :int64 %) {:meta-field :datatype})
 
 (drop-columns DS :V1)
 (drop-columns DS [:V1 :V2])
-(drop-columns DS (comp #{:int64} :datatype))
+(drop-columns DS #(= :int64 %) {:meta-field :datatype})
 
 (rename-columns DS {:V1 "v1"
                     :V2 "v2"})
@@ -821,3 +843,86 @@
 ;;    | ["AAPL" 2009] |    150.4 |
 ;;    | ["AAPL" 2010] |    206.6 |
 ;;    | ["AMZN" 2000] |    43.93 |
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; playground
+
+(defn- regroup-cols-from-template
+  [ds cols names value-name column-split-fn]
+  (let [template? (some nil? names)
+        pre-groups (->> cols
+                        (map (fn [col-name]
+                               (let [col (ds col-name)
+                                     split (column-split-fn col-name)
+                                     buff (if template? {} {value-name col})]
+                                 (into buff (map (fn [k v] (if k [k v] [v col]))
+                                                 names split))))))
+        groups (-> (->> names
+                        (remove nil?)
+                        (apply juxt))
+                   (clojure.core/group-by pre-groups)
+                   (vals))]
+    (map #(reduce merge %) groups)))
+
+(defn- cols->pre-longer
+  ([ds cols names value-name]
+   (cols->pre-longer ds cols names value-name nil))
+  ([ds cols names value-name column-splitter]
+   (let [column-split-fn (cond (instance? java.util.regex.Pattern column-splitter) (comp rest #(re-find column-splitter (str %)))
+                               (fn? column-splitter) column-splitter
+                               :else vector)
+         names (if (sequential+? names) names [names])]
+     (regroup-cols-from-template ds cols names value-name column-split-fn))))
+
+(defn- pre-longer->target-cols
+  [ds cnt m]
+  (let [new-cols (map (fn [[col-name maybe-column]]
+                        (if (col/is-column? maybe-column)
+                          (col/set-name maybe-column col-name)
+                          (col/new-column col-name (const-rdr/make-const-reader maybe-column :object cnt)))) m)]
+    (ds/append-columns ds new-cols)))
+
+(defn pivot->longer
+  "`tidyr` pivot_longer api"
+  ([ds cols-selector] (pivot->longer ds cols-selector nil))
+  ([ds cols-selector {:keys [target-cols value-column-name splitter drop-missing?]
+                      :or {target-cols :$column
+                           value-column-name :$value
+                           drop-missing? true}}]
+   (let [cols (select-column-names ds cols-selector)
+         groups (cols->pre-longer ds cols target-cols value-column-name splitter)
+         ds-template (drop-columns ds cols)
+         cnt (ds/row-count ds-template)
+         final-ds (ds/set-metadata (->> groups
+                                        (map (partial pre-longer->target-cols ds-template cnt))
+                                        (reduce ds/concat))
+                                   (ds/metadata ds))]
+     (if drop-missing? (drop-missing final-ds) final-ds))))
+
+;; TESTS
+
+(def rids (dataset "data/relig_income.csv"))
+(def who (dataset "data/who.csv.gz"))
+(def family (dataset "data/family.csv"))
+
+(def pn1 (dataset {:x [1 2 3 4]
+                   :a [1 1 0 0]
+                   :b [0 1 1 1]
+                   :y1 (repeatedly 4 rand)
+                   :y2 (repeatedly 4 rand)
+                   :z1 [3 3 3 3]
+                   :z2 [-2 -2 -2 -2]}))
+
+(pivot->longer rids (complement #{"religion"}))
+(pivot->longer pn1 [:y1 :y2 :z1 :z2] {:target-cols [nil :times]
+                                      :splitter #":(.)(.)"})
+
+(pivot->longer family (complement #{"family"}) {:target-cols [nil :child] :splitter #(str/split % #"_")})
+
+;; DOESN'T WORK DUE TO TYPE MISMATCH
+#_(pivot->longer who #(str/starts-with? % "new") {:target-cols [:diagnosis :gender :age]
+                                                  :splitter #"new_?(.*)_(.)(.*)"})
+
