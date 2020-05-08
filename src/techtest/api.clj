@@ -256,7 +256,7 @@
   (->> ds
        (ds/columns)
        (map meta)
-       (filter (comp cols-selector meta-field))
+       (filter (comp cols-selector (or meta-field identity)))
        (map :name)))
 
 (defn- select-column-names
@@ -344,8 +344,13 @@
   "Convert type of the column to the other type.
 
   Possible types: `:int64` `:int32` `:int16` `:int8` `:float64` `:float32` `:uint64` `:uint32` `:uint16` `:uint8` `:boolean` `:object`"
-  [ds colname new-type]
-  (ds/add-or-update-column ds colname (dtype/->reader (ds colname) new-type)))
+  ([ds coltype-map]
+   (reduce (fn [ds [colname new-type]]
+             (convert-column-type ds colname new-type)) ds coltype-map))
+  ([ds colname new-type]
+   (ds/add-or-update-column ds colname (if (= :string (-> colname ds meta :datatype))
+                                         (col/parse-column new-type (ds colname))
+                                         (dtype/->reader (ds colname) new-type)))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; ROWS OPERATIONS
@@ -599,6 +604,61 @@
 ;; RESHAPE
 ;;;;;;;;;;;;
 
+(defn- regroup-cols-from-template
+  [ds cols names value-name column-split-fn]
+  (let [template? (some nil? names)
+        pre-groups (->> cols
+                        (map (fn [col-name]
+                               (let [col (ds col-name)
+                                     split (column-split-fn col-name)
+                                     buff (if template? {} {value-name col})]
+                                 (into buff (mapv (fn [k v] (if k [k v] [v col]))
+                                                  names split))))))
+        groups (-> (->> names
+                        (remove nil?)
+                        (apply juxt))
+                   (clojure.core/group-by pre-groups)
+                   (vals))]
+    (map #(reduce merge %) groups)))
+
+(defn- cols->pre-longer
+  ([ds cols names value-name]
+   (cols->pre-longer ds cols names value-name nil))
+  ([ds cols names value-name column-splitter]
+   (let [column-split-fn (cond (instance? java.util.regex.Pattern column-splitter) (comp rest #(re-find column-splitter (str %)))
+                               (fn? column-splitter) column-splitter
+                               :else vector)
+         names (if (sequential+? names) names [names])]
+     (regroup-cols-from-template ds cols names value-name column-split-fn))))
+
+(defn- pre-longer->target-cols
+  [ds cnt m]
+  (let [new-cols (map (fn [[col-name maybe-column]]
+                        (if (col/is-column? maybe-column)
+                          (col/set-name maybe-column col-name)
+                          (col/new-column col-name (const-rdr/make-const-reader maybe-column :object cnt)))) m)]
+    (ds/append-columns ds new-cols)))
+
+(defn pivot->longer
+  "`tidyr` pivot_longer api"
+  ([ds cols-selector] (pivot->longer ds cols-selector nil))
+  ([ds cols-selector {:keys [target-cols value-column-name splitter drop-missing? meta-field datatypes]
+                      :or {target-cols :$column
+                           value-column-name :$value
+                           drop-missing? true
+                           meta-field :name}}]
+   (let [cols (select-column-names ds cols-selector meta-field)
+         groups (cols->pre-longer ds cols target-cols value-column-name splitter)
+         ds-template (drop-columns ds cols)
+         cnt (ds/row-count ds-template)]
+     (as-> (ds/set-metadata (->> groups                                        
+                                 (map (partial pre-longer->target-cols ds-template cnt))
+                                 (reduce ds/concat))
+                            (ds/metadata ds)) final-ds
+       (if drop-missing? (drop-missing final-ds (keys (first groups))) final-ds)
+       (if datatypes (convert-column-type final-ds datatypes) final-ds)))))
+
+
 ;;;;;;;;;;;;;;
 ;; USE CASES
 ;;;;;;;;;;;;;;
@@ -844,85 +904,138 @@
 ;;    | ["AAPL" 2010] |    206.6 |
 ;;    | ["AMZN" 2000] |    43.93 |
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; playground
-
-(defn- regroup-cols-from-template
-  [ds cols names value-name column-split-fn]
-  (let [template? (some nil? names)
-        pre-groups (->> cols
-                        (map (fn [col-name]
-                               (let [col (ds col-name)
-                                     split (column-split-fn col-name)
-                                     buff (if template? {} {value-name col})]
-                                 (into buff (map (fn [k v] (if k [k v] [v col]))
-                                                 names split))))))
-        groups (-> (->> names
-                        (remove nil?)
-                        (apply juxt))
-                   (clojure.core/group-by pre-groups)
-                   (vals))]
-    (map #(reduce merge %) groups)))
-
-(defn- cols->pre-longer
-  ([ds cols names value-name]
-   (cols->pre-longer ds cols names value-name nil))
-  ([ds cols names value-name column-splitter]
-   (let [column-split-fn (cond (instance? java.util.regex.Pattern column-splitter) (comp rest #(re-find column-splitter (str %)))
-                               (fn? column-splitter) column-splitter
-                               :else vector)
-         names (if (sequential+? names) names [names])]
-     (regroup-cols-from-template ds cols names value-name column-split-fn))))
-
-(defn- pre-longer->target-cols
-  [ds cnt m]
-  (let [new-cols (map (fn [[col-name maybe-column]]
-                        (if (col/is-column? maybe-column)
-                          (col/set-name maybe-column col-name)
-                          (col/new-column col-name (const-rdr/make-const-reader maybe-column :object cnt)))) m)]
-    (ds/append-columns ds new-cols)))
-
-(defn pivot->longer
-  "`tidyr` pivot_longer api"
-  ([ds cols-selector] (pivot->longer ds cols-selector nil))
-  ([ds cols-selector {:keys [target-cols value-column-name splitter drop-missing?]
-                      :or {target-cols :$column
-                           value-column-name :$value
-                           drop-missing? true}}]
-   (let [cols (select-column-names ds cols-selector)
-         groups (cols->pre-longer ds cols target-cols value-column-name splitter)
-         ds-template (drop-columns ds cols)
-         cnt (ds/row-count ds-template)
-         final-ds (ds/set-metadata (->> groups
-                                        (map (partial pre-longer->target-cols ds-template cnt))
-                                        (reduce ds/concat))
-                                   (ds/metadata ds))]
-     (if drop-missing? (drop-missing final-ds) final-ds))))
+;; RESHAPE TESTS
 
 ;; TESTS
 
-(def rids (dataset "data/relig_income.csv"))
-(def who (dataset "data/who.csv.gz"))
-(def family (dataset "data/family.csv"))
+(def data (dataset "data/relig_income.csv"))
+(pivot->longer data (complement #{"religion"}))
+;; => data/relig_income.csv [180 3]:
+;;    |                religion | :$value |           :$column |
+;;    |-------------------------+---------+--------------------|
+;;    |                Agnostic |      27 |              <$10k |
+;;    |                 Atheist |      12 |              <$10k |
+;;    |                Buddhist |      27 |              <$10k |
+;;    |                Catholic |     418 |              <$10k |
+;;    |      Don’t know/refused |      15 |              <$10k |
+;;    |        Evangelical Prot |     575 |              <$10k |
+;;    |                   Hindu |       1 |              <$10k |
+;;    | Historically Black Prot |     228 |              <$10k |
+;;    |       Jehovah's Witness |      20 |              <$10k |
+;;    |                  Jewish |      19 |              <$10k |
+;;    |           Mainline Prot |     289 |              <$10k |
+;;    |                  Mormon |      29 |              <$10k |
+;;    |                  Muslim |       6 |              <$10k |
+;;    |                Orthodox |      13 |              <$10k |
+;;    |         Other Christian |       9 |              <$10k |
+;;    |            Other Faiths |      20 |              <$10k |
+;;    |   Other World Religions |       5 |              <$10k |
+;;    |            Unaffiliated |     217 |              <$10k |
+;;    |                Agnostic |      96 | Don't know/refused |
 
-(def pn1 (dataset {:x [1 2 3 4]
-                   :a [1 1 0 0]
-                   :b [0 1 1 1]
-                   :y1 (repeatedly 4 rand)
-                   :y2 (repeatedly 4 rand)
-                   :z1 [3 3 3 3]
-                   :z2 [-2 -2 -2 -2]}))
 
-(pivot->longer rids (complement #{"religion"}))
-(pivot->longer pn1 [:y1 :y2 :z1 :z2] {:target-cols [nil :times]
-                                      :splitter #":(.)(.)"})
+(def data (-> (dataset "data/billboard.csv")
+              (drop-columns #(= :boolean %) {:meta-field :datatype}))) ;; drop some boolean columns, tidyr just skips them
 
-(pivot->longer family (complement #{"family"}) {:target-cols [nil :child] :splitter #(str/split % #"_")})
+(pivot->longer data #(str/starts-with? % "wk") {:target-cols :week
+                                                :value-column-name :rank})
 
-;; DOESN'T WORK DUE TO TYPE MISMATCH
-#_(pivot->longer who #(str/starts-with? % "new") {:target-cols [:diagnosis :gender :age]
-                                                  :splitter #"new_?(.*)_(.)(.*)"})
+(pivot->longer data #(str/starts-with? % "wk") {:target-cols :week
+                                                :value-column-name :rank
+                                                :splitter #"wk(.*)"
+                                                :datatypes {:week :int16}})
 
+(def data (dataset "data/who.csv.gz"))
+
+;; doesn't work well, data conversion ruins missing values
+;; without data conversion datatype mismatch throws an exception
+(let [data (reduce #(convert-column-type %1 %2 :int32) data (select-column-names data #(str/starts-with? % "new")))]
+  (pivot->longer data #(str/starts-with? % "new") {:target-cols [:diagnosis :gender :age]
+                                                   :splitter #"new_?(.*)_(.)(.*)"
+                                                   :value-column-name :count
+                                                   :datatypes {:age :int16}}))
+
+
+(def data (dataset "data/family.csv"))
+
+(pivot->longer data (complement #{"family"}) {:target-cols [nil :child]
+                                              :splitter #(str/split % #"_")
+                                              :datatypes {"gender" :int16}})
+;; => data/family.csv [9 4]:
+;;    | family |        dob | :child | gender |
+;;    |--------+------------+--------+--------|
+;;    |      1 | 1998-11-26 | child1 |      1 |
+;;    |      2 | 1996-06-22 | child1 |      2 |
+;;    |      3 | 2002-07-11 | child1 |      2 |
+;;    |      4 | 2004-10-10 | child1 |      1 |
+;;    |      5 | 2000-12-05 | child1 |      2 |
+;;    |      1 | 2000-01-29 | child2 |      2 |
+;;    |      3 | 2004-04-05 | child2 |      2 |
+;;    |      4 | 2009-08-27 | child2 |      1 |
+;;    |      5 | 2005-02-28 | child2 |      1 |
+
+(def data (dataset "data/anscombe.csv"))
+
+(pivot->longer data :all {:splitter #"(.)(.)"
+                          :target-cols [nil :set]})
+;; => data/anscombe.csv [44 3]:
+;;    |  x | :set |     y |
+;;    |----+------+-------|
+;;    | 10 |    4 | 8.040 |
+;;    |  8 |    4 | 6.950 |
+;;    | 13 |    4 | 7.580 |
+;;    |  9 |    4 | 8.810 |
+;;    | 11 |    4 | 8.330 |
+;;    | 14 |    4 | 9.960 |
+;;    |  6 |    4 | 7.240 |
+;;    |  4 |    4 | 4.260 |
+;;    | 12 |    4 | 10.84 |
+;;    |  7 |    4 | 4.820 |
+;;    |  5 |    4 | 5.680 |
+;;    | 10 |    4 | 9.140 |
+;;    |  8 |    4 | 8.140 |
+;;    | 13 |    4 | 8.740 |
+;;    |  9 |    4 | 8.770 |
+;;    | 11 |    4 | 9.260 |
+;;    | 14 |    4 | 8.100 |
+;;    |  6 |    4 | 6.130 |
+;;    |  4 |    4 | 3.100 |
+;;    | 12 |    4 | 9.130 |
+;;    |  7 |    4 | 7.260 |
+;;    |  5 |    4 | 4.740 |
+;;    | 10 |    4 | 7.460 |
+;;    |  8 |    4 | 6.770 |
+;;    | 13 |    4 | 12.74 |
+
+
+(def data (dataset {:x [1 2 3 4]
+                    :a [1 1 0 0]
+                    :b [0 1 1 1]
+                    :y1 (repeatedly 4 rand)
+                    :y2 (repeatedly 4 rand)
+                    :z1 [3 3 3 3]
+                    :z2 [-2 -2 -2 -2]}))
+
+(pivot->longer data [:y1 :y2 :z1 :z2] {:target-cols [nil :times]
+                                       :splitter #":(.)(.)"})
+;; => _unnamed [8 6]:
+;;    | :x | :a | :b |       y | :times |  z |
+;;    |----+----+----+---------+--------+----|
+;;    |  1 |  1 |  0 | 0.04292 |      1 |  3 |
+;;    |  2 |  1 |  1 | 0.01423 |      1 |  3 |
+;;    |  3 |  0 |  1 | 0.06682 |      1 |  3 |
+;;    |  4 |  0 |  1 |  0.7847 |      1 |  3 |
+;;    |  1 |  1 |  0 |  0.4265 |      2 | -2 |
+;;    |  2 |  1 |  1 |  0.2557 |      2 | -2 |
+;;    |  3 |  0 |  1 |  0.6817 |      2 | -2 |
+;;    |  4 |  0 |  1 |  0.1968 |      2 | -2 |
+
+
+(def data (dataset {:id [1 2 3 4]
+                    :choice1 ["A" "C" "D" "B"]
+                    :choice2 ["B" "B" nil "D"]
+                    :choice3 ["C" nil nil nil]}))
+
+(pivot->longer data (complement #{:id}))
