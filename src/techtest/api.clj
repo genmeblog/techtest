@@ -554,22 +554,22 @@
 
 (defn unique-by
   ([ds] (unique-by ds (ds/column-names ds)))
-  ([ds row-selector] (unique-by ds row-selector nil))
-  ([ds row-selector {:keys [strategy limit-columns]
-                     :or {strategy :first}
-                     :as options}]
+  ([ds cols-selector] (unique-by ds cols-selector nil))
+  ([ds cols-selector {:keys [strategy limit-columns]
+                      :or {strategy :first}
+                      :as options}]
    (if (grouped? ds)
      (-> ds
-         (ds/add-or-update-column :data (map #(unique-by % row-selector options) (ds :data)))
+         (ds/add-or-update-column :data (map #(unique-by % cols-selector options) (ds :data)))
          (correct-group-count))
      
      (let [local-options {:keep-fn (get strategies strategy :first)}]
        (cond
-         (sequential+? row-selector) (ds/unique-by identity (assoc local-options :column-name-seq row-selector) ds)
-         (fn? row-selector) (ds/unique-by row-selector (if limit-columns
-                                                         (assoc local-options :column-name-seq limit-columns)
-                                                         local-options) ds)
-         :else (ds/unique-by-column row-selector local-options ds))))))
+         (sequential+? cols-selector) (ds/unique-by identity (assoc local-options :column-name-seq cols-selector) ds)
+         (fn? cols-selector) (ds/unique-by cols-selector (if limit-columns
+                                                           (assoc local-options :column-name-seq limit-columns)
+                                                           local-options) ds)
+         :else (ds/unique-by-column cols-selector local-options ds))))))
 
 ;;;;;;;;;;;;
 ;; MISSING
@@ -1039,3 +1039,11 @@
                     :choice3 ["C" nil nil nil]}))
 
 (pivot->longer data (complement #{:id}))
+
+;; wider
+
+;; (def fish (-> (dataset "https://github.com/Myfanwy/ReproducibleExamples/raw/master/encounterhistories/fishdata.csv")
+;;               (drop-rows [2 3 4 6 11 33 55])))
+
+;; (group-by fish "Station")
+;; ((group-by fish ["TagID" "Station"]) :count)
