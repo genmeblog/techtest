@@ -358,9 +358,17 @@
    (reduce (fn [ds [colname new-type]]
              (convert-column-type ds colname new-type)) ds coltype-map))
   ([ds colname new-type]
-   (ds/add-or-update-column ds colname (if (= :string (-> colname ds meta :datatype))
-                                         (col/parse-column new-type (ds colname))
-                                         (dtype/->reader (ds colname) new-type)))))
+   (ds/add-or-update-column ds colname
+                            (let [current-type (-> colname ds meta :datatype)]
+                              (condp = current-type
+                                :string (col/parse-column new-type (ds colname))
+                                :object (let [curr-col (ds colname)]
+                                          (->> (col/new-column colname (dtype/->reader curr-col :string)
+                                                               (meta curr-col) (col/missing curr-col))
+                                               (col/parse-column new-type)))
+                                (let [curr-col (ds colname)]
+                                  (col/new-column colname (dtype/->reader curr-col new-type)
+                                                  (meta curr-col) (col/missing curr-col))))))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; ROWS OPERATIONS
@@ -955,8 +963,7 @@
 (pivot->longer data #(str/starts-with? % "wk") {:target-cols :week
                                                 :value-column-name :rank
                                                 :splitter #"wk(.*)"
-                                                ;; :datatypes {:week :int16}
-                                                })
+                                                :datatypes {:week :int16}})
 
 (def data (dataset "data/who.csv.gz"))
 
@@ -1054,5 +1061,4 @@
 
 ;; (group-by fish "Station")
 ;; ((group-by fish ["TagID" "Station"]) :count)
-
 

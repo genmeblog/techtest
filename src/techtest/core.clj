@@ -688,7 +688,7 @@ ans
 
 (defn group-by-columns-and-aggregate
   [gr-colls agg-fns-map ds]
-  (->> (ds/group-by identity ds gr-colls)
+  (->> (ds/group-by identity gr-colls ds)
        (map (fn [[group-idx group-ds]]
               (aggregate group-idx agg-fns-map group-ds)))
        ds/->dataset))

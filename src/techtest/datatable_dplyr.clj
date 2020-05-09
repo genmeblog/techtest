@@ -3047,7 +3047,7 @@ DS
 
 ;; ---- tech.ml.dataset
 
-;; doesn't work on beta 37
+;; doesn't work on beta 39
 #_(->> (ds/select-columns DS [:V1 :V2])
        (apply-to-columns dfn/mean [:V1 :V2]))
 ;; => _unnamed [1 2]:
@@ -3478,18 +3478,19 @@ DS
 
 ;; transmute_if(DF, is.numeric, list(~ '-'(., 1L)))
 
-(dpl/transmute_if DS r.base/is-numeric [:!list '(formula nil (- . 1))])
-;; =>   V1 V2
-;;    1  0 -1
-;;    2  3 -1
-;;    3  0 -1
-;;    4  3  3
-;;    5  0  4
-;;    6  3  5
-;;    7  0  6
-;;    8  3  7
-;;    9  0  8
-
+(dpl/transmute_if DF r.base/is-numeric [:!list '(formula nil (- . 1))])
+;; => # A tibble: 9 x 2
+;;         V1    V2
+;;      <dbl> <dbl>
+;;    1     0 -1   
+;;    2     3 -1   
+;;    3     0 -1   
+;;    4     3  3   
+;;    5     0  4.  
+;;    6     3  5.00
+;;    7     0  6.  
+;;    8     3  7.  
+;;    9     0  8   
 ;; ---- tech.ml.dataset
 
 (def cols (->> DS
