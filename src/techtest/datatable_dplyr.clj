@@ -3047,8 +3047,9 @@ DS
 
 ;; ---- tech.ml.dataset
 
-(->> (ds/select-columns DS [:V1 :V2])
-     (apply-to-columns dfn/mean [:V1 :V2]))
+;; doesn't work on beta 37
+#_(->> (ds/select-columns DS [:V1 :V2])
+       (apply-to-columns dfn/mean [:V1 :V2]))
 ;; => _unnamed [1 2]:
 ;;    |   :V1 |   :V2 |
 ;;    |-------+-------|

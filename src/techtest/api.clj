@@ -91,6 +91,16 @@
        (unroll ds unroll-selector)
        ds))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; DESCRIPTIVE FUNCTIONS
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn columns-info
+  [ds]
+  (->> (ds/columns ds)
+       (map meta)
+       (dataset)))
+
 ;;;;;;;;;;;;;
 ;; GROUPING
 ;;;;;;;;;;;;;
@@ -936,7 +946,7 @@
 ;;    |                Agnostic |      96 | Don't know/refused |
 
 
-(def data (-> (dataset "data/billboard.csv")
+(def data (-> (dataset "data/billboard.csv.gz")
               (drop-columns #(= :boolean %) {:meta-field :datatype}))) ;; drop some boolean columns, tidyr just skips them
 
 (pivot->longer data #(str/starts-with? % "wk") {:target-cols :week
@@ -945,17 +955,14 @@
 (pivot->longer data #(str/starts-with? % "wk") {:target-cols :week
                                                 :value-column-name :rank
                                                 :splitter #"wk(.*)"
-                                                :datatypes {:week :int16}})
+                                                ;; :datatypes {:week :int16}
+                                                })
 
 (def data (dataset "data/who.csv.gz"))
 
-;; doesn't work well, data conversion ruins missing values
-;; without data conversion datatype mismatch throws an exception
-(let [data (reduce #(convert-column-type %1 %2 :int32) data (select-column-names data #(str/starts-with? % "new")))]
-  (pivot->longer data #(str/starts-with? % "new") {:target-cols [:diagnosis :gender :age]
-                                                   :splitter #"new_?(.*)_(.)(.*)"
-                                                   :value-column-name :count
-                                                   :datatypes {:age :int16}}))
+(pivot->longer data #(str/starts-with? % "new") {:target-cols [:diagnosis :gender :age]
+                                                 :splitter #"new_?(.*)_(.)(.*)"
+                                                 :value-column-name :count})
 
 
 (def data (dataset "data/family.csv"))
@@ -1047,3 +1054,5 @@
 
 ;; (group-by fish "Station")
 ;; ((group-by fish ["TagID" "Station"]) :count)
+
+
