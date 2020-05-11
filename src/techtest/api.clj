@@ -180,8 +180,9 @@
 
 (defn- process-group-data
   [ds f]
-  #_(ds/column-map ds :data f :data)
-  (ds/add-or-update-column ds :data (map f (ds :data))))
+  (ds/column-map ds :data f :data)
+  ;; (ds/add-or-update-column ds :data (map f (ds :data)))
+  )
 
 (defn- correct-group-count
   "Correct count for each group"
@@ -367,9 +368,8 @@
      (apply ds/column-map ds target-column map-fn (select-column-names ds cols-selector meta-field)))))
 
 (defn- try-convert-to-type
-  [col new-type]
-  (col/new-column (col/column-name col) (dtype/->reader col new-type)
-                  (meta col) (col/missing col)))
+  [ds colname new-type]
+  (ds/column-cast ds colname new-type))
 
 (defn convert-column-type
   "Convert type of the column to the other type."
@@ -379,15 +379,21 @@
   ([ds colname new-type]
    (if (grouped? ds)
      (process-group-data ds #(convert-column-type % colname new-type))
-     (ds/add-or-update-column ds colname
-                              (let [col (ds colname)]
-                                (condp = (dtype/get-datatype col)
-                                  :string (col/parse-column new-type col)
-                                  :object (if (string? (dtype/get-value col 0))
-                                            ;; below doesn't work well
-                                            (col/parse-column new-type (try-convert-to-type col :string))
-                                            (try-convert-to-type col new-type))
-                                  (try-convert-to-type col new-type)))))))
+
+     (if (sequential+? new-type)
+       (try-convert-to-type ds colname new-type)
+       (if (= :object new-type)
+         (try-convert-to-type ds colname [:object identity])
+         (let [col (ds colname)]
+           (condp = (dtype/get-datatype col)
+             :string (ds/add-or-update-column ds colname (col/parse-column new-type col))
+             :object (if (string? (dtype/get-value col 0))
+                       (-> (try-convert-to-type ds colname :string)
+                           (ds/column colname)
+                           (->> (col/parse-column new-type)
+                                (ds/add-or-update-column ds colname)))
+                       (try-convert-to-type ds colname new-type))
+             (try-convert-to-type ds colname new-type))))))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; ROWS OPERATIONS
@@ -771,54 +777,61 @@
        (if drop-missing? (drop-missing final-ds (keys (first groups))) final-ds)
        (if datatypes (convert-column-type final-ds datatypes) final-ds)))))
 
+(defn- make-apply-join-fn
+  "Perform left-join on groups and create new columns"
+  [group-name->names single-value? value-names join-name col-to-drop starting-ds-count]
+  (fn [curr-ds {:keys [name data]}]
+    (let [col-name (str/join "_" (group-name->names name)) ;; source names
+          target-names (if single-value?
+                         [col-name]
+                         (map #(str % "-" col-name) value-names)) ;; traget column names
+          rename-map (zipmap value-names target-names)  ;; renaming map
+          data (-> data
+                   (rename-columns rename-map) ;; rename value column
+                   (select-columns (conj target-names join-name)) ;; select rhs for join
+                   (->> (ds/left-join join-name curr-ds)) ;; perform left join
+                   (drop-columns col-to-drop))] ;; drop unnecessary leftovers
+      (if (> (ds/row-count data) starting-ds-count) ;; in case when there were multiple values, create vectors
+        (strategy-vectorize data (select-column-names data (complement (set target-names))))
+        data))))
+
 (defn pivot->wider
   [ds cols-selector value-columns]
-  (let [col-names (select-column-names ds cols-selector)
-        value-names (select-column-names ds value-columns)
-        single-value? (= (count value-names) 1)
+  (let [col-names (select-column-names ds cols-selector) ;; columns to be unrolled
+        value-names (select-column-names ds value-columns) ;; columns to be used as values
+        single-value? (= (count value-names) 1) ;; maybe this is one column? (different name creation rely on this)
         rest-cols (->> (concat col-names value-names)
                        (set)
                        (complement)
-                       (select-column-names ds))
-        join-on-single? (= (count rest-cols) 1)
+                       (select-column-names ds)) ;; the columns used in join
+        join-on-single? (= (count rest-cols) 1) ;; mayve this is one column? (different join column creation)
         join-name (if join-on-single?
                     (first rest-cols)
-                    (gensym (apply str "^____" rest-cols)))
+                    (gensym (apply str "^____" rest-cols))) ;; generate join column name
         col-to-drop (if join-on-single?
                       (str "right." join-name)
-                      (symbol (str "right." join-name)))
+                      (symbol (str "right." join-name))) ;; what to drop after join
         pre-ds (if join-on-single?
                  ds
                  (join-columns ds join-name rest-cols {:result-type :seq
-                                                       :drop-columns? true}))
-        starting-ds (unique-by (select-columns pre-ds join-name))
-        starting-ds-count (ds/row-count starting-ds)
-        grouped-ds (group-by pre-ds col-names)
+                                                       :drop-columns? true})) ;; t.m.ds doesn't have join on multiple columns, so we need to create single column to be used fo join
+        starting-ds (unique-by (select-columns pre-ds join-name)) ;; left join source dataset
+        starting-ds-count (ds/row-count starting-ds) ;; how much records to expect
+        grouped-ds (group-by pre-ds col-names) ;; group by columns which values will create new columns
         group-name->names (->> col-names
                                (map #(fn [m] (get m %)))
-                               (apply juxt))
-        result (reduce (fn [curr-ds {:keys [name data]}]
-                         (let [col-name (str/join "_" (group-name->names name))
-                               target-names (if single-value?
-                                              [col-name]
-                                              (map #(str % "-" col-name) value-names))
-                               rename-map (zipmap value-names target-names)
-                               data (-> data
-                                        (rename-columns rename-map)
-                                        (select-columns (conj target-names join-name))
-                                        (->> (ds/left-join join-name curr-ds))
-                                        (drop-columns col-to-drop))]
-                           (if (> (ds/row-count data) starting-ds-count)
-                             (strategy-vectorize data (select-column-names data (complement (set target-names))))
-                             data)))
+                               (apply juxt)) ;; create function which extract new column name
+        result (reduce (make-apply-join-fn group-name->names single-value? value-names
+                                           join-name col-to-drop starting-ds-count)
                        starting-ds
-                       (reverse (ds/mapseq-reader grouped-ds)))]
-    (-> (if join-on-single?
+                       (reverse (ds/mapseq-reader grouped-ds)))] ;; perform join on groups and create new columns
+    (-> (if join-on-single? ;; finalize, recreate original columns from join column, and reorder stuff
           result
           (let [temp-ds (separate-column result join-name rest-cols identity {:drop-column? true})
                 rest-ds (select-columns temp-ds rest-cols)]
             (reduce #(ds/add-column %1 %2) rest-ds (ds/columns (drop-columns temp-ds rest-cols)))))
         (ds/set-dataset-name (ds/dataset-name ds)))))
+
 
 ;;;;;;;;;;;;;;
 ;; USE CASES
