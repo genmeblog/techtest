@@ -594,22 +594,24 @@
    :last strategy-last
    :random strategy-random})
 
-(defn- strategy-vectorize
-  [ds group-by-names]
-  (let [target-names (select-column-names ds (complement (set group-by-names)))]
-    (-> (group-by ds group-by-names)
-        (process-group-data (fn [ds]
-                              (as-> ds ds
-                                (select-columns ds target-names)
-                                (dataset [(zipmap target-names (map vec (ds/columns ds)))]))))
-        (correct-group-count)
-        (ungroup {:add-group-as-column? true}))))
+(defn- strategy-rollin
+  ([ds group-by-names] (strategy-rollin ds group-by-names nil))
+  ([ds group-by-names rollin-fn]
+   (let [target-names (select-column-names ds (complement (set group-by-names)))
+         rollin-fn (or rollin-fn vec)]
+     (-> (group-by ds group-by-names)
+         (process-group-data (fn [ds]
+                               (as-> ds ds
+                                 (select-columns ds target-names)
+                                 (dataset [(zipmap target-names (map rollin-fn (ds/columns ds)))]))))
+         (correct-group-count)
+         (ungroup {:add-group-as-column? true})))))
 
 (defn unique-by
   ([ds] (unique-by ds (ds/column-names ds)))
   ([ds cols-selector] (unique-by ds cols-selector nil))
-  ([ds cols-selector {:keys [strategy limit-columns]
-                      :or {strategy :first}
+  ([ds cols-selector {:keys [strategy rollin-fn limit-columns]
+                      :or {strategy :first rollin-fn vec}
                       :as options}]
    (if (grouped? ds)
      (-> ds
@@ -618,8 +620,8 @@
 
      (if (= 1 (ds/row-count ds))
        ds
-       (if (= strategy :vectorize)
-         (strategy-vectorize ds (select-column-names ds cols-selector))
+       (if (= strategy :rollin)
+         (strategy-rollin ds (select-column-names ds cols-selector) rollin-fn)
          (let [local-options {:keep-fn (get strategies strategy :first)}]
            (cond
              (sequential+? cols-selector) (ds/unique-by identity (assoc local-options :column-name-seq cols-selector) ds)
@@ -632,7 +634,7 @@
 ;; MISSING
 ;;;;;;;;;;;;
 
-(defn select-or-drop-missing
+(defn- select-or-drop-missing
   "Select rows with missing values"
   ([f ds] (select-or-drop-missing f ds nil))
   ([f ds cols-selector]
@@ -779,9 +781,12 @@
 
 (defn- make-apply-join-fn
   "Perform left-join on groups and create new columns"
-  [group-name->names single-value? value-names join-name col-to-drop starting-ds-count]
+  [group-name->names single-value? value-names join-name col-to-drop starting-ds-count rollin-fn rename-map]
   (fn [curr-ds {:keys [name data]}]
-    (let [col-name (str/join "_" (group-name->names name)) ;; source names
+    (let [col-name (str/join "_" (->> name
+                                      group-name->names
+                                      (remove nil?))) ;; source names
+          col-name (get rename-map col-name col-name)
           target-names (if single-value?
                          [col-name]
                          (map #(str % "-" col-name) value-names)) ;; traget column names
@@ -792,45 +797,69 @@
                    (->> (ds/left-join join-name curr-ds)) ;; perform left join
                    (drop-columns col-to-drop))] ;; drop unnecessary leftovers
       (if (> (ds/row-count data) starting-ds-count) ;; in case when there were multiple values, create vectors
-        (strategy-vectorize data (select-column-names data (complement (set target-names))))
+        (strategy-rollin data (select-column-names data (complement (set target-names))) rollin-fn)
         data))))
 
+;; shameless copy from dataset :/
+(defn- colname->str
+  ^String [item]
+  (cond
+    (string? item) item
+    (keyword? item) (name item)
+    (symbol? item) (name item)
+    :else (str item)))
+
+(defn- similar-colname-type
+  [orign-name new-name]
+  (cond
+    (string? orign-name) new-name
+    (keyword? orign-name) (keyword new-name)
+    (symbol? orign-name) (symbol new-name)
+    :else
+    (keyword new-name)))
+
+(defn- col-to-drop-name
+  [join-name]
+  (->> join-name
+       (colname->str)
+       (str "right.")
+       (similar-colname-type join-name)))
+
 (defn pivot->wider
-  [ds cols-selector value-columns]
-  (let [col-names (select-column-names ds cols-selector) ;; columns to be unrolled
-        value-names (select-column-names ds value-columns) ;; columns to be used as values
-        single-value? (= (count value-names) 1) ;; maybe this is one column? (different name creation rely on this)
-        rest-cols (->> (concat col-names value-names)
-                       (set)
-                       (complement)
-                       (select-column-names ds)) ;; the columns used in join
-        join-on-single? (= (count rest-cols) 1) ;; mayve this is one column? (different join column creation)
-        join-name (if join-on-single?
-                    (first rest-cols)
-                    (gensym (apply str "^____" rest-cols))) ;; generate join column name
-        col-to-drop (if join-on-single?
-                      (str "right." join-name)
-                      (symbol (str "right." join-name))) ;; what to drop after join
-        pre-ds (if join-on-single?
-                 ds
-                 (join-columns ds join-name rest-cols {:result-type :seq
-                                                       :drop-columns? true})) ;; t.m.ds doesn't have join on multiple columns, so we need to create single column to be used fo join
-        starting-ds (unique-by (select-columns pre-ds join-name)) ;; left join source dataset
-        starting-ds-count (ds/row-count starting-ds) ;; how much records to expect
-        grouped-ds (group-by pre-ds col-names) ;; group by columns which values will create new columns
-        group-name->names (->> col-names
-                               (map #(fn [m] (get m %)))
-                               (apply juxt)) ;; create function which extract new column name
-        result (reduce (make-apply-join-fn group-name->names single-value? value-names
-                                           join-name col-to-drop starting-ds-count)
-                       starting-ds
-                       (reverse (ds/mapseq-reader grouped-ds)))] ;; perform join on groups and create new columns
-    (-> (if join-on-single? ;; finalize, recreate original columns from join column, and reorder stuff
-          result
-          (let [temp-ds (separate-column result join-name rest-cols identity {:drop-column? true})
-                rest-ds (select-columns temp-ds rest-cols)]
-            (reduce #(ds/add-column %1 %2) rest-ds (ds/columns (drop-columns temp-ds rest-cols)))))
-        (ds/set-dataset-name (ds/dataset-name ds)))))
+  ([ds cols-selector value-columns] (pivot->wider ds cols-selector value-columns nil))
+  ([ds cols-selector value-columns {:keys [rollin-fn rename-map]}]
+   (let [col-names (select-column-names ds cols-selector) ;; columns to be unrolled
+         value-names (select-column-names ds value-columns) ;; columns to be used as values
+         single-value? (= (count value-names) 1) ;; maybe this is one column? (different name creation rely on this)
+         rest-cols (->> (concat col-names value-names)
+                        (set)
+                        (complement)
+                        (select-column-names ds)) ;; the columns used in join
+         join-on-single? (= (count rest-cols) 1) ;; mayve this is one column? (different join column creation)
+         join-name (if join-on-single?
+                     (first rest-cols)
+                     (gensym (apply str "^____" rest-cols))) ;; generate join column name
+         col-to-drop (col-to-drop-name join-name) ;; what to drop after join
+         pre-ds (if join-on-single?
+                  ds
+                  (join-columns ds join-name rest-cols {:result-type :seq
+                                                        :drop-columns? true})) ;; t.m.ds doesn't have join on multiple columns, so we need to create single column to be used fo join
+         starting-ds (unique-by (select-columns pre-ds join-name)) ;; left join source dataset
+         starting-ds-count (ds/row-count starting-ds) ;; how much records to expect
+         grouped-ds (group-by pre-ds col-names) ;; group by columns which values will create new columns
+         group-name->names (->> col-names
+                                (map #(fn [m] (get m %)))
+                                (apply juxt)) ;; create function which extract new column name
+         result (reduce (make-apply-join-fn group-name->names single-value? value-names
+                                            join-name col-to-drop starting-ds-count rollin-fn rename-map)
+                        starting-ds
+                        (reverse (ds/mapseq-reader grouped-ds)))] ;; perform join on groups and create new columns
+     (-> (if join-on-single? ;; finalize, recreate original columns from join column, and reorder stuff
+           result
+           (let [temp-ds (separate-column result join-name rest-cols identity {:drop-column? true})
+                 rest-ds (select-columns temp-ds rest-cols)]
+             (reduce #(ds/add-column %1 %2) rest-ds (ds/columns (drop-columns temp-ds rest-cols)))))
+         (ds/set-dataset-name (ds/dataset-name ds))))))
 
 
 ;;;;;;;;;;;;;;
@@ -919,7 +948,7 @@
 
 
 (ungroup (add-or-update-columns (group-by DS :V4) {:abc "X"
-                                                      :xyz [-1]} {:count-strategy :na}))
+                                                   :xyz [-1]} {:count-strategy :na}))
 
 (convert-column-type DS :V1 :float64)
 
@@ -952,7 +981,7 @@
                                             :mean-v2 (dfn/mean (ds :V2))})])
 
 (aggregate (group-by DS :V4) [#(dfn/mean (% :V3)) (fn [ds] {:mean-v1 (dfn/mean (ds :V1))
-                                                              :mean-v2 (dfn/mean (ds :V2))})])
+                                                           :mean-v2 (dfn/mean (ds :V2))})])
 
 (order-by DS :V1)
 (order-by DS :V1 :desc)
@@ -973,7 +1002,10 @@
 (unique-by DS :V1)
 (unique-by DS :V1 {:strategy :last})
 (unique-by DS :V1 {:strategy :random})
-(unique-by DS :V1 {:strategy :vectorize})
+(unique-by DS :V1 {:strategy :rollin})
+
+(unique-by DS :V4 {:strategy :rollin
+                   :rollin-fn dfn/sum})
 
 (unique-by DS [:V1 :V4])
 (unique-by DS [:V1 :V4] {:strategy :last})
@@ -1118,8 +1150,8 @@
 
 ;; TESTS
 
-(def data (dataset "data/relig_income.csv"))
-(pivot->longer data (complement #{"religion"}))
+(def relig-income (dataset "data/relig_income.csv"))
+(pivot->longer relig-income (complement #{"religion"}))
 ;; => data/relig_income.csv [180 3]:
 ;;    |                religion | :$value |           :$column |
 ;;    |-------------------------+---------+--------------------|
@@ -1144,11 +1176,11 @@
 ;;    |                Agnostic |      96 | Don't know/refused |
 
 
-(def data (-> (dataset "data/billboard.csv.gz")
-              (drop-columns #(= :boolean %) {:meta-field :datatype}))) ;; drop some boolean columns, tidyr just skips them
+(def bilboard (-> (dataset "data/billboard.csv.gz")
+                  (drop-columns #(= :boolean %) {:meta-field :datatype}))) ;; drop some boolean columns, tidyr just skips them
 
-(pivot->longer data #(str/starts-with? % "wk") {:target-cols :week
-                                                :value-column-name :rank})
+(pivot->longer bilboard #(str/starts-with? % "wk") {:target-cols :week
+                                                    :value-column-name :rank})
 ;; => data/billboard.csv.gz [5307 5]:
 ;;    |              artist |                   track | date.entered | :rank | :week |
 ;;    |---------------------+-------------------------+--------------+-------+-------|
@@ -1178,10 +1210,10 @@
 ;;    |       Anthony, Marc |          You Sang To Me |   2000-02-26 |     9 |  wk19 |
 ;;    |               Avant |           My First Love |   2000-11-04 |    81 |  wk19 |
 
-(pivot->longer data #(str/starts-with? % "wk") {:target-cols :week
-                                                :value-column-name :rank
-                                                :splitter #"wk(.*)"
-                                                :datatypes {:week :int16}})
+(pivot->longer bilboard #(str/starts-with? % "wk") {:target-cols :week
+                                                    :value-column-name :rank
+                                                    :splitter #"wk(.*)"
+                                                    :datatypes {:week :int16}})
 
 ;; => data/billboard.csv.gz [5307 5]:
 ;;    |              artist |                   track | date.entered | :rank | :week |
@@ -1212,11 +1244,11 @@
 ;;    |       Anthony, Marc |             My Baby You |   2000-09-16 |    81 |     6 |
 ;;    |       Anthony, Marc |          You Sang To Me |   2000-02-26 |    27 |     6 |
 
-(def data (dataset "data/who.csv.gz"))
+(def who (dataset "data/who.csv.gz"))
 
-(pivot->longer data #(str/starts-with? % "new") {:target-cols [:diagnosis :gender :age]
-                                                 :splitter #"new_?(.*)_(.)(.*)"
-                                                 :value-column-name :count})
+(pivot->longer who #(str/starts-with? % "new") {:target-cols [:diagnosis :gender :age]
+                                                :splitter #"new_?(.*)_(.)(.*)"
+                                                :value-column-name :count})
 
 ;; => data/who.csv.gz [76046 8]:
 ;;    |                           country | iso2 | iso3 | year | :count | :diagnosis | :gender | :age |
@@ -1247,11 +1279,11 @@
 ;;    |            Bosnia and Herzegovina |   BA |  BIH | 2013 |     57 |        rel |       m | 1524 |
 ;;    |                          Botswana |   BW |  BWA | 2013 |    423 |        rel |       m | 1524 |
 
-(def data (dataset "data/family.csv"))
+(def family (dataset "data/family.csv"))
 
-(pivot->longer data (complement #{"family"}) {:target-cols [nil :child]
-                                              :splitter #(str/split % #"_")
-                                              :datatypes {"gender" :int16}})
+(pivot->longer family (complement #{"family"}) {:target-cols [nil :child]
+                                                :splitter #(str/split % #"_")
+                                                :datatypes {"gender" :int16}})
 ;; => data/family.csv [9 4]:
 ;;    | family |        dob | :child | gender |
 ;;    |--------+------------+--------+--------|
@@ -1265,10 +1297,10 @@
 ;;    |      4 | 2009-08-27 | child2 |      1 |
 ;;    |      5 | 2005-02-28 | child2 |      1 |
 
-(def data (dataset "data/anscombe.csv"))
+(def anscombe (dataset "data/anscombe.csv"))
 
-(pivot->longer data :all {:splitter #"(.)(.)"
-                          :target-cols [nil :set]})
+(pivot->longer anscombe :all {:splitter #"(.)(.)"
+                              :target-cols [nil :set]})
 ;; => data/anscombe.csv [44 3]:
 ;;    |  x | :set |     y |
 ;;    |----+------+-------|
@@ -1299,16 +1331,16 @@
 ;;    | 13 |    4 | 12.74 |
 
 
-(def data (dataset {:x [1 2 3 4]
-                    :a [1 1 0 0]
-                    :b [0 1 1 1]
-                    :y1 (repeatedly 4 rand)
-                    :y2 (repeatedly 4 rand)
-                    :z1 [3 3 3 3]
-                    :z2 [-2 -2 -2 -2]}))
+(def pnl (dataset {:x [1 2 3 4]
+                   :a [1 1 0 0]
+                   :b [0 1 1 1]
+                   :y1 (repeatedly 4 rand)
+                   :y2 (repeatedly 4 rand)
+                   :z1 [3 3 3 3]
+                   :z2 [-2 -2 -2 -2]}))
 
-(pivot->longer data [:y1 :y2 :z1 :z2] {:target-cols [nil :times]
-                                       :splitter #":(.)(.)"})
+(pivot->longer pnl [:y1 :y2 :z1 :z2] {:target-cols [nil :times]
+                                      :splitter #":(.)(.)"})
 ;; => _unnamed [8 6]:
 ;;    | :x | :a | :b |       y | :times |  z |
 ;;    |----+----+----+---------+--------+----|
@@ -1320,26 +1352,6 @@
 ;;    |  2 |  1 |  1 |  0.2557 |      2 | -2 |
 ;;    |  3 |  0 |  1 |  0.6817 |      2 | -2 |
 ;;    |  4 |  0 |  1 |  0.1968 |      2 | -2 |
-
-
-(def data (dataset {:id [1 2 3 4]
-                    :choice1 ["A" "C" "D" "B"]
-                    :choice2 ["B" "B" nil "D"]
-                    :choice3 ["C" nil nil nil]}))
-
-(pivot->longer data (complement #{:id}))
-;; => _unnamed [8 3]:
-;;    | :id | :$value | :$column |
-;;    |-----+---------+----------|
-;;    |   1 |       A | :choice1 |
-;;    |   2 |       C | :choice1 |
-;;    |   3 |       D | :choice1 |
-;;    |   4 |       B | :choice1 |
-;;    |   1 |       B | :choice2 |
-;;    |   2 |       B | :choice2 |
-;;    |   4 |       D | :choice2 |
-;;    |   1 |       C | :choice3 |
-
 
 
 ;; wider
@@ -1369,6 +1381,60 @@
 ;;    | 4851 |     |        |     |      |     |      |     |       1 |     1 |         |      |
 ;;    | 4854 |     |        |     |      |     |      |     |       1 |     1 |         |      |
 ;;    | 4863 |     |        |     |      |     |      |     |       1 |     1 |         |      |
+
+(def warpbreaks (dataset "data/warpbreaks.csv"))
+
+(-> warpbreaks
+    (group-by ["wool" "tension"])
+    (aggregate {:n ds/row-count}))
+;; => null [6 3]:
+;;    | wool | tension | :n |
+;;    |------+---------+----|
+;;    |    A |       H |  9 |
+;;    |    B |       H |  9 |
+;;    |    A |       L |  9 |
+;;    |    A |       M |  9 |
+;;    |    B |       L |  9 |
+;;    |    B |       M |  9 |
+
+(pivot->wider (select-columns warpbreaks ["wool" "tension" "breaks"]) "wool" "breaks")
+;; => data/warpbreaks.csv [3 3]:
+;;    |                            A | tension |                            B |
+;;    |------------------------------+---------+------------------------------|
+;;    | [18 21 29 17 12 18 35 30 36] |       M | [42 26 19 16 39 28 21 39 29] |
+;;    | [26 30 54 25 70 52 51 26 67] |       L | [27 14 29 19 29 31 41 20 44] |
+;;    | [36 21 24 18 10 43 28 15 26] |       H | [20 21 24 17 13 15 15 16 28] |
+
+
+(pivot->wider (select-columns warpbreaks ["wool" "tension" "breaks"]) "wool" "breaks" {:rollin-fn dfn/mean})
+;; => data/warpbreaks.csv [3 3]:
+;;    |     A | tension |     B |
+;;    |-------+---------+-------|
+;;    | 24.56 |       H | 18.78 |
+;;    | 24.00 |       M | 28.78 |
+;;    | 44.56 |       L | 28.22 |
+
+(def production (dataset "data/production.csv"))
+
+(pivot->wider production ["product" "country"] "production")
+;; => data/production.csv [15 4]:
+;;    | year |     B_AI |    B_EI |     A_AI |
+;;    |------+----------+---------+----------|
+;;    | 2000 | -0.02618 |   1.405 |    1.637 |
+;;    | 2001 |  -0.6886 | -0.5962 |   0.1587 |
+;;    | 2002 |  0.06249 | -0.2657 |   -1.568 |
+;;    | 2003 |  -0.7234 |  0.6526 |  -0.4446 |
+;;    | 2004 |   0.4725 |  0.6256 | -0.07134 |
+;;    | 2005 |  -0.9417 |  -1.345 |    1.612 |
+;;    | 2006 |  -0.3478 | -0.9718 |  -0.7043 |
+;;    | 2007 |   0.5243 |  -1.697 |   -1.536 |
+;;    | 2008 |    1.832 | 0.04556 |   0.8391 |
+;;    | 2009 |   0.1071 |   1.193 |  -0.3742 |
+;;    | 2010 |  -0.3290 |  -1.606 |  -0.7116 |
+;;    | 2011 |   -1.783 | -0.7724 |    1.128 |
+;;    | 2012 |   0.6113 |  -2.503 |    1.457 |
+;;    | 2013 |  -0.7853 |  -1.628 |   -1.559 |
+;;    | 2014 |   0.9784 | 0.03330 |  -0.1170 |
 
 (def income (dataset "data/us_rent_income.csv"))
 
@@ -1401,38 +1467,6 @@
 ;;    |    26 |             Michigan |           26987 |         82 |           824 |        3 |
 ;;    |    27 |            Minnesota |           32734 |        189 |           906 |        4 |
 ;;    |    28 |          Mississippi |           22766 |        194 |           740 |        5 |
-
-(def warpbreaks (dataset "data/warpbreaks.csv"))
-
-(pivot->wider (select-columns warpbreaks ["wool" "tension" "breaks"]) "wool" "breaks")
-;; => data/warpbreaks.csv [3 3]:
-;;    |                            A | tension |                            B |
-;;    |------------------------------+---------+------------------------------|
-;;    | [18 21 29 17 12 18 35 30 36] |       M | [42 26 19 16 39 28 21 39 29] |
-;;    | [26 30 54 25 70 52 51 26 67] |       L | [27 14 29 19 29 31 41 20 44] |
-;;    | [36 21 24 18 10 43 28 15 26] |       H | [20 21 24 17 13 15 15 16 28] |
-
-(def production (dataset "data/production.csv"))
-
-(pivot->wider production ["product" "country"] "production")
-;; => data/production.csv [15 4]:
-;;    | year |     B_AI |    B_EI |     A_AI |
-;;    |------+----------+---------+----------|
-;;    | 2000 | -0.02618 |   1.405 |    1.637 |
-;;    | 2001 |  -0.6886 | -0.5962 |   0.1587 |
-;;    | 2002 |  0.06249 | -0.2657 |   -1.568 |
-;;    | 2003 |  -0.7234 |  0.6526 |  -0.4446 |
-;;    | 2004 |   0.4725 |  0.6256 | -0.07134 |
-;;    | 2005 |  -0.9417 |  -1.345 |    1.612 |
-;;    | 2006 |  -0.3478 | -0.9718 |  -0.7043 |
-;;    | 2007 |   0.5243 |  -1.697 |   -1.536 |
-;;    | 2008 |    1.832 | 0.04556 |   0.8391 |
-;;    | 2009 |   0.1071 |   1.193 |  -0.3742 |
-;;    | 2010 |  -0.3290 |  -1.606 |  -0.7116 |
-;;    | 2011 |   -1.783 | -0.7724 |    1.128 |
-;;    | 2012 |   0.6113 |  -2.503 |    1.457 |
-;;    | 2013 |  -0.7853 |  -1.628 |   -1.559 |
-;;    | 2014 |   0.9784 | 0.03330 |  -0.1170 |
 
 (def contacts (dataset "data/contacts.csv"))
 
@@ -1537,3 +1571,89 @@
 ;;    |     AUS | 2013 |  URB | 1.979E+07 |   1.875 |
 ;;    |     AUS | 2013 |  POP | 2.315E+07 |   1.758 |
 ;;    |     AUT | 2013 |  URB | 4.862E+06 |  0.9196 |
+
+
+
+(def multi (dataset {:id [1 2 3 4]
+                     :choice1 ["A" "C" "D" "B"]
+                     :choice2 ["B" "B" nil "D"]
+                     :choice3 ["C" nil nil nil]}))
+
+(def multi2 (-> multi
+                (pivot->longer (complement #{:id}))
+                (add-or-update-column :checked true)))
+multi2
+;; => _unnamed [8 4]:
+;;    | :id | :$value | :$column | :checked |
+;;    |-----+---------+----------+----------|
+;;    |   1 |       A | :choice1 |     true |
+;;    |   2 |       C | :choice1 |     true |
+;;    |   3 |       D | :choice1 |     true |
+;;    |   4 |       B | :choice1 |     true |
+;;    |   1 |       B | :choice2 |     true |
+;;    |   2 |       B | :choice2 |     true |
+;;    |   4 |       D | :choice2 |     true |
+;;    |   1 |       C | :choice3 |     true |
+
+(-> multi2
+    (drop-columns :$column)
+    (pivot->wider :$value :checked {:drop-missing? false}))
+;; => _unnamed [4 5]:
+;;    | :id |    D |    C |    B |    A |
+;;    |-----+------+------+------+------|
+;;    |   1 |      | true | true | true |
+;;    |   2 |      | true | true |      |
+;;    |   3 | true |      |      |      |
+;;    |   4 | true |      | true |      |
+
+
+(def construction (dataset "data/construction.csv"))
+
+(def construction-unit-map {"1 unit" "1"
+                            "2 to 4 units" "2-4"
+                            "5 units or more" "5+"})
+
+(-> construction
+    (pivot->longer #"^[125NWS].*|Midwest" {:target-cols [:units :region]
+                                           :splitter (fn [col-name]
+                                                       (if (re-matches #"^[125].*" col-name)
+                                                         [(construction-unit-map col-name) nil]
+                                                         [nil col-name]))
+                                           :value-column-name :n
+                                           :drop-missing? false})
+    (select-rows (fn [row] (and (= "January" (row "Month"))))))
+;; => data/construction.csv [7 5]:
+;;    | Year |   Month |  :n | :units |   :region |
+;;    |------+---------+-----+--------+-----------|
+;;    | 2018 | January | 859 |      1 |           |
+;;    | 2018 | January |     |    2-4 |           |
+;;    | 2018 | January | 348 |     5+ |           |
+;;    | 2018 | January | 114 |        | Northeast |
+;;    | 2018 | January | 169 |        |   Midwest |
+;;    | 2018 | January | 596 |        |     South |
+;;    | 2018 | January | 339 |        |      West |
+
+
+(-> construction
+    (pivot->longer #"^[125NWS].*|Midwest" {:target-cols [:units :region]
+                                           :splitter (fn [col-name]
+                                                       (if (re-matches #"^[125].*" col-name)
+                                                         [(construction-unit-map col-name) nil]
+                                                         [nil col-name]))
+                                           :value-column-name :n
+                                           :drop-missing? false})
+    (pivot->wider [:units :region] :n {:rename-map (zipmap (vals construction-unit-map)
+                                                           (keys construction-unit-map))}))
+
+;; => data/construction.csv [9 9]:
+;;    | Year |     Month | West | 1 unit | South | Northeast | 2 to 4 units | 5 units or more | Midwest |
+;;    |------+-----------+------+--------+-------+-----------+--------------+-----------------+---------|
+;;    | 2018 |   January |  339 |    859 |   596 |       114 |              |             348 |     169 |
+;;    | 2018 |  February |  336 |    882 |   655 |       138 |              |             400 |     160 |
+;;    | 2018 |     March |  330 |    862 |   595 |       150 |              |             356 |     154 |
+;;    | 2018 |     April |  304 |    797 |   613 |       144 |              |             447 |     196 |
+;;    | 2018 |       May |  319 |    875 |   673 |        90 |              |             364 |     169 |
+;;    | 2018 |      June |  360 |    867 |   610 |        76 |              |             342 |     170 |
+;;    | 2018 |      July |  310 |    829 |   594 |       108 |              |             360 |     183 |
+;;    | 2018 |    August |  286 |    939 |   649 |        90 |              |             286 |     205 |
+;;    | 2018 | September |  296 |    835 |   560 |       117 |              |             304 |     175 |
