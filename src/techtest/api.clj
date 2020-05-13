@@ -4,9 +4,8 @@
             [tech.v2.datatype.functional :as dfn]
             [tech.v2.datatype :as dtype]
             [tech.v2.datatype.datetime.operations :as dtype-dt-ops]
-            [tech.v2.datatype.readers.const :as const-rdr]
-            [tech.v2.datatype.readers.concat :as concat-rdr]
-            [tech.ml.dataset.pipeline :as pipe]
+            [tech.v2.datatype.readers.update :as update-rdr]
+            [tech.v2.datatype.bitmap :as bitmap]
             [tech.ml.protocols.dataset :as prot]
             [clojure.string :as str]
             [clojure.set :as set])
@@ -224,7 +223,7 @@
   "Convert group id to as seq of columns"
   [add-group-id-as-column? count group-id]
   (if add-group-id-as-column?
-    [(col/new-column :$group-id (const-rdr/make-const-reader group-id :int64 count))]))
+    [(col/new-column :$group-id (dtype/const-reader group-id count {:datatype :int64}))]))
 
 (defn- prepare-ds-for-ungrouping
   "Add optional group name and/or group-id as columns to a result of ungrouping."
@@ -366,6 +365,15 @@
    (if (grouped? ds)
      (process-group-data ds #(map-columns % target-column map-fn cols-selector options))
      (apply ds/column-map ds target-column map-fn (select-column-names ds cols-selector meta-field)))))
+
+(defn reorder-columns
+  "Reorder columns using column selector(s). When column names are incomplete, the missing will be attached at the end."
+  [ds cols-selector & cols-selectors]
+  (let [selected-cols (->> cols-selectors
+                           (map (partial select-column-names ds))
+                           (reduce concat (select-column-names ds cols-selector)))
+        rest-cols (select-column-names ds (complement (set selected-cols)))]
+    (ds/select-columns ds (concat selected-cols rest-cols))))
 
 (defn- try-convert-to-type
   [ds colname new-type]
@@ -659,6 +667,60 @@
 (def ^{:doc (select-or-drop-missing-docstring "Drop")}
   drop-missing (partial select-or-drop-missing ds/drop-rows))
 
+(defn replace-missing
+  ([ds cols-selector value] (replace-missing ds cols-selector value nil))
+  ([ds cols-selector value {:keys [strategy]
+                            :or {strategy :value}}]
+   (let [cols (select-column-names ds cols-selector)]
+     (reduce (fn [ds colname]
+               (let [col (ds colname)
+                     m (col/missing col)]
+                 (if-not (empty? m)
+                   (ds/assoc ds colname (condp = strategy
+                                          (update-rdr/update-reader col (cond
+                                                                          (map? value) value
+                                                                          (sequential+? value) (zipmap m (cycle value))
+                                                                          :else (bitmap/bitmap-value->bitmap-map m value)))))
+                   ds))) ds cols))))
+
+((replace-missing (dataset {:a [1 2 nil 3 4 nil nil nil 11]}) :a {2 44}) :a)
+
+(def col (col/new-column :a [1 2 nil 3 4 nil nil nil 11]))
+col
+;; => #tech.ml.dataset.column<object>[9]
+;;    :a
+;;    [1, 2, , 3, 4, , , , 11, ]
+
+;; ???
+(col/missing col)
+;; => #{}
+
+(def ds (ds/name-values-seq->dataset {:a [1 2 nil 3 4 nil nil nil 11]}))
+
+(col/missing (ds :a))
+;; => #{2,5,6,7}
+
+(def ds1 (ds/assoc ds :a (update-rdr/update-reader (ds :a) {2 2222 5 5555 6 6666 7 7777})))
+
+(ds1 :a)
+;; => #tech.ml.dataset.column<int64>[9]
+;;    :a
+;;    [1, 2, 2222, 3, 4, 5555, 6666, 7777, 11, ]
+
+(col/missing (ds1 :a))
+;; => #{}
+
+(def ds2 (ds/assoc ds :a (update-rdr/update-reader (ds :a) {2 2222})))
+
+(ds2 :a)
+;; => #tech.ml.dataset.column<int64>[9]
+;;    :a
+;;    [1, 2, 2222, 3, 4, -9223372036854775808, -9223372036854775808, -9223372036854775808, 11, ]
+
+;; ???
+(col/missing (ds2 :a))
+;; => #{}
+
 ;;;;;;;;;;;;;;;
 ;; JOIN/SPLIT
 ;;;;;;;;;;;;;;;
@@ -726,16 +788,16 @@
 ;;;;;;;;;;;;
 
 (defn- regroup-cols-from-template
-  [ds cols names value-name column-split-fn]
-  (let [template? (some nil? names)
+  [ds cols target-cols value-name column-split-fn]
+  (let [template? (some nil? target-cols)
         pre-groups (->> cols
                         (map (fn [col-name]
                                (let [col (ds col-name)
                                      split (column-split-fn col-name)
                                      buff (if template? {} {value-name col})]
                                  (into buff (mapv (fn [k v] (if k [k v] [v col]))
-                                                  names split))))))
-        groups (-> (->> names
+                                                  target-cols split))))))
+        groups (-> (->> target-cols
                         (remove nil?)
                         (map #(fn [n] (get n %)))
                         (apply juxt))
@@ -744,13 +806,10 @@
     (map #(reduce merge %) groups)))
 
 (defn- cols->pre-longer
-  ([ds cols names value-name]
-   (cols->pre-longer ds cols names value-name nil))
   ([ds cols names value-name column-splitter]
    (let [column-split-fn (cond (instance? java.util.regex.Pattern column-splitter) (comp rest #(re-find column-splitter (str %)))
                                (fn? column-splitter) column-splitter
-                               :else vector)
-         names (if (sequential+? names) names [names])]
+                               :else vector)]
      (regroup-cols-from-template ds cols names value-name column-split-fn))))
 
 (defn- pre-longer->target-cols
@@ -758,7 +817,7 @@
   (let [new-cols (map (fn [[col-name maybe-column]]
                         (if (col/is-column? maybe-column)
                           (col/set-name maybe-column col-name)
-                          (col/new-column col-name (const-rdr/make-const-reader maybe-column :object cnt)))) m)]
+                          (col/new-column col-name (dtype/const-reader maybe-column cnt {:datatype :object})))) m)]
     (ds/append-columns ds new-cols)))
 
 (defn pivot->longer
@@ -769,15 +828,18 @@
                            value-column-name :$value
                            drop-missing? true}}]
    (let [cols (select-column-names ds cols-selector meta-field)
+         target-cols (if (sequential+? target-cols) target-cols [target-cols])
          groups (cols->pre-longer ds cols target-cols value-column-name splitter)
+         cols-to-add (keys (first groups))
          ds-template (drop-columns ds cols)
          cnt (ds/row-count ds-template)]
      (as-> (ds/set-metadata (->> groups                                        
                                  (map (partial pre-longer->target-cols ds-template cnt))
                                  (reduce ds/concat))
                             (ds/metadata ds)) final-ds
-       (if drop-missing? (drop-missing final-ds (keys (first groups))) final-ds)
-       (if datatypes (convert-column-type final-ds datatypes) final-ds)))))
+       (if drop-missing? (drop-missing final-ds cols-to-add) final-ds)
+       (if datatypes (convert-column-type final-ds datatypes) final-ds)
+       (reorder-columns final-ds (ds/column-names ds-template) (remove nil? target-cols))))))
 
 (defn- make-apply-join-fn
   "Perform left-join on groups and create new columns"
@@ -853,12 +915,11 @@
          result (reduce (make-apply-join-fn group-name->names single-value? value-names
                                             join-name col-to-drop starting-ds-count rollin-fn rename-map)
                         starting-ds
-                        (reverse (ds/mapseq-reader grouped-ds)))] ;; perform join on groups and create new columns
+                        (ds/mapseq-reader grouped-ds))] ;; perform join on groups and create new columns
      (-> (if join-on-single? ;; finalize, recreate original columns from join column, and reorder stuff
            result
-           (let [temp-ds (separate-column result join-name rest-cols identity {:drop-column? true})
-                 rest-ds (select-columns temp-ds rest-cols)]
-             (reduce #(ds/add-column %1 %2) rest-ds (ds/columns (drop-columns temp-ds rest-cols)))))
+           (-> (separate-column result join-name rest-cols identity {:drop-column? true})
+               (reorder-columns rest-cols)))
          (ds/set-dataset-name (ds/dataset-name ds))))))
 
 
@@ -1152,63 +1213,70 @@
 
 (def relig-income (dataset "data/relig_income.csv"))
 (pivot->longer relig-income (complement #{"religion"}))
-;; => data/relig_income.csv [180 3]:
-;;    |                religion | :$value |           :$column |
-;;    |-------------------------+---------+--------------------|
-;;    |                Agnostic |      27 |              <$10k |
-;;    |                 Atheist |      12 |              <$10k |
-;;    |                Buddhist |      27 |              <$10k |
-;;    |                Catholic |     418 |              <$10k |
-;;    |      Don’t know/refused |      15 |              <$10k |
-;;    |        Evangelical Prot |     575 |              <$10k |
-;;    |                   Hindu |       1 |              <$10k |
-;;    | Historically Black Prot |     228 |              <$10k |
-;;    |       Jehovah's Witness |      20 |              <$10k |
-;;    |                  Jewish |      19 |              <$10k |
-;;    |           Mainline Prot |     289 |              <$10k |
-;;    |                  Mormon |      29 |              <$10k |
-;;    |                  Muslim |       6 |              <$10k |
-;;    |                Orthodox |      13 |              <$10k |
-;;    |         Other Christian |       9 |              <$10k |
-;;    |            Other Faiths |      20 |              <$10k |
-;;    |   Other World Religions |       5 |              <$10k |
-;;    |            Unaffiliated |     217 |              <$10k |
-;;    |                Agnostic |      96 | Don't know/refused |
 
+;; => data/relig_income.csv [180 3]:
+;;    |                religion |           :$column | :$value |
+;;    |-------------------------+--------------------+---------|
+;;    |                Agnostic |              <$10k |      27 |
+;;    |                 Atheist |              <$10k |      12 |
+;;    |                Buddhist |              <$10k |      27 |
+;;    |                Catholic |              <$10k |     418 |
+;;    |      Don’t know/refused |              <$10k |      15 |
+;;    |        Evangelical Prot |              <$10k |     575 |
+;;    |                   Hindu |              <$10k |       1 |
+;;    | Historically Black Prot |              <$10k |     228 |
+;;    |       Jehovah's Witness |              <$10k |      20 |
+;;    |                  Jewish |              <$10k |      19 |
+;;    |           Mainline Prot |              <$10k |     289 |
+;;    |                  Mormon |              <$10k |      29 |
+;;    |                  Muslim |              <$10k |       6 |
+;;    |                Orthodox |              <$10k |      13 |
+;;    |         Other Christian |              <$10k |       9 |
+;;    |            Other Faiths |              <$10k |      20 |
+;;    |   Other World Religions |              <$10k |       5 |
+;;    |            Unaffiliated |              <$10k |     217 |
+;;    |                Agnostic | Don't know/refused |      96 |
+;;    |                 Atheist | Don't know/refused |      76 |
+;;    |                Buddhist | Don't know/refused |      54 |
+;;    |                Catholic | Don't know/refused |    1489 |
+;;    |      Don’t know/refused | Don't know/refused |     116 |
+;;    |        Evangelical Prot | Don't know/refused |    1529 |
+;;    |                   Hindu | Don't know/refused |      37 |
 
 (def bilboard (-> (dataset "data/billboard.csv.gz")
                   (drop-columns #(= :boolean %) {:meta-field :datatype}))) ;; drop some boolean columns, tidyr just skips them
 
 (pivot->longer bilboard #(str/starts-with? % "wk") {:target-cols :week
                                                     :value-column-name :rank})
+
 ;; => data/billboard.csv.gz [5307 5]:
-;;    |              artist |                   track | date.entered | :rank | :week |
+;;    |              artist |                   track | date.entered | :week | :rank |
 ;;    |---------------------+-------------------------+--------------+-------+-------|
-;;    |        3 Doors Down |              Kryptonite |   2000-04-08 |     4 |  wk35 |
-;;    |       Braxton, Toni |    He Wasn't Man Enough |   2000-03-18 |    34 |  wk35 |
-;;    |               Creed |                  Higher |   1999-09-11 |    22 |  wk35 |
-;;    |               Creed |     With Arms Wide Open |   2000-05-13 |     5 |  wk35 |
-;;    |         Hill, Faith |                 Breathe |   1999-11-06 |     8 |  wk35 |
-;;    |                 Joe |            I Wanna Know |   2000-01-01 |     5 |  wk35 |
-;;    |            Lonestar |                  Amazed |   1999-06-05 |    14 |  wk35 |
-;;    |    Vertical Horizon |     Everything You Want |   2000-01-22 |    27 |  wk35 |
-;;    |     matchbox twenty |                    Bent |   2000-04-29 |    33 |  wk35 |
-;;    |               Creed |                  Higher |   1999-09-11 |    21 |  wk55 |
-;;    |            Lonestar |                  Amazed |   1999-06-05 |    22 |  wk55 |
-;;    |        3 Doors Down |              Kryptonite |   2000-04-08 |    18 |  wk19 |
-;;    |        3 Doors Down |                   Loser |   2000-10-21 |    73 |  wk19 |
-;;    |                98^0 | Give Me Just One Nig... |   2000-08-19 |    93 |  wk19 |
-;;    |             Aaliyah |           I Don't Wanna |   2000-01-29 |    83 |  wk19 |
-;;    |             Aaliyah |               Try Again |   2000-03-18 |     3 |  wk19 |
-;;    |      Adams, Yolanda |           Open My Heart |   2000-08-26 |    79 |  wk19 |
-;;    | Aguilera, Christina | Come On Over Baby (A... |   2000-08-05 |    23 |  wk19 |
-;;    | Aguilera, Christina |           I Turn To You |   2000-04-15 |    29 |  wk19 |
-;;    | Aguilera, Christina |       What A Girl Wants |   1999-11-27 |    18 |  wk19 |
-;;    |        Alice Deejay |        Better Off Alone |   2000-04-08 |    79 |  wk19 |
-;;    |               Amber |                  Sexual |   1999-07-17 |    95 |  wk19 |
-;;    |       Anthony, Marc |             My Baby You |   2000-09-16 |    91 |  wk19 |
-;;    |       Anthony, Marc |          You Sang To Me |   2000-02-26 |     9 |  wk19 |
-;;    |               Avant |           My First Love |   2000-11-04 |    81 |  wk19 |
+;;    |        3 Doors Down |              Kryptonite |   2000-04-08 |  wk35 |     4 |
+;;    |       Braxton, Toni |    He Wasn't Man Enough |   2000-03-18 |  wk35 |    34 |
+;;    |               Creed |                  Higher |   1999-09-11 |  wk35 |    22 |
+;;    |               Creed |     With Arms Wide Open |   2000-05-13 |  wk35 |     5 |
+;;    |         Hill, Faith |                 Breathe |   1999-11-06 |  wk35 |     8 |
+;;    |                 Joe |            I Wanna Know |   2000-01-01 |  wk35 |     5 |
+;;    |            Lonestar |                  Amazed |   1999-06-05 |  wk35 |    14 |
+;;    |    Vertical Horizon |     Everything You Want |   2000-01-22 |  wk35 |    27 |
+;;    |     matchbox twenty |                    Bent |   2000-04-29 |  wk35 |    33 |
+;;    |               Creed |                  Higher |   1999-09-11 |  wk55 |    21 |
+;;    |            Lonestar |                  Amazed |   1999-06-05 |  wk55 |    22 |
+;;    |        3 Doors Down |              Kryptonite |   2000-04-08 |  wk19 |    18 |
+;;    |        3 Doors Down |                   Loser |   2000-10-21 |  wk19 |    73 |
+;;    |                98^0 | Give Me Just One Nig... |   2000-08-19 |  wk19 |    93 |
+;;    |             Aaliyah |           I Don't Wanna |   2000-01-29 |  wk19 |    83 |
+;;    |             Aaliyah |               Try Again |   2000-03-18 |  wk19 |     3 |
+;;    |      Adams, Yolanda |           Open My Heart |   2000-08-26 |  wk19 |    79 |
+;;    | Aguilera, Christina | Come On Over Baby (A... |   2000-08-05 |  wk19 |    23 |
+;;    | Aguilera, Christina |           I Turn To You |   2000-04-15 |  wk19 |    29 |
+;;    | Aguilera, Christina |       What A Girl Wants |   1999-11-27 |  wk19 |    18 |
+;;    |        Alice Deejay |        Better Off Alone |   2000-04-08 |  wk19 |    79 |
+;;    |               Amber |                  Sexual |   1999-07-17 |  wk19 |    95 |
+;;    |       Anthony, Marc |             My Baby You |   2000-09-16 |  wk19 |    91 |
+;;    |       Anthony, Marc |          You Sang To Me |   2000-02-26 |  wk19 |     9 |
+;;    |               Avant |           My First Love |   2000-11-04 |  wk19 |    81 |
 
 (pivot->longer bilboard #(str/starts-with? % "wk") {:target-cols :week
                                                     :value-column-name :rank
@@ -1216,33 +1284,33 @@
                                                     :datatypes {:week :int16}})
 
 ;; => data/billboard.csv.gz [5307 5]:
-;;    |              artist |                   track | date.entered | :rank | :week |
+;;    |              artist |                   track | date.entered | :week | :rank |
 ;;    |---------------------+-------------------------+--------------+-------+-------|
-;;    |        3 Doors Down |              Kryptonite |   2000-04-08 |    21 |    46 |
-;;    |               Creed |                  Higher |   1999-09-11 |     7 |    46 |
-;;    |               Creed |     With Arms Wide Open |   2000-05-13 |    37 |    46 |
-;;    |         Hill, Faith |                 Breathe |   1999-11-06 |    31 |    46 |
-;;    |            Lonestar |                  Amazed |   1999-06-05 |     5 |    46 |
-;;    |        3 Doors Down |              Kryptonite |   2000-04-08 |    42 |    51 |
-;;    |               Creed |                  Higher |   1999-09-11 |    14 |    51 |
-;;    |         Hill, Faith |                 Breathe |   1999-11-06 |    49 |    51 |
-;;    |            Lonestar |                  Amazed |   1999-06-05 |    12 |    51 |
-;;    |               2 Pac | Baby Don't Cry (Keep... |   2000-02-26 |    94 |     6 |
-;;    |        3 Doors Down |              Kryptonite |   2000-04-08 |    57 |     6 |
-;;    |        3 Doors Down |                   Loser |   2000-10-21 |    65 |     6 |
-;;    |            504 Boyz |           Wobble Wobble |   2000-04-15 |    31 |     6 |
-;;    |                98^0 | Give Me Just One Nig... |   2000-08-19 |    19 |     6 |
-;;    |             Aaliyah |           I Don't Wanna |   2000-01-29 |    35 |     6 |
-;;    |             Aaliyah |               Try Again |   2000-03-18 |    18 |     6 |
-;;    |      Adams, Yolanda |           Open My Heart |   2000-08-26 |    67 |     6 |
-;;    |       Adkins, Trace |                    More |   2000-04-29 |    69 |     6 |
-;;    | Aguilera, Christina | Come On Over Baby (A... |   2000-08-05 |    18 |     6 |
-;;    | Aguilera, Christina |           I Turn To You |   2000-04-15 |    19 |     6 |
-;;    | Aguilera, Christina |       What A Girl Wants |   1999-11-27 |    13 |     6 |
-;;    |        Alice Deejay |        Better Off Alone |   2000-04-08 |    36 |     6 |
-;;    |               Amber |                  Sexual |   1999-07-17 |    93 |     6 |
-;;    |       Anthony, Marc |             My Baby You |   2000-09-16 |    81 |     6 |
-;;    |       Anthony, Marc |          You Sang To Me |   2000-02-26 |    27 |     6 |
+;;    |        3 Doors Down |              Kryptonite |   2000-04-08 |    46 |    21 |
+;;    |               Creed |                  Higher |   1999-09-11 |    46 |     7 |
+;;    |               Creed |     With Arms Wide Open |   2000-05-13 |    46 |    37 |
+;;    |         Hill, Faith |                 Breathe |   1999-11-06 |    46 |    31 |
+;;    |            Lonestar |                  Amazed |   1999-06-05 |    46 |     5 |
+;;    |        3 Doors Down |              Kryptonite |   2000-04-08 |    51 |    42 |
+;;    |               Creed |                  Higher |   1999-09-11 |    51 |    14 |
+;;    |         Hill, Faith |                 Breathe |   1999-11-06 |    51 |    49 |
+;;    |            Lonestar |                  Amazed |   1999-06-05 |    51 |    12 |
+;;    |               2 Pac | Baby Don't Cry (Keep... |   2000-02-26 |     6 |    94 |
+;;    |        3 Doors Down |              Kryptonite |   2000-04-08 |     6 |    57 |
+;;    |        3 Doors Down |                   Loser |   2000-10-21 |     6 |    65 |
+;;    |            504 Boyz |           Wobble Wobble |   2000-04-15 |     6 |    31 |
+;;    |                98^0 | Give Me Just One Nig... |   2000-08-19 |     6 |    19 |
+;;    |             Aaliyah |           I Don't Wanna |   2000-01-29 |     6 |    35 |
+;;    |             Aaliyah |               Try Again |   2000-03-18 |     6 |    18 |
+;;    |      Adams, Yolanda |           Open My Heart |   2000-08-26 |     6 |    67 |
+;;    |       Adkins, Trace |                    More |   2000-04-29 |     6 |    69 |
+;;    | Aguilera, Christina | Come On Over Baby (A... |   2000-08-05 |     6 |    18 |
+;;    | Aguilera, Christina |           I Turn To You |   2000-04-15 |     6 |    19 |
+;;    | Aguilera, Christina |       What A Girl Wants |   1999-11-27 |     6 |    13 |
+;;    |        Alice Deejay |        Better Off Alone |   2000-04-08 |     6 |    36 |
+;;    |               Amber |                  Sexual |   1999-07-17 |     6 |    93 |
+;;    |       Anthony, Marc |             My Baby You |   2000-09-16 |     6 |    81 |
+;;    |       Anthony, Marc |          You Sang To Me |   2000-02-26 |     6 |    27 |
 
 (def who (dataset "data/who.csv.gz"))
 
@@ -1251,85 +1319,86 @@
                                                 :value-column-name :count})
 
 ;; => data/who.csv.gz [76046 8]:
-;;    |                           country | iso2 | iso3 | year | :count | :diagnosis | :gender | :age |
-;;    |-----------------------------------+------+------+------+--------+------------+---------+------|
-;;    |                           Albania |   AL |  ALB | 2013 |     60 |        rel |       m | 1524 |
-;;    |                           Algeria |   DZ |  DZA | 2013 |   1021 |        rel |       m | 1524 |
-;;    |                           Andorra |   AD |  AND | 2013 |      0 |        rel |       m | 1524 |
-;;    |                            Angola |   AO |  AGO | 2013 |   2992 |        rel |       m | 1524 |
-;;    |                          Anguilla |   AI |  AIA | 2013 |      0 |        rel |       m | 1524 |
-;;    |               Antigua and Barbuda |   AG |  ATG | 2013 |      1 |        rel |       m | 1524 |
-;;    |                         Argentina |   AR |  ARG | 2013 |   1124 |        rel |       m | 1524 |
-;;    |                           Armenia |   AM |  ARM | 2013 |    116 |        rel |       m | 1524 |
-;;    |                         Australia |   AU |  AUS | 2013 |    105 |        rel |       m | 1524 |
-;;    |                           Austria |   AT |  AUT | 2013 |     44 |        rel |       m | 1524 |
-;;    |                        Azerbaijan |   AZ |  AZE | 2013 |    958 |        rel |       m | 1524 |
-;;    |                           Bahamas |   BS |  BHS | 2013 |      2 |        rel |       m | 1524 |
-;;    |                           Bahrain |   BH |  BHR | 2013 |     13 |        rel |       m | 1524 |
-;;    |                        Bangladesh |   BD |  BGD | 2013 |  14705 |        rel |       m | 1524 |
-;;    |                          Barbados |   BB |  BRB | 2013 |      0 |        rel |       m | 1524 |
-;;    |                           Belarus |   BY |  BLR | 2013 |    162 |        rel |       m | 1524 |
-;;    |                           Belgium |   BE |  BEL | 2013 |     63 |        rel |       m | 1524 |
-;;    |                            Belize |   BZ |  BLZ | 2013 |      8 |        rel |       m | 1524 |
-;;    |                             Benin |   BJ |  BEN | 2013 |    301 |        rel |       m | 1524 |
-;;    |                           Bermuda |   BM |  BMU | 2013 |      0 |        rel |       m | 1524 |
-;;    |                            Bhutan |   BT |  BTN | 2013 |    180 |        rel |       m | 1524 |
-;;    |  Bolivia (Plurinational State of) |   BO |  BOL | 2013 |   1470 |        rel |       m | 1524 |
-;;    | Bonaire, Saint Eustatius and Saba |   BQ |  BES | 2013 |      0 |        rel |       m | 1524 |
-;;    |            Bosnia and Herzegovina |   BA |  BIH | 2013 |     57 |        rel |       m | 1524 |
-;;    |                          Botswana |   BW |  BWA | 2013 |    423 |        rel |       m | 1524 |
+;;    |                           country | iso2 | iso3 | year | :diagnosis | :gender | :age | :count |
+;;    |-----------------------------------+------+------+------+------------+---------+------+--------|
+;;    |                           Albania |   AL |  ALB | 2013 |        rel |       m | 1524 |     60 |
+;;    |                           Algeria |   DZ |  DZA | 2013 |        rel |       m | 1524 |   1021 |
+;;    |                           Andorra |   AD |  AND | 2013 |        rel |       m | 1524 |      0 |
+;;    |                            Angola |   AO |  AGO | 2013 |        rel |       m | 1524 |   2992 |
+;;    |                          Anguilla |   AI |  AIA | 2013 |        rel |       m | 1524 |      0 |
+;;    |               Antigua and Barbuda |   AG |  ATG | 2013 |        rel |       m | 1524 |      1 |
+;;    |                         Argentina |   AR |  ARG | 2013 |        rel |       m | 1524 |   1124 |
+;;    |                           Armenia |   AM |  ARM | 2013 |        rel |       m | 1524 |    116 |
+;;    |                         Australia |   AU |  AUS | 2013 |        rel |       m | 1524 |    105 |
+;;    |                           Austria |   AT |  AUT | 2013 |        rel |       m | 1524 |     44 |
+;;    |                        Azerbaijan |   AZ |  AZE | 2013 |        rel |       m | 1524 |    958 |
+;;    |                           Bahamas |   BS |  BHS | 2013 |        rel |       m | 1524 |      2 |
+;;    |                           Bahrain |   BH |  BHR | 2013 |        rel |       m | 1524 |     13 |
+;;    |                        Bangladesh |   BD |  BGD | 2013 |        rel |       m | 1524 |  14705 |
+;;    |                          Barbados |   BB |  BRB | 2013 |        rel |       m | 1524 |      0 |
+;;    |                           Belarus |   BY |  BLR | 2013 |        rel |       m | 1524 |    162 |
+;;    |                           Belgium |   BE |  BEL | 2013 |        rel |       m | 1524 |     63 |
+;;    |                            Belize |   BZ |  BLZ | 2013 |        rel |       m | 1524 |      8 |
+;;    |                             Benin |   BJ |  BEN | 2013 |        rel |       m | 1524 |    301 |
+;;    |                           Bermuda |   BM |  BMU | 2013 |        rel |       m | 1524 |      0 |
+;;    |                            Bhutan |   BT |  BTN | 2013 |        rel |       m | 1524 |    180 |
+;;    |  Bolivia (Plurinational State of) |   BO |  BOL | 2013 |        rel |       m | 1524 |   1470 |
+;;    | Bonaire, Saint Eustatius and Saba |   BQ |  BES | 2013 |        rel |       m | 1524 |      0 |
+;;    |            Bosnia and Herzegovina |   BA |  BIH | 2013 |        rel |       m | 1524 |     57 |
+;;    |                          Botswana |   BW |  BWA | 2013 |        rel |       m | 1524 |    423 |
 
 (def family (dataset "data/family.csv"))
 
 (pivot->longer family (complement #{"family"}) {:target-cols [nil :child]
                                                 :splitter #(str/split % #"_")
                                                 :datatypes {"gender" :int16}})
+
 ;; => data/family.csv [9 4]:
-;;    | family |        dob | :child | gender |
-;;    |--------+------------+--------+--------|
-;;    |      1 | 1998-11-26 | child1 |      1 |
-;;    |      2 | 1996-06-22 | child1 |      2 |
-;;    |      3 | 2002-07-11 | child1 |      2 |
-;;    |      4 | 2004-10-10 | child1 |      1 |
-;;    |      5 | 2000-12-05 | child1 |      2 |
-;;    |      1 | 2000-01-29 | child2 |      2 |
-;;    |      3 | 2004-04-05 | child2 |      2 |
-;;    |      4 | 2009-08-27 | child2 |      1 |
-;;    |      5 | 2005-02-28 | child2 |      1 |
+;;    | family | :child |        dob | gender |
+;;    |--------+--------+------------+--------|
+;;    |      1 | child1 | 1998-11-26 |      1 |
+;;    |      2 | child1 | 1996-06-22 |      2 |
+;;    |      3 | child1 | 2002-07-11 |      2 |
+;;    |      4 | child1 | 2004-10-10 |      1 |
+;;    |      5 | child1 | 2000-12-05 |      2 |
+;;    |      1 | child2 | 2000-01-29 |      2 |
+;;    |      3 | child2 | 2004-04-05 |      2 |
+;;    |      4 | child2 | 2009-08-27 |      1 |
+;;    |      5 | child2 | 2005-02-28 |      1 |
 
 (def anscombe (dataset "data/anscombe.csv"))
 
 (pivot->longer anscombe :all {:splitter #"(.)(.)"
                               :target-cols [nil :set]})
-;; => data/anscombe.csv [44 3]:
-;;    |  x | :set |     y |
-;;    |----+------+-------|
-;;    | 10 |    4 | 8.040 |
-;;    |  8 |    4 | 6.950 |
-;;    | 13 |    4 | 7.580 |
-;;    |  9 |    4 | 8.810 |
-;;    | 11 |    4 | 8.330 |
-;;    | 14 |    4 | 9.960 |
-;;    |  6 |    4 | 7.240 |
-;;    |  4 |    4 | 4.260 |
-;;    | 12 |    4 | 10.84 |
-;;    |  7 |    4 | 4.820 |
-;;    |  5 |    4 | 5.680 |
-;;    | 10 |    4 | 9.140 |
-;;    |  8 |    4 | 8.140 |
-;;    | 13 |    4 | 8.740 |
-;;    |  9 |    4 | 8.770 |
-;;    | 11 |    4 | 9.260 |
-;;    | 14 |    4 | 8.100 |
-;;    |  6 |    4 | 6.130 |
-;;    |  4 |    4 | 3.100 |
-;;    | 12 |    4 | 9.130 |
-;;    |  7 |    4 | 7.260 |
-;;    |  5 |    4 | 4.740 |
-;;    | 10 |    4 | 7.460 |
-;;    |  8 |    4 | 6.770 |
-;;    | 13 |    4 | 12.74 |
 
+;; => data/anscombe.csv [44 3]:
+;;    | :set |  x |     y |
+;;    |------+----+-------|
+;;    |    4 | 10 | 8.040 |
+;;    |    4 |  8 | 6.950 |
+;;    |    4 | 13 | 7.580 |
+;;    |    4 |  9 | 8.810 |
+;;    |    4 | 11 | 8.330 |
+;;    |    4 | 14 | 9.960 |
+;;    |    4 |  6 | 7.240 |
+;;    |    4 |  4 | 4.260 |
+;;    |    4 | 12 | 10.84 |
+;;    |    4 |  7 | 4.820 |
+;;    |    4 |  5 | 5.680 |
+;;    |    4 | 10 | 9.140 |
+;;    |    4 |  8 | 8.140 |
+;;    |    4 | 13 | 8.740 |
+;;    |    4 |  9 | 8.770 |
+;;    |    4 | 11 | 9.260 |
+;;    |    4 | 14 | 8.100 |
+;;    |    4 |  6 | 6.130 |
+;;    |    4 |  4 | 3.100 |
+;;    |    4 | 12 | 9.130 |
+;;    |    4 |  7 | 7.260 |
+;;    |    4 |  5 | 4.740 |
+;;    |    4 | 10 | 7.460 |
+;;    |    4 |  8 | 6.770 |
+;;    |    4 | 13 | 12.74 |
 
 (def pnl (dataset {:x [1 2 3 4]
                    :a [1 1 0 0]
@@ -1341,18 +1410,18 @@
 
 (pivot->longer pnl [:y1 :y2 :z1 :z2] {:target-cols [nil :times]
                                       :splitter #":(.)(.)"})
-;; => _unnamed [8 6]:
-;;    | :x | :a | :b |       y | :times |  z |
-;;    |----+----+----+---------+--------+----|
-;;    |  1 |  1 |  0 | 0.04292 |      1 |  3 |
-;;    |  2 |  1 |  1 | 0.01423 |      1 |  3 |
-;;    |  3 |  0 |  1 | 0.06682 |      1 |  3 |
-;;    |  4 |  0 |  1 |  0.7847 |      1 |  3 |
-;;    |  1 |  1 |  0 |  0.4265 |      2 | -2 |
-;;    |  2 |  1 |  1 |  0.2557 |      2 | -2 |
-;;    |  3 |  0 |  1 |  0.6817 |      2 | -2 |
-;;    |  4 |  0 |  1 |  0.1968 |      2 | -2 |
 
+;; => _unnamed [8 6]:
+;;    | :x | :a | :b | :times |       y |  z |
+;;    |----+----+----+--------+---------+----|
+;;    |  1 |  1 |  0 |      1 |  0.7929 |  3 |
+;;    |  2 |  1 |  1 |      1 |  0.4401 |  3 |
+;;    |  3 |  0 |  1 |      1 |  0.6825 |  3 |
+;;    |  4 |  0 |  1 |      1 |  0.2481 |  3 |
+;;    |  1 |  1 |  0 |      2 | 0.09633 | -2 |
+;;    |  2 |  1 |  1 |      2 |  0.8609 | -2 |
+;;    |  3 |  0 |  1 |      2 |  0.6604 | -2 |
+;;    |  4 |  0 |  1 |      2 |  0.7120 | -2 |
 
 ;; wider
 
@@ -1360,33 +1429,34 @@
 
 (pivot->wider fish "station" "seen")
 ;; => data/fish_encounters.csv [19 12]:
-;;    | fish | BCW | Lisbon | BCE | BCW2 | MAW | BCE2 | MAE | Release | I80_1 | Base_TD | Rstr |
-;;    |------+-----+--------+-----+------+-----+------+-----+---------+-------+---------+------|
-;;    | 4842 |   1 |      1 |   1 |    1 |   1 |    1 |   1 |       1 |     1 |       1 |    1 |
-;;    | 4843 |   1 |      1 |   1 |    1 |   1 |    1 |   1 |       1 |     1 |       1 |    1 |
-;;    | 4844 |   1 |      1 |   1 |    1 |   1 |    1 |   1 |       1 |     1 |       1 |    1 |
-;;    | 4845 |     |      1 |     |      |     |      |     |       1 |     1 |       1 |    1 |
-;;    | 4848 |     |      1 |     |      |     |      |     |       1 |     1 |         |    1 |
-;;    | 4850 |   1 |        |   1 |      |     |      |     |       1 |     1 |       1 |    1 |
-;;    | 4855 |     |      1 |     |      |     |      |     |       1 |     1 |       1 |    1 |
-;;    | 4857 |   1 |      1 |   1 |    1 |     |    1 |     |       1 |     1 |       1 |    1 |
-;;    | 4858 |   1 |      1 |   1 |    1 |   1 |    1 |   1 |       1 |     1 |       1 |    1 |
-;;    | 4859 |     |      1 |     |      |     |      |     |       1 |     1 |       1 |    1 |
-;;    | 4861 |   1 |      1 |   1 |    1 |   1 |    1 |   1 |       1 |     1 |       1 |    1 |
-;;    | 4862 |   1 |      1 |   1 |    1 |     |    1 |     |       1 |     1 |       1 |    1 |
-;;    | 4864 |     |        |     |      |     |      |     |       1 |     1 |         |      |
-;;    | 4865 |     |      1 |     |      |     |      |     |       1 |     1 |         |      |
-;;    | 4847 |     |      1 |     |      |     |      |     |       1 |     1 |         |      |
-;;    | 4849 |     |        |     |      |     |      |     |       1 |     1 |         |      |
-;;    | 4851 |     |        |     |      |     |      |     |       1 |     1 |         |      |
-;;    | 4854 |     |        |     |      |     |      |     |       1 |     1 |         |      |
-;;    | 4863 |     |        |     |      |     |      |     |       1 |     1 |         |      |
+;;    | fish | Rstr | Base_TD | I80_1 | Release | MAE | BCE2 | MAW | BCW2 | BCE | Lisbon | BCW |
+;;    |------+------+---------+-------+---------+-----+------+-----+------+-----+--------+-----|
+;;    | 4842 |    1 |       1 |     1 |       1 |   1 |    1 |   1 |    1 |   1 |      1 |   1 |
+;;    | 4843 |    1 |       1 |     1 |       1 |   1 |    1 |   1 |    1 |   1 |      1 |   1 |
+;;    | 4844 |    1 |       1 |     1 |       1 |   1 |    1 |   1 |    1 |   1 |      1 |   1 |
+;;    | 4850 |    1 |       1 |     1 |       1 |     |      |     |      |   1 |        |   1 |
+;;    | 4857 |    1 |       1 |     1 |       1 |     |    1 |     |    1 |   1 |      1 |   1 |
+;;    | 4858 |    1 |       1 |     1 |       1 |   1 |    1 |   1 |    1 |   1 |      1 |   1 |
+;;    | 4861 |    1 |       1 |     1 |       1 |   1 |    1 |   1 |    1 |   1 |      1 |   1 |
+;;    | 4862 |    1 |       1 |     1 |       1 |     |    1 |     |    1 |   1 |      1 |   1 |
+;;    | 4864 |      |         |     1 |       1 |     |      |     |      |     |        |     |
+;;    | 4865 |      |         |     1 |       1 |     |      |     |      |     |      1 |     |
+;;    | 4845 |    1 |       1 |     1 |       1 |     |      |     |      |     |      1 |     |
+;;    | 4847 |      |         |     1 |       1 |     |      |     |      |     |      1 |     |
+;;    | 4848 |    1 |         |     1 |       1 |     |      |     |      |     |      1 |     |
+;;    | 4849 |      |         |     1 |       1 |     |      |     |      |     |        |     |
+;;    | 4851 |      |         |     1 |       1 |     |      |     |      |     |        |     |
+;;    | 4854 |      |         |     1 |       1 |     |      |     |      |     |        |     |
+;;    | 4855 |    1 |       1 |     1 |       1 |     |      |     |      |     |      1 |     |
+;;    | 4859 |    1 |       1 |     1 |       1 |     |      |     |      |     |      1 |     |
+;;    | 4863 |      |         |     1 |       1 |     |      |     |      |     |        |     |
 
 (def warpbreaks (dataset "data/warpbreaks.csv"))
 
 (-> warpbreaks
     (group-by ["wool" "tension"])
     (aggregate {:n ds/row-count}))
+
 ;; => null [6 3]:
 ;;    | wool | tension | :n |
 ;;    |------+---------+----|
@@ -1398,181 +1468,189 @@
 ;;    |    B |       M |  9 |
 
 (pivot->wider (select-columns warpbreaks ["wool" "tension" "breaks"]) "wool" "breaks")
-;; => data/warpbreaks.csv [3 3]:
-;;    |                            A | tension |                            B |
-;;    |------------------------------+---------+------------------------------|
-;;    | [18 21 29 17 12 18 35 30 36] |       M | [42 26 19 16 39 28 21 39 29] |
-;;    | [26 30 54 25 70 52 51 26 67] |       L | [27 14 29 19 29 31 41 20 44] |
-;;    | [36 21 24 18 10 43 28 15 26] |       H | [20 21 24 17 13 15 15 16 28] |
 
+;; => data/warpbreaks.csv [3 3]:
+;;    | tension |                            B |                            A |
+;;    |---------+------------------------------+------------------------------|
+;;    |       M | [42 26 19 16 39 28 21 39 29] | [18 21 29 17 12 18 35 30 36] |
+;;    |       H | [20 21 24 17 13 15 15 16 28] | [36 21 24 18 10 43 28 15 26] |
+;;    |       L | [27 14 29 19 29 31 41 20 44] | [26 30 54 25 70 52 51 26 67] |
 
 (pivot->wider (select-columns warpbreaks ["wool" "tension" "breaks"]) "wool" "breaks" {:rollin-fn dfn/mean})
+
 ;; => data/warpbreaks.csv [3 3]:
-;;    |     A | tension |     B |
-;;    |-------+---------+-------|
-;;    | 24.56 |       H | 18.78 |
-;;    | 24.00 |       M | 28.78 |
-;;    | 44.56 |       L | 28.22 |
+;;    | tension |     B |     A |
+;;    |---------+-------+-------|
+;;    |       H | 18.78 | 24.56 |
+;;    |       M | 28.78 | 24.00 |
+;;    |       L | 28.22 | 44.56 |
 
 (def production (dataset "data/production.csv"))
 
 (pivot->wider production ["product" "country"] "production")
+
 ;; => data/production.csv [15 4]:
-;;    | year |     B_AI |    B_EI |     A_AI |
+;;    | year |     A_AI |    B_EI |     B_AI |
 ;;    |------+----------+---------+----------|
-;;    | 2000 | -0.02618 |   1.405 |    1.637 |
-;;    | 2001 |  -0.6886 | -0.5962 |   0.1587 |
-;;    | 2002 |  0.06249 | -0.2657 |   -1.568 |
-;;    | 2003 |  -0.7234 |  0.6526 |  -0.4446 |
-;;    | 2004 |   0.4725 |  0.6256 | -0.07134 |
-;;    | 2005 |  -0.9417 |  -1.345 |    1.612 |
-;;    | 2006 |  -0.3478 | -0.9718 |  -0.7043 |
-;;    | 2007 |   0.5243 |  -1.697 |   -1.536 |
-;;    | 2008 |    1.832 | 0.04556 |   0.8391 |
-;;    | 2009 |   0.1071 |   1.193 |  -0.3742 |
-;;    | 2010 |  -0.3290 |  -1.606 |  -0.7116 |
-;;    | 2011 |   -1.783 | -0.7724 |    1.128 |
-;;    | 2012 |   0.6113 |  -2.503 |    1.457 |
-;;    | 2013 |  -0.7853 |  -1.628 |   -1.559 |
-;;    | 2014 |   0.9784 | 0.03330 |  -0.1170 |
+;;    | 2000 |    1.637 |   1.405 | -0.02618 |
+;;    | 2001 |   0.1587 | -0.5962 |  -0.6886 |
+;;    | 2002 |   -1.568 | -0.2657 |  0.06249 |
+;;    | 2003 |  -0.4446 |  0.6526 |  -0.7234 |
+;;    | 2004 | -0.07134 |  0.6256 |   0.4725 |
+;;    | 2005 |    1.612 |  -1.345 |  -0.9417 |
+;;    | 2006 |  -0.7043 | -0.9718 |  -0.3478 |
+;;    | 2007 |   -1.536 |  -1.697 |   0.5243 |
+;;    | 2008 |   0.8391 | 0.04556 |    1.832 |
+;;    | 2009 |  -0.3742 |   1.193 |   0.1071 |
+;;    | 2010 |  -0.7116 |  -1.606 |  -0.3290 |
+;;    | 2011 |    1.128 | -0.7724 |   -1.783 |
+;;    | 2012 |    1.457 |  -2.503 |   0.6113 |
+;;    | 2013 |   -1.559 |  -1.628 |  -0.7853 |
+;;    | 2014 |  -0.1170 | 0.03330 |   0.9784 |
 
 (def income (dataset "data/us_rent_income.csv"))
 
 (pivot->wider income "variable" ["estimate" "moe"])
+
 ;; => data/us_rent_income.csv [52 6]:
-;;    | GEOID |                 NAME | estimate-income | moe-income | estimate-rent | moe-rent |
-;;    |-------+----------------------+-----------------+------------+---------------+----------|
-;;    |     1 |              Alabama |           24476 |        136 |           747 |        3 |
-;;    |     2 |               Alaska |           32940 |        508 |          1200 |       13 |
-;;    |     4 |              Arizona |           27517 |        148 |           972 |        4 |
-;;    |     5 |             Arkansas |           23789 |        165 |           709 |        5 |
-;;    |     6 |           California |           29454 |        109 |          1358 |        3 |
-;;    |     8 |             Colorado |           32401 |        109 |          1125 |        5 |
-;;    |     9 |          Connecticut |           35326 |        195 |          1123 |        5 |
-;;    |    10 |             Delaware |           31560 |        247 |          1076 |       10 |
-;;    |    11 | District of Columbia |           43198 |        681 |          1424 |       17 |
-;;    |    12 |              Florida |           25952 |         70 |          1077 |        3 |
-;;    |    13 |              Georgia |           27024 |        106 |           927 |        3 |
-;;    |    15 |               Hawaii |           32453 |        218 |          1507 |       18 |
-;;    |    16 |                Idaho |           25298 |        208 |           792 |        7 |
-;;    |    17 |             Illinois |           30684 |         83 |           952 |        3 |
-;;    |    18 |              Indiana |           27247 |        117 |           782 |        3 |
-;;    |    19 |                 Iowa |           30002 |        143 |           740 |        4 |
-;;    |    20 |               Kansas |           29126 |        208 |           801 |        5 |
-;;    |    21 |             Kentucky |           24702 |        159 |           713 |        4 |
-;;    |    22 |            Louisiana |           25086 |        155 |           825 |        4 |
-;;    |    23 |                Maine |           26841 |        187 |           808 |        7 |
-;;    |    24 |             Maryland |           37147 |        152 |          1311 |        5 |
-;;    |    25 |        Massachusetts |           34498 |        199 |          1173 |        5 |
-;;    |    26 |             Michigan |           26987 |         82 |           824 |        3 |
-;;    |    27 |            Minnesota |           32734 |        189 |           906 |        4 |
-;;    |    28 |          Mississippi |           22766 |        194 |           740 |        5 |
+;;    | GEOID |                 NAME | estimate-rent | moe-rent | estimate-income | moe-income |
+;;    |-------+----------------------+---------------+----------+-----------------+------------|
+;;    |     1 |              Alabama |           747 |        3 |           24476 |        136 |
+;;    |     2 |               Alaska |          1200 |       13 |           32940 |        508 |
+;;    |     4 |              Arizona |           972 |        4 |           27517 |        148 |
+;;    |     5 |             Arkansas |           709 |        5 |           23789 |        165 |
+;;    |     6 |           California |          1358 |        3 |           29454 |        109 |
+;;    |     8 |             Colorado |          1125 |        5 |           32401 |        109 |
+;;    |     9 |          Connecticut |          1123 |        5 |           35326 |        195 |
+;;    |    10 |             Delaware |          1076 |       10 |           31560 |        247 |
+;;    |    11 | District of Columbia |          1424 |       17 |           43198 |        681 |
+;;    |    12 |              Florida |          1077 |        3 |           25952 |         70 |
+;;    |    13 |              Georgia |           927 |        3 |           27024 |        106 |
+;;    |    15 |               Hawaii |          1507 |       18 |           32453 |        218 |
+;;    |    16 |                Idaho |           792 |        7 |           25298 |        208 |
+;;    |    17 |             Illinois |           952 |        3 |           30684 |         83 |
+;;    |    18 |              Indiana |           782 |        3 |           27247 |        117 |
+;;    |    19 |                 Iowa |           740 |        4 |           30002 |        143 |
+;;    |    20 |               Kansas |           801 |        5 |           29126 |        208 |
+;;    |    21 |             Kentucky |           713 |        4 |           24702 |        159 |
+;;    |    22 |            Louisiana |           825 |        4 |           25086 |        155 |
+;;    |    23 |                Maine |           808 |        7 |           26841 |        187 |
+;;    |    24 |             Maryland |          1311 |        5 |           37147 |        152 |
+;;    |    25 |        Massachusetts |          1173 |        5 |           34498 |        199 |
+;;    |    26 |             Michigan |           824 |        3 |           26987 |         82 |
+;;    |    27 |            Minnesota |           906 |        4 |           32734 |        189 |
+;;    |    28 |          Mississippi |           740 |        5 |           22766 |        194 |
 
 (def contacts (dataset "data/contacts.csv"))
 
 (pivot->wider contacts "field" "value")
+
 ;; => data/contacts.csv [3 4]:
-;;    | person_id | company |             name |           email |
-;;    |-----------+---------+------------------+-----------------|
-;;    |         2 |  google |       John Smith | john@google.com |
-;;    |         1 |  Toyota |   Jiena McLellan |                 |
-;;    |         3 |         | Huxley Ratcliffe |                 |
+;;    | person_id |           email |             name | company |
+;;    |-----------+-----------------+------------------+---------|
+;;    |         1 |                 |   Jiena McLellan |  Toyota |
+;;    |         2 | john@google.com |       John Smith |  google |
+;;    |         3 |                 | Huxley Ratcliffe |         |
 
 (def world-bank-pop (dataset "data/world_bank_pop.csv.gz"))
 
 (def pop2 (pivot->longer world-bank-pop (map str (range 2000 2018)) {:drop-missing? false
                                                                      :target-cols ["year"]
                                                                      :value-column-name "value"}))
-;; => data/world_bank_pop.csv [19008 4]:
-;;    | country |   indicator |     value | year |
-;;    |---------+-------------+-----------+------|
-;;    |     ABW | SP.URB.TOTL | 4.436E+04 | 2013 |
-;;    |     ABW | SP.URB.GROW |    0.6695 | 2013 |
-;;    |     ABW | SP.POP.TOTL | 1.032E+05 | 2013 |
-;;    |     ABW | SP.POP.GROW |    0.5929 | 2013 |
-;;    |     AFG | SP.URB.TOTL | 7.734E+06 | 2013 |
-;;    |     AFG | SP.URB.GROW |     4.193 | 2013 |
-;;    |     AFG | SP.POP.TOTL | 3.173E+07 | 2013 |
-;;    |     AFG | SP.POP.GROW |     3.315 | 2013 |
-;;    |     AGO | SP.URB.TOTL | 1.612E+07 | 2013 |
-;;    |     AGO | SP.URB.GROW |     4.723 | 2013 |
-;;    |     AGO | SP.POP.TOTL | 2.600E+07 | 2013 |
-;;    |     AGO | SP.POP.GROW |     3.532 | 2013 |
-;;    |     ALB | SP.URB.TOTL | 1.604E+06 | 2013 |
-;;    |     ALB | SP.URB.GROW |     1.744 | 2013 |
-;;    |     ALB | SP.POP.TOTL | 2.895E+06 | 2013 |
-;;    |     ALB | SP.POP.GROW |   -0.1832 | 2013 |
-;;    |     AND | SP.URB.TOTL | 7.153E+04 | 2013 |
-;;    |     AND | SP.URB.GROW |    -2.119 | 2013 |
-;;    |     AND | SP.POP.TOTL | 8.079E+04 | 2013 |
-;;    |     AND | SP.POP.GROW |    -2.013 | 2013 |
-;;    |     ARB | SP.URB.TOTL | 2.186E+08 | 2013 |
-;;    |     ARB | SP.URB.GROW |     2.783 | 2013 |
-;;    |     ARB | SP.POP.TOTL | 3.817E+08 | 2013 |
-;;    |     ARB | SP.POP.GROW |     2.249 | 2013 |
-;;    |     ARE | SP.URB.TOTL | 7.661E+06 | 2013 |
+pop2
+
+;; => data/world_bank_pop.csv.gz [19008 4]:
+;;    | country |   indicator | year |     value |
+;;    |---------+-------------+------+-----------|
+;;    |     ABW | SP.URB.TOTL | 2013 | 4.436E+04 |
+;;    |     ABW | SP.URB.GROW | 2013 |    0.6695 |
+;;    |     ABW | SP.POP.TOTL | 2013 | 1.032E+05 |
+;;    |     ABW | SP.POP.GROW | 2013 |    0.5929 |
+;;    |     AFG | SP.URB.TOTL | 2013 | 7.734E+06 |
+;;    |     AFG | SP.URB.GROW | 2013 |     4.193 |
+;;    |     AFG | SP.POP.TOTL | 2013 | 3.173E+07 |
+;;    |     AFG | SP.POP.GROW | 2013 |     3.315 |
+;;    |     AGO | SP.URB.TOTL | 2013 | 1.612E+07 |
+;;    |     AGO | SP.URB.GROW | 2013 |     4.723 |
+;;    |     AGO | SP.POP.TOTL | 2013 | 2.600E+07 |
+;;    |     AGO | SP.POP.GROW | 2013 |     3.532 |
+;;    |     ALB | SP.URB.TOTL | 2013 | 1.604E+06 |
+;;    |     ALB | SP.URB.GROW | 2013 |     1.744 |
+;;    |     ALB | SP.POP.TOTL | 2013 | 2.895E+06 |
+;;    |     ALB | SP.POP.GROW | 2013 |   -0.1832 |
+;;    |     AND | SP.URB.TOTL | 2013 | 7.153E+04 |
+;;    |     AND | SP.URB.GROW | 2013 |    -2.119 |
+;;    |     AND | SP.POP.TOTL | 2013 | 8.079E+04 |
+;;    |     AND | SP.POP.GROW | 2013 |    -2.013 |
+;;    |     ARB | SP.URB.TOTL | 2013 | 2.186E+08 |
+;;    |     ARB | SP.URB.GROW | 2013 |     2.783 |
+;;    |     ARB | SP.POP.TOTL | 2013 | 3.817E+08 |
+;;    |     ARB | SP.POP.GROW | 2013 |     2.249 |
+;;    |     ARE | SP.URB.TOTL | 2013 | 7.661E+06 |
 
 (def pop3 (-> (separate-column pop2 "indicator" ["area" "variable"] #(rest (str/split % #"\.")) {:drop-column? true})))
-;; => data/world_bank_pop.csv [19008 5]:
-;;    | country |     value | year | area | variable |
-;;    |---------+-----------+------+------+----------|
-;;    |     ABW | 4.436E+04 | 2013 |  URB |     TOTL |
-;;    |     ABW |    0.6695 | 2013 |  URB |     GROW |
-;;    |     ABW | 1.032E+05 | 2013 |  POP |     TOTL |
-;;    |     ABW |    0.5929 | 2013 |  POP |     GROW |
-;;    |     AFG | 7.734E+06 | 2013 |  URB |     TOTL |
-;;    |     AFG |     4.193 | 2013 |  URB |     GROW |
-;;    |     AFG | 3.173E+07 | 2013 |  POP |     TOTL |
-;;    |     AFG |     3.315 | 2013 |  POP |     GROW |
-;;    |     AGO | 1.612E+07 | 2013 |  URB |     TOTL |
-;;    |     AGO |     4.723 | 2013 |  URB |     GROW |
-;;    |     AGO | 2.600E+07 | 2013 |  POP |     TOTL |
-;;    |     AGO |     3.532 | 2013 |  POP |     GROW |
-;;    |     ALB | 1.604E+06 | 2013 |  URB |     TOTL |
-;;    |     ALB |     1.744 | 2013 |  URB |     GROW |
-;;    |     ALB | 2.895E+06 | 2013 |  POP |     TOTL |
-;;    |     ALB |   -0.1832 | 2013 |  POP |     GROW |
-;;    |     AND | 7.153E+04 | 2013 |  URB |     TOTL |
-;;    |     AND |    -2.119 | 2013 |  URB |     GROW |
-;;    |     AND | 8.079E+04 | 2013 |  POP |     TOTL |
-;;    |     AND |    -2.013 | 2013 |  POP |     GROW |
-;;    |     ARB | 2.186E+08 | 2013 |  URB |     TOTL |
-;;    |     ARB |     2.783 | 2013 |  URB |     GROW |
-;;    |     ARB | 3.817E+08 | 2013 |  POP |     TOTL |
-;;    |     ARB |     2.249 | 2013 |  POP |     GROW |
-;;    |     ARE | 7.661E+06 | 2013 |  URB |     TOTL |
+
+pop3
+
+;; => data/world_bank_pop.csv.gz [19008 5]:
+;;    | country | year |     value | area | variable |
+;;    |---------+------+-----------+------+----------|
+;;    |     ABW | 2013 | 4.436E+04 |  URB |     TOTL |
+;;    |     ABW | 2013 |    0.6695 |  URB |     GROW |
+;;    |     ABW | 2013 | 1.032E+05 |  POP |     TOTL |
+;;    |     ABW | 2013 |    0.5929 |  POP |     GROW |
+;;    |     AFG | 2013 | 7.734E+06 |  URB |     TOTL |
+;;    |     AFG | 2013 |     4.193 |  URB |     GROW |
+;;    |     AFG | 2013 | 3.173E+07 |  POP |     TOTL |
+;;    |     AFG | 2013 |     3.315 |  POP |     GROW |
+;;    |     AGO | 2013 | 1.612E+07 |  URB |     TOTL |
+;;    |     AGO | 2013 |     4.723 |  URB |     GROW |
+;;    |     AGO | 2013 | 2.600E+07 |  POP |     TOTL |
+;;    |     AGO | 2013 |     3.532 |  POP |     GROW |
+;;    |     ALB | 2013 | 1.604E+06 |  URB |     TOTL |
+;;    |     ALB | 2013 |     1.744 |  URB |     GROW |
+;;    |     ALB | 2013 | 2.895E+06 |  POP |     TOTL |
+;;    |     ALB | 2013 |   -0.1832 |  POP |     GROW |
+;;    |     AND | 2013 | 7.153E+04 |  URB |     TOTL |
+;;    |     AND | 2013 |    -2.119 |  URB |     GROW |
+;;    |     AND | 2013 | 8.079E+04 |  POP |     TOTL |
+;;    |     AND | 2013 |    -2.013 |  POP |     GROW |
+;;    |     ARB | 2013 | 2.186E+08 |  URB |     TOTL |
+;;    |     ARB | 2013 |     2.783 |  URB |     GROW |
+;;    |     ARB | 2013 | 3.817E+08 |  POP |     TOTL |
+;;    |     ARB | 2013 |     2.249 |  POP |     GROW |
+;;    |     ARE | 2013 | 7.661E+06 |  URB |     TOTL |
 
 (pivot->wider pop3 "variable" "value")
-;; => data/world_bank_pop.csv [9504 5]:
-;;    | country | year | area |      TOTL |    GROW |
-;;    |---------+------+------+-----------+---------|
-;;    |     ABW | 2013 |  URB | 4.436E+04 |  0.6695 |
-;;    |     ABW | 2013 |  POP | 1.032E+05 |  0.5929 |
-;;    |     AFG | 2013 |  URB | 7.734E+06 |   4.193 |
-;;    |     AFG | 2013 |  POP | 3.173E+07 |   3.315 |
-;;    |     AGO | 2013 |  URB | 1.612E+07 |   4.723 |
-;;    |     AGO | 2013 |  POP | 2.600E+07 |   3.532 |
-;;    |     ALB | 2013 |  URB | 1.604E+06 |   1.744 |
-;;    |     ALB | 2013 |  POP | 2.895E+06 | -0.1832 |
-;;    |     AND | 2013 |  URB | 7.153E+04 |  -2.119 |
-;;    |     AND | 2013 |  POP | 8.079E+04 |  -2.013 |
-;;    |     ARB | 2013 |  URB | 2.186E+08 |   2.783 |
-;;    |     ARB | 2013 |  POP | 3.817E+08 |   2.249 |
-;;    |     ARE | 2013 |  URB | 7.661E+06 |   1.555 |
-;;    |     ARE | 2013 |  POP | 9.006E+06 |   1.182 |
-;;    |     ARG | 2013 |  URB | 3.882E+07 |   1.188 |
-;;    |     ARG | 2013 |  POP | 4.254E+07 |   1.047 |
-;;    |     ARM | 2013 |  URB | 1.828E+06 |  0.2810 |
-;;    |     ARM | 2013 |  POP | 2.894E+06 |  0.4013 |
-;;    |     ASM | 2013 |  URB | 4.831E+04 | 0.05798 |
-;;    |     ASM | 2013 |  POP | 5.531E+04 |  0.1393 |
-;;    |     ATG | 2013 |  URB | 2.480E+04 |  0.3838 |
-;;    |     ATG | 2013 |  POP | 9.782E+04 |   1.076 |
-;;    |     AUS | 2013 |  URB | 1.979E+07 |   1.875 |
-;;    |     AUS | 2013 |  POP | 2.315E+07 |   1.758 |
-;;    |     AUT | 2013 |  URB | 4.862E+06 |  0.9196 |
 
-
+;; => data/world_bank_pop.csv.gz [9504 5]:
+;;    | country | year | area |    GROW |      TOTL |
+;;    |---------+------+------+---------+-----------|
+;;    |     ABW | 2013 |  URB |  0.6695 | 4.436E+04 |
+;;    |     ABW | 2013 |  POP |  0.5929 | 1.032E+05 |
+;;    |     AFG | 2013 |  URB |   4.193 | 7.734E+06 |
+;;    |     AFG | 2013 |  POP |   3.315 | 3.173E+07 |
+;;    |     AGO | 2013 |  URB |   4.723 | 1.612E+07 |
+;;    |     AGO | 2013 |  POP |   3.532 | 2.600E+07 |
+;;    |     ALB | 2013 |  URB |   1.744 | 1.604E+06 |
+;;    |     ALB | 2013 |  POP | -0.1832 | 2.895E+06 |
+;;    |     AND | 2013 |  URB |  -2.119 | 7.153E+04 |
+;;    |     AND | 2013 |  POP |  -2.013 | 8.079E+04 |
+;;    |     ARB | 2013 |  URB |   2.783 | 2.186E+08 |
+;;    |     ARB | 2013 |  POP |   2.249 | 3.817E+08 |
+;;    |     ARE | 2013 |  URB |   1.555 | 7.661E+06 |
+;;    |     ARE | 2013 |  POP |   1.182 | 9.006E+06 |
+;;    |     ARG | 2013 |  URB |   1.188 | 3.882E+07 |
+;;    |     ARG | 2013 |  POP |   1.047 | 4.254E+07 |
+;;    |     ARM | 2013 |  URB |  0.2810 | 1.828E+06 |
+;;    |     ARM | 2013 |  POP |  0.4013 | 2.894E+06 |
+;;    |     ASM | 2013 |  URB | 0.05798 | 4.831E+04 |
+;;    |     ASM | 2013 |  POP |  0.1393 | 5.531E+04 |
+;;    |     ATG | 2013 |  URB |  0.3838 | 2.480E+04 |
+;;    |     ATG | 2013 |  POP |   1.076 | 9.782E+04 |
+;;    |     AUS | 2013 |  URB |   1.875 | 1.979E+07 |
+;;    |     AUS | 2013 |  POP |   1.758 | 2.315E+07 |
+;;    |     AUT | 2013 |  URB |  0.9196 | 4.862E+06 |
 
 (def multi (dataset {:id [1 2 3 4]
                      :choice1 ["A" "C" "D" "B"]
@@ -1583,28 +1661,30 @@
                 (pivot->longer (complement #{:id}))
                 (add-or-update-column :checked true)))
 multi2
+
 ;; => _unnamed [8 4]:
-;;    | :id | :$value | :$column | :checked |
-;;    |-----+---------+----------+----------|
-;;    |   1 |       A | :choice1 |     true |
-;;    |   2 |       C | :choice1 |     true |
-;;    |   3 |       D | :choice1 |     true |
-;;    |   4 |       B | :choice1 |     true |
-;;    |   1 |       B | :choice2 |     true |
-;;    |   2 |       B | :choice2 |     true |
-;;    |   4 |       D | :choice2 |     true |
-;;    |   1 |       C | :choice3 |     true |
+;;    | :id | :$column | :$value | :checked |
+;;    |-----+----------+---------+----------|
+;;    |   1 | :choice1 |       A |     true |
+;;    |   2 | :choice1 |       C |     true |
+;;    |   3 | :choice1 |       D |     true |
+;;    |   4 | :choice1 |       B |     true |
+;;    |   1 | :choice2 |       B |     true |
+;;    |   2 | :choice2 |       B |     true |
+;;    |   4 | :choice2 |       D |     true |
+;;    |   1 | :choice3 |       C |     true |
 
 (-> multi2
     (drop-columns :$column)
     (pivot->wider :$value :checked {:drop-missing? false}))
+
 ;; => _unnamed [4 5]:
-;;    | :id |    D |    C |    B |    A |
+;;    | :id |    A |    B |    C |    D |
 ;;    |-----+------+------+------+------|
-;;    |   1 |      | true | true | true |
+;;    |   3 |      |      |      | true |
+;;    |   4 |      | true |      | true |
+;;    |   1 | true | true | true |      |
 ;;    |   2 |      | true | true |      |
-;;    |   3 | true |      |      |      |
-;;    |   4 | true |      | true |      |
 
 
 (def construction (dataset "data/construction.csv"))
@@ -1622,17 +1702,17 @@ multi2
                                            :value-column-name :n
                                            :drop-missing? false})
     (select-rows (fn [row] (and (= "January" (row "Month"))))))
-;; => data/construction.csv [7 5]:
-;;    | Year |   Month |  :n | :units |   :region |
-;;    |------+---------+-----+--------+-----------|
-;;    | 2018 | January | 859 |      1 |           |
-;;    | 2018 | January |     |    2-4 |           |
-;;    | 2018 | January | 348 |     5+ |           |
-;;    | 2018 | January | 114 |        | Northeast |
-;;    | 2018 | January | 169 |        |   Midwest |
-;;    | 2018 | January | 596 |        |     South |
-;;    | 2018 | January | 339 |        |      West |
 
+;; => data/construction.csv [7 5]:
+;;    | Year |   Month | :units |   :region |  :n |
+;;    |------+---------+--------+-----------+-----|
+;;    | 2018 | January |      1 |           | 859 |
+;;    | 2018 | January |    2-4 |           |     |
+;;    | 2018 | January |     5+ |           | 348 |
+;;    | 2018 | January |        | Northeast | 114 |
+;;    | 2018 | January |        |   Midwest | 169 |
+;;    | 2018 | January |        |     South | 596 |
+;;    | 2018 | January |        |      West | 339 |
 
 (-> construction
     (pivot->longer #"^[125NWS].*|Midwest" {:target-cols [:units :region]
@@ -1646,14 +1726,132 @@ multi2
                                                            (keys construction-unit-map))}))
 
 ;; => data/construction.csv [9 9]:
-;;    | Year |     Month | West | 1 unit | South | Northeast | 2 to 4 units | 5 units or more | Midwest |
-;;    |------+-----------+------+--------+-------+-----------+--------------+-----------------+---------|
-;;    | 2018 |   January |  339 |    859 |   596 |       114 |              |             348 |     169 |
-;;    | 2018 |  February |  336 |    882 |   655 |       138 |              |             400 |     160 |
-;;    | 2018 |     March |  330 |    862 |   595 |       150 |              |             356 |     154 |
-;;    | 2018 |     April |  304 |    797 |   613 |       144 |              |             447 |     196 |
-;;    | 2018 |       May |  319 |    875 |   673 |        90 |              |             364 |     169 |
-;;    | 2018 |      June |  360 |    867 |   610 |        76 |              |             342 |     170 |
-;;    | 2018 |      July |  310 |    829 |   594 |       108 |              |             360 |     183 |
-;;    | 2018 |    August |  286 |    939 |   649 |        90 |              |             286 |     205 |
-;;    | 2018 | September |  296 |    835 |   560 |       117 |              |             304 |     175 |
+;;    | Year |     Month | Midwest | 5 units or more | 2 to 4 units | Northeast | South | 1 unit | West |
+;;    |------+-----------+---------+-----------------+--------------+-----------+-------+--------+------|
+;;    | 2018 |   January |     169 |             348 |              |       114 |   596 |    859 |  339 |
+;;    | 2018 |  February |     160 |             400 |              |       138 |   655 |    882 |  336 |
+;;    | 2018 |     March |     154 |             356 |              |       150 |   595 |    862 |  330 |
+;;    | 2018 |     April |     196 |             447 |              |       144 |   613 |    797 |  304 |
+;;    | 2018 |       May |     169 |             364 |              |        90 |   673 |    875 |  319 |
+;;    | 2018 |      June |     170 |             342 |              |        76 |   610 |    867 |  360 |
+;;    | 2018 |      July |     183 |             360 |              |       108 |   594 |    829 |  310 |
+;;    | 2018 |    August |     205 |             286 |              |        90 |   649 |    939 |  286 |
+;;    | 2018 | September |     175 |             304 |              |       117 |   560 |    835 |  296 |
+
+;;
+
+(def stockstidyr (dataset "data/stockstidyr.csv"))
+
+(pivot->longer stockstidyr ["X" "Y" "Z"] {:value-column-name :price
+                                          :target-cols :stocks})
+
+;; => data/stockstidyr.csv [30 3]:
+;;    |       time | :stocks |  :price |
+;;    |------------+---------+---------|
+;;    | 2009-01-01 |       X |   1.310 |
+;;    | 2009-01-02 |       X | -0.2999 |
+;;    | 2009-01-03 |       X |  0.5365 |
+;;    | 2009-01-04 |       X |  -1.884 |
+;;    | 2009-01-05 |       X | -0.9605 |
+;;    | 2009-01-06 |       X |  -1.185 |
+;;    | 2009-01-07 |       X | -0.8521 |
+;;    | 2009-01-08 |       X |  0.2523 |
+;;    | 2009-01-09 |       X |  0.4026 |
+;;    | 2009-01-10 |       X | -0.6438 |
+;;    | 2009-01-01 |       Y |  -1.890 |
+;;    | 2009-01-02 |       Y |  -1.825 |
+;;    | 2009-01-03 |       Y |  -1.036 |
+;;    | 2009-01-04 |       Y | -0.5218 |
+;;    | 2009-01-05 |       Y |  -2.217 |
+;;    | 2009-01-06 |       Y |  -2.894 |
+;;    | 2009-01-07 |       Y |  -2.168 |
+;;    | 2009-01-08 |       Y | -0.3285 |
+;;    | 2009-01-09 |       Y |   1.964 |
+;;    | 2009-01-10 |       Y |   2.686 |
+;;    | 2009-01-01 |       Z |  -1.779 |
+;;    | 2009-01-02 |       Z |   2.399 |
+;;    | 2009-01-03 |       Z |  -3.987 |
+;;    | 2009-01-04 |       Z |  -2.831 |
+;;    | 2009-01-05 |       Z |   1.437 |
+
+(def iris (dataset "data/iris.csv"))
+
+(def mini-iris (select-rows iris [1 50 100]))
+
+(pivot->longer mini-iris (complement #{"Species"}) {:value-column-name :measurement
+                                                    :target-cols "flower_att"})
+
+;; => data/iris.csv [12 3]:
+;;    |    Species |   flower_att | :measurement |
+;;    |------------+--------------+--------------|
+;;    |     setosa | Sepal.Length |        4.900 |
+;;    | versicolor | Sepal.Length |        7.000 |
+;;    |  virginica | Sepal.Length |        6.300 |
+;;    |     setosa |  Sepal.Width |        3.000 |
+;;    | versicolor |  Sepal.Width |        3.200 |
+;;    |  virginica |  Sepal.Width |        3.300 |
+;;    |     setosa | Petal.Length |        1.400 |
+;;    | versicolor | Petal.Length |        4.700 |
+;;    |  virginica | Petal.Length |        6.000 |
+;;    |     setosa |  Petal.Width |       0.2000 |
+;;    | versicolor |  Petal.Width |        1.400 |
+;;    |  virginica |  Petal.Width |        2.500 |
+;;
+
+(def stocksm (pivot->longer stockstidyr ["X" "Y" "Z"] {:value-column-name :price
+                                                       :target-cols :stocks}))
+
+(pivot->wider stocksm :stocks :price)
+
+;; => data/stockstidyr.csv [10 4]:
+;;    |       time |      Z |       X |       Y |
+;;    |------------+--------+---------+---------|
+;;    | 2009-01-01 | -1.779 |   1.310 |  -1.890 |
+;;    | 2009-01-02 |  2.399 | -0.2999 |  -1.825 |
+;;    | 2009-01-03 | -3.987 |  0.5365 |  -1.036 |
+;;    | 2009-01-04 | -2.831 |  -1.884 | -0.5218 |
+;;    | 2009-01-05 |  1.437 | -0.9605 |  -2.217 |
+;;    | 2009-01-06 |  3.398 |  -1.185 |  -2.894 |
+;;    | 2009-01-07 | -1.201 | -0.8521 |  -2.168 |
+;;    | 2009-01-08 | -1.532 |  0.2523 | -0.3285 |
+;;    | 2009-01-09 | -6.809 |  0.4026 |   1.964 |
+;;    | 2009-01-10 | -2.559 | -0.6438 |   2.686 |
+
+(pivot->wider (select-rows stocksm (range 0 30 4)) "time" :price)
+
+;; => data/stockstidyr.csv [3 6]:
+;;    | :stocks | 2009-01-05 | 2009-01-07 | 2009-01-01 | 2009-01-03 | 2009-01-09 |
+;;    |---------+------------+------------+------------+------------+------------|
+;;    |       X |    -0.9605 |            |      1.310 |            |     0.4026 |
+;;    |       Z |      1.437 |            |     -1.779 |            |     -6.809 |
+;;    |       Y |            |     -2.168 |            |     -1.036 |            |
+
+(def df (dataset {:x ["a" "b"]
+                  :y [3 4]
+                  :z [5 6]}))
+
+df
+;; => _unnamed [2 3]:
+;;    | :x | :y | :z |
+;;    |----+----+----|
+;;    |  a |  3 |  5 |
+;;    |  b |  4 |  6 |
+
+(pivot->wider df :x :y)
+
+;; => _unnamed [2 3]:
+;;    | :z | b | a |
+;;    |----+---+---|
+;;    |  5 |   | 3 |
+;;    |  6 | 4 |   |
+
+(-> (pivot->wider df :x :y)
+    (pivot->longer ["a" "b"] {:target-cols :x
+                              :value-column-name :y}))
+
+;; => _unnamed [2 3]:
+;;    | :z | :x | :y |
+;;    |----+----+----|
+;;    |  5 |  a |  3 |
+;;    |  6 |  b |  4 |
+
