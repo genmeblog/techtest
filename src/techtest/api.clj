@@ -5,11 +5,15 @@
             [tech.v2.datatype :as dtype]
             [tech.v2.datatype.datetime.operations :as dtype-dt-ops]
             [tech.v2.datatype.readers.update :as update-rdr]
+            [tech.v2.datatype.readers.concat :as concat-rdr]
             [tech.v2.datatype.bitmap :as bitmap]
             [tech.ml.protocols.dataset :as prot]
             [clojure.string :as str]
             [clojure.set :as set])
-  (:refer-clojure :exclude [group-by drop]))
+  (:refer-clojure :exclude [group-by drop])
+  (:import [org.roaringbitmap RoaringBitmap]))
+
+#_(set! *warn-on-reflection* true)
 
 ;; attempt to reorganized api
 
@@ -132,10 +136,11 @@
 (defn- group-indexes->map
   "Create map representing grouped dataset from indexes"
   [ds id [k idxs]]
-  {:name k
-   :group-id id
-   :count (count idxs)
-   :data (ds/set-dataset-name (ds/select ds :all idxs) k)})
+  (let [cnt (count idxs)]
+    {:name k
+     :group-id id
+     :count cnt
+     :data (vary-meta (ds/set-dataset-name (ds/select ds :all idxs) k) assoc :group-id id)}))
 
 (defn- group-by->dataset
   "Create grouped dataset from indexes"
@@ -259,7 +264,7 @@
        (prepare-ds-for-ungrouping add-group-as-column? add-group-id-as-column?)
        (order-ds-for-ungrouping order-by-group?)
        (->> (map :data)
-            (reduce ds/concat))
+            (apply ds/concat))
        (ds/set-dataset-name dataset-name))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;
@@ -632,7 +637,9 @@
          (strategy-rollin ds (select-column-names ds cols-selector) rollin-fn)
          (let [local-options {:keep-fn (get strategies strategy :first)}]
            (cond
-             (sequential+? cols-selector) (ds/unique-by identity (assoc local-options :column-name-seq cols-selector) ds)
+             (sequential+? cols-selector) (if (= (count cols-selector) 1)
+                                            (ds/unique-by-column (first cols-selector) local-options ds)
+                                            (ds/unique-by identity (assoc local-options :column-name-seq cols-selector) ds))
              (fn? cols-selector) (ds/unique-by cols-selector (if limit-columns
                                                                (assoc local-options :column-name-seq limit-columns)
                                                                local-options) ds)
@@ -667,59 +674,72 @@
 (def ^{:doc (select-or-drop-missing-docstring "Drop")}
   drop-missing (partial select-or-drop-missing ds/drop-rows))
 
+(defn- remove-from-rbitmap
+  ^RoaringBitmap [^RoaringBitmap rb ks]
+  (let [rb (.clone rb)]
+    (reduce (fn [^RoaringBitmap rb ^long k]
+              (.remove rb k)
+              rb) rb ks)))
+
+(defn- replace-missing-with-value
+  [col missing value]
+  (col/new-column (col/column-name col)
+                  (update-rdr/update-reader col (cond
+                                                  (map? value) value
+                                                  (sequential+? value) (zipmap missing (cycle value))
+                                                  :else (bitmap/bitmap-value->bitmap-map missing value)))
+                  {} (if (map? value)
+                       (remove-from-rbitmap missing (keys value))
+                       (RoaringBitmap.))))
+
+(defn- missing-direction-prev
+  ^long [^RoaringBitmap rb ^long idx]
+  (.previousAbsentValue rb idx))
+
+(defn- missing-direction-next
+  ^long [^RoaringBitmap rb ^long idx]
+  (.nextAbsentValue rb idx))
+
+(defn- replace-missing-with-direction
+  [f col missing value]
+  (let [cnt (dtype/ecount col)
+        step1 (replace-missing-with-value col missing (reduce (fn [m v]
+                                                                (let [vv (f missing v)]
+                                                                  (if (< -1 vv cnt)
+                                                                    (assoc m v (dtype/get-value col vv))
+                                                                    m))) {} missing))]
+    (if (or (nil? value)
+            (empty? (col/missing step1)))
+      step1
+      (replace-missing-with-value step1 (col/missing step1) value))))
+
+(defn- replace-missing-with-strategy
+  [col missing value strategy]
+  (let [value (if (fn? value)
+                (value (dtype/->reader col (dtype/get-datatype col) {:missing-policy :elide}))
+                value)]
+    (condp = strategy
+      :down (replace-missing-with-direction missing-direction-prev col missing value)
+      :up (replace-missing-with-direction missing-direction-next col missing value)
+      (replace-missing-with-value col missing value))))
+
 (defn replace-missing
   ([ds cols-selector value] (replace-missing ds cols-selector value nil))
   ([ds cols-selector value {:keys [strategy]
-                            :or {strategy :value}}]
-   (let [cols (select-column-names ds cols-selector)]
-     (reduce (fn [ds colname]
-               (let [col (ds colname)
-                     m (col/missing col)]
-                 (if-not (empty? m)
-                   (ds/assoc ds colname (condp = strategy
-                                          (update-rdr/update-reader col (cond
-                                                                          (map? value) value
-                                                                          (sequential+? value) (zipmap m (cycle value))
-                                                                          :else (bitmap/bitmap-value->bitmap-map m value)))))
-                   ds))) ds cols))))
+                            :or {strategy :value}
+                            :as options}]
 
-((replace-missing (dataset {:a [1 2 nil 3 4 nil nil nil 11]}) :a {2 44}) :a)
+   (if (grouped? ds)
 
-(def col (col/new-column :a [1 2 nil 3 4 nil nil nil 11]))
-col
-;; => #tech.ml.dataset.column<object>[9]
-;;    :a
-;;    [1, 2, , 3, 4, , , , 11, ]
-
-;; ???
-(col/missing col)
-;; => #{}
-
-(def ds (ds/name-values-seq->dataset {:a [1 2 nil 3 4 nil nil nil 11]}))
-
-(col/missing (ds :a))
-;; => #{2,5,6,7}
-
-(def ds1 (ds/assoc ds :a (update-rdr/update-reader (ds :a) {2 2222 5 5555 6 6666 7 7777})))
-
-(ds1 :a)
-;; => #tech.ml.dataset.column<int64>[9]
-;;    :a
-;;    [1, 2, 2222, 3, 4, 5555, 6666, 7777, 11, ]
-
-(col/missing (ds1 :a))
-;; => #{}
-
-(def ds2 (ds/assoc ds :a (update-rdr/update-reader (ds :a) {2 2222})))
-
-(ds2 :a)
-;; => #tech.ml.dataset.column<int64>[9]
-;;    :a
-;;    [1, 2, 2222, 3, 4, -9223372036854775808, -9223372036854775808, -9223372036854775808, 11, ]
-
-;; ???
-(col/missing (ds2 :a))
-;; => #{}
+     (process-group-data ds #(replace-missing % cols-selector value options))
+     
+     (let [cols (select-column-names ds cols-selector)]
+       (reduce (fn [ds colname]
+                 (let [col (ds colname)
+                       missing (col/missing col)]
+                   (if-not (empty? missing)
+                     (ds/add-or-update-column ds (replace-missing-with-strategy col missing value strategy))
+                     ds))) ds cols)))))
 
 ;;;;;;;;;;;;;;;
 ;; JOIN/SPLIT
@@ -728,7 +748,7 @@ col
 (defn join-columns
   ([ds target-column cols-selector] (join-columns ds target-column cols-selector nil))
   ([ds target-column cols-selector {:keys [separator missing-subst drop-columns? result-type]
-                                    :or {separator "-" drop-columns? false result-type :string}
+                                    :or {separator "-" drop-columns? true result-type :string}
                                     :as options}]
    (if (grouped? ds)
      
@@ -753,10 +773,26 @@ col
 
          (if drop-columns? (drop-columns result cols-selector) result))))))
 
+(defn- separate-column->columns
+  [col target-columns replace-missing separator-fn]
+  (let [res (pmap separator-fn col)]
+    (pmap (fn [idx colname]
+            (col/new-column colname (map #(replace-missing (nth % idx)) res))) (range) target-columns)))
+
+(defn- prepare-missing-subst-fn
+  [missing-subst]
+  (let [missing-subst-fn (if (or (set? missing-subst)
+                                 (fn? missing-subst))
+                           missing-subst
+                           (partial = missing-subst))]
+    (fn [res]
+      (map #(if (missing-subst-fn %) nil %) res))))
+
 (defn separate-column
+  ([ds column target-columns] (separate-column ds column target-columns identity))
   ([ds column target-columns separator] (separate-column ds column target-columns separator nil))
   ([ds column target-columns separator {:keys [missing-subst drop-column?]
-                                        :or {drop-column? false}
+                                        :or {drop-column? true}
                                         :as options}]
    (if (grouped? ds)
      
@@ -768,20 +804,17 @@ col
                           (instance? java.util.regex.Pattern separator) #(rest (re-matches separator (str %)))
                           :else separator)
            replace-missing (if missing-subst
-                             (let [f (if (or (set? missing-subst)
-                                             (fn? missing-subst))
-                                       missing-subst
-                                       (partial = missing-subst))]
-                               (fn [res]
-                                 (map #(if (f %) nil %) res)))
+                             (prepare-missing-subst-fn missing-subst)
                              identity)
-           result (->> (ds column)
-                       (map (comp (partial zipmap target-columns) replace-missing separator-fn))
-                       (dataset)
-                       (ds/columns)
-                       (reduce (partial ds/add-column) ds))]
-       (if drop-column? (drop-columns result column) result)))))
-
+           result (separate-column->columns (ds column) target-columns replace-missing separator-fn)
+           [dataset-before dataset-after] (map (partial ds/select-columns ds)
+                                               (split-with #(not= % column)
+                                                           (ds/column-names ds)))]
+       (-> (if drop-column?
+             dataset-before
+             (ds/add-column dataset-before (ds column)))
+           (ds/append-columns result)
+           (ds/append-columns (ds/columns (ds/drop-columns dataset-after [column]))))))))
 
 ;;;;;;;;;;;;
 ;; RESHAPE
@@ -835,16 +868,26 @@ col
          cnt (ds/row-count ds-template)]
      (as-> (ds/set-metadata (->> groups                                        
                                  (map (partial pre-longer->target-cols ds-template cnt))
-                                 (reduce ds/concat))
+                                 (apply ds/concat))
                             (ds/metadata ds)) final-ds
        (if drop-missing? (drop-missing final-ds cols-to-add) final-ds)
        (if datatypes (convert-column-type final-ds datatypes) final-ds)
        (reorder-columns final-ds (ds/column-names ds-template) (remove nil? target-cols))))))
 
+(defn- drop-join-leftovers
+  [data join-name]
+  (drop-columns data (-> (meta data)
+                         :right-column-names
+                         (get join-name))))
+
+(defn- perform-join
+  [join-ds curr-ds join-name]
+  (ds/left-join join-name curr-ds join-ds))
+
 (defn- make-apply-join-fn
   "Perform left-join on groups and create new columns"
-  [group-name->names single-value? value-names join-name col-to-drop starting-ds-count rollin-fn rename-map]
-  (fn [curr-ds {:keys [name data]}]
+  [group-name->names single-value? value-names join-name starting-ds-count rollin-fn rollin? rename-map]
+  (fn [curr-ds {:keys [name group-id count data]}]
     (let [col-name (str/join "_" (->> name
                                       group-name->names
                                       (remove nil?))) ;; source names
@@ -852,44 +895,22 @@ col
           target-names (if single-value?
                          [col-name]
                          (map #(str % "-" col-name) value-names)) ;; traget column names
-          rename-map (zipmap value-names target-names)  ;; renaming map
+          rename-map (zipmap value-names target-names) ;; renaming map
           data (-> data
                    (rename-columns rename-map) ;; rename value column
                    (select-columns (conj target-names join-name)) ;; select rhs for join
-                   (->> (ds/left-join join-name curr-ds)) ;; perform left join
-                   (drop-columns col-to-drop))] ;; drop unnecessary leftovers
+                   (perform-join curr-ds join-name) ;; perform left join
+                   (drop-join-leftovers join-name))] ;; drop unnecessary leftovers
       (if (> (ds/row-count data) starting-ds-count) ;; in case when there were multiple values, create vectors
-        (strategy-rollin data (select-column-names data (complement (set target-names))) rollin-fn)
+        (if rollin?
+          (strategy-rollin data (select-column-names data (complement (set target-names))) rollin-fn)
+          (do (println "WARNING: multiple values in result detected, data should be rolled in.")
+              data))
         data))))
-
-;; shameless copy from dataset :/
-(defn- colname->str
-  ^String [item]
-  (cond
-    (string? item) item
-    (keyword? item) (name item)
-    (symbol? item) (name item)
-    :else (str item)))
-
-(defn- similar-colname-type
-  [orign-name new-name]
-  (cond
-    (string? orign-name) new-name
-    (keyword? orign-name) (keyword new-name)
-    (symbol? orign-name) (symbol new-name)
-    :else
-    (keyword new-name)))
-
-(defn- col-to-drop-name
-  [join-name]
-  (->> join-name
-       (colname->str)
-       (str "right.")
-       (similar-colname-type join-name)))
 
 (defn pivot->wider
   ([ds cols-selector value-columns] (pivot->wider ds cols-selector value-columns nil))
-  ([ds cols-selector value-columns {:keys [rollin-fn rename-map]}]
+  ([ds cols-selector value-columns {:keys [rollin-fn rollin? rename-map]}]
    (let [col-names (select-column-names ds cols-selector) ;; columns to be unrolled
          value-names (select-column-names ds value-columns) ;; columns to be used as values
          single-value? (= (count value-names) 1) ;; maybe this is one column? (different name creation rely on this)
@@ -901,7 +922,7 @@ col
          join-name (if join-on-single?
                      (first rest-cols)
                      (gensym (apply str "^____" rest-cols))) ;; generate join column name
-         col-to-drop (col-to-drop-name join-name) ;; what to drop after join
+         ;; col-to-drop (col-to-drop-name join-name) ;; what to drop after join
          pre-ds (if join-on-single?
                   ds
                   (join-columns ds join-name rest-cols {:result-type :seq
@@ -913,7 +934,7 @@ col
                                 (map #(fn [m] (get m %)))
                                 (apply juxt)) ;; create function which extract new column name
          result (reduce (make-apply-join-fn group-name->names single-value? value-names
-                                            join-name col-to-drop starting-ds-count rollin-fn rename-map)
+                                            join-name starting-ds-count rollin-fn rollin? rename-map)
                         starting-ds
                         (ds/mapseq-reader grouped-ds))] ;; perform join on groups and create new columns
      (-> (if join-on-single? ;; finalize, recreate original columns from join column, and reorder stuff
@@ -921,6 +942,7 @@ col
            (-> (separate-column result join-name rest-cols identity {:drop-column? true})
                (reorder-columns rest-cols)))
          (ds/set-dataset-name (ds/dataset-name ds))))))
+
 
 
 ;;;;;;;;;;;;;;
@@ -958,6 +980,9 @@ col
                    :V2 (range 1 10)
                    :V3 (take 9 (cycle [0.5 1.0 nil 1.5]))
                    :V4 (take 9 (cycle [\A \B \C]))}))
+
+(def DSm2 (dataset {:a [nil nil nil 1 2 nil 3 4 nil nil nil 11 nil]
+                    :b [nil 2   2   2 2 3   nil 3 nil   3   nil   4  nil]}))
 
 (group-by DS :V1 {:result-type :as-map})
 (group-by DS [:V1 :V3])
@@ -1085,6 +1110,18 @@ col
 (ungroup (select-missing (group-by DSm :V4)))
 (ungroup (drop-missing (group-by DSm :V4)))
 
+(replace-missing DSm2 :a 222)
+(replace-missing DSm2 [:a :b] 222)
+
+(replace-missing DSm2 :a nil {:strategy :up})
+(replace-missing DSm2 :a nil {:strategy :down})
+(replace-missing DSm2 :a 999 {:strategy :up})
+(replace-missing DSm2 :a 999 {:strategy :down})
+(replace-missing DSm2 [:a :b] 999 {:strategy :down})
+
+(replace-missing DSm2 [:a :b] dfn/median)
+
+(ungroup (replace-missing (group-by DSm2 :b) [:a] 11 {:strategy :up}))
 
 (join-columns DSm :joined [:V1 :V2 :V4])
 (join-columns DSm :joined [:V1 :V2 :V4] {:drop-columns? true})
@@ -1104,12 +1141,11 @@ col
 
 (separate-column DS :V3 [:int-part :frac-part] (fn [^double v]
                                                  [(int (quot v 1.0))
-                                                  (mod v 1.0)]) {:drop-column? true})
+                                                  (mod v 1.0)]) {:drop-column? false})
 
 (separate-column DS :V3 [:int-part :frac-part] (fn [^double v]
                                                  [(int (quot v 1.0))
-                                                  (mod v 1.0)]) {:drop-column? true
-                                                                 :missing-subst #{0 0.0}})
+                                                  (mod v 1.0)]) {:missing-subst #{0 0.0}})
 
 (separate-column (join-columns DSm :joined [:V1 :V2 :V4] {:result-type :map})
                  :joined [:v1 :v2 :v4] (juxt :V1 :V2 :V4))
@@ -1188,23 +1224,23 @@ col
     (group-by (juxt :symbol #(dtype-dt-ops/get-years (% :date))))
     (aggregate #(dfn/mean (% :price)))
     (order-by :$group-name)
+    (separate-column :$group-name [:symbol :year])
     (select-rows (range 12)))
-;; => _unnamed [12 2]:
-;;    |  :$group-name | :summary |
-;;    |---------------+----------|
-;;    | ["AAPL" 2000] |    21.75 |
-;;    | ["AAPL" 2001] |    10.18 |
-;;    | ["AAPL" 2002] |    9.408 |
-;;    | ["AAPL" 2003] |    9.347 |
-;;    | ["AAPL" 2004] |    18.72 |
-;;    | ["AAPL" 2005] |    48.17 |
-;;    | ["AAPL" 2006] |    72.04 |
-;;    | ["AAPL" 2007] |    133.4 |
-;;    | ["AAPL" 2008] |    138.5 |
-;;    | ["AAPL" 2009] |    150.4 |
-;;    | ["AAPL" 2010] |    206.6 |
-;;    | ["AMZN" 2000] |    43.93 |
-
+;; => _unnamed [12 3]:
+;;    | :symbol | :year | :summary |
+;;    |---------+-------+----------|
+;;    |    AAPL |  2000 |    21.75 |
+;;    |    AAPL |  2001 |    10.18 |
+;;    |    AAPL |  2002 |    9.408 |
+;;    |    AAPL |  2003 |    9.347 |
+;;    |    AAPL |  2004 |    18.72 |
+;;    |    AAPL |  2005 |    48.17 |
+;;    |    AAPL |  2006 |    72.04 |
+;;    |    AAPL |  2007 |    133.4 |
+;;    |    AAPL |  2008 |    138.5 |
+;;    |    AAPL |  2009 |    150.4 |
+;;    |    AAPL |  2010 |    206.6 |
+;;    |    AMZN |  2000 |    43.93 |
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; RESHAPE TESTS
@@ -1467,7 +1503,7 @@ col
 ;;    |    B |       L |  9 |
 ;;    |    B |       M |  9 |
 
-(pivot->wider (select-columns warpbreaks ["wool" "tension" "breaks"]) "wool" "breaks")
+(pivot->wider (select-columns warpbreaks ["wool" "tension" "breaks"]) "wool" "breaks" {:rollin? true})
 
 ;; => data/warpbreaks.csv [3 3]:
 ;;    | tension |                            B |                            A |
@@ -1476,7 +1512,8 @@ col
 ;;    |       H | [20 21 24 17 13 15 15 16 28] | [36 21 24 18 10 43 28 15 26] |
 ;;    |       L | [27 14 29 19 29 31 41 20 44] | [26 30 54 25 70 52 51 26 67] |
 
-(pivot->wider (select-columns warpbreaks ["wool" "tension" "breaks"]) "wool" "breaks" {:rollin-fn dfn/mean})
+(pivot->wider (select-columns warpbreaks ["wool" "tension" "breaks"]) "wool" "breaks" {:rollin-fn dfn/mean
+                                                                                       :rollin? true})
 
 ;; => data/warpbreaks.csv [3 3]:
 ;;    | tension |     B |     A |
@@ -1588,69 +1625,68 @@ pop2
 ;;    |     ARB | SP.POP.GROW | 2013 |     2.249 |
 ;;    |     ARE | SP.URB.TOTL | 2013 | 7.661E+06 |
 
-(def pop3 (-> (separate-column pop2 "indicator" ["area" "variable"] #(rest (str/split % #"\.")) {:drop-column? true})))
+(def pop3 (-> (separate-column pop2 "indicator" ["area" "variable"] #(rest (str/split % #"\.")))))
 
 pop3
 
 ;; => data/world_bank_pop.csv.gz [19008 5]:
-;;    | country | year |     value | area | variable |
-;;    |---------+------+-----------+------+----------|
-;;    |     ABW | 2013 | 4.436E+04 |  URB |     TOTL |
-;;    |     ABW | 2013 |    0.6695 |  URB |     GROW |
-;;    |     ABW | 2013 | 1.032E+05 |  POP |     TOTL |
-;;    |     ABW | 2013 |    0.5929 |  POP |     GROW |
-;;    |     AFG | 2013 | 7.734E+06 |  URB |     TOTL |
-;;    |     AFG | 2013 |     4.193 |  URB |     GROW |
-;;    |     AFG | 2013 | 3.173E+07 |  POP |     TOTL |
-;;    |     AFG | 2013 |     3.315 |  POP |     GROW |
-;;    |     AGO | 2013 | 1.612E+07 |  URB |     TOTL |
-;;    |     AGO | 2013 |     4.723 |  URB |     GROW |
-;;    |     AGO | 2013 | 2.600E+07 |  POP |     TOTL |
-;;    |     AGO | 2013 |     3.532 |  POP |     GROW |
-;;    |     ALB | 2013 | 1.604E+06 |  URB |     TOTL |
-;;    |     ALB | 2013 |     1.744 |  URB |     GROW |
-;;    |     ALB | 2013 | 2.895E+06 |  POP |     TOTL |
-;;    |     ALB | 2013 |   -0.1832 |  POP |     GROW |
-;;    |     AND | 2013 | 7.153E+04 |  URB |     TOTL |
-;;    |     AND | 2013 |    -2.119 |  URB |     GROW |
-;;    |     AND | 2013 | 8.079E+04 |  POP |     TOTL |
-;;    |     AND | 2013 |    -2.013 |  POP |     GROW |
-;;    |     ARB | 2013 | 2.186E+08 |  URB |     TOTL |
-;;    |     ARB | 2013 |     2.783 |  URB |     GROW |
-;;    |     ARB | 2013 | 3.817E+08 |  POP |     TOTL |
-;;    |     ARB | 2013 |     2.249 |  POP |     GROW |
-;;    |     ARE | 2013 | 7.661E+06 |  URB |     TOTL |
+;;    | country | area | variable | year |     value |
+;;    |---------+------+----------+------+-----------|
+;;    |     ABW |  URB |     TOTL | 2013 | 4.436E+04 |
+;;    |     ABW |  URB |     GROW | 2013 |    0.6695 |
+;;    |     ABW |  POP |     TOTL | 2013 | 1.032E+05 |
+;;    |     ABW |  POP |     GROW | 2013 |    0.5929 |
+;;    |     AFG |  URB |     TOTL | 2013 | 7.734E+06 |
+;;    |     AFG |  URB |     GROW | 2013 |     4.193 |
+;;    |     AFG |  POP |     TOTL | 2013 | 3.173E+07 |
+;;    |     AFG |  POP |     GROW | 2013 |     3.315 |
+;;    |     AGO |  URB |     TOTL | 2013 | 1.612E+07 |
+;;    |     AGO |  URB |     GROW | 2013 |     4.723 |
+;;    |     AGO |  POP |     TOTL | 2013 | 2.600E+07 |
+;;    |     AGO |  POP |     GROW | 2013 |     3.532 |
+;;    |     ALB |  URB |     TOTL | 2013 | 1.604E+06 |
+;;    |     ALB |  URB |     GROW | 2013 |     1.744 |
+;;    |     ALB |  POP |     TOTL | 2013 | 2.895E+06 |
+;;    |     ALB |  POP |     GROW | 2013 |   -0.1832 |
+;;    |     AND |  URB |     TOTL | 2013 | 7.153E+04 |
+;;    |     AND |  URB |     GROW | 2013 |    -2.119 |
+;;    |     AND |  POP |     TOTL | 2013 | 8.079E+04 |
+;;    |     AND |  POP |     GROW | 2013 |    -2.013 |
+;;    |     ARB |  URB |     TOTL | 2013 | 2.186E+08 |
+;;    |     ARB |  URB |     GROW | 2013 |     2.783 |
+;;    |     ARB |  POP |     TOTL | 2013 | 3.817E+08 |
+;;    |     ARB |  POP |     GROW | 2013 |     2.249 |
+;;    |     ARE |  URB |     TOTL | 2013 | 7.661E+06 |
 
 (pivot->wider pop3 "variable" "value")
-
 ;; => data/world_bank_pop.csv.gz [9504 5]:
-;;    | country | year | area |    GROW |      TOTL |
+;;    | country | area | year |    GROW |      TOTL |
 ;;    |---------+------+------+---------+-----------|
-;;    |     ABW | 2013 |  URB |  0.6695 | 4.436E+04 |
-;;    |     ABW | 2013 |  POP |  0.5929 | 1.032E+05 |
-;;    |     AFG | 2013 |  URB |   4.193 | 7.734E+06 |
-;;    |     AFG | 2013 |  POP |   3.315 | 3.173E+07 |
-;;    |     AGO | 2013 |  URB |   4.723 | 1.612E+07 |
-;;    |     AGO | 2013 |  POP |   3.532 | 2.600E+07 |
-;;    |     ALB | 2013 |  URB |   1.744 | 1.604E+06 |
-;;    |     ALB | 2013 |  POP | -0.1832 | 2.895E+06 |
-;;    |     AND | 2013 |  URB |  -2.119 | 7.153E+04 |
-;;    |     AND | 2013 |  POP |  -2.013 | 8.079E+04 |
-;;    |     ARB | 2013 |  URB |   2.783 | 2.186E+08 |
-;;    |     ARB | 2013 |  POP |   2.249 | 3.817E+08 |
-;;    |     ARE | 2013 |  URB |   1.555 | 7.661E+06 |
-;;    |     ARE | 2013 |  POP |   1.182 | 9.006E+06 |
-;;    |     ARG | 2013 |  URB |   1.188 | 3.882E+07 |
-;;    |     ARG | 2013 |  POP |   1.047 | 4.254E+07 |
-;;    |     ARM | 2013 |  URB |  0.2810 | 1.828E+06 |
-;;    |     ARM | 2013 |  POP |  0.4013 | 2.894E+06 |
-;;    |     ASM | 2013 |  URB | 0.05798 | 4.831E+04 |
-;;    |     ASM | 2013 |  POP |  0.1393 | 5.531E+04 |
-;;    |     ATG | 2013 |  URB |  0.3838 | 2.480E+04 |
-;;    |     ATG | 2013 |  POP |   1.076 | 9.782E+04 |
-;;    |     AUS | 2013 |  URB |   1.875 | 1.979E+07 |
-;;    |     AUS | 2013 |  POP |   1.758 | 2.315E+07 |
-;;    |     AUT | 2013 |  URB |  0.9196 | 4.862E+06 |
+;;    |     ABW |  URB | 2013 |  0.6695 | 4.436E+04 |
+;;    |     ABW |  POP | 2013 |  0.5929 | 1.032E+05 |
+;;    |     AFG |  URB | 2013 |   4.193 | 7.734E+06 |
+;;    |     AFG |  POP | 2013 |   3.315 | 3.173E+07 |
+;;    |     AGO |  URB | 2013 |   4.723 | 1.612E+07 |
+;;    |     AGO |  POP | 2013 |   3.532 | 2.600E+07 |
+;;    |     ALB |  URB | 2013 |   1.744 | 1.604E+06 |
+;;    |     ALB |  POP | 2013 | -0.1832 | 2.895E+06 |
+;;    |     AND |  URB | 2013 |  -2.119 | 7.153E+04 |
+;;    |     AND |  POP | 2013 |  -2.013 | 8.079E+04 |
+;;    |     ARB |  URB | 2013 |   2.783 | 2.186E+08 |
+;;    |     ARB |  POP | 2013 |   2.249 | 3.817E+08 |
+;;    |     ARE |  URB | 2013 |   1.555 | 7.661E+06 |
+;;    |     ARE |  POP | 2013 |   1.182 | 9.006E+06 |
+;;    |     ARG |  URB | 2013 |   1.188 | 3.882E+07 |
+;;    |     ARG |  POP | 2013 |   1.047 | 4.254E+07 |
+;;    |     ARM |  URB | 2013 |  0.2810 | 1.828E+06 |
+;;    |     ARM |  POP | 2013 |  0.4013 | 2.894E+06 |
+;;    |     ASM |  URB | 2013 | 0.05798 | 4.831E+04 |
+;;    |     ASM |  POP | 2013 |  0.1393 | 5.531E+04 |
+;;    |     ATG |  URB | 2013 |  0.3838 | 2.480E+04 |
+;;    |     ATG |  POP | 2013 |   1.076 | 9.782E+04 |
+;;    |     AUS |  URB | 2013 |   1.875 | 1.979E+07 |
+;;    |     AUS |  POP | 2013 |   1.758 | 2.315E+07 |
+;;    |     AUT |  URB | 2013 |  0.9196 | 4.862E+06 |
 
 (def multi (dataset {:id [1 2 3 4]
                      :choice1 ["A" "C" "D" "B"]
