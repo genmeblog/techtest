@@ -182,16 +182,18 @@
                     (into {}))
        (group-by->dataset ds group-indexes options)))))
 
-(defn- process-group-data
-  [ds f]
-  (ds/column-map ds :data f :data)
-  ;; (ds/add-or-update-column ds :data (map f (ds :data)))
-  )
-
 (defn- correct-group-count
   "Correct count for each group"
   [ds]
   (ds/column-map ds :count ds/row-count :data))
+
+(defn- process-group-data
+  ([ds f] (process-group-data ds f false))
+  ([ds f corr-count?]
+   (let [temp (ds/column-map ds :data f :data)]
+     (if corr-count?
+       (correct-group-count temp)
+       temp))))
 
 (defn group-as-map
   "Convert grouped dataset to the map of groups"
@@ -520,8 +522,7 @@
                       :as options}]
    (if (grouped? ds)
      (-> ds
-         (ds/add-or-update-column :data (map #(aggregate % fn-map-or-seq options) (ds :data)))
-         (correct-group-count)
+         (process-group-data #(aggregate % fn-map-or-seq options) true)
          (ungroup {:add-group-as-column? true}))
      (cond
        (fn? fn-map-or-seq) (aggregate ds {:summary fn-map-or-seq})
@@ -616,8 +617,7 @@
          (process-group-data (fn [ds]
                                (as-> ds ds
                                  (select-columns ds target-names)
-                                 (dataset [(zipmap target-names (map rollin-fn (ds/columns ds)))]))))
-         (correct-group-count)
+                                 (dataset [(zipmap target-names (map rollin-fn (ds/columns ds)))]))) true)
          (ungroup {:add-group-as-column? true})))))
 
 (defn unique-by
@@ -627,9 +627,7 @@
                       :or {strategy :first rollin-fn vec}
                       :as options}]
    (if (grouped? ds)
-     (-> ds
-         (ds/add-or-update-column :data (map #(unique-by % cols-selector options) (ds :data)))
-         (correct-group-count))
+     (process-group-data ds #(unique-by % cols-selector options) true)
 
      (if (= 1 (ds/row-count ds))
        ds
@@ -654,9 +652,8 @@
   ([f ds] (select-or-drop-missing f ds nil))
   ([f ds cols-selector]
    (if (grouped? ds)
-     (-> ds
-         (ds/add-or-update-column :data (map #(select-or-drop-missing f % cols-selector) (ds :data)))
-         (correct-group-count))
+     (process-group-data ds #(select-or-drop-missing f % cols-selector) true)
+
      (let [ds- (if cols-selector
                  (select-columns ds cols-selector)
                  ds)]
