@@ -9,48 +9,36 @@
             [tech.v2.datatype.bitmap :as bitmap]
             [tech.ml.protocols.dataset :as prot]
             [clojure.string :as str]
-            [clojure.set :as set])
-  (:refer-clojure :exclude [group-by drop])
+
+            [tech.parallel.utils :as importer]
+            [techtest.api.utils :refer [map-kv map-v iterable-sequence?]])
+  (:refer-clojure :exclude [group-by drop concat])
   (:import [org.roaringbitmap RoaringBitmap]))
 
 #_(set! *warn-on-reflection* true)
 
 ;; attempt to reorganized api
 
-;;;;;;;;;;;;
-;; HELPERS
-;;;;;;;;;;;;
+;; dataset
 
-(defn- map-v [f coll] (reduce-kv (fn [m k v] (assoc m k (f v))) (empty coll) coll))
-(defn- map-kv [f coll] (reduce-kv (fn [m k v] (assoc m k (f k v))) (empty coll) coll))
+(importer/export-symbols tech.ml.dataset
+                         column-count
+                         row-count
+                         set-dataset-name
+                         dataset-name
+                         column
+                         column-names
+                         has-column?
+                         concat)
 
-;;;;;;;;;;;;;;;;;;;;;
-;; DATASET CREATION
-;;;;;;;;;;;;;;;;;;;;;
+(importer/export-symbols techtest.api.dataset
+                         dataset?
+                         dataset
+                         shape
+                         info
+                         columns
+                         rows)
 
-(defn dataset?
-  "Is `ds` a `dataset` type?"
-  [ds]
-  (satisfies? prot/PColumnarDataset ds))
-
-(defn- sequential+?
-  "Check if object is sequencial, is column or maybe a reader?"
-  [xs]
-  (and (not (map? xs))
-       (or (sequential? xs)
-           (col/is-column? xs)
-           (instance? Iterable xs))))
-
-(defn- fix-map-dataset
-  "If map contains value which is not a sequence, convert ir to a sequence."
-  [map-ds]
-  (let [c (if-let [first-seq (->> map-ds
-                                  (vals)
-                                  (filter sequential+?)
-                                  (first))]
-            (count first-seq)
-            1)]
-    (map-v #(if (sequential+? %) % (repeat c %)) map-ds)))
 
 (defn unroll
   "Unroll columns if they are sequences. Selector can be one of:
@@ -61,49 +49,13 @@
   [ds columns-selector]
   (cond
     (map? columns-selector) (reduce #(ds/unroll-column %1 (first %2) {:datatype (second %2)}) ds columns-selector)
-    (sequential+? columns-selector) (reduce #(ds/unroll-column %1 %2) ds columns-selector)
+    (iterable-sequence? columns-selector) (reduce #(ds/unroll-column %1 %2) ds columns-selector)
     :else (ds/unroll-column ds columns-selector)))
 
-(defn dataset
-  "Create `dataset`.
-  
-  Dataset can be created from:
-
-  * single value
-  * map of values and/or sequences
-  * sequence of maps
-  * sequence of columns
-  * file or url
-
-  If `unroll` is set, `unroll` function is called."
-  ([data]
-   (dataset data nil))
-  ([data {:keys [single-value-name]
-          :or {single-value-name :$value}
-          :as options}]
-   (let [ds (cond
-              (dataset? data) data
-              (map? data) (apply ds/name-values-seq->dataset (fix-map-dataset data) options)
-              (and (sequential+? data)
-                   (every? sequential+? data)
-                   (every? #(= 2 (count %)) data)) (dataset (into {} data) options)
-              (and (sequential+? data)
-                   (every? col/is-column? data)) (ds/new-dataset options data)
-              (not (seqable? data)) (ds/->dataset [{single-value-name data}] options)
-              :else (ds/->dataset data options))]
-     (if-let [unroll-selector (:unroll options)]
-       (unroll ds unroll-selector)
-       ds))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; DESCRIPTIVE FUNCTIONS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn columns-info
-  [ds]
-  (->> (ds/columns ds)
-       (map meta)
-       (dataset)))
 
 ;;;;;;;;;;;;;
 ;; GROUPING
@@ -129,7 +81,7 @@
   [grouping-selector ds limit-columns]
   (cond
     (map? grouping-selector) grouping-selector
-    (sequential+? grouping-selector) (ds/group-by->indexes identity grouping-selector ds)
+    (iterable-sequence? grouping-selector) (ds/group-by->indexes identity grouping-selector ds)
     (fn? grouping-selector) (ds/group-by->indexes grouping-selector limit-columns ds)
     :else (ds/group-by-column->indexes grouping-selector ds)))
 
@@ -207,7 +159,7 @@
   "Add group columns to the result of ungrouping"
   [ds col1 col2 columns]
   (->> columns
-       (concat col1 col2)
+       (clojure.core/concat col1 col2)
        (remove nil?)
        (ds/new-dataset)
        (assoc ds :data)))
@@ -291,7 +243,7 @@
    (cond
      (= :all cols-selector) (ds/column-names ds)
      (map? cols-selector) (keys cols-selector)
-     (sequential+? cols-selector) cols-selector
+     (iterable-sequence? cols-selector) cols-selector
      (instance? java.util.regex.Pattern cols-selector) (filter-column-names ds #(re-matches cols-selector (str %)) meta-field)
      (fn? cols-selector) (filter-column-names ds cols-selector meta-field)
      :else [cols-selector])))
@@ -336,7 +288,7 @@
                         (take cnt (cycle col-or-seq))
                         (if (col/is-column? col-or-seq)
                           (col/extend-column-with-empty col-or-seq (- cnt seq-cnt))
-                          (concat col-or-seq (repeat (- cnt seq-cnt) nil))))
+                          (clojure.core/concat col-or-seq (repeat (- cnt seq-cnt) nil))))
       :else col-or-seq)))
 
 (defn add-or-update-column
@@ -353,7 +305,7 @@
      
      (cond
        (or (col/is-column? column-seq-or-gen)
-           (sequential+? column-seq-or-gen)) (->> (ds/row-count ds)
+           (iterable-sequence? column-seq-or-gen)) (->> (ds/row-count ds)
                                                   (fix-column-size column-seq-or-gen count-strategy)
                                                   (ds/add-or-update-column ds col-name))
        (fn? column-seq-or-gen) (add-or-update-column ds col-name (column-seq-or-gen ds))
@@ -378,9 +330,9 @@
   [ds cols-selector & cols-selectors]
   (let [selected-cols (->> cols-selectors
                            (map (partial select-column-names ds))
-                           (reduce concat (select-column-names ds cols-selector)))
+                           (reduce clojure.core/concat (select-column-names ds cols-selector)))
         rest-cols (select-column-names ds (complement (set selected-cols)))]
-    (ds/select-columns ds (concat selected-cols rest-cols))))
+    (ds/select-columns ds (clojure.core/concat selected-cols rest-cols))))
 
 (defn- try-convert-to-type
   [ds colname new-type]
@@ -395,7 +347,7 @@
    (if (grouped? ds)
      (process-group-data ds #(convert-column-type % colname new-type))
 
-     (if (sequential+? new-type)
+     (if (iterable-sequence? new-type)
        (try-convert-to-type ds colname new-type)
        (if (= :object new-type)
          (try-convert-to-type ds colname [:object identity])
@@ -440,7 +392,7 @@
   ([ds rows-selector limit-columns]
    (cond
      (number? rows-selector) [(long rows-selector)]
-     (sequential+? rows-selector) (find-indexes-from-seq ds rows-selector)
+     (iterable-sequence? rows-selector) (find-indexes-from-seq ds rows-selector)
      (fn? rows-selector) (find-indexes-from-fn ds rows-selector limit-columns))))
 
 (defn- select-or-drop-rows
@@ -499,10 +451,10 @@
   [tot-res k agg-res]
   (cond
     (map? agg-res) (reduce conj tot-res agg-res)
-    (sequential+? agg-res) (->> agg-res
-                                (map-indexed vector)
-                                (reduce (fn [b [id v]]
-                                          (conj b [(keyword (str (name k) "-" id)) v])) tot-res))
+    (iterable-sequence? agg-res) (->> agg-res
+                                      (map-indexed vector)
+                                      (reduce (fn [b [id v]]
+                                                (conj b [(keyword (str (name k) "-" id)) v])) tot-res))
     :else (conj tot-res [k agg-res])))
 
 (defn aggregate
@@ -526,11 +478,11 @@
          (ungroup {:add-group-as-column? true}))
      (cond
        (fn? fn-map-or-seq) (aggregate ds {:summary fn-map-or-seq})
-       (sequential+? fn-map-or-seq) (->> fn-map-or-seq
-                                         (zipmap (map #(->> %
-                                                            (str default-column-name-prefix "-")
-                                                            keyword) (range)))
-                                         (aggregate ds))
+       (iterable-sequence? fn-map-or-seq) (->> fn-map-or-seq
+                                               (zipmap (map #(->> %
+                                                                  (str default-column-name-prefix "-")
+                                                                  keyword) (range)))
+                                               (aggregate ds))
        :else (dataset (reduce (fn [res [k f]]
                                 (add-agg-result res k (f ds))) [] fn-map-or-seq) options)))))
 
@@ -548,7 +500,7 @@
 
 (defn asc-desc-comparator
   [orders]
-  (if-not (sequential+? orders)
+  (if-not (iterable-sequence? orders)
     (comparator->fn orders)
     (if (every? #(= % :asc) orders)
       compare
@@ -577,7 +529,7 @@
   - :desc
   - custom comparator function"
   ([ds cols-selector]
-   (order-by ds cols-selector (if (sequential+? cols-selector)
+   (order-by ds cols-selector (if (iterable-sequence? cols-selector)
                                 (repeat (count cols-selector) :asc)
                                 [:asc])))
   ([ds cols-selector order-or-comparators]
@@ -587,9 +539,9 @@
 
      (let [comp-fn (asc-desc-comparator order-or-comparators)]
        (cond
-         (sequential+? cols-selector) (ds/sort-by (apply juxt (map #(if (fn? %)
-                                                                      %
-                                                                      (fn [ds] (get ds %))) cols-selector)) comp-fn ds)
+         (iterable-sequence? cols-selector) (ds/sort-by (apply juxt (map #(if (fn? %)
+                                                                            %
+                                                                            (fn [ds] (get ds %))) cols-selector)) comp-fn ds)
          (fn? cols-selector) (ds/sort-by cols-selector
                                          comp-fn
                                          ds)
@@ -608,36 +560,36 @@
    :last strategy-last
    :random strategy-random})
 
-(defn- strategy-rollin
-  ([ds group-by-names] (strategy-rollin ds group-by-names nil))
-  ([ds group-by-names rollin-fn]
+(defn- strategy-fold
+  ([ds group-by-names] (strategy-fold ds group-by-names nil))
+  ([ds group-by-names fold-fn]
    (let [target-names (select-column-names ds (complement (set group-by-names)))
-         rollin-fn (or rollin-fn vec)]
+         fold-fn (or fold-fn vec)]
      (-> (group-by ds group-by-names)
          (process-group-data (fn [ds]
                                (as-> ds ds
                                  (select-columns ds target-names)
-                                 (dataset [(zipmap target-names (map rollin-fn (ds/columns ds)))]))) true)
+                                 (dataset [(zipmap target-names (map fold-fn (ds/columns ds)))]))) true)
          (ungroup {:add-group-as-column? true})))))
 
 (defn unique-by
   ([ds] (unique-by ds (ds/column-names ds)))
   ([ds cols-selector] (unique-by ds cols-selector nil))
-  ([ds cols-selector {:keys [strategy rollin-fn limit-columns]
-                      :or {strategy :first rollin-fn vec}
+  ([ds cols-selector {:keys [strategy fold-fn limit-columns]
+                      :or {strategy :first fold-fn vec}
                       :as options}]
    (if (grouped? ds)
      (process-group-data ds #(unique-by % cols-selector options) true)
 
      (if (= 1 (ds/row-count ds))
        ds
-       (if (= strategy :rollin)
-         (strategy-rollin ds (select-column-names ds cols-selector) rollin-fn)
+       (if (= strategy :fold)
+         (strategy-fold ds (select-column-names ds cols-selector) fold-fn)
          (let [local-options {:keep-fn (get strategies strategy :first)}]
            (cond
-             (sequential+? cols-selector) (if (= (count cols-selector) 1)
-                                            (ds/unique-by-column (first cols-selector) local-options ds)
-                                            (ds/unique-by identity (assoc local-options :column-name-seq cols-selector) ds))
+             (iterable-sequence? cols-selector) (if (= (count cols-selector) 1)
+                                                  (ds/unique-by-column (first cols-selector) local-options ds)
+                                                  (ds/unique-by identity (assoc local-options :column-name-seq cols-selector) ds))
              (fn? cols-selector) (ds/unique-by cols-selector (if limit-columns
                                                                (assoc local-options :column-name-seq limit-columns)
                                                                local-options) ds)
@@ -683,7 +635,7 @@
   (col/new-column (col/column-name col)
                   (update-rdr/update-reader col (cond
                                                   (map? value) value
-                                                  (sequential+? value) (zipmap missing (cycle value))
+                                                  (iterable-sequence? value) (zipmap missing (cycle value))
                                                   :else (bitmap/bitmap-value->bitmap-map missing value)))
                   {} (if (map? value)
                        (remove-from-rbitmap missing (keys value))
@@ -757,7 +709,7 @@
                            :map (let [col-names (ds/column-names cols)]
                                   #(zipmap col-names %))
                            :seq seq
-                           (let [sep (if (sequential+? separator)
+                           (let [sep (if (iterable-sequence? separator)
                                        (cycle separator)
                                        (repeat separator))]
                              (fn [row] (->> row
@@ -858,7 +810,7 @@
                            value-column-name :$value
                            drop-missing? true}}]
    (let [cols (select-column-names ds cols-selector meta-field)
-         target-cols (if (sequential+? target-cols) target-cols [target-cols])
+         target-cols (if (iterable-sequence? target-cols) target-cols [target-cols])
          groups (cols->pre-longer ds cols target-cols value-column-name splitter)
          cols-to-add (keys (first groups))
          ds-template (drop-columns ds cols)
@@ -883,7 +835,7 @@
 
 (defn- make-apply-join-fn
   "Perform left-join on groups and create new columns"
-  [group-name->names single-value? value-names join-name starting-ds-count rollin-fn rollin? rename-map]
+  [group-name->names single-value? value-names join-name starting-ds-count fold-fn rename-map]
   (fn [curr-ds {:keys [name group-id count data]}]
     (let [col-name (str/join "_" (->> name
                                       group-name->names
@@ -899,19 +851,19 @@
                    (perform-join curr-ds join-name) ;; perform left join
                    (drop-join-leftovers join-name))] ;; drop unnecessary leftovers
       (if (> (ds/row-count data) starting-ds-count) ;; in case when there were multiple values, create vectors
-        (if rollin?
-          (strategy-rollin data (select-column-names data (complement (set target-names))) rollin-fn)
+        (if fold-fn
+          (strategy-fold data (select-column-names data (complement (set target-names))) fold-fn)
           (do (println "WARNING: multiple values in result detected, data should be rolled in.")
               data))
         data))))
 
 (defn pivot->wider
   ([ds cols-selector value-columns] (pivot->wider ds cols-selector value-columns nil))
-  ([ds cols-selector value-columns {:keys [rollin-fn rollin? rename-map]}]
+  ([ds cols-selector value-columns {:keys [fold-fn rename-map]}]
    (let [col-names (select-column-names ds cols-selector) ;; columns to be unrolled
          value-names (select-column-names ds value-columns) ;; columns to be used as values
          single-value? (= (count value-names) 1) ;; maybe this is one column? (different name creation rely on this)
-         rest-cols (->> (concat col-names value-names)
+         rest-cols (->> (clojure.core/concat col-names value-names)
                         (set)
                         (complement)
                         (select-column-names ds)) ;; the columns used in join
@@ -931,7 +883,7 @@
                                 (map #(fn [m] (get m %)))
                                 (apply juxt)) ;; create function which extract new column name
          result (reduce (make-apply-join-fn group-name->names single-value? value-names
-                                            join-name starting-ds-count rollin-fn rollin? rename-map)
+                                            join-name starting-ds-count fold-fn rename-map)
                         starting-ds
                         (ds/mapseq-reader grouped-ds))] ;; perform join on groups and create new columns
      (-> (if join-on-single? ;; finalize, recreate original columns from join column, and reorder stuff
@@ -946,18 +898,6 @@
 ;; USE CASES
 ;;;;;;;;;;;;;;
 
-(dataset 999)
-(dataset [[:A 33]])
-(dataset {:A 33})
-(dataset {:A [1 2 3]})
-(dataset {:A [3 4 5] :B "X"})
-(dataset [[:A [3 4 5]] [:B "X"]])
-(dataset [{:a 1 :b 3} {:b 2 :a 99}])
-
-(dataset [{:a 1 :b [1 2 3]} {:a 2 :b [3 4]}])
-(dataset [{:a 1 :b [1 2 3]} {:a 2 :b [3 4]}] {:unroll {:b :float64}})
-(dataset [{:a 1 :b [1 2 3]} {:a 2 :b [3 4]}] {:unroll [:b]})
-(dataset [{:a 1 :b [1 2 3] :c 2} {:a 2 :b [3 4] :c 1} {:a 3 :b 3 :c [2 3]}] {:unroll [:b :c]})
 
 ;; unroll
 
@@ -1085,10 +1025,10 @@
 (unique-by DS :V1)
 (unique-by DS :V1 {:strategy :last})
 (unique-by DS :V1 {:strategy :random})
-(unique-by DS :V1 {:strategy :rollin})
+(unique-by DS :V1 {:strategy :fold})
 
-(unique-by DS :V4 {:strategy :rollin
-                   :rollin-fn dfn/sum})
+(unique-by DS :V4 {:strategy :fold
+                   :fold-fn dfn/sum})
 
 (unique-by DS [:V1 :V4])
 (unique-by DS [:V1 :V4] {:strategy :last})
@@ -1500,7 +1440,7 @@
 ;;    |    B |       L |  9 |
 ;;    |    B |       M |  9 |
 
-(pivot->wider (select-columns warpbreaks ["wool" "tension" "breaks"]) "wool" "breaks" {:rollin? true})
+(pivot->wider (select-columns warpbreaks ["wool" "tension" "breaks"]) "wool" "breaks" {:fold-fn vec})
 
 ;; => data/warpbreaks.csv [3 3]:
 ;;    | tension |                            B |                            A |
@@ -1509,8 +1449,7 @@
 ;;    |       H | [20 21 24 17 13 15 15 16 28] | [36 21 24 18 10 43 28 15 26] |
 ;;    |       L | [27 14 29 19 29 31 41 20 44] | [26 30 54 25 70 52 51 26 67] |
 
-(pivot->wider (select-columns warpbreaks ["wool" "tension" "breaks"]) "wool" "breaks" {:rollin-fn dfn/mean
-                                                                                       :rollin? true})
+(pivot->wider (select-columns warpbreaks ["wool" "tension" "breaks"]) "wool" "breaks" {:fold-fn dfn/mean})
 
 ;; => data/warpbreaks.csv [3 3]:
 ;;    | tension |     B |     A |

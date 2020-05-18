@@ -1,0 +1,292 @@
+---
+title: "Proposed API for tech.ml.dataset"
+author: GenerateMe
+date: "`r Sys.Date()`"
+output:
+    html_document:
+        highlight: pygments
+        theme: sandstone
+        includes:
+            in_header: better_tables.html
+    pdf_document:
+        highlight: tango
+    md_document:
+        variant: markdown_github
+---
+
+
+```{css echo=FALSE}
+table { width: auto !important; margin-right: auto; margin-left: 2%; }
+```
+
+
+```{r setup, include=FALSE}
+find_nrepl_port_up <- function() {
+    wd <- getwd()
+    while(wd != dirname(wd)) {
+        f <- paste0(wd,"/.nrepl-port")
+        if(file.exists(f)) return(paste0("@",f))
+        wd <- dirname(wd)
+        f <- NULL
+    }
+}
+port_file <- find_nrepl_port_up()
+if(is.null(port_file)) stop("nREPL port not found")
+library(knitr)
+knitr_one_string <- knitr:::one_string
+nrepl_cmd  <- "rep"
+opts_chunk$set(comment=NA, highlight=TRUE)
+knit_engines$set(clojure = function(options) {
+    rep_params <- if(isTRUE(options$stdout_only)) {
+                      "--print 'out,1,%{out}' --print 'value,1,' -p"
+                  } else {
+                      "-p"
+                  }
+    code <- paste(rep_params, port_file, shQuote(knitr_one_string(options$code)))
+    out <- if (options$eval) {
+               if (options$message) message('running: ', nrepl_cmd, ' ', code)
+               tryCatch(
+                   system2(nrepl_cmd, code, stdout = TRUE, stderr = TRUE, env = options$engine.env),
+                   error = function(e) {
+                       if (!options$error) stop(e)
+                       paste('Error in running command', nrepl_cmd)
+                   }
+               )
+           } else ''
+    if (!options$error && !is.null(attr(out, 'status'))) stop(knitr_one_string(out))
+    engine_output(options, options$code, out)})
+```
+
+## Introduction
+
+```{clojure results="hide"}
+(require '[techtest.api :as api])
+```
+
+## Functionality {.tabset .tabset-fade}
+
+### Dataset {.tabset .tabset-fade .tabset-pills}
+
+
+#### Dataset creation 
+
+
+
+Empty dataset.
+
+```{clojure}
+(api/dataset)
+```
+
+---
+
+Dataset from single value.
+
+```{clojure results="asis"}
+(api/dataset 999)
+```
+
+---
+
+Rename default column name for single value
+
+```{clojure results="asis"}
+(api/dataset 999 {:single-value-column-name "my-single-value"})
+(api/dataset 999 {:single-value-column-name ""})
+```
+
+---
+
+Sequence of pairs (first = column name, second = value(s)).
+
+```{clojure results="asis"}
+(api/dataset [[:A 33] [:B 5] [:C :a]])
+```
+
+---
+
+Not sequential values are repeated row-count number of times.
+
+```{clojure results="asis"}
+(api/dataset [[:A [1 2 3 4 5 6]] [:B "X"] [:C :a]])
+```
+
+---
+
+Dataset created from map (keys = column name, second = value(s)). Works the same as sequence of pairs.
+
+```{clojure results="asis"}
+(api/dataset {:A 33})
+(api/dataset {:A [1 2 3]})
+(api/dataset {:A [3 4 5] :B "X"})
+```
+
+---
+
+You can put any value inside a column
+
+```{clojure results="asis"}
+(api/dataset {:A [[3 4 5] [:a :b]] :B "X"})
+```
+
+---
+
+Sequence of maps
+
+```{clojure results="asis"}
+(api/dataset [{:a 1 :b 3} {:b 2 :a 99}])
+(api/dataset [{:a 1 :b [1 2 3]} {:a 2 :b [3 4]}])
+```
+
+---
+
+Missing values are marked by `nil`
+
+```{clojure results="asis"}
+(api/dataset [{:a nil :b 1} {:a 3 :b 4} {:a 11}])
+```
+
+---
+
+Import CSV file
+
+```{clojure results="asis"}
+(api/dataset "data/family.csv")
+```
+
+---
+
+Import from URL
+
+```{clojure results="hide"}
+(defonce ds (api/dataset "https://vega.github.io/vega-lite/examples/data/seattle-weather.csv"))
+```
+
+```{clojure results="asis"}
+ds
+```
+
+#### Dataset related functions
+
+Number of rows
+
+```{clojure}
+(api/row-count ds)
+```
+
+---
+
+Number of columns
+
+```{clojure}
+(api/column-count ds)
+```
+
+---
+
+Shape of the dataset, [row count, column count]
+
+```{clojure}
+(api/shape ds)
+```
+
+---
+
+General info about dataset. There are three variants:
+
+* default - containing information about columns with basic statistics
+* `:basic` - just name, row and column count and information if dataset is a result of `group-by` operation
+* `:columns` - columns' metadata
+
+```{clojure results="asis"}
+(api/info ds)
+(api/info ds :basic)
+(api/info ds :columns)
+```
+
+---
+
+Getting and setting dataset name
+
+```{clojure}
+(api/dataset-name ds)
+
+(->> "seattle-weather"
+     (api/set-dataset-name ds)
+     (api/dataset-name))
+```
+
+#### Columns and rows
+
+Select dataset column names
+
+```{clojure}
+(api/column-names ds)
+```
+
+---
+
+Select column.
+
+```{clojure}
+(ds "wind")
+(api/column ds "date")
+```
+
+---
+
+Columns as sequence
+
+```{clojure}
+(take 2 (api/columns ds))
+```
+
+---
+
+Columns as map
+
+```{clojure}
+(keys (api/columns ds :as-map))
+```
+
+---
+
+Rows as sequence of sequences
+
+```{clojure}
+(take 2 (api/rows ds))
+```
+
+---
+
+Rows as sequence of maps
+
+```{clojure stdout_only=TRUE}
+(clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
+```
+
+### Columns
+
+### Rows
+
+### Groups
+
+### Aggregate
+
+### Order
+
+### Unique
+
+### Missing
+
+### Join/Split
+
+### Fold/Unroll
+
+### Reshape
+
+
+
+
+
+
