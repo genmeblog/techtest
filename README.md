@@ -6,6 +6,7 @@
 
 Approach to define a layer on the top of [tech.ml.dataset](https://github.com/techascent/tech.ml.dataset)
 
+[DOCUMENTATION IN PROGRESS](https://genmeblog.github.io/techtest/api.html)
 
 ## techtest.core
 
