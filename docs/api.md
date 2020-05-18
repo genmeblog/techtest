@@ -1,6 +1,20 @@
 Introduction
 ------------
 
+[tech.ml.dataset](https://github.com/techascent/tech.ml.dataset) is a great and fast library which brings columnar dataset to the Clojure. Chris Nuernberger has been working on this library for last year as a part of bigger `tech.ml` stack.
+
+I've started to test the library and help to fix uncovered bugs. My main goal was to compare functionalities with the other standards from other platforms. I focused on R solutions: [dplyr](https://dplyr.tidyverse.org/), [tidyr](https://tidyr.tidyverse.org/) and [data.table](https://rdatatable.gitlab.io/data.table/).
+
+During conversions of the examples I've come up how to reorganized existing `tech.ml.dataset` functions into simple to use API. The main goals were:
+
+-   Focus on dataset manipulation functionality, leaving other parts of `tech.ml` like pipelines, datatypes, readers, ML, etc.
+-   Single entry point for common operations - one function dispatching on given arguments.
+-   `group-by` results with special kind of dataset - a dataset containing subsets created after grouping as a column.
+-   Most operations recognize regular dataset and grouped dataset and process data accordingly.
+-   One function form to enable thread-first on dataset.
+
+All proposed functions are grouped in tabs below. Select group to see examples and details.
+
 ``` clojure
 (require '[techtest.api :as api])
 ```
@@ -10,7 +24,32 @@ Functionality
 
 ### Dataset
 
+Dataset is a special type which can be considered as a map of columns implemented around `tech.ml.datatype` library. Each column can be considered as named sequence of typed data. Supported types include integers, floats, string, boolean, date/time, objects etc.
+
 #### Dataset creation
+
+Dataset can be created from various of types of Clojure structures and files:
+
+-   single values
+-   sequence of maps
+-   map of sequences or values
+-   sequence of columns (taken from other dataset or created manually)
+-   sequence of pairs
+-   file types: raw/gzipped csv/tsv, json, xls(x) taken from local file system or URL
+-   input stream
+
+`api/dataset` accepts:
+
+-   data
+-   options (see documentation of `tech.ml.dataset/->dataset` function for full list):
+    -   `:dataset-name` - name of the dataset
+    -   `:num-rows` - number of rows to read from file
+    -   `:header-row?` - indication if first row in file is a header
+    -   `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
+    -   `:separator` - column separator
+    -   `:single-value-column-name` - name of the column when single value is provided
+
+------------------------------------------------------------------------
 
 Empty dataset.
 
@@ -36,11 +75,12 @@ Dataset from single value.
 
 ------------------------------------------------------------------------
 
-Rename default column name for single value
+Set column name for single value. Also set the dataset name.
 
 ``` clojure
 (api/dataset 999 {:single-value-column-name "my-single-value"})
-(api/dataset 999 {:single-value-column-name ""})
+(api/dataset 999 {:single-value-column-name ""
+                  :dataset-name "Single value"})
 ```
 
 \_unnamed \[1 1\]:
@@ -49,7 +89,7 @@ Rename default column name for single value
 |-----------------|
 | 999             |
 
-\_unnamed \[1 1\]:
+Single value \[1 1\]:
 
 | 0   |
 |-----|
@@ -234,7 +274,28 @@ ds
 | 2012-01-24 | 8.600         | 10.00     | 2.200     | 5.100 | rain    |
 | 2012-01-25 | 8.100         | 8.900     | 4.400     | 5.400 | rain    |
 
+#### Saving
+
+Export dataset to a file or output stream can be done by calling `api/write-csv!`. Function accepts:
+
+-   dataset
+-   file name with one of the extensions: `.csv`, `.tsv`, `.csv.gz` and `.tsv.gz` or output stream
+-   options:
+    -   `:separator` - string or separator char.
+
+``` clojure
+(api/write-csv! ds "output.tsv.gz")
+(.exists (clojure.java.io/file "output.csv.gz"))
+```
+
+    nil
+    true
+
 #### Dataset related functions
+
+Summary of dataset functions like number of rows, columns and basic stats.
+
+------------------------------------------------------------------------
 
 Number of rows
 
@@ -253,6 +314,16 @@ Number of columns
 ```
 
     6
+
+------------------------------------------------------------------------
+
+Names of columns.
+
+``` clojure
+(api/column-names ds)
+```
+
+    ("date" "precipitation" "temp_max" "temp_min" "wind" "weather")
 
 ------------------------------------------------------------------------
 
@@ -423,28 +494,27 @@ General info about dataset. There are three variants:
 
 ------------------------------------------------------------------------
 
-Getting and setting dataset name
+Getting a dataset name
 
 ``` clojure
 (api/dataset-name ds)
+```
 
+    "https://vega.github.io/vega-lite/examples/data/seattle-weather.csv"
+
+------------------------------------------------------------------------
+
+Setting a dataset name (operation is immutable).
+
+``` clojure
 (->> "seattle-weather"
      (api/set-dataset-name ds)
      (api/dataset-name))
 ```
 
-    "https://vega.github.io/vega-lite/examples/data/seattle-weather.csv"
     "seattle-weather"
 
 #### Columns and rows
-
-Select dataset column names
-
-``` clojure
-(api/column-names ds)
-```
-
-    ("date" "precipitation" "temp_max" "temp_min" "wind" "weather")
 
 ------------------------------------------------------------------------
 
@@ -494,7 +564,7 @@ Rows as sequence of sequences
 (take 2 (api/rows ds))
 ```
 
-    ([#object[java.time.LocalDate 0x3a332cef "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x51b4a1b8 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+    ([#object[java.time.LocalDate 0x1b5a01b "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x8b3cd25 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 
 ------------------------------------------------------------------------
 
@@ -504,13 +574,13 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
-    ({"date" #object[java.time.LocalDate 0x2a7baf0a "2012-01-01"],
+    ({"date" #object[java.time.LocalDate 0x4391b49 "2012-01-01"],
       "precipitation" 0.0,
       "temp_min" 5.0,
       "weather" "drizzle",
       "temp_max" 12.8,
       "wind" 4.7}
-     {"date" #object[java.time.LocalDate 0x71714e82 "2012-01-02"],
+     {"date" #object[java.time.LocalDate 0x155fd87b "2012-01-02"],
       "precipitation" 10.9,
       "temp_min" 2.8,
       "weather" "rain",
@@ -531,8 +601,10 @@ Rows as sequence of maps
 
 ### Missing
 
-### Join/Split
+### Join/Split Columns
 
-### Fold/Unroll
+### Fold/Unroll Rows
 
 ### Reshape
+
+### Join/Concat

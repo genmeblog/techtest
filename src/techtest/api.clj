@@ -29,7 +29,8 @@
                          column
                          column-names
                          has-column?
-                         concat)
+                         concat
+                         write-csv!)
 
 (importer/export-symbols techtest.api.dataset
                          dataset?

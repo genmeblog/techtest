@@ -59,6 +59,21 @@ knit_engines$set(clojure = function(options) {
 
 ## Introduction
 
+[tech.ml.dataset](https://github.com/techascent/tech.ml.dataset) is a great and fast library which brings columnar dataset to the Clojure. Chris Nuernberger has been working on this library for last year as a part of bigger `tech.ml` stack.
+
+I've started to test the library and help to fix uncovered bugs. My main goal was to compare functionalities with the other standards from other platforms. I focused on R solutions: [dplyr](https://dplyr.tidyverse.org/), [tidyr](https://tidyr.tidyverse.org/) and [data.table](https://rdatatable.gitlab.io/data.table/).
+
+During conversions of the examples I've come up how to reorganized existing `tech.ml.dataset` functions into simple to use API. The main goals were:
+
+* Focus on dataset manipulation functionality, leaving other parts of `tech.ml` like pipelines, datatypes, readers, ML, etc.
+* Single entry point for common operations - one function dispatching on given arguments.
+* `group-by` results with special kind of dataset - a dataset containing subsets created after grouping as a column.
+* Most operations recognize regular dataset and grouped dataset and process data accordingly.
+* One function form to enable thread-first on dataset.
+
+All proposed functions are grouped in tabs below. Select group to see examples and details.
+
+
 ```{clojure results="hide"}
 (require '[techtest.api :as api])
 ```
@@ -67,10 +82,32 @@ knit_engines$set(clojure = function(options) {
 
 ### Dataset {.tabset .tabset-fade .tabset-pills}
 
+Dataset is a special type which can be considered as a map of columns implemented around `tech.ml.datatype` library. Each column can be considered as named sequence of typed data. Supported types include integers, floats, string, boolean, date/time, objects etc.
 
 #### Dataset creation 
 
+Dataset can be created from various of types of Clojure structures and files:
 
+* single values
+* sequence of maps
+* map of sequences or values
+* sequence of columns (taken from other dataset or created manually)
+* sequence of pairs
+* file types: raw/gzipped csv/tsv, json, xls(x) taken from local file system or URL
+* input stream
+
+`api/dataset` accepts:
+
+* data
+* options (see documentation of `tech.ml.dataset/->dataset` function for full list):
+    - `:dataset-name` - name of the dataset
+    - `:num-rows` - number of rows to read from file
+    - `:header-row?` - indication if first row in file is a header
+    - `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
+    - `:separator` - column separator
+    - `:single-value-column-name` - name of the column when single value is provided
+
+---
 
 Empty dataset.
 
@@ -88,11 +125,12 @@ Dataset from single value.
 
 ---
 
-Rename default column name for single value
+Set column name for single value. Also set the dataset name.
 
 ```{clojure results="asis"}
 (api/dataset 999 {:single-value-column-name "my-single-value"})
-(api/dataset 999 {:single-value-column-name ""})
+(api/dataset 999 {:single-value-column-name ""
+                  :dataset-name "Single value"})
 ```
 
 ---
@@ -166,7 +204,25 @@ Import from URL
 ds
 ```
 
+#### Saving
+
+Export dataset to a file or output stream can be done by calling `api/write-csv!`. Function accepts:
+
+* dataset
+* file name with one of the extensions: `.csv`, `.tsv`, `.csv.gz` and `.tsv.gz` or output stream
+* options:
+    - `:separator` - string or separator char.
+
+```{clojure}
+(api/write-csv! ds "output.tsv.gz")
+(.exists (clojure.java.io/file "output.csv.gz"))
+```
+
 #### Dataset related functions
+
+Summary of dataset functions like number of rows, columns and basic stats.
+
+---
 
 Number of rows
 
@@ -180,6 +236,14 @@ Number of columns
 
 ```{clojure}
 (api/column-count ds)
+```
+
+---
+
+Names of columns.
+
+```{clojure}
+(api/column-names ds)
 ```
 
 ---
@@ -206,11 +270,17 @@ General info about dataset. There are three variants:
 
 ---
 
-Getting and setting dataset name
+Getting a dataset name
 
 ```{clojure}
 (api/dataset-name ds)
+```
 
+---
+
+Setting a dataset name (operation is immutable).
+
+```{clojure}
 (->> "seattle-weather"
      (api/set-dataset-name ds)
      (api/dataset-name))
@@ -218,11 +288,6 @@ Getting and setting dataset name
 
 #### Columns and rows
 
-Select dataset column names
-
-```{clojure}
-(api/column-names ds)
-```
 
 ---
 
@@ -279,14 +344,10 @@ Rows as sequence of maps
 
 ### Missing
 
-### Join/Split
+### Join/Split Columns
 
-### Fold/Unroll
+### Fold/Unroll Rows
 
 ### Reshape
 
-
-
-
-
-
+### Join/Concat
