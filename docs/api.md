@@ -15,9 +15,35 @@ During conversions of the examples I've come up how to reorganized existing `tec
 
 All proposed functions are grouped in tabs below. Select group to see examples and details.
 
+INFO: The future of this API is not known yet. Two directions are possible: integration into `tech.ml` or development under `Scicloj` organization. For the time being use this repo if you want to try. Join the discussion on [Zulip](https://clojurians.zulipchat.com/#narrow/stream/236259-tech.2Eml.2Edataset.2Edev/topic/api)
+
+Let's require main namespace and define dataset used in most examples:
+
 ``` clojure
 (require '[techtest.api :as api])
+(def DS (api/dataset {:V1 (take 9 (cycle [1 2]))
+                      :V2 (range 1 10)
+                      :V3 (take 9 (cycle [0.5 1.0 1.5]))
+                      :V4 (take 9 (cycle [\A \B \C]))}))
 ```
+
+``` clojure
+DS
+```
+
+\_unnamed \[9 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 9   | 1.500  | C   |
 
 Functionality
 -------------
@@ -42,12 +68,12 @@ Dataset can be created from various of types of Clojure structures and files:
 
 -   data
 -   options (see documentation of `tech.ml.dataset/->dataset` function for full list):
-    -   `:dataset-name` - name of the dataset
-    -   `:num-rows` - number of rows to read from file
-    -   `:header-row?` - indication if first row in file is a header
-    -   `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
-    -   `:separator` - column separator
-    -   `:single-value-column-name` - name of the column when single value is provided
+-   `:dataset-name` - name of the dataset
+-   `:num-rows` - number of rows to read from file
+-   `:header-row?` - indication if first row in file is a header
+-   `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
+-   `:separator` - column separator
+-   `:single-value-column-name` - name of the column when single value is provided
 
 ------------------------------------------------------------------------
 
@@ -281,7 +307,7 @@ Export dataset to a file or output stream can be done by calling `api/write-csv!
 -   dataset
 -   file name with one of the extensions: `.csv`, `.tsv`, `.csv.gz` and `.tsv.gz` or output stream
 -   options:
-    -   `:separator` - string or separator char.
+-   `:separator` - string or separator char.
 
 ``` clojure
 (api/write-csv! ds "output.tsv.gz")
@@ -293,7 +319,7 @@ Export dataset to a file or output stream can be done by calling `api/write-csv!
 
 #### Dataset related functions
 
-Summary of dataset functions like number of rows, columns and basic stats.
+Summary functions about the dataset like number of rows, columns and basic stats.
 
 ------------------------------------------------------------------------
 
@@ -516,6 +542,8 @@ Setting a dataset name (operation is immutable).
 
 #### Columns and rows
 
+Get columns and rows as sequences. `column`, `columns` and `rows` treat grouped dataset as regular one. See `Groups` to read more about grouped datasets.
+
 ------------------------------------------------------------------------
 
 Select column.
@@ -564,7 +592,7 @@ Rows as sequence of sequences
 (take 2 (api/rows ds))
 ```
 
-    ([#object[java.time.LocalDate 0x1b5a01b "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x8b3cd25 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+    ([#object[java.time.LocalDate 0x1516ecfb "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x5be151b8 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 
 ------------------------------------------------------------------------
 
@@ -574,24 +602,153 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
-    ({"date" #object[java.time.LocalDate 0x4391b49 "2012-01-01"],
+    ({"date" #object[java.time.LocalDate 0xeac8a83 "2012-01-01"],
       "precipitation" 0.0,
       "temp_min" 5.0,
       "weather" "drizzle",
       "temp_max" 12.8,
       "wind" 4.7}
-     {"date" #object[java.time.LocalDate 0x155fd87b "2012-01-02"],
+     {"date" #object[java.time.LocalDate 0x6fd0ff91 "2012-01-02"],
       "precipitation" 10.9,
       "temp_min" 2.8,
       "weather" "rain",
       "temp_max" 10.6,
       "wind" 4.5})
 
+### Group-by
+
+Grouping by is an operation which splits dataset into subdatasets and pack it into new special type of... dataset. I distinguish two types of dataset: regular dataset and grouped dataset. The latter is the result of grouping.
+
+Grouped dataset is annotated in by `:grouped?` meta tag and consist following columns:
+
+-   `:name` - group name or structure
+-   `:group-id` - integer assigned to the group
+-   `:count` - number of elements in a group
+-   `:data` - groups as datasets
+
+Almost all functions recognize type of the dataset (grouped or not) and operate accordingly.
+
+You can't apply reshaping or join/concat functions on grouped datasets.
+
+#### Grouping
+
+Grouping is done by calling `group-by` function with arguments:
+
+-   `ds` - dataset
+-   `grouping-selector` - what to use for grouping
+-   options:
+-   `:result-type` - what to return:
+-   `:as-dataset` (default) - return grouped dataset
+-   `:as-indexes` - return rows ids (row number from original dataset)
+-   `:as-map` - return map with group names as keys and subdataset as values
+-   `:limit-columns` - list of the columns which should be returned during grouping by function.
+
+Grouping can be done by:
+
+-   single column name
+-   seq of column names
+-   map of keys (group names) and row indexes
+-   value returned by function taking row as map
+
+Note: currently dataset inside dataset is printed recursively so it renders poorly from markdown.
+
+------------------------------------------------------------------------
+
+List of columns in groupd dataset
+
+``` clojure
+(api/column-names (api/group-by DS :V1))
+```
+
+    (:name :group-id :count :data)
+
+------------------------------------------------------------------------
+
+Content of the grouped dataset
+
+``` clojure
+(api/columns (api/group-by DS :V1) :as-map)
+```
+
+    {:name #tech.ml.dataset.column<int64>[2]
+    :name
+    [1, 2, ], :group-id #tech.ml.dataset.column<int64>[2]
+    :group-id
+    [0, 1, ], :count #tech.ml.dataset.column<int32>[2]
+    :count
+    [5, 4, ], :data #tech.ml.dataset.column<object>[2]
+    :data
+    [1 [5 4]:
+
+    | :V1 | :V2 |    :V3 | :V4 |
+    |-----+-----+--------+-----|
+    |   1 |   1 | 0.5000 |   A |
+    |   1 |   3 |  1.500 |   C |
+    |   1 |   5 |  1.000 |   B |
+    |   1 |   7 | 0.5000 |   A |
+    |   1 |   9 |  1.500 |   C |
+    , 2 [4 4]:
+
+    | :V1 | :V2 |    :V3 | :V4 |
+    |-----+-----+--------+-----|
+    |   2 |   2 |  1.000 |   B |
+    |   2 |   4 | 0.5000 |   A |
+    |   2 |   6 |  1.500 |   C |
+    |   2 |   8 |  1.000 |   B |
+    , ]}
+
+------------------------------------------------------------------------
+
+Grouped dataset as map
+
+``` clojure
+(keys (api/group-by DS :V1 {:result-type :as-map}))
+```
+
+    (1 2)
+
+``` clojure
+(vals (api/group-by DS :V1 {:result-type :as-map}))
+```
+
+(\_unnamed \[5 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 9   | 1.500  | C   |
+
+\_unnamed \[4 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 2   | 2   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 6   | 1.500  | C   |
+| 2   | 8   | 1.000  | B   |
+
+)
+
+------------------------------------------------------------------------
+
+Group dataset as map of indexes (row ids)
+
+``` clojure
+(api/group-by DS :V1 {:result-type :as-indexes})
+```
+
+    {1 [0 2 4 6 8], 2 [1 3 5 7]}
+
+#### Ungrouping
+
+#### Other functions
+
 ### Columns
 
 ### Rows
-
-### Groups
 
 ### Aggregate
 

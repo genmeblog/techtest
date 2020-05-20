@@ -53,7 +53,7 @@ knit_engines$set(clojure = function(options) {
                    }
                )
            } else ''
-    if (!options$error && !is.null(attr(out, 'status'))) stop(knitr_one_string(out))
+               if (!options$error && !is.null(attr(out, 'status'))) stop(knitr_one_string(out))
     engine_output(options, options$code, out)})
 ```
 
@@ -73,10 +73,23 @@ During conversions of the examples I've come up how to reorganized existing `tec
 
 All proposed functions are grouped in tabs below. Select group to see examples and details.
 
+INFO: The future of this API is not known yet. Two directions are possible: integration into `tech.ml` or development under `Scicloj` organization. For the time being use this repo if you want to try. Join the discussion on [Zulip](https://clojurians.zulipchat.com/#narrow/stream/236259-tech.2Eml.2Edataset.2Edev/topic/api)
+
+
+Let's require main namespace and define dataset used in most examples:
 
 ```{clojure results="hide"}
 (require '[techtest.api :as api])
+(def DS (api/dataset {:V1 (take 9 (cycle [1 2]))
+                      :V2 (range 1 10)
+                      :V3 (take 9 (cycle [0.5 1.0 1.5]))
+                      :V4 (take 9 (cycle [\A \B \C]))}))
 ```
+
+```{clojure results="asis"}
+DS
+```
+
 
 ## Functionality {.tabset .tabset-fade}
 
@@ -100,12 +113,12 @@ Dataset can be created from various of types of Clojure structures and files:
 
 * data
 * options (see documentation of `tech.ml.dataset/->dataset` function for full list):
-    - `:dataset-name` - name of the dataset
-    - `:num-rows` - number of rows to read from file
-    - `:header-row?` - indication if first row in file is a header
-    - `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
-    - `:separator` - column separator
-    - `:single-value-column-name` - name of the column when single value is provided
+- `:dataset-name` - name of the dataset
+- `:num-rows` - number of rows to read from file
+- `:header-row?` - indication if first row in file is a header
+- `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
+- `:separator` - column separator
+- `:single-value-column-name` - name of the column when single value is provided
 
 ---
 
@@ -211,7 +224,7 @@ Export dataset to a file or output stream can be done by calling `api/write-csv!
 * dataset
 * file name with one of the extensions: `.csv`, `.tsv`, `.csv.gz` and `.tsv.gz` or output stream
 * options:
-    - `:separator` - string or separator char.
+- `:separator` - string or separator char.
 
 ```{clojure}
 (api/write-csv! ds "output.tsv.gz")
@@ -220,7 +233,7 @@ Export dataset to a file or output stream can be done by calling `api/write-csv!
 
 #### Dataset related functions
 
-Summary of dataset functions like number of rows, columns and basic stats.
+Summary functions about the dataset like number of rows, columns and basic stats.
 
 ---
 
@@ -288,6 +301,7 @@ Setting a dataset name (operation is immutable).
 
 #### Columns and rows
 
+Get columns and rows as sequences. `column`, `columns` and `rows` treat grouped dataset as regular one. See `Groups` to read more about grouped datasets. 
 
 ---
 
@@ -330,11 +344,87 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
+### Group-by {.tabset .tabset-fade .tabset-pills}
+
+Grouping by is an operation which splits dataset into subdatasets and pack it into new special type of... dataset. I distinguish two types of dataset: regular dataset and grouped dataset. The latter is the result of grouping.
+
+Grouped dataset is annotated in by `:grouped?` meta tag and consist following columns:
+
+* `:name` - group name or structure
+* `:group-id` - integer assigned to the group
+* `:count` - number of elements in a group
+* `:data` - groups as datasets
+
+Almost all functions recognize type of the dataset (grouped or not) and operate accordingly. 
+
+You can't apply reshaping or join/concat functions on grouped datasets.
+
+#### Grouping
+
+Grouping is done by calling `group-by` function with arguments:
+
+* `ds` - dataset
+* `grouping-selector` - what to use for grouping
+* options:
+- `:result-type` - what to return:
+  * `:as-dataset` (default) - return grouped dataset
+  * `:as-indexes` - return rows ids (row number from original dataset)
+  * `:as-map` - return map with group names as keys and subdataset as values
+- `:limit-columns` - list of the columns which should be returned during grouping by function.
+
+Grouping can be done by:
+
+* single column name
+* seq of column names
+* map of keys (group names) and row indexes
+* value returned by function taking row as map
+
+Note: currently dataset inside dataset is printed recursively so it renders poorly from markdown.
+
+---
+
+List of columns in groupd dataset
+
+```{clojure}
+(api/column-names (api/group-by DS :V1))
+```
+
+---
+
+Content of the grouped dataset
+
+```{clojure}
+(api/columns (api/group-by DS :V1) :as-map)
+```
+
+---
+
+Grouped dataset as map
+
+```{clojure}
+(keys (api/group-by DS :V1 {:result-type :as-map}))
+```
+
+```{clojure results="asis"}
+(vals (api/group-by DS :V1 {:result-type :as-map}))
+```
+
+---
+
+Group dataset as map of indexes (row ids)
+
+```{clojure}
+(api/group-by DS :V1 {:result-type :as-indexes})
+```
+
+
+#### Ungrouping
+
+#### Other functions
+
 ### Columns
 
 ### Rows
-
-### Groups
 
 ### Aggregate
 

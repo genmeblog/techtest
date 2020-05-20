@@ -3,7 +3,7 @@
             [tech.ml.dataset.column :as col]
             [tech.ml.protocols.dataset :as prot]
 
-            [techtest.api.utils :refer [map-kv map-v iterable-sequence?]]))
+            [techtest.api.utils :refer [map-v iterable-sequence?]]))
 
 ;;;;;;;;;;;;;;;;;;;;;
 ;; DATASET CREATION

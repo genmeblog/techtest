@@ -11,7 +11,7 @@
 
 <meta name="author" content="GenerateMe" />
 
-<meta name="date" content="2020-05-19" />
+<meta name="date" content="2020-05-20" />
 
 <title>Proposed API for tech.ml.dataset</title>
 
@@ -237,7 +237,7 @@ summary {
 
 <h1 class="title toc-ignore">Proposed API for tech.ml.dataset</h1>
 <h4 class="author">GenerateMe</h4>
-<h4 class="date">2020-05-19</h4>
+<h4 class="date">2020-05-20</h4>
 
 </div>
 
@@ -258,7 +258,81 @@ table { width: auto !important; margin-right: auto; margin-left: 2%; }
 <li>One function form to enable thread-first on dataset.</li>
 </ul>
 <p>All proposed functions are grouped in tabs below. Select group to see examples and details.</p>
-<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">require</span> '[techtest.api <span class="at">:as</span> api])</code></pre></div>
+<p>INFO: The future of this API is not known yet. Two directions are possible: integration into <code>tech.ml</code> or development under <code>Scicloj</code> organization. For the time being use this repo if you want to try. Join the discussion on <a href="https://clojurians.zulipchat.com/#narrow/stream/236259-tech.2Eml.2Edataset.2Edev/topic/api">Zulip</a></p>
+<p>Let’s require main namespace and define dataset used in most examples:</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">require</span> '[techtest.api <span class="at">:as</span> api])
+(<span class="bu">def</span><span class="fu"> DS </span>(api/dataset {<span class="at">:V1</span> (<span class="kw">take</span> <span class="dv">9</span> (<span class="kw">cycle</span> [<span class="dv">1</span> <span class="dv">2</span>]))
+                      <span class="at">:V2</span> (<span class="kw">range</span> <span class="dv">1</span> <span class="dv">10</span>)
+                      <span class="at">:V3</span> (<span class="kw">take</span> <span class="dv">9</span> (<span class="kw">cycle</span> [<span class="fl">0.5</span> <span class="fl">1.0</span> <span class="fl">1.5</span>]))
+                      <span class="at">:V4</span> (<span class="kw">take</span> <span class="dv">9</span> (<span class="kw">cycle</span> [<span class="ch">\A</span> <span class="ch">\B</span> <span class="ch">\C</span>]))}))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">DS</code></pre></div>
+<p>_unnamed [9 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="functionality" class="section level2 tabset tabset-fade">
 <h2>Functionality</h2>
@@ -280,15 +354,13 @@ table { width: auto !important; margin-right: auto; margin-left: 2%; }
 <p><code>api/dataset</code> accepts:</p>
 <ul>
 <li>data</li>
-<li>options (see documentation of <code>tech.ml.dataset/-&gt;dataset</code> function for full list):
-<ul>
+<li>options (see documentation of <code>tech.ml.dataset/-&gt;dataset</code> function for full list):</li>
 <li><code>:dataset-name</code> - name of the dataset</li>
 <li><code>:num-rows</code> - number of rows to read from file</li>
 <li><code>:header-row?</code> - indication if first row in file is a header</li>
 <li><code>:key-fn</code> - function applied to column names (eg. <code>keyword</code>, to convert column names to keywords)</li>
 <li><code>:separator</code> - column separator</li>
 <li><code>:single-value-column-name</code> - name of the column when single value is provided</li>
-</ul></li>
 </ul>
 <hr />
 <p>Empty dataset.</p>
@@ -834,10 +906,8 @@ table { width: auto !important; margin-right: auto; margin-left: 2%; }
 <ul>
 <li>dataset</li>
 <li>file name with one of the extensions: <code>.csv</code>, <code>.tsv</code>, <code>.csv.gz</code> and <code>.tsv.gz</code> or output stream</li>
-<li>options:
-<ul>
+<li>options:</li>
 <li><code>:separator</code> - string or separator char.</li>
-</ul></li>
 </ul>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/write-csv! ds <span class="st">&quot;output.tsv.gz&quot;</span>)
 (.exists (clojure.java.io/file <span class="st">&quot;output.csv.gz&quot;</span>))</code></pre></div>
@@ -846,7 +916,7 @@ true</code></pre>
 </div>
 <div id="dataset-related-functions" class="section level4">
 <h4>Dataset related functions</h4>
-<p>Summary of dataset functions like number of rows, columns and basic stats.</p>
+<p>Summary functions about the dataset like number of rows, columns and basic stats.</p>
 <hr />
 <p>Number of rows</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/row-count ds)</code></pre></div>
@@ -1063,6 +1133,7 @@ true</code></pre>
 </div>
 <div id="columns-and-rows" class="section level4">
 <h4>Columns and rows</h4>
+<p>Get columns and rows as sequences. <code>column</code>, <code>columns</code> and <code>rows</code> treat grouped dataset as regular one. See <code>Groups</code> to read more about grouped datasets.</p>
 <hr />
 <p>Select column.</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(ds <span class="st">&quot;wind&quot;</span>)
@@ -1088,17 +1159,17 @@ precipitation
 <hr />
 <p>Rows as sequence of sequences</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">take</span> <span class="dv">2</span> (api/rows ds))</code></pre></div>
-<pre><code>([#object[java.time.LocalDate 0x6679c63a &quot;2012-01-01&quot;] 0.0 12.8 5.0 4.7 &quot;drizzle&quot;] [#object[java.time.LocalDate 0x652f35e1 &quot;2012-01-02&quot;] 10.9 10.6 2.8 4.5 &quot;rain&quot;])</code></pre>
+<pre><code>([#object[java.time.LocalDate 0x2a131759 &quot;2012-01-01&quot;] 0.0 12.8 5.0 4.7 &quot;drizzle&quot;] [#object[java.time.LocalDate 0x32e6bbcd &quot;2012-01-02&quot;] 10.9 10.6 2.8 4.5 &quot;rain&quot;])</code></pre>
 <hr />
 <p>Rows as sequence of maps</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(clojure.pprint/pprint (<span class="kw">take</span> <span class="dv">2</span> (api/rows ds <span class="at">:as-maps</span>)))</code></pre></div>
-<pre><code>({&quot;date&quot; #object[java.time.LocalDate 0x2aea1e51 &quot;2012-01-01&quot;],
+<pre><code>({&quot;date&quot; #object[java.time.LocalDate 0x616b56d4 &quot;2012-01-01&quot;],
   &quot;precipitation&quot; 0.0,
   &quot;temp_min&quot; 5.0,
   &quot;weather&quot; &quot;drizzle&quot;,
   &quot;temp_max&quot; 12.8,
   &quot;wind&quot; 4.7}
- {&quot;date&quot; #object[java.time.LocalDate 0x2c8f7ad2 &quot;2012-01-02&quot;],
+ {&quot;date&quot; #object[java.time.LocalDate 0x1d1b16b0 &quot;2012-01-02&quot;],
   &quot;precipitation&quot; 10.9,
   &quot;temp_min&quot; 2.8,
   &quot;weather&quot; &quot;rain&quot;,
@@ -1106,14 +1177,175 @@ precipitation
   &quot;wind&quot; 4.5})</code></pre>
 </div>
 </div>
+<div id="group-by" class="section level3 tabset tabset-fade tabset-pills">
+<h3>Group-by</h3>
+<p>Grouping by is an operation which splits dataset into subdatasets and pack it into new special type of… dataset. I distinguish two types of dataset: regular dataset and grouped dataset. The latter is the result of grouping.</p>
+<p>Grouped dataset is annotated in by <code>:grouped?</code> meta tag and consist following columns:</p>
+<ul>
+<li><code>:name</code> - group name or structure</li>
+<li><code>:group-id</code> - integer assigned to the group</li>
+<li><code>:count</code> - number of elements in a group</li>
+<li><code>:data</code> - groups as datasets</li>
+</ul>
+<p>Almost all functions recognize type of the dataset (grouped or not) and operate accordingly.</p>
+<p>You can’t apply reshaping or join/concat functions on grouped datasets.</p>
+<div id="grouping" class="section level4">
+<h4>Grouping</h4>
+<p>Grouping is done by calling <code>group-by</code> function with arguments:</p>
+<ul>
+<li><code>ds</code> - dataset</li>
+<li><code>grouping-selector</code> - what to use for grouping</li>
+<li>options:</li>
+<li><code>:result-type</code> - what to return:</li>
+<li><code>:as-dataset</code> (default) - return grouped dataset</li>
+<li><code>:as-indexes</code> - return rows ids (row number from original dataset)</li>
+<li><code>:as-map</code> - return map with group names as keys and subdataset as values</li>
+<li><code>:limit-columns</code> - list of the columns which should be returned during grouping by function.</li>
+</ul>
+<p>Grouping can be done by:</p>
+<ul>
+<li>single column name</li>
+<li>seq of column names</li>
+<li>map of keys (group names) and row indexes</li>
+<li>value returned by function taking row as map</li>
+</ul>
+<p>Note: currently dataset inside dataset is printed recursively so it renders poorly from markdown.</p>
+<hr />
+<p>List of columns in groupd dataset</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/column-names (api/group-by DS <span class="at">:V1</span>))</code></pre></div>
+<pre><code>(:name :group-id :count :data)</code></pre>
+<hr />
+<p>Content of the grouped dataset</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/columns (api/group-by DS <span class="at">:V1</span>) <span class="at">:as-map</span>)</code></pre></div>
+<pre><code>{:name #tech.ml.dataset.column&lt;int64&gt;[2]
+:name
+[1, 2, ], :group-id #tech.ml.dataset.column&lt;int64&gt;[2]
+:group-id
+[0, 1, ], :count #tech.ml.dataset.column&lt;int32&gt;[2]
+:count
+[5, 4, ], :data #tech.ml.dataset.column&lt;object&gt;[2]
+:data
+[1 [5 4]:
+
+| :V1 | :V2 |    :V3 | :V4 |
+|-----+-----+--------+-----|
+|   1 |   1 | 0.5000 |   A |
+|   1 |   3 |  1.500 |   C |
+|   1 |   5 |  1.000 |   B |
+|   1 |   7 | 0.5000 |   A |
+|   1 |   9 |  1.500 |   C |
+, 2 [4 4]:
+
+| :V1 | :V2 |    :V3 | :V4 |
+|-----+-----+--------+-----|
+|   2 |   2 |  1.000 |   B |
+|   2 |   4 | 0.5000 |   A |
+|   2 |   6 |  1.500 |   C |
+|   2 |   8 |  1.000 |   B |
+, ]}</code></pre>
+<hr />
+<p>Grouped dataset as map</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">keys</span> (api/group-by DS <span class="at">:V1</span> {<span class="at">:result-type</span> <span class="at">:as-map</span>}))</code></pre></div>
+<pre><code>(1 2)</code></pre>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">vals</span> (api/group-by DS <span class="at">:V1</span> {<span class="at">:result-type</span> <span class="at">:as-map</span>}))</code></pre></div>
+<p>(_unnamed [5 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p>_unnamed [4 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<p>)</p>
+<hr />
+<p>Group dataset as map of indexes (row ids)</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/group-by DS <span class="at">:V1</span> {<span class="at">:result-type</span> <span class="at">:as-indexes</span>})</code></pre></div>
+<pre><code>{1 [0 2 4 6 8], 2 [1 3 5 7]}</code></pre>
+</div>
+<div id="ungrouping" class="section level4">
+<h4>Ungrouping</h4>
+</div>
+<div id="other-functions" class="section level4">
+<h4>Other functions</h4>
+</div>
+</div>
 <div id="columns" class="section level3">
 <h3>Columns</h3>
 </div>
 <div id="rows" class="section level3">
 <h3>Rows</h3>
-</div>
-<div id="groups" class="section level3">
-<h3>Groups</h3>
 </div>
 <div id="aggregate" class="section level3">
 <h3>Aggregate</h3>
