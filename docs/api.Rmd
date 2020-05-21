@@ -8,9 +8,9 @@ output:
         theme: sandstone
         toc: true
         toc_depth: 4
-        toc_float: true
-        smooth_scroll: true
-        collapsed: false
+        toc_float:
+            smooth_scroll: true
+            collapsed: true
         includes:
             in_header: better_tables.html
     pdf_document:
@@ -118,12 +118,12 @@ Dataset can be created from various of types of Clojure structures and files:
 
 * data
 * options (see documentation of `tech.ml.dataset/->dataset` function for full list):
-- `:dataset-name` - name of the dataset
-- `:num-rows` - number of rows to read from file
-- `:header-row?` - indication if first row in file is a header
-- `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
-- `:separator` - column separator
-- `:single-value-column-name` - name of the column when single value is provided
+    - `:dataset-name` - name of the dataset
+    - `:num-rows` - number of rows to read from file
+    - `:header-row?` - indication if first row in file is a header
+    - `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
+    - `:separator` - column separator
+    - `:single-value-column-name` - name of the column when single value is provided
 
 ---
 
@@ -357,7 +357,6 @@ Grouped dataset is annotated in by `:grouped?` meta tag and consist following co
 
 * `:name` - group name or structure
 * `:group-id` - integer assigned to the group
-* `:count` - number of elements in a group
 * `:data` - groups as datasets
 
 Almost all functions recognize type of the dataset (grouped or not) and operate accordingly. 
@@ -651,9 +650,43 @@ It can be important when you want to remove some groups (rows) from grouped data
     (api/grouped?))
 ```
 
+---
+
+This is considered internal.
+
+If you want to implement your own mapping function on grouped dataset you can call `process-group-data` and pass function operating on datasets. Result should be a dataset to have ungrouping working. 
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V1)
+    (api/process-group-data #(str "Shape: " (vector (api/row-count %) (api/column-count %))))
+    (api/as-regular-dataset))
+```
+
+
 ### Columns
 
+#### Names
+
+#### Select
+
+#### Drop
+
+#### Add or update
+
+#### Map
+
+#### Reorder
+
+#### Type conversion
+
 ### Rows
+
+#### Select
+
+#### Drop
+
+#### Other
 
 ### Aggregate
 
@@ -661,12 +694,42 @@ It can be important when you want to remove some groups (rows) from grouped data
 
 ### Unique
 
+#### Strategies
+
 ### Missing
 
-### Join/Split Columns
+### Select
+
+### Drop
+
+### Replace
+
+### Join/Separate Columns
+
+#### Join
+
+#### Separate
 
 ### Fold/Unroll Rows
 
+#### Fold
+
+#### Unroll
+
 ### Reshape
 
+#### Longer
+
+#### Wider
+
 ### Join/Concat
+
+#### Left
+
+#### Right
+
+#### Inner
+
+#### Hash
+
+#### Concat

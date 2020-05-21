@@ -11,8 +11,7 @@
             [clojure.string :as str]
 
             [tech.parallel.utils :as exporter]
-            [techtest.api.utils :refer [map-kv map-v iterable-sequence?]]
-            [techtest.api.group-by :refer [correct-group-count process-group-data]])
+            [techtest.api.utils :refer [map-kv map-v iterable-sequence?]])
   (:refer-clojure :exclude [group-by drop concat])
   (:import [org.roaringbitmap RoaringBitmap]))
 
@@ -46,8 +45,20 @@
                          grouped?
                          unmark-group
                          as-regular-dataset
+                         process-group-data
                          groups->seq
                          groups->map)
+
+(exporter/export-symbols techtest.api.columns
+                         select-column-names
+                         select-columns
+                         drop-columns
+                         rename-columns
+                         add-or-update-column
+                         add-or-update-columns
+                         map-columns
+                         reorder-columns
+                         convert-column-type)
 
 ;; concat
 
@@ -82,142 +93,6 @@
 ;; COLUMNS OPERATIONS
 ;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn- filter-column-names
-  "Filter column names"
-  [ds cols-selector meta-field]
-  (let [field-fn (if (= :all meta-field)
-                   identity
-                   (or meta-field :name))]
-    (->> ds
-         (ds/columns)
-         (map meta)
-         (filter (comp cols-selector field-fn))
-         (map :name))))
-
-(defn- select-column-names
-  ([ds cols-selector] (select-column-names ds cols-selector :name))
-  ([ds cols-selector meta-field]
-   (cond
-     (= :all cols-selector) (ds/column-names ds)
-     (map? cols-selector) (keys cols-selector)
-     (iterable-sequence? cols-selector) cols-selector
-     (instance? java.util.regex.Pattern cols-selector) (filter-column-names ds #(re-matches cols-selector (str %)) meta-field)
-     (fn? cols-selector) (filter-column-names ds cols-selector meta-field)
-     :else [cols-selector])))
-
-(defn- select-or-drop-columns
-  "Select or drop columns."
-  ([f ds] (select-or-drop-columns f ds :all))
-  ([f ds cols-selector] (select-or-drop-columns f ds cols-selector nil))
-  ([f ds cols-selector {:keys [meta-field]}]
-   (if (grouped? ds)
-     (process-group-data ds #(select-or-drop-columns f % cols-selector))
-     (f ds (select-column-names ds cols-selector meta-field)))))
-
-(defn- select-or-drop-colums-docstring
-  [op]
-  (str op " columns by (returns dataset):
-
-  - name
-  - sequence of names
-  - map of names with new names (rename)
-  - function which filter names (via column metadata)"))
-
-(def ^{:doc (select-or-drop-colums-docstring "Select")}
-  select-columns (partial select-or-drop-columns ds/select-columns))
-
-(def ^{:doc (select-or-drop-colums-docstring "Drop")}
-  drop-columns (partial select-or-drop-columns ds/drop-columns))
-
-(defn rename-columns
-  "Rename columns with provided old -> new name map"
-  [ds col-map]
-  (if (grouped? ds)
-    (process-group-data ds #(ds/rename-columns % col-map))
-    (ds/rename-columns ds col-map)))
-
-(defn- fix-column-size
-  [col-or-seq strategy cnt]
-  (let [seq-cnt (count col-or-seq)]
-    (cond
-      (> seq-cnt cnt) (take cnt col-or-seq)
-      (< seq-cnt cnt) (if (= strategy :cycle)
-                        (take cnt (cycle col-or-seq))
-                        (if (col/is-column? col-or-seq)
-                          (col/extend-column-with-empty col-or-seq (- cnt seq-cnt))
-                          (clojure.core/concat col-or-seq (repeat (- cnt seq-cnt) nil))))
-      :else col-or-seq)))
-
-(defn add-or-update-column
-  "Add or update (modify) column under `col-name`.
-
-  `column-seq-or-gen` can be sequence of values or generator function (which gets `ds` as input)."
-  ([ds col-name column-seq-or-gen] (add-or-update-column ds col-name column-seq-or-gen nil))
-  ([ds col-name column-seq-or-gen {:keys [count-strategy]
-                                   :or {count-strategy :cycle}
-                                   :as options}]
-   (if (grouped? ds)
-
-     (process-group-data ds #(add-or-update-column % col-name column-seq-or-gen options))
-     
-     (cond
-       (or (col/is-column? column-seq-or-gen)
-           (iterable-sequence? column-seq-or-gen)) (->> (ds/row-count ds)
-                                                  (fix-column-size column-seq-or-gen count-strategy)
-                                                  (ds/add-or-update-column ds col-name))
-       (fn? column-seq-or-gen) (add-or-update-column ds col-name (column-seq-or-gen ds))
-       :else (ds/add-or-update-column ds col-name (repeat (ds/row-count ds) column-seq-or-gen))))))
-
-(defn add-or-update-columns
-  "Add or updade (modify) columns defined in `columns-map` (mapping: name -> column-seq-or-gen) "
-  ([ds columns-map] (add-or-update-columns ds columns-map nil))
-  ([ds columns-map options]
-   (reduce-kv (fn [ds k v] (add-or-update-column ds k v options)) ds columns-map)))
-
-(defn map-columns
-  ([ds target-column map-fn cols-selector] (map-columns ds target-column map-fn cols-selector nil))
-  ([ds target-column map-fn cols-selector {:keys [meta-field]
-                                           :as options}]
-   (if (grouped? ds)
-     (process-group-data ds #(map-columns % target-column map-fn cols-selector options))
-     (apply ds/column-map ds target-column map-fn (select-column-names ds cols-selector meta-field)))))
-
-(defn reorder-columns
-  "Reorder columns using column selector(s). When column names are incomplete, the missing will be attached at the end."
-  [ds cols-selector & cols-selectors]
-  (let [selected-cols (->> cols-selectors
-                           (map (partial select-column-names ds))
-                           (reduce clojure.core/concat (select-column-names ds cols-selector)))
-        rest-cols (select-column-names ds (complement (set selected-cols)))]
-    (ds/select-columns ds (clojure.core/concat selected-cols rest-cols))))
-
-(defn- try-convert-to-type
-  [ds colname new-type]
-  (ds/column-cast ds colname new-type))
-
-(defn convert-column-type
-  "Convert type of the column to the other type."
-  ([ds coltype-map]
-   (reduce (fn [ds [colname new-type]]
-             (convert-column-type ds colname new-type)) ds coltype-map))
-  ([ds colname new-type]
-   (if (grouped? ds)
-     (process-group-data ds #(convert-column-type % colname new-type))
-
-     (if (iterable-sequence? new-type)
-       (try-convert-to-type ds colname new-type)
-       (if (= :object new-type)
-         (try-convert-to-type ds colname [:object identity])
-         (let [col (ds colname)]
-           (condp = (dtype/get-datatype col)
-             :string (ds/add-or-update-column ds colname (col/parse-column new-type col))
-             :object (if (string? (dtype/get-value col 0))
-                       (-> (try-convert-to-type ds colname :string)
-                           (ds/column colname)
-                           (->> (col/parse-column new-type)
-                                (ds/add-or-update-column ds colname)))
-                       (try-convert-to-type ds colname new-type))
-             (try-convert-to-type ds colname new-type))))))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; ROWS OPERATIONS
@@ -259,10 +134,8 @@
                         :as options}]
    (if (grouped? ds)
      (let [pre-ds (map #(add-or-update-columns % pre) (ds :data))
-           indices (map #(find-indexes % rows-selector limit-columns) pre-ds)]
-       (-> ds
-           (ds/add-or-update-column :data (map #(select-or-drop-rows f %1 %2) (ds :data) indices))
-           (correct-group-count)))
+           indices (map #(find-indexes % rows-selector limit-columns) pre-ds)]       
+       (ds/add-or-update-column ds :data (map #(select-or-drop-rows f %1 %2) (ds :data) indices)))
      
      (f ds (find-indexes (add-or-update-columns ds pre) rows-selector limit-columns)))))
 
@@ -331,7 +204,7 @@
                       :as options}]
    (if (grouped? ds)
      (-> ds
-         (process-group-data #(aggregate % fn-map-or-seq options) true)
+         (process-group-data #(aggregate % fn-map-or-seq options))
          (ungroup {:add-group-as-column true}))
      (cond
        (fn? fn-map-or-seq) (aggregate ds {:summary fn-map-or-seq})
@@ -426,7 +299,7 @@
          (process-group-data (fn [ds]
                                (as-> ds ds
                                  (select-columns ds target-names)
-                                 (dataset [(zipmap target-names (map fold-fn (ds/columns ds)))]))) true)
+                                 (dataset [(zipmap target-names (map fold-fn (ds/columns ds)))]))))
          (ungroup {:add-group-as-column true})))))
 
 (defn unique-by
@@ -436,7 +309,7 @@
                       :or {strategy :first fold-fn vec}
                       :as options}]
    (if (grouped? ds)
-     (process-group-data ds #(unique-by % cols-selector options) true)
+     (process-group-data ds #(unique-by % cols-selector options))
 
      (if (= 1 (ds/row-count ds))
        ds
@@ -461,7 +334,7 @@
   ([f ds] (select-or-drop-missing f ds nil))
   ([f ds cols-selector]
    (if (grouped? ds)
-     (process-group-data ds #(select-or-drop-missing f % cols-selector) true)
+     (process-group-data ds #(select-or-drop-missing f % cols-selector))
 
      (let [ds- (if cols-selector
                  (select-columns ds cols-selector)
@@ -693,7 +566,7 @@
 (defn- make-apply-join-fn
   "Perform left-join on groups and create new columns"
   [group-name->names single-value? value-names join-name starting-ds-count fold-fn rename-map]
-  (fn [curr-ds {:keys [name group-id count data]}]
+  (fn [curr-ds {:keys [name group-id data]}]
     (let [col-name (str/join "_" (->> name
                                       group-name->names
                                       (remove nil?))) ;; source names

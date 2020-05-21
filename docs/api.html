@@ -430,13 +430,15 @@ table { width: auto !important; margin-right: auto; margin-left: 2%; }
 <p><code>api/dataset</code> accepts:</p>
 <ul>
 <li>data</li>
-<li>options (see documentation of <code>tech.ml.dataset/-&gt;dataset</code> function for full list):</li>
+<li>options (see documentation of <code>tech.ml.dataset/-&gt;dataset</code> function for full list):
+<ul>
 <li><code>:dataset-name</code> - name of the dataset</li>
 <li><code>:num-rows</code> - number of rows to read from file</li>
 <li><code>:header-row?</code> - indication if first row in file is a header</li>
 <li><code>:key-fn</code> - function applied to column names (eg. <code>keyword</code>, to convert column names to keywords)</li>
 <li><code>:separator</code> - column separator</li>
 <li><code>:single-value-column-name</code> - name of the column when single value is provided</li>
+</ul></li>
 </ul>
 <hr />
 <p>Empty dataset.</p>
@@ -1235,17 +1237,17 @@ precipitation
 <hr />
 <p>Rows as sequence of sequences</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">take</span> <span class="dv">2</span> (api/rows ds))</code></pre></div>
-<pre><code>([#object[java.time.LocalDate 0x591cc889 &quot;2012-01-01&quot;] 0.0 12.8 5.0 4.7 &quot;drizzle&quot;] [#object[java.time.LocalDate 0x41f8da37 &quot;2012-01-02&quot;] 10.9 10.6 2.8 4.5 &quot;rain&quot;])</code></pre>
+<pre><code>([#object[java.time.LocalDate 0x125afddf &quot;2012-01-01&quot;] 0.0 12.8 5.0 4.7 &quot;drizzle&quot;] [#object[java.time.LocalDate 0x3971a49f &quot;2012-01-02&quot;] 10.9 10.6 2.8 4.5 &quot;rain&quot;])</code></pre>
 <hr />
 <p>Rows as sequence of maps</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(clojure.pprint/pprint (<span class="kw">take</span> <span class="dv">2</span> (api/rows ds <span class="at">:as-maps</span>)))</code></pre></div>
-<pre><code>({&quot;date&quot; #object[java.time.LocalDate 0xa41b719 &quot;2012-01-01&quot;],
+<pre><code>({&quot;date&quot; #object[java.time.LocalDate 0x60a75cb &quot;2012-01-01&quot;],
   &quot;precipitation&quot; 0.0,
   &quot;temp_min&quot; 5.0,
   &quot;weather&quot; &quot;drizzle&quot;,
   &quot;temp_max&quot; 12.8,
   &quot;wind&quot; 4.7}
- {&quot;date&quot; #object[java.time.LocalDate 0x78dfac0 &quot;2012-01-02&quot;],
+ {&quot;date&quot; #object[java.time.LocalDate 0x5f26d16a &quot;2012-01-02&quot;],
   &quot;precipitation&quot; 10.9,
   &quot;temp_min&quot; 2.8,
   &quot;weather&quot; &quot;rain&quot;,
@@ -1260,7 +1262,6 @@ precipitation
 <ul>
 <li><code>:name</code> - group name or structure</li>
 <li><code>:group-id</code> - integer assigned to the group</li>
-<li><code>:count</code> - number of elements in a group</li>
 <li><code>:data</code> - groups as datasets</li>
 </ul>
 <p>Almost all functions recognize type of the dataset (grouped or not) and operate accordingly.</p>
@@ -1295,7 +1296,7 @@ precipitation
 <hr />
 <p>List of columns in groupd dataset</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/column-names (api/group-by DS <span class="at">:V1</span>))</code></pre></div>
-<pre><code>(:name :group-id :count :data)</code></pre>
+<pre><code>(:name :group-id :data)</code></pre>
 <hr />
 <p>Content of the grouped dataset</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/columns (api/group-by DS <span class="at">:V1</span>) <span class="at">:as-map</span>)</code></pre></div>
@@ -1303,9 +1304,7 @@ precipitation
 :name
 [1, 2, ], :group-id #tech.ml.dataset.column&lt;int64&gt;[2]
 :group-id
-[0, 1, ], :count #tech.ml.dataset.column&lt;int32&gt;[2]
-:count
-[5, 4, ], :data #tech.ml.dataset.column&lt;object&gt;[2]
+[0, 1, ], :data #tech.ml.dataset.column&lt;object&gt;[2]
 :data
 [1 [5 4]:
 
@@ -3003,13 +3002,72 @@ precipitation
     (api/as-regular-dataset)
     (api/grouped?))</code></pre></div>
 <pre><code>nil</code></pre>
+<hr />
+<p>This is considered internal.</p>
+<p>If you want to implement your own mapping function on grouped dataset you can call <code>process-group-data</code> and pass function operating on datasets. Result should be a dataset to have ungrouping working.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by <span class="at">:V1</span>)
+    (api/process-group-data #(<span class="kw">str</span> <span class="st">&quot;Shape: &quot;</span> (<span class="kw">vector</span> (api/row-count <span class="va">%</span>) (api/column-count <span class="va">%</span>))))
+    (api/as-regular-dataset))</code></pre></div>
+<p>_unnamed [2 3]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:name</th>
+<th>:group-id</th>
+<th>:data</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>0</td>
+<td>Shape: [5 4]</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>1</td>
+<td>Shape: [4 4]</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div id="columns" class="section level3">
 <h3>Columns</h3>
+<div id="names" class="section level4">
+<h4>Names</h4>
+</div>
+<div id="select" class="section level4">
+<h4>Select</h4>
+</div>
+<div id="drop" class="section level4">
+<h4>Drop</h4>
+</div>
+<div id="add-or-update" class="section level4">
+<h4>Add or update</h4>
+</div>
+<div id="map" class="section level4">
+<h4>Map</h4>
+</div>
+<div id="reorder" class="section level4">
+<h4>Reorder</h4>
+</div>
+<div id="type-conversion" class="section level4">
+<h4>Type conversion</h4>
+</div>
 </div>
 <div id="rows" class="section level3">
 <h3>Rows</h3>
+<div id="select-1" class="section level4">
+<h4>Select</h4>
+</div>
+<div id="drop-1" class="section level4">
+<h4>Drop</h4>
+</div>
+<div id="other" class="section level4">
+<h4>Other</h4>
+</div>
 </div>
 <div id="aggregate" class="section level3">
 <h3>Aggregate</h3>
@@ -3019,21 +3077,66 @@ precipitation
 </div>
 <div id="unique" class="section level3">
 <h3>Unique</h3>
+<div id="strategies" class="section level4">
+<h4>Strategies</h4>
+</div>
 </div>
 <div id="missing" class="section level3">
 <h3>Missing</h3>
 </div>
-<div id="joinsplit-columns" class="section level3">
-<h3>Join/Split Columns</h3>
+<div id="select-2" class="section level3">
+<h3>Select</h3>
+</div>
+<div id="drop-2" class="section level3">
+<h3>Drop</h3>
+</div>
+<div id="replace" class="section level3">
+<h3>Replace</h3>
+</div>
+<div id="joinseparate-columns" class="section level3">
+<h3>Join/Separate Columns</h3>
+<div id="join" class="section level4">
+<h4>Join</h4>
+</div>
+<div id="separate" class="section level4">
+<h4>Separate</h4>
+</div>
 </div>
 <div id="foldunroll-rows" class="section level3">
 <h3>Fold/Unroll Rows</h3>
+<div id="fold" class="section level4">
+<h4>Fold</h4>
+</div>
+<div id="unroll" class="section level4">
+<h4>Unroll</h4>
+</div>
 </div>
 <div id="reshape" class="section level3">
 <h3>Reshape</h3>
+<div id="longer" class="section level4">
+<h4>Longer</h4>
+</div>
+<div id="wider" class="section level4">
+<h4>Wider</h4>
+</div>
 </div>
 <div id="joinconcat" class="section level3">
 <h3>Join/Concat</h3>
+<div id="left" class="section level4">
+<h4>Left</h4>
+</div>
+<div id="right" class="section level4">
+<h4>Right</h4>
+</div>
+<div id="inner" class="section level4">
+<h4>Inner</h4>
+</div>
+<div id="hash" class="section level4">
+<h4>Hash</h4>
+</div>
+<div id="concat" class="section level4">
+<h4>Concat</h4>
+</div>
 </div>
 </div>
 

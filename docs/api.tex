@@ -240,20 +240,24 @@ files:
   options (see documentation of
   \texttt{tech.ml.dataset/-\textgreater{}dataset} function for full
   list):
-\item
-  \texttt{:dataset-name} - name of the dataset
-\item
-  \texttt{:num-rows} - number of rows to read from file
-\item
-  \texttt{:header-row?} - indication if first row in file is a header
-\item
-  \texttt{:key-fn} - function applied to column names (eg.
-  \texttt{keyword}, to convert column names to keywords)
-\item
-  \texttt{:separator} - column separator
-\item
-  \texttt{:single-value-column-name} - name of the column when single
-  value is provided
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{:dataset-name} - name of the dataset
+  \item
+    \texttt{:num-rows} - number of rows to read from file
+  \item
+    \texttt{:header-row?} - indication if first row in file is a header
+  \item
+    \texttt{:key-fn} - function applied to column names (eg.
+    \texttt{keyword}, to convert column names to keywords)
+  \item
+    \texttt{:separator} - column separator
+  \item
+    \texttt{:single-value-column-name} - name of the column when single
+    value is provided
+  \end{itemize}
 \end{itemize}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -996,7 +1000,7 @@ Rows as sequence of sequences
 \end{Shaded}
 
 \begin{verbatim}
-([#object[java.time.LocalDate 0x63c2a642 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x638f82ee "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+([#object[java.time.LocalDate 0x489940d9 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x156af23e "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -1010,13 +1014,13 @@ Rows as sequence of maps
 \end{Shaded}
 
 \begin{verbatim}
-({"date" #object[java.time.LocalDate 0x53812aae "2012-01-01"],
+({"date" #object[java.time.LocalDate 0x3b73ea3d "2012-01-01"],
   "precipitation" 0.0,
   "temp_min" 5.0,
   "weather" "drizzle",
   "temp_max" 12.8,
   "wind" 4.7}
- {"date" #object[java.time.LocalDate 0x6e354546 "2012-01-02"],
+ {"date" #object[java.time.LocalDate 0x51191802 "2012-01-02"],
   "precipitation" 10.9,
   "temp_min" 2.8,
   "weather" "rain",
@@ -1040,8 +1044,6 @@ consist following columns:
   \texttt{:name} - group name or structure
 \item
   \texttt{:group-id} - integer assigned to the group
-\item
-  \texttt{:count} - number of elements in a group
 \item
   \texttt{:data} - groups as datasets
 \end{itemize}
@@ -1120,7 +1122,7 @@ List of columns in groupd dataset
 \end{Shaded}
 
 \begin{verbatim}
-(:name :group-id :count :data)
+(:name :group-id :data)
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -1138,9 +1140,7 @@ Content of the grouped dataset
 :name
 [1, 2, ], :group-id #tech.ml.dataset.column<int64>[2]
 :group-id
-[0, 1, ], :count #tech.ml.dataset.column<int32>[2]
-:count
-[5, 4, ], :data #tech.ml.dataset.column<object>[2]
+[0, 1, ], :data #tech.ml.dataset.column<object>[2]
 :data
 [1 [5 4]:
 
@@ -2091,9 +2091,58 @@ grouped dataset using \texttt{drop-rows} or something like that.
 nil
 \end{verbatim}
 
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+This is considered internal.
+
+If you want to implement your own mapping function on grouped dataset
+you can call \texttt{process-group-data} and pass function operating on
+datasets. Result should be a dataset to have ungrouping working.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V1}\NormalTok{)}
+\NormalTok{    (api/process-group-data #(}\KeywordTok{str} \StringTok{"Shape: "}\NormalTok{ (}\KeywordTok{vector}\NormalTok{ (api/row-count }\VariableTok{%}\NormalTok{) (api/column-count }\VariableTok{%}\NormalTok{))))}
+\NormalTok{    (api/as-regular-dataset))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}2 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:name & :group-id & :data\tabularnewline
+\midrule
+\endhead
+1 & 0 & Shape: {[}5 4{]}\tabularnewline
+2 & 1 & Shape: {[}4 4{]}\tabularnewline
+\bottomrule
+\end{longtable}
+
 \subsubsection{Columns}\label{columns}
 
+\paragraph{Names}\label{names}
+
+\paragraph{Select}\label{select}
+
+\paragraph{Drop}\label{drop}
+
+\paragraph{Add or update}\label{add-or-update}
+
+\paragraph{Map}\label{map}
+
+\paragraph{Reorder}\label{reorder}
+
+\paragraph{Type conversion}\label{type-conversion}
+
 \subsubsection{Rows}\label{rows}
+
+\paragraph{Select}\label{select-1}
+
+\paragraph{Drop}\label{drop-1}
+
+\paragraph{Other}\label{other}
 
 \subsubsection{Aggregate}\label{aggregate}
 
@@ -2101,14 +2150,44 @@ nil
 
 \subsubsection{Unique}\label{unique}
 
+\paragraph{Strategies}\label{strategies}
+
 \subsubsection{Missing}\label{missing}
 
-\subsubsection{Join/Split Columns}\label{joinsplit-columns}
+\subsubsection{Select}\label{select-2}
+
+\subsubsection{Drop}\label{drop-2}
+
+\subsubsection{Replace}\label{replace}
+
+\subsubsection{Join/Separate Columns}\label{joinseparate-columns}
+
+\paragraph{Join}\label{join}
+
+\paragraph{Separate}\label{separate}
 
 \subsubsection{Fold/Unroll Rows}\label{foldunroll-rows}
 
+\paragraph{Fold}\label{fold}
+
+\paragraph{Unroll}\label{unroll}
+
 \subsubsection{Reshape}\label{reshape}
 
+\paragraph{Longer}\label{longer}
+
+\paragraph{Wider}\label{wider}
+
 \subsubsection{Join/Concat}\label{joinconcat}
+
+\paragraph{Left}\label{left}
+
+\paragraph{Right}\label{right}
+
+\paragraph{Inner}\label{inner}
+
+\paragraph{Hash}\label{hash}
+
+\paragraph{Concat}\label{concat}
 
 \end{document}

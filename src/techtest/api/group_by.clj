@@ -41,11 +41,9 @@
 (defn- group-indexes->map
   "Create map representing grouped dataset from indexes"
   [ds id [k idxs]]
-  (let [cnt (count idxs)]
-    {:name k
-     :group-id id
-     :count cnt
-     :data (subdataset ds id k idxs)}))
+  {:name k
+   :group-id id
+   :data (subdataset ds id k idxs)})
 
 (defn- group-by->dataset
   "Create grouped dataset from indexes"
@@ -73,7 +71,6 @@
 
   - name - group name
   - group-id - id of the group (int)
-  - count - number of rows in group
   - data - group as dataset"
   ([ds grouping-selector] (group-by ds grouping-selector nil))
   ([ds grouping-selector {:keys [limit-columns result-type]
@@ -89,18 +86,9 @@
                     (into {}))
        (group-by->dataset ds group-indexes options)))))
 
-(defn correct-group-count
-  "Correct count for each group"
-  [ds]
-  (ds/column-map ds :count ds/row-count :data))
-
-(defn process-group-data
-  ([ds f] (process-group-data ds f false))
-  ([ds f corr-count?]
-   (let [temp (ds/column-map ds :data f :data)]
-     (if corr-count?
-       (correct-group-count temp)
-       temp))))
+(defn process-group-data  
+  [ds f]
+  (ds/column-map ds :data f :data))
 
 (defn groups->map
   "Convert grouped dataset to the map of groups"
@@ -164,13 +152,14 @@
   [ds add-group-as-column add-group-id-as-column separate?]
   (->> ds
        (ds/mapseq-reader)
-       (map (fn [{:keys [name group-id count data] :as ds}]
+       (map (fn [{:keys [name group-id data] :as ds}]
               (if (or add-group-as-column
                       add-group-id-as-column)
-                (add-groups-as-columns ds
-                                       (group-as-column->seq add-group-as-column separate? name count)
-                                       (group-id-as-column->seq add-group-id-as-column count group-id)
-                                       (ds/columns data))
+                (let [count (ds/row-count data)]
+                  (add-groups-as-columns ds
+                                         (group-as-column->seq add-group-as-column separate? name count)
+                                         (group-id-as-column->seq add-group-id-as-column count group-id)
+                                         (ds/columns data)))
                 ds)))))
 
 (defn- order-ds-for-ungrouping

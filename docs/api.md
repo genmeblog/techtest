@@ -68,12 +68,12 @@ Dataset can be created from various of types of Clojure structures and files:
 
 -   data
 -   options (see documentation of `tech.ml.dataset/->dataset` function for full list):
--   `:dataset-name` - name of the dataset
--   `:num-rows` - number of rows to read from file
--   `:header-row?` - indication if first row in file is a header
--   `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
--   `:separator` - column separator
--   `:single-value-column-name` - name of the column when single value is provided
+    -   `:dataset-name` - name of the dataset
+    -   `:num-rows` - number of rows to read from file
+    -   `:header-row?` - indication if first row in file is a header
+    -   `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
+    -   `:separator` - column separator
+    -   `:single-value-column-name` - name of the column when single value is provided
 
 ------------------------------------------------------------------------
 
@@ -592,7 +592,7 @@ Rows as sequence of sequences
 (take 2 (api/rows ds))
 ```
 
-    ([#object[java.time.LocalDate 0x3892e386 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x1de4fc54 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+    ([#object[java.time.LocalDate 0x2bf3d90c "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x1d369205 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 
 ------------------------------------------------------------------------
 
@@ -602,13 +602,13 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
-    ({"date" #object[java.time.LocalDate 0x4d6d9324 "2012-01-01"],
+    ({"date" #object[java.time.LocalDate 0x793036cf "2012-01-01"],
       "precipitation" 0.0,
       "temp_min" 5.0,
       "weather" "drizzle",
       "temp_max" 12.8,
       "wind" 4.7}
-     {"date" #object[java.time.LocalDate 0x76a31a90 "2012-01-02"],
+     {"date" #object[java.time.LocalDate 0x4e8b61bc "2012-01-02"],
       "precipitation" 10.9,
       "temp_min" 2.8,
       "weather" "rain",
@@ -623,7 +623,6 @@ Grouped dataset is annotated in by `:grouped?` meta tag and consist following co
 
 -   `:name` - group name or structure
 -   `:group-id` - integer assigned to the group
--   `:count` - number of elements in a group
 -   `:data` - groups as datasets
 
 Almost all functions recognize type of the dataset (grouped or not) and operate accordingly.
@@ -663,7 +662,7 @@ List of columns in groupd dataset
 (api/column-names (api/group-by DS :V1))
 ```
 
-    (:name :group-id :count :data)
+    (:name :group-id :data)
 
 ------------------------------------------------------------------------
 
@@ -677,9 +676,7 @@ Content of the grouped dataset
     :name
     [1, 2, ], :group-id #tech.ml.dataset.column<int64>[2]
     :group-id
-    [0, 1, ], :count #tech.ml.dataset.column<int32>[2]
-    :count
-    [5, 4, ], :data #tech.ml.dataset.column<object>[2]
+    [0, 1, ], :data #tech.ml.dataset.column<object>[2]
     :data
     [1 [5 4]:
 
@@ -1331,9 +1328,49 @@ It can be important when you want to remove some groups (rows) from grouped data
 
     nil
 
+------------------------------------------------------------------------
+
+This is considered internal.
+
+If you want to implement your own mapping function on grouped dataset you can call `process-group-data` and pass function operating on datasets. Result should be a dataset to have ungrouping working.
+
+``` clojure
+(-> DS
+    (api/group-by :V1)
+    (api/process-group-data #(str "Shape: " (vector (api/row-count %) (api/column-count %))))
+    (api/as-regular-dataset))
+```
+
+\_unnamed \[2 3\]:
+
+| :name | :group-id | :data          |
+|-------|-----------|----------------|
+| 1     | 0         | Shape: \[5 4\] |
+| 2     | 1         | Shape: \[4 4\] |
+
 ### Columns
 
+#### Names
+
+#### Select
+
+#### Drop
+
+#### Add or update
+
+#### Map
+
+#### Reorder
+
+#### Type conversion
+
 ### Rows
+
+#### Select
+
+#### Drop
+
+#### Other
 
 ### Aggregate
 
@@ -1341,12 +1378,42 @@ It can be important when you want to remove some groups (rows) from grouped data
 
 ### Unique
 
+#### Strategies
+
 ### Missing
 
-### Join/Split Columns
+### Select
+
+### Drop
+
+### Replace
+
+### Join/Separate Columns
+
+#### Join
+
+#### Separate
 
 ### Fold/Unroll Rows
 
+#### Fold
+
+#### Unroll
+
 ### Reshape
 
+#### Longer
+
+#### Wider
+
 ### Join/Concat
+
+#### Left
+
+#### Right
+
+#### Inner
+
+#### Hash
+
+#### Concat

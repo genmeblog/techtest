@@ -13,3 +13,7 @@
   (or (sequential? xs)      
       (and (not (map? xs))
            (instance? Iterable xs))))
+
+(defn ->str
+  [v]
+  (if (instance? clojure.lang.Named v) (name v) (str v)))
