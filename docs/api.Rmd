@@ -6,6 +6,11 @@ output:
     html_document:
         highlight: pygments
         theme: sandstone
+        toc: true
+        toc_depth: 4
+        toc_float: true
+        smooth_scroll: true
+        collapsed: false
         includes:
             in_header: better_tables.html
     pdf_document:
@@ -91,7 +96,7 @@ DS
 ```
 
 
-## Functionality {.tabset .tabset-fade}
+## Functionality 
 
 ### Dataset
 
@@ -621,9 +626,30 @@ Also we can supress separation
                   :add-group-as-column true}))
 ```
 
-
-
 #### Other functions
+
+To check if dataset is grouped or not just use `grouped?` function.
+
+```{clojure}
+(api/grouped? DS)
+```
+
+```{clojure}
+(api/grouped? (api/group-by DS :V1))
+```
+
+---
+
+If you want to remove grouping annotation (to make all the functions work as with regular dataset) you can use `unmark-group` or `as-regular-dataset` (alias) functions.
+
+It can be important when you want to remove some groups (rows) from grouped dataset using `drop-rows` or something like that.
+
+```{clojure}
+(-> DS
+    (api/group-by :V1)
+    (api/as-regular-dataset)
+    (api/grouped?))
+```
 
 ### Columns
 

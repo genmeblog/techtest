@@ -996,7 +996,7 @@ Rows as sequence of sequences
 \end{Shaded}
 
 \begin{verbatim}
-([#object[java.time.LocalDate 0x70ca466e "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x506de7eb "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+([#object[java.time.LocalDate 0x63c2a642 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x638f82ee "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -1010,13 +1010,13 @@ Rows as sequence of maps
 \end{Shaded}
 
 \begin{verbatim}
-({"date" #object[java.time.LocalDate 0x172b080b "2012-01-01"],
+({"date" #object[java.time.LocalDate 0x53812aae "2012-01-01"],
   "precipitation" 0.0,
   "temp_min" 5.0,
   "weather" "drizzle",
   "temp_max" 12.8,
   "wind" 4.7}
- {"date" #object[java.time.LocalDate 0x5b83950 "2012-01-02"],
+ {"date" #object[java.time.LocalDate 0x6e354546 "2012-01-02"],
   "precipitation" 10.9,
   "temp_min" 2.8,
   "weather" "rain",
@@ -1757,7 +1757,7 @@ Grouping and ungrouping.
 \end{Highlighting}
 \end{Shaded}
 
-null {[}9 4{]}:
+\_unnamed {[}9 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1821,7 +1821,7 @@ Let's add group name and id as additional columns
 \end{Highlighting}
 \end{Shaded}
 
-null {[}9 6{]}:
+\_unnamed {[}9 6{]}:
 
 \begin{longtable}[]{@{}llllll@{}}
 \toprule
@@ -1853,7 +1853,7 @@ Let's assign different column names
 \end{Highlighting}
 \end{Shaded}
 
-null {[}9 6{]}:
+\_unnamed {[}9 6{]}:
 
 \begin{longtable}[]{@{}llllll@{}}
 \toprule
@@ -1887,7 +1887,7 @@ names.
 \end{Highlighting}
 \end{Shaded}
 
-null {[}9 6{]}:
+\_unnamed {[}9 6{]}:
 
 \begin{longtable}[]{@{}llllll@{}}
 \toprule
@@ -1922,7 +1922,7 @@ We can add group names without separation
 \end{Highlighting}
 \end{Shaded}
 
-null {[}9 5{]}:
+\_unnamed {[}9 5{]}:
 
 \begin{longtable}[]{@{}lllll@{}}
 \toprule
@@ -1962,7 +1962,7 @@ The same applies to group names as sequences
 \end{Highlighting}
 \end{Shaded}
 
-null {[}9 6{]}:
+\_unnamed {[}9 6{]}:
 
 \begin{longtable}[]{@{}llllll@{}}
 \toprule
@@ -1993,7 +1993,7 @@ Let's provide column names
 \end{Highlighting}
 \end{Shaded}
 
-null {[}9 6{]}:
+\_unnamed {[}9 6{]}:
 
 \begin{longtable}[]{@{}llllll@{}}
 \toprule
@@ -2025,7 +2025,7 @@ Also we can supress separation
 \end{Highlighting}
 \end{Shaded}
 
-null {[}9 5{]}:
+\_unnamed {[}9 5{]}:
 
 \begin{longtable}[]{@{}lllll@{}}
 \toprule
@@ -2045,6 +2045,51 @@ null {[}9 5{]}:
 \end{longtable}
 
 \paragraph{Other functions}\label{other-functions}
+
+To check if dataset is grouped or not just use \texttt{grouped?}
+function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/grouped? DS)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+nil
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/grouped? (api/group-by DS }\AttributeTok{:V1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+true
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+If you want to remove grouping annotation (to make all the functions
+work as with regular dataset) you can use \texttt{unmark-group} or
+\texttt{as-regular-dataset} (alias) functions.
+
+It can be important when you want to remove some groups (rows) from
+grouped dataset using \texttt{drop-rows} or something like that.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V1}\NormalTok{)}
+\NormalTok{    (api/as-regular-dataset)}
+\NormalTok{    (api/grouped?))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+nil
+\end{verbatim}
 
 \subsubsection{Columns}\label{columns}
 

@@ -18,7 +18,7 @@
   [ds]
   (vary-meta ds dissoc :grouped?))
 
-(defn mark-as-group
+(defn- mark-as-group
   "Add grouping tag"
   [ds]
   (vary-meta ds assoc :grouped? true))
@@ -34,7 +34,7 @@
     (fn? grouping-selector) (ds/group-by->indexes grouping-selector limit-columns ds)
     :else (ds/group-by-column->indexes grouping-selector ds)))
 
-(defn- subgroup
+(defn- subdataset
   [ds id k idxs]
   (vary-meta (ds/set-dataset-name (ds/select ds :all idxs) k) assoc :group-id id))
 
@@ -45,7 +45,7 @@
     {:name k
      :group-id id
      :count cnt
-     :data (subgroup ds id k idxs)}))
+     :data (subdataset ds id k idxs)}))
 
 (defn- group-by->dataset
   "Create grouped dataset from indexes"
@@ -83,9 +83,9 @@
      (condp = result-type
        :as-indexes group-indexes
        :as-seq (->> group-indexes ;; java.util.HashMap
-                    (map-indexed (fn [id [k idxs]] (subgroup ds id k idxs))))
+                    (map-indexed (fn [id [k idxs]] (subdataset ds id k idxs))))
        :as-map (->> group-indexes ;; java.util.HashMap
-                    (map-indexed (fn [id [k idxs]] [k (subgroup ds id k idxs)])) 
+                    (map-indexed (fn [id [k idxs]] [k (subdataset ds id k idxs)])) 
                     (into {}))
        (group-by->dataset ds group-indexes options)))))
 
@@ -195,4 +195,4 @@
        (order-ds-for-ungrouping order?)
        (->> (map :data)
             (apply ds/concat))
-       (ds/set-dataset-name dataset-name))))
+       (ds/set-dataset-name (or dataset-name (ds/dataset-name ds))))))

@@ -592,7 +592,7 @@ Rows as sequence of sequences
 (take 2 (api/rows ds))
 ```
 
-    ([#object[java.time.LocalDate 0x47ef3a10 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x56eb1566 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+    ([#object[java.time.LocalDate 0x3892e386 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x1de4fc54 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 
 ------------------------------------------------------------------------
 
@@ -602,13 +602,13 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
-    ({"date" #object[java.time.LocalDate 0x6ec21437 "2012-01-01"],
+    ({"date" #object[java.time.LocalDate 0x4d6d9324 "2012-01-01"],
       "precipitation" 0.0,
       "temp_min" 5.0,
       "weather" "drizzle",
       "temp_max" 12.8,
       "wind" 4.7}
-     {"date" #object[java.time.LocalDate 0x30174fe7 "2012-01-02"],
+     {"date" #object[java.time.LocalDate 0x76a31a90 "2012-01-02"],
       "precipitation" 10.9,
       "temp_min" 2.8,
       "weather" "rain",
@@ -1085,7 +1085,7 @@ Grouping and ungrouping.
     (api/ungroup))
 ```
 
-null \[9 4\]:
+\_unnamed \[9 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
@@ -1135,7 +1135,7 @@ Let's add group name and id as additional columns
                   :add-group-id-as-column true}))
 ```
 
-null \[9 6\]:
+\_unnamed \[9 6\]:
 
 | :$group-name | :$group-id | :V1 | :V2 | :V3    | :V4 |
 |--------------|------------|-----|-----|--------|-----|
@@ -1160,7 +1160,7 @@ Let's assign different column names
                   :add-group-id-as-column "group id"}))
 ```
 
-null \[9 6\]:
+\_unnamed \[9 6\]:
 
 | Is V2 less than 4? | group id | :V1 | :V2 | :V3    | :V4 |
 |--------------------|----------|-----|-----|--------|-----|
@@ -1186,7 +1186,7 @@ If we group by map, we can automatically create new columns out of group names.
     (api/ungroup {:add-group-as-column true}))
 ```
 
-null \[9 6\]:
+\_unnamed \[9 6\]:
 
 | V1 and V3 multiplied | V4 as string | :V1 | :V2 | :V3    | :V4 |
 |----------------------|--------------|-----|-----|--------|-----|
@@ -1213,7 +1213,7 @@ We can add group names without separation
                   :separate? false}))
 ```
 
-null \[9 5\]:
+\_unnamed \[9 5\]:
 
 | just map                                         | :V1 | :V2 | :V3    | :V4 |
 |--------------------------------------------------|-----|-----|--------|-----|
@@ -1237,7 +1237,7 @@ The same applies to group names as sequences
     (api/ungroup {:add-group-as-column "abc"}))
 ```
 
-null \[9 6\]:
+\_unnamed \[9 6\]:
 
 | :abc-0 | :abc-1 | :V1 | :V2 | :V3    | :V4 |
 |--------|--------|-----|-----|--------|-----|
@@ -1261,7 +1261,7 @@ Let's provide column names
     (api/ungroup {:add-group-as-column ["v1" "v3"]}))
 ```
 
-null \[9 6\]:
+\_unnamed \[9 6\]:
 
 | v1  | v3     | :V1 | :V2 | :V3    | :V4 |
 |-----|--------|-----|-----|--------|-----|
@@ -1286,7 +1286,7 @@ Also we can supress separation
                   :add-group-as-column true}))
 ```
 
-null \[9 5\]:
+\_unnamed \[9 5\]:
 
 | :$group-name | :V1 | :V2 | :V3    | :V4 |
 |--------------|-----|-----|--------|-----|
@@ -1301,6 +1301,35 @@ null \[9 5\]:
 | \[2 1.0\]    | 2   | 8   | 1.000  | B   |
 
 #### Other functions
+
+To check if dataset is grouped or not just use `grouped?` function.
+
+``` clojure
+(api/grouped? DS)
+```
+
+    nil
+
+``` clojure
+(api/grouped? (api/group-by DS :V1))
+```
+
+    true
+
+------------------------------------------------------------------------
+
+If you want to remove grouping annotation (to make all the functions work as with regular dataset) you can use `unmark-group` or `as-regular-dataset` (alias) functions.
+
+It can be important when you want to remove some groups (rows) from grouped dataset using `drop-rows` or something like that.
+
+``` clojure
+(-> DS
+    (api/group-by :V1)
+    (api/as-regular-dataset)
+    (api/grouped?))
+```
+
+    nil
 
 ### Columns
 

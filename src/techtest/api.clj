@@ -46,7 +46,6 @@
                          grouped?
                          unmark-group
                          as-regular-dataset
-                         mark-as-group
                          groups->seq
                          groups->map)
 
