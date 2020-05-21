@@ -53,7 +53,7 @@ knit_engines$set(clojure = function(options) {
                    }
                )
            } else ''
-               if (!options$error && !is.null(attr(out, 'status'))) stop(knitr_one_string(out))
+    if (!options$error && !is.null(attr(out, 'status'))) stop(knitr_one_string(out))
     engine_output(options, options$code, out)})
 ```
 
@@ -93,7 +93,7 @@ DS
 
 ## Functionality {.tabset .tabset-fade}
 
-### Dataset {.tabset .tabset-fade .tabset-pills}
+### Dataset
 
 Dataset is a special type which can be considered as a map of columns implemented around `tech.ml.datatype` library. Each column can be considered as named sequence of typed data. Supported types include integers, floats, string, boolean, date/time, objects etc.
 
@@ -344,7 +344,7 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
-### Group-by {.tabset .tabset-fade .tabset-pills}
+### Group-by
 
 Grouping by is an operation which splits dataset into subdatasets and pack it into new special type of... dataset. I distinguish two types of dataset: regular dataset and grouped dataset. The latter is the result of grouping.
 
@@ -366,11 +366,14 @@ Grouping is done by calling `group-by` function with arguments:
 * `ds` - dataset
 * `grouping-selector` - what to use for grouping
 * options:
-- `:result-type` - what to return:
-  * `:as-dataset` (default) - return grouped dataset
-  * `:as-indexes` - return rows ids (row number from original dataset)
-  * `:as-map` - return map with group names as keys and subdataset as values
-- `:limit-columns` - list of the columns which should be returned during grouping by function.
+    - `:result-type` - what to return:
+        * `:as-dataset` (default) - return grouped dataset
+        * `:as-indexes` - return rows ids (row number from original dataset)
+        * `:as-map` - return map with group names as keys and subdataset as values
+        * `:as-seq` - return sequens of subdatasets
+    - `:limit-columns` - list of the columns which should be returned during grouping by function.
+
+All subdatasets (groups) have set name as the group name, additionally `group-id` is in meta.
 
 Grouping can be done by:
 
@@ -379,7 +382,7 @@ Grouping can be done by:
 * map of keys (group names) and row indexes
 * value returned by function taking row as map
 
-Note: currently dataset inside dataset is printed recursively so it renders poorly from markdown.
+Note: currently dataset inside dataset is printed recursively so it renders poorly from markdown. So I will use `:as-seq` result type to show just group names and groups.
 
 ---
 
@@ -417,8 +420,208 @@ Group dataset as map of indexes (row ids)
 (api/group-by DS :V1 {:result-type :as-indexes})
 ```
 
+---
+
+To get groups as sequence or a map can be done from grouped dataset using `groups->seq` and `groups->map` functions.
+
+Groups as seq can be obtained by just accessing `:data` column.
+
+I will use temporary dataset here.
+
+```{clojure results="asis"}
+(let [ds (-> {"a" [1 1 2 2]
+              "b" ["a" "b" "c" "d"]}
+             (api/dataset)
+             (api/group-by "a"))]
+  (seq (ds :data))) ;; seq is not necessary but Markdown treats `:data` as command here
+```
+
+```{clojure results="asis"}
+(-> {"a" [1 1 2 2]
+     "b" ["a" "b" "c" "d"]}
+    (api/dataset)
+    (api/group-by "a")
+    (api/groups->seq))
+```
+
+---
+
+Groups as map
+
+```{clojure results="asis"}
+(-> {"a" [1 1 2 2]
+     "b" ["a" "b" "c" "d"]}
+    (api/dataset)
+    (api/group-by "a")
+    (api/groups->map))
+```
+
+---
+
+Grouping by more than one column. You can see that group names are maps. When ungrouping is done these maps are used to restore column names.
+
+```{clojure results="asis"}
+(api/group-by DS [:V1 :V3] {:result-type :as-seq})
+```
+
+---
+
+Grouping can be done by providing just row indexes. This way you can assign the same row to more than one group.
+
+```{clojure results="asis"}
+(api/group-by DS {"group-a" [1 2 1 2]
+                  "group-b" [5 5 5 1]} {:result-type :as-seq})
+```
+
+---
+
+You can group by a result of gruping function which gets row as map and should return group name. When map is used as a group name, ungrouping restore original column names.
+
+```{clojure results="asis"}
+(api/group-by DS (fn [row] (* (:V1 row)
+                             (:V3 row))) {:result-type :as-seq})
+```
+
+---
+
+You can use any predicate on column to split dataset into two groups.
+
+```{clojure results="asis"}
+(api/group-by DS (comp #(< % 1.0) :V3) {:result-type :as-seq})
+```
+
+---
+
+`juxt` is also helpful
+
+```{clojure results="asis"}
+(api/group-by DS (juxt :V1 :V3) {:result-type :as-seq})
+```
+
+--- 
+
+`tech.ml.dataset` provides an option to limit columns which are passed to grouping functions. It's done for performance purposes.
+
+```{clojure results="asis"}
+(api/group-by DS identity {:result-type :as-seq
+                           :limit-columns [:V1]})
+```
 
 #### Ungrouping
+
+Ungrouping simply concats all the groups into the dataset. Following options are possible
+
+* `:order?` - order groups according to the group name ascending order. Default: `false`
+* `:add-group-as-column` - should group name become a column? If yes column is created with provided name (or `:$group-name` if argument is `true`). Default: `nil`.
+* `:add-group-id-as-column` - should group id become a column? If yes column is created with provided name (or `:$group-id` if argument is `true`). Default: `nil`.
+* `:dataset-name` - to name resulting dataset. Default: `nil` (_unnamed)
+
+If group name is a map, it will be splitted into separate columns. Be sure that groups (subdatasets) doesn't contain the same columns already.
+
+If group name is a vector, it will be splitted into separate columns. If you want to name them, set vector of target column names as `:add-group-as-column` argument.
+
+After ungrouping, order of the rows is kept within the groups but groups are ordered according to the internal storage.
+
+---
+
+Grouping and ungrouping.
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V3)
+    (api/ungroup))
+```
+
+---
+
+Groups sorted by group name and named.
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V3)
+    (api/ungroup {:order? true
+                  :dataset-name "Ordered by V3"}))
+```
+
+---
+
+Let's add group name and id as additional columns
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by (comp #(< % 4) :V2))
+    (api/ungroup {:add-group-as-column true
+                  :add-group-id-as-column true}))
+```
+
+---
+
+Let's assign different column names
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by (comp #(< % 4) :V2))
+    (api/ungroup {:add-group-as-column "Is V2 less than 4?"
+                  :add-group-id-as-column "group id"}))
+```
+
+---
+
+If we group by map, we can automatically create new columns out of group names.
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by (fn [row] {"V1 and V3 multiplied" (* (:V1 row)
+                                                      (:V3 row))
+                            "V4 as string" (str (:V4 row))}))
+    (api/ungroup {:add-group-as-column true}))
+```
+
+---
+
+We can add group names without separation
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by (fn [row] {"V1 and V3 multiplied" (* (:V1 row)
+                                                      (:V3 row))
+                            "V4 as string" (str (:V4 row))}))
+    (api/ungroup {:add-group-as-column "just map"
+                  :separate? false}))
+```
+
+---
+
+The same applies to group names as sequences
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by (juxt :V1 :V3))
+    (api/ungroup {:add-group-as-column "abc"}))
+```
+
+---
+
+Let's provide column names
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by (juxt :V1 :V3))
+    (api/ungroup {:add-group-as-column ["v1" "v3"]}))
+```
+
+---
+
+Also we can supress separation
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by (juxt :V1 :V3))
+    (api/ungroup {:separate? false
+                  :add-group-as-column true}))
+```
+
+
 
 #### Other functions
 

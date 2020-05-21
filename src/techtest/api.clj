@@ -30,7 +30,6 @@
                          column
                          column-names
                          has-column?
-                         concat
                          write-csv!)
 
 (exporter/export-symbols techtest.api.dataset
@@ -48,8 +47,14 @@
                          unmark-group
                          as-regular-dataset
                          mark-as-group
-                         group-as-map)
+                         groups->seq
+                         groups->map)
 
+;; concat
+
+(defn concat
+  [datasets]
+  (apply ds/concat datasets))
 
 
 (defn unroll
@@ -328,7 +333,7 @@
    (if (grouped? ds)
      (-> ds
          (process-group-data #(aggregate % fn-map-or-seq options) true)
-         (ungroup {:add-group-as-column? true}))
+         (ungroup {:add-group-as-column true}))
      (cond
        (fn? fn-map-or-seq) (aggregate ds {:summary fn-map-or-seq})
        (iterable-sequence? fn-map-or-seq) (->> fn-map-or-seq
@@ -423,7 +428,7 @@
                                (as-> ds ds
                                  (select-columns ds target-names)
                                  (dataset [(zipmap target-names (map fold-fn (ds/columns ds)))]))) true)
-         (ungroup {:add-group-as-column? true})))))
+         (ungroup {:add-group-as-column true})))))
 
 (defn unique-by
   ([ds] (unique-by ds (ds/column-names ds)))
@@ -774,22 +779,13 @@
 (def DSm2 (dataset {:a [nil nil nil 1 2 nil 3 4 nil nil nil 11 nil]
                     :b [nil 2   2   2 2 3   nil 3 nil   3   nil   4  nil]}))
 
-(group-by DS :V1 {:result-type :as-map})
-(group-by DS [:V1 :V3])
-(group-by DS (juxt :V1 :V4))
-(group-by DS #(< (:V2 %) 4))
-(group-by DS (comp #{\B} :V4))
-
-(grouped? DS)
-(grouped? (group-by DS [:V1 :V3]))
 
 (ungroup (group-by DS :V1) {:dataset-name "ungrouped"})
-(ungroup (group-by DS [:V1 :V3]) {:add-group-id-as-column? true})
-(ungroup (group-by DS (juxt :V1 :V4)) {:add-group-as-column? true})
-(ungroup (group-by DS #(< (:V2 %) 4)) {:add-group-as-column? true})
-(ungroup (group-by DS (comp #{\B \C} :V4)) {:add-group-as-column? true})
+(ungroup (group-by DS [:V1 :V3]) {:add-group-id-as-column true})
+(ungroup (group-by DS (juxt :V1 :V4)) {:add-group-as-column "my group"})
+(ungroup (group-by DS #(< (:V2 %) 4)) {:add-group-as-column true})
+(ungroup (group-by DS (comp #{\B \C} :V4)) {:add-group-as-column true})
 
-(group-as-map (group-by DS (juxt :V1 :V4)))
 
 (select-columns DS :V1)
 (select-columns DS [:V1 :V2])
@@ -1013,8 +1009,8 @@
 (-> stocks
     (group-by (juxt :symbol #(dtype-dt-ops/get-years (% :date))))
     (aggregate #(dfn/mean (% :price)))
-    (order-by :$group-name)
-    (separate-column :$group-name [:symbol :year])
+    (rename-columns {:$group-name-0 :symbol
+                     :$group-name-1 :year})
     (select-rows (range 12)))
 ;; => _unnamed [12 3]:
 ;;    | :symbol | :year | :summary |

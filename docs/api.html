@@ -11,7 +11,7 @@
 
 <meta name="author" content="GenerateMe" />
 
-<meta name="date" content="2020-05-20" />
+<meta name="date" content="2020-05-21" />
 
 <title>Proposed API for tech.ml.dataset</title>
 
@@ -237,7 +237,7 @@ summary {
 
 <h1 class="title toc-ignore">Proposed API for tech.ml.dataset</h1>
 <h4 class="author">GenerateMe</h4>
-<h4 class="date">2020-05-20</h4>
+<h4 class="date">2020-05-21</h4>
 
 </div>
 
@@ -336,7 +336,7 @@ table { width: auto !important; margin-right: auto; margin-left: 2%; }
 </div>
 <div id="functionality" class="section level2 tabset tabset-fade">
 <h2>Functionality</h2>
-<div id="dataset" class="section level3 tabset tabset-fade tabset-pills">
+<div id="dataset" class="section level3">
 <h3>Dataset</h3>
 <p>Dataset is a special type which can be considered as a map of columns implemented around <code>tech.ml.datatype</code> library. Each column can be considered as named sequence of typed data. Supported types include integers, floats, string, boolean, date/time, objects etc.</p>
 <div id="dataset-creation" class="section level4">
@@ -1159,17 +1159,17 @@ precipitation
 <hr />
 <p>Rows as sequence of sequences</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">take</span> <span class="dv">2</span> (api/rows ds))</code></pre></div>
-<pre><code>([#object[java.time.LocalDate 0x2a131759 &quot;2012-01-01&quot;] 0.0 12.8 5.0 4.7 &quot;drizzle&quot;] [#object[java.time.LocalDate 0x32e6bbcd &quot;2012-01-02&quot;] 10.9 10.6 2.8 4.5 &quot;rain&quot;])</code></pre>
+<pre><code>([#object[java.time.LocalDate 0x1e1ba2b6 &quot;2012-01-01&quot;] 0.0 12.8 5.0 4.7 &quot;drizzle&quot;] [#object[java.time.LocalDate 0x7bc03571 &quot;2012-01-02&quot;] 10.9 10.6 2.8 4.5 &quot;rain&quot;])</code></pre>
 <hr />
 <p>Rows as sequence of maps</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(clojure.pprint/pprint (<span class="kw">take</span> <span class="dv">2</span> (api/rows ds <span class="at">:as-maps</span>)))</code></pre></div>
-<pre><code>({&quot;date&quot; #object[java.time.LocalDate 0x616b56d4 &quot;2012-01-01&quot;],
+<pre><code>({&quot;date&quot; #object[java.time.LocalDate 0x6ed31e40 &quot;2012-01-01&quot;],
   &quot;precipitation&quot; 0.0,
   &quot;temp_min&quot; 5.0,
   &quot;weather&quot; &quot;drizzle&quot;,
   &quot;temp_max&quot; 12.8,
   &quot;wind&quot; 4.7}
- {&quot;date&quot; #object[java.time.LocalDate 0x1d1b16b0 &quot;2012-01-02&quot;],
+ {&quot;date&quot; #object[java.time.LocalDate 0x14c4e801 &quot;2012-01-02&quot;],
   &quot;precipitation&quot; 10.9,
   &quot;temp_min&quot; 2.8,
   &quot;weather&quot; &quot;rain&quot;,
@@ -1177,7 +1177,7 @@ precipitation
   &quot;wind&quot; 4.5})</code></pre>
 </div>
 </div>
-<div id="group-by" class="section level3 tabset tabset-fade tabset-pills">
+<div id="group-by" class="section level3">
 <h3>Group-by</h3>
 <p>Grouping by is an operation which splits dataset into subdatasets and pack it into new special type of… dataset. I distinguish two types of dataset: regular dataset and grouped dataset. The latter is the result of grouping.</p>
 <p>Grouped dataset is annotated in by <code>:grouped?</code> meta tag and consist following columns:</p>
@@ -1195,13 +1195,19 @@ precipitation
 <ul>
 <li><code>ds</code> - dataset</li>
 <li><code>grouping-selector</code> - what to use for grouping</li>
-<li>options:</li>
-<li><code>:result-type</code> - what to return:</li>
+<li>options:
+<ul>
+<li><code>:result-type</code> - what to return:
+<ul>
 <li><code>:as-dataset</code> (default) - return grouped dataset</li>
 <li><code>:as-indexes</code> - return rows ids (row number from original dataset)</li>
 <li><code>:as-map</code> - return map with group names as keys and subdataset as values</li>
+<li><code>:as-seq</code> - return sequens of subdatasets</li>
+</ul></li>
 <li><code>:limit-columns</code> - list of the columns which should be returned during grouping by function.</li>
+</ul></li>
 </ul>
+<p>All subdatasets (groups) have set name as the group name, additionally <code>group-id</code> is in meta.</p>
 <p>Grouping can be done by:</p>
 <ul>
 <li>single column name</li>
@@ -1209,7 +1215,7 @@ precipitation
 <li>map of keys (group names) and row indexes</li>
 <li>value returned by function taking row as map</li>
 </ul>
-<p>Note: currently dataset inside dataset is printed recursively so it renders poorly from markdown.</p>
+<p>Note: currently dataset inside dataset is printed recursively so it renders poorly from markdown. So I will use <code>:as-seq</code> result type to show just group names and groups.</p>
 <hr />
 <p>List of columns in groupd dataset</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/column-names (api/group-by DS <span class="at">:V1</span>))</code></pre></div>
@@ -1248,7 +1254,7 @@ precipitation
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">keys</span> (api/group-by DS <span class="at">:V1</span> {<span class="at">:result-type</span> <span class="at">:as-map</span>}))</code></pre></div>
 <pre><code>(1 2)</code></pre>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">vals</span> (api/group-by DS <span class="at">:V1</span> {<span class="at">:result-type</span> <span class="at">:as-map</span>}))</code></pre></div>
-<p>(_unnamed [5 4]:</p>
+<p>(1 [5 4]:</p>
 <table>
 <thead>
 <tr class="header">
@@ -1291,7 +1297,7 @@ precipitation
 </tr>
 </tbody>
 </table>
-<p>_unnamed [4 4]:</p>
+<p>2 [4 4]:</p>
 <table>
 <thead>
 <tr class="header">
@@ -1333,9 +1339,1578 @@ precipitation
 <p>Group dataset as map of indexes (row ids)</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/group-by DS <span class="at">:V1</span> {<span class="at">:result-type</span> <span class="at">:as-indexes</span>})</code></pre></div>
 <pre><code>{1 [0 2 4 6 8], 2 [1 3 5 7]}</code></pre>
+<hr />
+<p>To get groups as sequence or a map can be done from grouped dataset using <code>groups-&gt;seq</code> and <code>groups-&gt;map</code> functions.</p>
+<p>Groups as seq can be obtained by just accessing <code>:data</code> column.</p>
+<p>I will use temporary dataset here.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">let</span> [ds (<span class="kw">-&gt;</span> {<span class="st">&quot;a&quot;</span> [<span class="dv">1</span> <span class="dv">1</span> <span class="dv">2</span> <span class="dv">2</span>]
+              <span class="st">&quot;b&quot;</span> [<span class="st">&quot;a&quot;</span> <span class="st">&quot;b&quot;</span> <span class="st">&quot;c&quot;</span> <span class="st">&quot;d&quot;</span>]}
+             (api/dataset)
+             (api/group-by <span class="st">&quot;a&quot;</span>))]
+  (<span class="kw">seq</span> (ds <span class="at">:data</span>))) <span class="co">;; seq is not necessary but Markdown treats `:data` as command here</span></code></pre></div>
+<p>(1 [2 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>a</th>
+<th>b</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>a</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>b</td>
+</tr>
+</tbody>
+</table>
+<p>2 [2 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>a</th>
+<th>b</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>c</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>d</td>
+</tr>
+</tbody>
+</table>
+<p>)</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> {<span class="st">&quot;a&quot;</span> [<span class="dv">1</span> <span class="dv">1</span> <span class="dv">2</span> <span class="dv">2</span>]
+     <span class="st">&quot;b&quot;</span> [<span class="st">&quot;a&quot;</span> <span class="st">&quot;b&quot;</span> <span class="st">&quot;c&quot;</span> <span class="st">&quot;d&quot;</span>]}
+    (api/dataset)
+    (api/group-by <span class="st">&quot;a&quot;</span>)
+    (api/groups-&gt;seq))</code></pre></div>
+<p>(1 [2 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>a</th>
+<th>b</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>a</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>b</td>
+</tr>
+</tbody>
+</table>
+<p>2 [2 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>a</th>
+<th>b</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>c</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>d</td>
+</tr>
+</tbody>
+</table>
+<p>)</p>
+<hr />
+<p>Groups as map</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> {<span class="st">&quot;a&quot;</span> [<span class="dv">1</span> <span class="dv">1</span> <span class="dv">2</span> <span class="dv">2</span>]
+     <span class="st">&quot;b&quot;</span> [<span class="st">&quot;a&quot;</span> <span class="st">&quot;b&quot;</span> <span class="st">&quot;c&quot;</span> <span class="st">&quot;d&quot;</span>]}
+    (api/dataset)
+    (api/group-by <span class="st">&quot;a&quot;</span>)
+    (api/groups-&gt;map))</code></pre></div>
+<p>{1 1 [2 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>a</th>
+<th>b</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>a</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>b</td>
+</tr>
+</tbody>
+</table>
+<p>, 2 2 [2 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>a</th>
+<th>b</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>c</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>d</td>
+</tr>
+</tbody>
+</table>
+<p>}</p>
+<hr />
+<p>Grouping by more than one column. You can see that group names are maps. When ungrouping is done these maps are used to restore column names.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/group-by DS [<span class="at">:V1</span> <span class="at">:V3</span>] {<span class="at">:result-type</span> <span class="at">:as-seq</span>})</code></pre></div>
+<p>({:V3 1.0, :V1 1} [1 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<p>{:V3 0.5, :V1 1} [2 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+</tbody>
+</table>
+<p>{:V3 0.5, :V1 2} [1 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+</tbody>
+</table>
+<p>{:V3 1.0, :V1 2} [2 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<p>{:V3 1.5, :V1 1} [2 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p>{:V3 1.5, :V1 2} [1 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p>)</p>
+<hr />
+<p>Grouping can be done by providing just row indexes. This way you can assign the same row to more than one group.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/group-by DS {<span class="st">&quot;group-a&quot;</span> [<span class="dv">1</span> <span class="dv">2</span> <span class="dv">1</span> <span class="dv">2</span>]
+                  <span class="st">&quot;group-b&quot;</span> [<span class="dv">5</span> <span class="dv">5</span> <span class="dv">5</span> <span class="dv">1</span>]} {<span class="at">:result-type</span> <span class="at">:as-seq</span>})</code></pre></div>
+<p>(group-a [4 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p>group-b [4 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<p>)</p>
+<hr />
+<p>You can group by a result of gruping function which gets row as map and should return group name. When map is used as a group name, ungrouping restore original column names.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/group-by DS (<span class="kw">fn</span> [row] (<span class="kw">*</span> (<span class="at">:V1</span> row)
+                             (<span class="at">:V3</span> row))) {<span class="at">:result-type</span> <span class="at">:as-seq</span>})</code></pre></div>
+<p>(1.0 [2 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<p>2.0 [2 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<p>0.5 [2 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+</tbody>
+</table>
+<p>3.0 [1 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p>1.5 [2 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p>)</p>
+<hr />
+<p>You can use any predicate on column to split dataset into two groups.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/group-by DS (<span class="kw">comp</span> #(<span class="kw">&lt;</span> <span class="va">%</span> <span class="fl">1.0</span>) <span class="at">:V3</span>) {<span class="at">:result-type</span> <span class="at">:as-seq</span>})</code></pre></div>
+<p>(false [6 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p>true [3 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+</tbody>
+</table>
+<p>)</p>
+<hr />
+<p><code>juxt</code> is also helpful</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/group-by DS (<span class="kw">juxt</span> <span class="at">:V1</span> <span class="at">:V3</span>) {<span class="at">:result-type</span> <span class="at">:as-seq</span>})</code></pre></div>
+<p>([1 1.0] [1 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<p>[1 0.5] [2 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+</tbody>
+</table>
+<p>[2 1.5] [1 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p>[1 1.5] [2 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p>[2 0.5] [1 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+</tbody>
+</table>
+<p>[2 1.0] [2 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<p>)</p>
+<hr />
+<p><code>tech.ml.dataset</code> provides an option to limit columns which are passed to grouping functions. It’s done for performance purposes.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/group-by DS <span class="kw">identity</span> {<span class="at">:result-type</span> <span class="at">:as-seq</span>
+                           <span class="at">:limit-columns</span> [<span class="at">:V1</span>]})</code></pre></div>
+<p>({:V1 1} [5 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p>{:V1 2} [4 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<p>)</p>
 </div>
 <div id="ungrouping" class="section level4">
 <h4>Ungrouping</h4>
+<p>Ungrouping simply concats all the groups into the dataset. Following options are possible</p>
+<ul>
+<li><code>:order?</code> - order groups according to the group name ascending order. Default: <code>false</code></li>
+<li><code>:add-group-as-column</code> - should group name become a column? If yes column is created with provided name (or <code>:$group-name</code> if argument is <code>true</code>). Default: <code>nil</code>.</li>
+<li><code>:add-group-id-as-column</code> - should group id become a column? If yes column is created with provided name (or <code>:$group-id</code> if argument is <code>true</code>). Default: <code>nil</code>.</li>
+<li><code>:dataset-name</code> - to name resulting dataset. Default: <code>nil</code> (_unnamed)</li>
+</ul>
+<p>If group name is a map, it will be splitted into separate columns. Be sure that groups (subdatasets) doesn’t contain the same columns already.</p>
+<p>If group name is a vector, it will be splitted into separate columns. If you want to name them, set vector of target column names as <code>:add-group-as-column</code> argument.</p>
+<p>After ungrouping, order of the rows is kept within the groups but groups are ordered according to the internal storage.</p>
+<hr />
+<p>Grouping and ungrouping.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by <span class="at">:V3</span>)
+    (api/ungroup))</code></pre></div>
+<p>null [9 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Groups sorted by group name and named.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by <span class="at">:V3</span>)
+    (api/ungroup {<span class="at">:order</span>? <span class="va">true</span>
+                  <span class="at">:dataset-name</span> <span class="st">&quot;Ordered by V3&quot;</span>}))</code></pre></div>
+<p>Ordered by V3 [9 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Let’s add group name and id as additional columns</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by (<span class="kw">comp</span> #(<span class="kw">&lt;</span> <span class="va">%</span> <span class="dv">4</span>) <span class="at">:V2</span>))
+    (api/ungroup {<span class="at">:add-group-as-column</span> <span class="va">true</span>
+                  <span class="at">:add-group-id-as-column</span> <span class="va">true</span>}))</code></pre></div>
+<p>null [9 6]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:$group-name</th>
+<th>:$group-id</th>
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>false</td>
+<td>0</td>
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>false</td>
+<td>0</td>
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>false</td>
+<td>0</td>
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>false</td>
+<td>0</td>
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>false</td>
+<td>0</td>
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>false</td>
+<td>0</td>
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>true</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>true</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>true</td>
+<td>1</td>
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Let’s assign different column names</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by (<span class="kw">comp</span> #(<span class="kw">&lt;</span> <span class="va">%</span> <span class="dv">4</span>) <span class="at">:V2</span>))
+    (api/ungroup {<span class="at">:add-group-as-column</span> <span class="st">&quot;Is V2 less than 4?&quot;</span>
+                  <span class="at">:add-group-id-as-column</span> <span class="st">&quot;group id&quot;</span>}))</code></pre></div>
+<p>null [9 6]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Is V2 less than 4?</th>
+<th>group id</th>
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>false</td>
+<td>0</td>
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>false</td>
+<td>0</td>
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>false</td>
+<td>0</td>
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>false</td>
+<td>0</td>
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>false</td>
+<td>0</td>
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>false</td>
+<td>0</td>
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>true</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>true</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>true</td>
+<td>1</td>
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>If we group by map, we can automatically create new columns out of group names.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by (<span class="kw">fn</span> [row] {<span class="st">&quot;V1 and V3 multiplied&quot;</span> (<span class="kw">*</span> (<span class="at">:V1</span> row)
+                                                      (<span class="at">:V3</span> row))
+                            <span class="st">&quot;V4 as string&quot;</span> (<span class="kw">str</span> (<span class="at">:V4</span> row))}))
+    (api/ungroup {<span class="at">:add-group-as-column</span> <span class="va">true</span>}))</code></pre></div>
+<p>null [9 6]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>V1 and V3 multiplied</th>
+<th>V4 as string</th>
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3.000</td>
+<td>C</td>
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1.500</td>
+<td>C</td>
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1.500</td>
+<td>C</td>
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1.000</td>
+<td>A</td>
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>0.5000</td>
+<td>A</td>
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>0.5000</td>
+<td>A</td>
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1.000</td>
+<td>B</td>
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2.000</td>
+<td>B</td>
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2.000</td>
+<td>B</td>
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>We can add group names without separation</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by (<span class="kw">fn</span> [row] {<span class="st">&quot;V1 and V3 multiplied&quot;</span> (<span class="kw">*</span> (<span class="at">:V1</span> row)
+                                                      (<span class="at">:V3</span> row))
+                            <span class="st">&quot;V4 as string&quot;</span> (<span class="kw">str</span> (<span class="at">:V4</span> row))}))
+    (api/ungroup {<span class="at">:add-group-as-column</span> <span class="st">&quot;just map&quot;</span>
+                  <span class="at">:separate</span>? <span class="va">false</span>}))</code></pre></div>
+<p>null [9 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>just map</th>
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>{“V1 and V3 multiplied” 3.0, “V4 as string” “C”}</td>
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>{“V1 and V3 multiplied” 1.5, “V4 as string” “C”}</td>
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>{“V1 and V3 multiplied” 1.5, “V4 as string” “C”}</td>
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>{“V1 and V3 multiplied” 1.0, “V4 as string” “A”}</td>
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>{“V1 and V3 multiplied” 0.5, “V4 as string” “A”}</td>
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>{“V1 and V3 multiplied” 0.5, “V4 as string” “A”}</td>
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>{“V1 and V3 multiplied” 1.0, “V4 as string” “B”}</td>
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>{“V1 and V3 multiplied” 2.0, “V4 as string” “B”}</td>
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>{“V1 and V3 multiplied” 2.0, “V4 as string” “B”}</td>
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>The same applies to group names as sequences</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by (<span class="kw">juxt</span> <span class="at">:V1</span> <span class="at">:V3</span>))
+    (api/ungroup {<span class="at">:add-group-as-column</span> <span class="st">&quot;abc&quot;</span>}))</code></pre></div>
+<p>null [9 6]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:abc-0</th>
+<th>:abc-1</th>
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1.000</td>
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>0.5000</td>
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>0.5000</td>
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>1.500</td>
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>1.500</td>
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1.500</td>
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>0.5000</td>
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>1.000</td>
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>1.000</td>
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Let’s provide column names</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by (<span class="kw">juxt</span> <span class="at">:V1</span> <span class="at">:V3</span>))
+    (api/ungroup {<span class="at">:add-group-as-column</span> [<span class="st">&quot;v1&quot;</span> <span class="st">&quot;v3&quot;</span>]}))</code></pre></div>
+<p>null [9 6]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>v1</th>
+<th>v3</th>
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1.000</td>
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>0.5000</td>
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>0.5000</td>
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>1.500</td>
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>1.500</td>
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1.500</td>
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>0.5000</td>
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>1.000</td>
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>1.000</td>
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Also we can supress separation</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by (<span class="kw">juxt</span> <span class="at">:V1</span> <span class="at">:V3</span>))
+    (api/ungroup {<span class="at">:separate</span>? <span class="va">false</span>
+                  <span class="at">:add-group-as-column</span> <span class="va">true</span>}))</code></pre></div>
+<p>null [9 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:$group-name</th>
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>[1 1.0]</td>
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>[1 0.5]</td>
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>[1 0.5]</td>
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>[2 1.5]</td>
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>[1 1.5]</td>
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>[1 1.5]</td>
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>[2 0.5]</td>
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>[2 1.0]</td>
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>[2 1.0]</td>
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="other-functions" class="section level4">
 <h4>Other functions</h4>

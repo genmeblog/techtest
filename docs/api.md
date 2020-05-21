@@ -592,7 +592,7 @@ Rows as sequence of sequences
 (take 2 (api/rows ds))
 ```
 
-    ([#object[java.time.LocalDate 0x1516ecfb "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x5be151b8 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+    ([#object[java.time.LocalDate 0x47ef3a10 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x56eb1566 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 
 ------------------------------------------------------------------------
 
@@ -602,13 +602,13 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
-    ({"date" #object[java.time.LocalDate 0xeac8a83 "2012-01-01"],
+    ({"date" #object[java.time.LocalDate 0x6ec21437 "2012-01-01"],
       "precipitation" 0.0,
       "temp_min" 5.0,
       "weather" "drizzle",
       "temp_max" 12.8,
       "wind" 4.7}
-     {"date" #object[java.time.LocalDate 0x6fd0ff91 "2012-01-02"],
+     {"date" #object[java.time.LocalDate 0x30174fe7 "2012-01-02"],
       "precipitation" 10.9,
       "temp_min" 2.8,
       "weather" "rain",
@@ -637,11 +637,14 @@ Grouping is done by calling `group-by` function with arguments:
 -   `ds` - dataset
 -   `grouping-selector` - what to use for grouping
 -   options:
--   `:result-type` - what to return:
--   `:as-dataset` (default) - return grouped dataset
--   `:as-indexes` - return rows ids (row number from original dataset)
--   `:as-map` - return map with group names as keys and subdataset as values
--   `:limit-columns` - list of the columns which should be returned during grouping by function.
+    -   `:result-type` - what to return:
+        -   `:as-dataset` (default) - return grouped dataset
+        -   `:as-indexes` - return rows ids (row number from original dataset)
+        -   `:as-map` - return map with group names as keys and subdataset as values
+        -   `:as-seq` - return sequens of subdatasets
+    -   `:limit-columns` - list of the columns which should be returned during grouping by function.
+
+All subdatasets (groups) have set name as the group name, additionally `group-id` is in meta.
 
 Grouping can be done by:
 
@@ -650,7 +653,7 @@ Grouping can be done by:
 -   map of keys (group names) and row indexes
 -   value returned by function taking row as map
 
-Note: currently dataset inside dataset is printed recursively so it renders poorly from markdown.
+Note: currently dataset inside dataset is printed recursively so it renders poorly from markdown. So I will use `:as-seq` result type to show just group names and groups.
 
 ------------------------------------------------------------------------
 
@@ -711,7 +714,7 @@ Grouped dataset as map
 (vals (api/group-by DS :V1 {:result-type :as-map}))
 ```
 
-(\_unnamed \[5 4\]:
+(1 \[5 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
@@ -721,7 +724,7 @@ Grouped dataset as map
 | 1   | 7   | 0.5000 | A   |
 | 1   | 9   | 1.500  | C   |
 
-\_unnamed \[4 4\]:
+2 \[4 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
@@ -742,7 +745,560 @@ Group dataset as map of indexes (row ids)
 
     {1 [0 2 4 6 8], 2 [1 3 5 7]}
 
+------------------------------------------------------------------------
+
+To get groups as sequence or a map can be done from grouped dataset using `groups->seq` and `groups->map` functions.
+
+Groups as seq can be obtained by just accessing `:data` column.
+
+I will use temporary dataset here.
+
+``` clojure
+(let [ds (-> {"a" [1 1 2 2]
+              "b" ["a" "b" "c" "d"]}
+             (api/dataset)
+             (api/group-by "a"))]
+  (seq (ds :data))) ;; seq is not necessary but Markdown treats `:data` as command here
+```
+
+(1 \[2 2\]:
+
+| a   | b   |
+|-----|-----|
+| 1   | a   |
+| 1   | b   |
+
+2 \[2 2\]:
+
+| a   | b   |
+|-----|-----|
+| 2   | c   |
+| 2   | d   |
+
+)
+
+``` clojure
+(-> {"a" [1 1 2 2]
+     "b" ["a" "b" "c" "d"]}
+    (api/dataset)
+    (api/group-by "a")
+    (api/groups->seq))
+```
+
+(1 \[2 2\]:
+
+| a   | b   |
+|-----|-----|
+| 1   | a   |
+| 1   | b   |
+
+2 \[2 2\]:
+
+| a   | b   |
+|-----|-----|
+| 2   | c   |
+| 2   | d   |
+
+)
+
+------------------------------------------------------------------------
+
+Groups as map
+
+``` clojure
+(-> {"a" [1 1 2 2]
+     "b" ["a" "b" "c" "d"]}
+    (api/dataset)
+    (api/group-by "a")
+    (api/groups->map))
+```
+
+{1 1 \[2 2\]:
+
+| a   | b   |
+|-----|-----|
+| 1   | a   |
+| 1   | b   |
+
+, 2 2 \[2 2\]:
+
+| a   | b   |
+|-----|-----|
+| 2   | c   |
+| 2   | d   |
+
+}
+
+------------------------------------------------------------------------
+
+Grouping by more than one column. You can see that group names are maps. When ungrouping is done these maps are used to restore column names.
+
+``` clojure
+(api/group-by DS [:V1 :V3] {:result-type :as-seq})
+```
+
+({:V3 1.0, :V1 1} \[1 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 1   | 5   | 1.000 | B   |
+
+{:V3 0.5, :V1 1} \[2 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+
+{:V3 0.5, :V1 2} \[1 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 2   | 4   | 0.5000 | A   |
+
+{:V3 1.0, :V1 2} \[2 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 2   | 2   | 1.000 | B   |
+| 2   | 8   | 1.000 | B   |
+
+{:V3 1.5, :V1 1} \[2 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 1   | 3   | 1.500 | C   |
+| 1   | 9   | 1.500 | C   |
+
+{:V3 1.5, :V1 2} \[1 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 2   | 6   | 1.500 | C   |
+
+)
+
+------------------------------------------------------------------------
+
+Grouping can be done by providing just row indexes. This way you can assign the same row to more than one group.
+
+``` clojure
+(api/group-by DS {"group-a" [1 2 1 2]
+                  "group-b" [5 5 5 1]} {:result-type :as-seq})
+```
+
+(group-a \[4 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 2   | 2   | 1.000 | B   |
+| 1   | 3   | 1.500 | C   |
+| 2   | 2   | 1.000 | B   |
+| 1   | 3   | 1.500 | C   |
+
+group-b \[4 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 2   | 6   | 1.500 | C   |
+| 2   | 6   | 1.500 | C   |
+| 2   | 6   | 1.500 | C   |
+| 2   | 2   | 1.000 | B   |
+
+)
+
+------------------------------------------------------------------------
+
+You can group by a result of gruping function which gets row as map and should return group name. When map is used as a group name, ungrouping restore original column names.
+
+``` clojure
+(api/group-by DS (fn [row] (* (:V1 row)
+                             (:V3 row))) {:result-type :as-seq})
+```
+
+(1.0 \[2 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 2   | 4   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+
+2.0 \[2 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 2   | 2   | 1.000 | B   |
+| 2   | 8   | 1.000 | B   |
+
+0.5 \[2 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+
+3.0 \[1 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 2   | 6   | 1.500 | C   |
+
+1.5 \[2 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 1   | 3   | 1.500 | C   |
+| 1   | 9   | 1.500 | C   |
+
+)
+
+------------------------------------------------------------------------
+
+You can use any predicate on column to split dataset into two groups.
+
+``` clojure
+(api/group-by DS (comp #(< % 1.0) :V3) {:result-type :as-seq})
+```
+
+(false \[6 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 2   | 2   | 1.000 | B   |
+| 1   | 3   | 1.500 | C   |
+| 1   | 5   | 1.000 | B   |
+| 2   | 6   | 1.500 | C   |
+| 2   | 8   | 1.000 | B   |
+| 1   | 9   | 1.500 | C   |
+
+true \[3 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+
+)
+
+------------------------------------------------------------------------
+
+`juxt` is also helpful
+
+``` clojure
+(api/group-by DS (juxt :V1 :V3) {:result-type :as-seq})
+```
+
+(\[1 1.0\] \[1 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 1   | 5   | 1.000 | B   |
+
+\[1 0.5\] \[2 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+
+\[2 1.5\] \[1 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 2   | 6   | 1.500 | C   |
+
+\[1 1.5\] \[2 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 1   | 3   | 1.500 | C   |
+| 1   | 9   | 1.500 | C   |
+
+\[2 0.5\] \[1 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 2   | 4   | 0.5000 | A   |
+
+\[2 1.0\] \[2 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 2   | 2   | 1.000 | B   |
+| 2   | 8   | 1.000 | B   |
+
+)
+
+------------------------------------------------------------------------
+
+`tech.ml.dataset` provides an option to limit columns which are passed to grouping functions. It's done for performance purposes.
+
+``` clojure
+(api/group-by DS identity {:result-type :as-seq
+                           :limit-columns [:V1]})
+```
+
+({:V1 1} \[5 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 9   | 1.500  | C   |
+
+{:V1 2} \[4 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 2   | 2   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 6   | 1.500  | C   |
+| 2   | 8   | 1.000  | B   |
+
+)
+
 #### Ungrouping
+
+Ungrouping simply concats all the groups into the dataset. Following options are possible
+
+-   `:order?` - order groups according to the group name ascending order. Default: `false`
+-   `:add-group-as-column` - should group name become a column? If yes column is created with provided name (or `:$group-name` if argument is `true`). Default: `nil`.
+-   `:add-group-id-as-column` - should group id become a column? If yes column is created with provided name (or `:$group-id` if argument is `true`). Default: `nil`.
+-   `:dataset-name` - to name resulting dataset. Default: `nil` (\_unnamed)
+
+If group name is a map, it will be splitted into separate columns. Be sure that groups (subdatasets) doesn't contain the same columns already.
+
+If group name is a vector, it will be splitted into separate columns. If you want to name them, set vector of target column names as `:add-group-as-column` argument.
+
+After ungrouping, order of the rows is kept within the groups but groups are ordered according to the internal storage.
+
+------------------------------------------------------------------------
+
+Grouping and ungrouping.
+
+``` clojure
+(-> DS
+    (api/group-by :V3)
+    (api/ungroup))
+```
+
+null \[9 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 2   | 2   | 1.000  | B   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 1   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
+
+------------------------------------------------------------------------
+
+Groups sorted by group name and named.
+
+``` clojure
+(-> DS
+    (api/group-by :V3)
+    (api/ungroup {:order? true
+                  :dataset-name "Ordered by V3"}))
+```
+
+Ordered by V3 \[9 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
+
+------------------------------------------------------------------------
+
+Let's add group name and id as additional columns
+
+``` clojure
+(-> DS
+    (api/group-by (comp #(< % 4) :V2))
+    (api/ungroup {:add-group-as-column true
+                  :add-group-id-as-column true}))
+```
+
+null \[9 6\]:
+
+| :$group-name | :$group-id | :V1 | :V2 | :V3    | :V4 |
+|--------------|------------|-----|-----|--------|-----|
+| false        | 0          | 2   | 4   | 0.5000 | A   |
+| false        | 0          | 1   | 5   | 1.000  | B   |
+| false        | 0          | 2   | 6   | 1.500  | C   |
+| false        | 0          | 1   | 7   | 0.5000 | A   |
+| false        | 0          | 2   | 8   | 1.000  | B   |
+| false        | 0          | 1   | 9   | 1.500  | C   |
+| true         | 1          | 1   | 1   | 0.5000 | A   |
+| true         | 1          | 2   | 2   | 1.000  | B   |
+| true         | 1          | 1   | 3   | 1.500  | C   |
+
+------------------------------------------------------------------------
+
+Let's assign different column names
+
+``` clojure
+(-> DS
+    (api/group-by (comp #(< % 4) :V2))
+    (api/ungroup {:add-group-as-column "Is V2 less than 4?"
+                  :add-group-id-as-column "group id"}))
+```
+
+null \[9 6\]:
+
+| Is V2 less than 4? | group id | :V1 | :V2 | :V3    | :V4 |
+|--------------------|----------|-----|-----|--------|-----|
+| false              | 0        | 2   | 4   | 0.5000 | A   |
+| false              | 0        | 1   | 5   | 1.000  | B   |
+| false              | 0        | 2   | 6   | 1.500  | C   |
+| false              | 0        | 1   | 7   | 0.5000 | A   |
+| false              | 0        | 2   | 8   | 1.000  | B   |
+| false              | 0        | 1   | 9   | 1.500  | C   |
+| true               | 1        | 1   | 1   | 0.5000 | A   |
+| true               | 1        | 2   | 2   | 1.000  | B   |
+| true               | 1        | 1   | 3   | 1.500  | C   |
+
+------------------------------------------------------------------------
+
+If we group by map, we can automatically create new columns out of group names.
+
+``` clojure
+(-> DS
+    (api/group-by (fn [row] {"V1 and V3 multiplied" (* (:V1 row)
+                                                      (:V3 row))
+                            "V4 as string" (str (:V4 row))}))
+    (api/ungroup {:add-group-as-column true}))
+```
+
+null \[9 6\]:
+
+| V1 and V3 multiplied | V4 as string | :V1 | :V2 | :V3    | :V4 |
+|----------------------|--------------|-----|-----|--------|-----|
+| 3.000                | C            | 2   | 6   | 1.500  | C   |
+| 1.500                | C            | 1   | 3   | 1.500  | C   |
+| 1.500                | C            | 1   | 9   | 1.500  | C   |
+| 1.000                | A            | 2   | 4   | 0.5000 | A   |
+| 0.5000               | A            | 1   | 1   | 0.5000 | A   |
+| 0.5000               | A            | 1   | 7   | 0.5000 | A   |
+| 1.000                | B            | 1   | 5   | 1.000  | B   |
+| 2.000                | B            | 2   | 2   | 1.000  | B   |
+| 2.000                | B            | 2   | 8   | 1.000  | B   |
+
+------------------------------------------------------------------------
+
+We can add group names without separation
+
+``` clojure
+(-> DS
+    (api/group-by (fn [row] {"V1 and V3 multiplied" (* (:V1 row)
+                                                      (:V3 row))
+                            "V4 as string" (str (:V4 row))}))
+    (api/ungroup {:add-group-as-column "just map"
+                  :separate? false}))
+```
+
+null \[9 5\]:
+
+| just map                                         | :V1 | :V2 | :V3    | :V4 |
+|--------------------------------------------------|-----|-----|--------|-----|
+| {"V1 and V3 multiplied" 3.0, "V4 as string" "C"} | 2   | 6   | 1.500  | C   |
+| {"V1 and V3 multiplied" 1.5, "V4 as string" "C"} | 1   | 3   | 1.500  | C   |
+| {"V1 and V3 multiplied" 1.5, "V4 as string" "C"} | 1   | 9   | 1.500  | C   |
+| {"V1 and V3 multiplied" 1.0, "V4 as string" "A"} | 2   | 4   | 0.5000 | A   |
+| {"V1 and V3 multiplied" 0.5, "V4 as string" "A"} | 1   | 1   | 0.5000 | A   |
+| {"V1 and V3 multiplied" 0.5, "V4 as string" "A"} | 1   | 7   | 0.5000 | A   |
+| {"V1 and V3 multiplied" 1.0, "V4 as string" "B"} | 1   | 5   | 1.000  | B   |
+| {"V1 and V3 multiplied" 2.0, "V4 as string" "B"} | 2   | 2   | 1.000  | B   |
+| {"V1 and V3 multiplied" 2.0, "V4 as string" "B"} | 2   | 8   | 1.000  | B   |
+
+------------------------------------------------------------------------
+
+The same applies to group names as sequences
+
+``` clojure
+(-> DS
+    (api/group-by (juxt :V1 :V3))
+    (api/ungroup {:add-group-as-column "abc"}))
+```
+
+null \[9 6\]:
+
+| :abc-0 | :abc-1 | :V1 | :V2 | :V3    | :V4 |
+|--------|--------|-----|-----|--------|-----|
+| 1      | 1.000  | 1   | 5   | 1.000  | B   |
+| 1      | 0.5000 | 1   | 1   | 0.5000 | A   |
+| 1      | 0.5000 | 1   | 7   | 0.5000 | A   |
+| 2      | 1.500  | 2   | 6   | 1.500  | C   |
+| 1      | 1.500  | 1   | 3   | 1.500  | C   |
+| 1      | 1.500  | 1   | 9   | 1.500  | C   |
+| 2      | 0.5000 | 2   | 4   | 0.5000 | A   |
+| 2      | 1.000  | 2   | 2   | 1.000  | B   |
+| 2      | 1.000  | 2   | 8   | 1.000  | B   |
+
+------------------------------------------------------------------------
+
+Let's provide column names
+
+``` clojure
+(-> DS
+    (api/group-by (juxt :V1 :V3))
+    (api/ungroup {:add-group-as-column ["v1" "v3"]}))
+```
+
+null \[9 6\]:
+
+| v1  | v3     | :V1 | :V2 | :V3    | :V4 |
+|-----|--------|-----|-----|--------|-----|
+| 1   | 1.000  | 1   | 5   | 1.000  | B   |
+| 1   | 0.5000 | 1   | 1   | 0.5000 | A   |
+| 1   | 0.5000 | 1   | 7   | 0.5000 | A   |
+| 2   | 1.500  | 2   | 6   | 1.500  | C   |
+| 1   | 1.500  | 1   | 3   | 1.500  | C   |
+| 1   | 1.500  | 1   | 9   | 1.500  | C   |
+| 2   | 0.5000 | 2   | 4   | 0.5000 | A   |
+| 2   | 1.000  | 2   | 2   | 1.000  | B   |
+| 2   | 1.000  | 2   | 8   | 1.000  | B   |
+
+------------------------------------------------------------------------
+
+Also we can supress separation
+
+``` clojure
+(-> DS
+    (api/group-by (juxt :V1 :V3))
+    (api/ungroup {:separate? false
+                  :add-group-as-column true}))
+```
+
+null \[9 5\]:
+
+| :$group-name | :V1 | :V2 | :V3    | :V4 |
+|--------------|-----|-----|--------|-----|
+| \[1 1.0\]    | 1   | 5   | 1.000  | B   |
+| \[1 0.5\]    | 1   | 1   | 0.5000 | A   |
+| \[1 0.5\]    | 1   | 7   | 0.5000 | A   |
+| \[2 1.5\]    | 2   | 6   | 1.500  | C   |
+| \[1 1.5\]    | 1   | 3   | 1.500  | C   |
+| \[1 1.5\]    | 1   | 9   | 1.500  | C   |
+| \[2 0.5\]    | 2   | 4   | 0.5000 | A   |
+| \[2 1.0\]    | 2   | 2   | 1.000  | B   |
+| \[2 1.0\]    | 2   | 8   | 1.000  | B   |
 
 #### Other functions
 

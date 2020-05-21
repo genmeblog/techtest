@@ -1,0 +1,2069 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\PassOptionsToPackage{hyphens}{url} % url is loaded by hyperref
+\usepackage[unicode=true]{hyperref}
+\hypersetup{
+            pdftitle={Proposed API for tech.ml.dataset},
+            pdfauthor={GenerateMe},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{longtable,booktabs}
+% Fix footnotes in tables (requires footnote package)
+\IfFileExists{footnote.sty}{\usepackage{footnote}\makesavenoteenv{long table}}{}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+
+\title{Proposed API for tech.ml.dataset}
+\author{GenerateMe}
+\date{2020-05-21}
+
+\begin{document}
+\maketitle
+
+\subsection{Introduction}\label{introduction}
+
+\href{https://github.com/techascent/tech.ml.dataset}{tech.ml.dataset} is
+a great and fast library which brings columnar dataset to the Clojure.
+Chris Nuernberger has been working on this library for last year as a
+part of bigger \texttt{tech.ml} stack.
+
+I've started to test the library and help to fix uncovered bugs. My main
+goal was to compare functionalities with the other standards from other
+platforms. I focused on R solutions:
+\href{https://dplyr.tidyverse.org/}{dplyr},
+\href{https://tidyr.tidyverse.org/}{tidyr} and
+\href{https://rdatatable.gitlab.io/data.table/}{data.table}.
+
+During conversions of the examples I've come up how to reorganized
+existing \texttt{tech.ml.dataset} functions into simple to use API. The
+main goals were:
+
+\begin{itemize}
+\tightlist
+\item
+  Focus on dataset manipulation functionality, leaving other parts of
+  \texttt{tech.ml} like pipelines, datatypes, readers, ML, etc.
+\item
+  Single entry point for common operations - one function dispatching on
+  given arguments.
+\item
+  \texttt{group-by} results with special kind of dataset - a dataset
+  containing subsets created after grouping as a column.
+\item
+  Most operations recognize regular dataset and grouped dataset and
+  process data accordingly.
+\item
+  One function form to enable thread-first on dataset.
+\end{itemize}
+
+All proposed functions are grouped in tabs below. Select group to see
+examples and details.
+
+INFO: The future of this API is not known yet. Two directions are
+possible: integration into \texttt{tech.ml} or development under
+\texttt{Scicloj} organization. For the time being use this repo if you
+want to try. Join the discussion on
+\href{https://clojurians.zulipchat.com/\#narrow/stream/236259-tech.2Eml.2Edataset.2Edev/topic/api}{Zulip}
+
+Let's require main namespace and define dataset used in most examples:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{require}\NormalTok{ '[techtest.api }\AttributeTok{:as}\NormalTok{ api])}
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(api/dataset \{}\AttributeTok{:V1}\NormalTok{ (}\KeywordTok{take} \DecValTok{9}\NormalTok{ (}\KeywordTok{cycle}\NormalTok{ [}\DecValTok{1} \DecValTok{2}\NormalTok{]))}
+                      \AttributeTok{:V2}\NormalTok{ (}\KeywordTok{range} \DecValTok{1} \DecValTok{10}\NormalTok{)}
+                      \AttributeTok{:V3}\NormalTok{ (}\KeywordTok{take} \DecValTok{9}\NormalTok{ (}\KeywordTok{cycle}\NormalTok{ [}\FloatTok{0.5} \FloatTok{1.0} \FloatTok{1.5}\NormalTok{]))}
+                      \AttributeTok{:V4}\NormalTok{ (}\KeywordTok{take} \DecValTok{9}\NormalTok{ (}\KeywordTok{cycle}\NormalTok{ [}\CharTok{\textbackslash{}A} \CharTok{\textbackslash{}B} \CharTok{\textbackslash{}C}\NormalTok{]))\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DS}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Functionality}\label{functionality}
+
+\subsubsection{Dataset}\label{dataset}
+
+Dataset is a special type which can be considered as a map of columns
+implemented around \texttt{tech.ml.datatype} library. Each column can be
+considered as named sequence of typed data. Supported types include
+integers, floats, string, boolean, date/time, objects etc.
+
+\paragraph{Dataset creation}\label{dataset-creation}
+
+Dataset can be created from various of types of Clojure structures and
+files:
+
+\begin{itemize}
+\tightlist
+\item
+  single values
+\item
+  sequence of maps
+\item
+  map of sequences or values
+\item
+  sequence of columns (taken from other dataset or created manually)
+\item
+  sequence of pairs
+\item
+  file types: raw/gzipped csv/tsv, json, xls(x) taken from local file
+  system or URL
+\item
+  input stream
+\end{itemize}
+
+\texttt{api/dataset} accepts:
+
+\begin{itemize}
+\tightlist
+\item
+  data
+\item
+  options (see documentation of
+  \texttt{tech.ml.dataset/-\textgreater{}dataset} function for full
+  list):
+\item
+  \texttt{:dataset-name} - name of the dataset
+\item
+  \texttt{:num-rows} - number of rows to read from file
+\item
+  \texttt{:header-row?} - indication if first row in file is a header
+\item
+  \texttt{:key-fn} - function applied to column names (eg.
+  \texttt{keyword}, to convert column names to keywords)
+\item
+  \texttt{:separator} - column separator
+\item
+  \texttt{:single-value-column-name} - name of the column when single
+  value is provided
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Empty dataset.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+_unnamed [0 0]:
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Dataset from single value.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset }\DecValTok{999}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 1{]}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+:\$value\tabularnewline
+\midrule
+\endhead
+999\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Set column name for single value. Also set the dataset name.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset }\DecValTok{999}\NormalTok{ \{}\AttributeTok{:single-value-column-name} \StringTok{"my-single-value"}\NormalTok{\})}
+\NormalTok{(api/dataset }\DecValTok{999}\NormalTok{ \{}\AttributeTok{:single-value-column-name} \StringTok{""}
+                  \AttributeTok{:dataset-name} \StringTok{"Single value"}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 1{]}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+my-single-value\tabularnewline
+\midrule
+\endhead
+999\tabularnewline
+\bottomrule
+\end{longtable}
+
+Single value {[}1 1{]}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+0\tabularnewline
+\midrule
+\endhead
+999\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Sequence of pairs (first = column name, second = value(s)).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset [[}\AttributeTok{:A} \DecValTok{33}\NormalTok{] [}\AttributeTok{:B} \DecValTok{5}\NormalTok{] [}\AttributeTok{:C} \AttributeTok{:a}\NormalTok{]])}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:A & :B & :C\tabularnewline
+\midrule
+\endhead
+33 & 5 & :a\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Not sequential values are repeated row-count number of times.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset [[}\AttributeTok{:A}\NormalTok{ [}\DecValTok{1} \DecValTok{2} \DecValTok{3} \DecValTok{4} \DecValTok{5} \DecValTok{6}\NormalTok{]] [}\AttributeTok{:B} \StringTok{"X"}\NormalTok{] [}\AttributeTok{:C} \AttributeTok{:a}\NormalTok{]])}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}6 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:A & :B & :C\tabularnewline
+\midrule
+\endhead
+1 & X & :a\tabularnewline
+2 & X & :a\tabularnewline
+3 & X & :a\tabularnewline
+4 & X & :a\tabularnewline
+5 & X & :a\tabularnewline
+6 & X & :a\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Dataset created from map (keys = column name, second = value(s)). Works
+the same as sequence of pairs.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset \{}\AttributeTok{:A} \DecValTok{33}\NormalTok{\})}
+\NormalTok{(api/dataset \{}\AttributeTok{:A}\NormalTok{ [}\DecValTok{1} \DecValTok{2} \DecValTok{3}\NormalTok{]\})}
+\NormalTok{(api/dataset \{}\AttributeTok{:A}\NormalTok{ [}\DecValTok{3} \DecValTok{4} \DecValTok{5}\NormalTok{] }\AttributeTok{:B} \StringTok{"X"}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 1{]}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+:A\tabularnewline
+\midrule
+\endhead
+33\tabularnewline
+\bottomrule
+\end{longtable}
+
+\_unnamed {[}3 1{]}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+:A\tabularnewline
+\midrule
+\endhead
+1\tabularnewline
+2\tabularnewline
+3\tabularnewline
+\bottomrule
+\end{longtable}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:A & :B\tabularnewline
+\midrule
+\endhead
+3 & X\tabularnewline
+4 & X\tabularnewline
+5 & X\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+You can put any value inside a column
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset \{}\AttributeTok{:A}\NormalTok{ [[}\DecValTok{3} \DecValTok{4} \DecValTok{5}\NormalTok{] [}\AttributeTok{:a} \AttributeTok{:b}\NormalTok{]] }\AttributeTok{:B} \StringTok{"X"}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}2 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:A & :B\tabularnewline
+\midrule
+\endhead
+{[}3 4 5{]} & X\tabularnewline
+{[}:a :b{]} & X\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Sequence of maps
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset [\{}\AttributeTok{:a} \DecValTok{1} \AttributeTok{:b} \DecValTok{3}\NormalTok{\} \{}\AttributeTok{:b} \DecValTok{2} \AttributeTok{:a} \DecValTok{99}\NormalTok{\}])}
+\NormalTok{(api/dataset [\{}\AttributeTok{:a} \DecValTok{1} \AttributeTok{:b}\NormalTok{ [}\DecValTok{1} \DecValTok{2} \DecValTok{3}\NormalTok{]\} \{}\AttributeTok{:a} \DecValTok{2} \AttributeTok{:b}\NormalTok{ [}\DecValTok{3} \DecValTok{4}\NormalTok{]\}])}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}2 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:a & :b\tabularnewline
+\midrule
+\endhead
+1 & 3\tabularnewline
+99 & 2\tabularnewline
+\bottomrule
+\end{longtable}
+
+\_unnamed {[}2 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:a & :b\tabularnewline
+\midrule
+\endhead
+1 & {[}1 2 3{]}\tabularnewline
+2 & {[}3 4{]}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Missing values are marked by \texttt{nil}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset [\{}\AttributeTok{:a} \VariableTok{nil} \AttributeTok{:b} \DecValTok{1}\NormalTok{\} \{}\AttributeTok{:a} \DecValTok{3} \AttributeTok{:b} \DecValTok{4}\NormalTok{\} \{}\AttributeTok{:a} \DecValTok{11}\NormalTok{\}])}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:a & :b\tabularnewline
+\midrule
+\endhead
+& 1\tabularnewline
+3 & 4\tabularnewline
+11 &\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Import CSV file
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset }\StringTok{"data/family.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+data/family.csv {[}5 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+family & dob\_child1 & dob\_child2 & gender\_child1 &
+gender\_child2\tabularnewline
+\midrule
+\endhead
+1 & 1998-11-26 & 2000-01-29 & 1 & 2\tabularnewline
+2 & 1996-06-22 & & 2 &\tabularnewline
+3 & 2002-07-11 & 2004-04-05 & 2 & 2\tabularnewline
+4 & 2004-10-10 & 2009-08-27 & 1 & 1\tabularnewline
+5 & 2000-12-05 & 2005-02-28 & 2 & 1\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Import from URL
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{defonce}\FunctionTok{ ds }\NormalTok{(api/dataset }\StringTok{"https://vega.github.io/vega-lite/examples/data/seattle-weather.csv"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ds}
+\end{Highlighting}
+\end{Shaded}
+
+\url{https://vega.github.io/vega-lite/examples/data/seattle-weather.csv}
+{[}1461 6{]}:
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+date & precipitation & temp\_max & temp\_min & wind &
+weather\tabularnewline
+\midrule
+\endhead
+2012-01-01 & 0.000 & 12.80 & 5.000 & 4.700 & drizzle\tabularnewline
+2012-01-02 & 10.90 & 10.60 & 2.800 & 4.500 & rain\tabularnewline
+2012-01-03 & 0.8000 & 11.70 & 7.200 & 2.300 & rain\tabularnewline
+2012-01-04 & 20.30 & 12.20 & 5.600 & 4.700 & rain\tabularnewline
+2012-01-05 & 1.300 & 8.900 & 2.800 & 6.100 & rain\tabularnewline
+2012-01-06 & 2.500 & 4.400 & 2.200 & 2.200 & rain\tabularnewline
+2012-01-07 & 0.000 & 7.200 & 2.800 & 2.300 & rain\tabularnewline
+2012-01-08 & 0.000 & 10.00 & 2.800 & 2.000 & sun\tabularnewline
+2012-01-09 & 4.300 & 9.400 & 5.000 & 3.400 & rain\tabularnewline
+2012-01-10 & 1.000 & 6.100 & 0.6000 & 3.400 & rain\tabularnewline
+2012-01-11 & 0.000 & 6.100 & -1.100 & 5.100 & sun\tabularnewline
+2012-01-12 & 0.000 & 6.100 & -1.700 & 1.900 & sun\tabularnewline
+2012-01-13 & 0.000 & 5.000 & -2.800 & 1.300 & sun\tabularnewline
+2012-01-14 & 4.100 & 4.400 & 0.6000 & 5.300 & snow\tabularnewline
+2012-01-15 & 5.300 & 1.100 & -3.300 & 3.200 & snow\tabularnewline
+2012-01-16 & 2.500 & 1.700 & -2.800 & 5.000 & snow\tabularnewline
+2012-01-17 & 8.100 & 3.300 & 0.000 & 5.600 & snow\tabularnewline
+2012-01-18 & 19.80 & 0.000 & -2.800 & 5.000 & snow\tabularnewline
+2012-01-19 & 15.20 & -1.100 & -2.800 & 1.600 & snow\tabularnewline
+2012-01-20 & 13.50 & 7.200 & -1.100 & 2.300 & snow\tabularnewline
+2012-01-21 & 3.000 & 8.300 & 3.300 & 8.200 & rain\tabularnewline
+2012-01-22 & 6.100 & 6.700 & 2.200 & 4.800 & rain\tabularnewline
+2012-01-23 & 0.000 & 8.300 & 1.100 & 3.600 & rain\tabularnewline
+2012-01-24 & 8.600 & 10.00 & 2.200 & 5.100 & rain\tabularnewline
+2012-01-25 & 8.100 & 8.900 & 4.400 & 5.400 & rain\tabularnewline
+\bottomrule
+\end{longtable}
+
+\paragraph{Saving}\label{saving}
+
+Export dataset to a file or output stream can be done by calling
+\texttt{api/write-csv!}. Function accepts:
+
+\begin{itemize}
+\tightlist
+\item
+  dataset
+\item
+  file name with one of the extensions: \texttt{.csv}, \texttt{.tsv},
+  \texttt{.csv.gz} and \texttt{.tsv.gz} or output stream
+\item
+  options:
+\item
+  \texttt{:separator} - string or separator char.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/write-csv! ds }\StringTok{"output.tsv.gz"}\NormalTok{)}
+\NormalTok{(.exists (clojure.java.io/file }\StringTok{"output.csv.gz"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+nil
+true
+\end{verbatim}
+
+\paragraph{Dataset related functions}\label{dataset-related-functions}
+
+Summary functions about the dataset like number of rows, columns and
+basic stats.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Number of rows
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/row-count ds)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+1461
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Number of columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/column-count ds)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+6
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Names of columns.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/column-names ds)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+("date" "precipitation" "temp_max" "temp_min" "wind" "weather")
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Shape of the dataset, {[}row count, column count{]}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/shape ds)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1461 6]
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+General info about dataset. There are three variants:
+
+\begin{itemize}
+\tightlist
+\item
+  default - containing information about columns with basic statistics
+\item
+  \texttt{:basic} - just name, row and column count and information if
+  dataset is a result of \texttt{group-by} operation
+\item
+  \texttt{:columns} - columns' metadata
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/info ds)}
+\NormalTok{(api/info ds }\AttributeTok{:basic}\NormalTok{)}
+\NormalTok{(api/info ds }\AttributeTok{:columns}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\url{https://vega.github.io/vega-lite/examples/data/seattle-weather.csv}:
+descriptive-stats {[}6 10{]}:
+
+\begin{longtable}[]{@{}llllllllll@{}}
+\toprule
+\begin{minipage}[b]{0.08\columnwidth}\raggedright\strut
+:col-name\strut
+\end{minipage} & \begin{minipage}[b]{0.11\columnwidth}\raggedright\strut
+:datatype\strut
+\end{minipage} & \begin{minipage}[b]{0.06\columnwidth}\raggedright\strut
+:n-valid\strut
+\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright\strut
+:n-missing\strut
+\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright\strut
+:mean\strut
+\end{minipage} & \begin{minipage}[b]{0.04\columnwidth}\raggedright\strut
+:mode\strut
+\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright\strut
+:min\strut
+\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright\strut
+:max\strut
+\end{minipage} & \begin{minipage}[b]{0.12\columnwidth}\raggedright\strut
+:standard-deviation\strut
+\end{minipage} & \begin{minipage}[b]{0.05\columnwidth}\raggedright\strut
+:skew\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+date\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+:packed-local-date\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+1461\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+0\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+2013-12-31\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+2012-01-01\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+2015-12-31\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+precipitation\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+:float32\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+1461\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+0\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+3.029\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+0.000\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+55.90\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright\strut
+6.680\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+3.506\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+temp\_max\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+:float32\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+1461\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+0\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+16.44\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+-1.600\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+35.60\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright\strut
+7.350\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+0.2809\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+temp\_min\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+:float32\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+1461\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+0\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+8.235\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+-7.100\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+18.30\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright\strut
+5.023\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+-0.2495\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+weather\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+:string\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+1461\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+0\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+sun\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+wind\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+:float32\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+1461\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+0\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+3.241\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+0.4000\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+9.500\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright\strut
+1.438\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+0.8917\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\url{https://vega.github.io/vega-lite/examples/data/seattle-weather.csv}
+:basic info {[}1 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+\begin{minipage}[b]{0.61\columnwidth}\raggedright\strut
+:name\strut
+\end{minipage} & \begin{minipage}[b]{0.11\columnwidth}\raggedright\strut
+:grouped?\strut
+\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright\strut
+:rows\strut
+\end{minipage} & \begin{minipage}[b]{0.10\columnwidth}\raggedright\strut
+:columns\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.61\columnwidth}\raggedright\strut
+\url{https://vega.github.io/vega-lite/examples/data/seattle-weather.csv}\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+false\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+1461\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+6\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\url{https://vega.github.io/vega-lite/examples/data/seattle-weather.csv}
+:column info {[}6 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:name & :size & :datatype & :categorical?\tabularnewline
+\midrule
+\endhead
+date & 1461 & :packed-local-date &\tabularnewline
+precipitation & 1461 & :float32 &\tabularnewline
+temp\_max & 1461 & :float32 &\tabularnewline
+temp\_min & 1461 & :float32 &\tabularnewline
+wind & 1461 & :float32 &\tabularnewline
+weather & 1461 & :string & true\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Getting a dataset name
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset-name ds)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+"https://vega.github.io/vega-lite/examples/data/seattle-weather.csv"
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Setting a dataset name (operation is immutable).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->>} \StringTok{"seattle-weather"}
+\NormalTok{     (api/set-dataset-name ds)}
+\NormalTok{     (api/dataset-name))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+"seattle-weather"
+\end{verbatim}
+
+\paragraph{Columns and rows}\label{columns-and-rows}
+
+Get columns and rows as sequences. \texttt{column}, \texttt{columns} and
+\texttt{rows} treat grouped dataset as regular one. See \texttt{Groups}
+to read more about grouped datasets.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Select column.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(ds }\StringTok{"wind"}\NormalTok{)}
+\NormalTok{(api/column ds }\StringTok{"date"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#tech.ml.dataset.column<float32>[1461]
+wind
+[4.700, 4.500, 2.300, 4.700, 6.100, 2.200, 2.300, 2.000, 3.400, 3.400, 5.100, 1.900, 1.300, 5.300, 3.200, 5.000, 5.600, 5.000, 1.600, 2.300, ...]
+#tech.ml.dataset.column<packed-local-date>[1461]
+date
+[2012-01-01, 2012-01-02, 2012-01-03, 2012-01-04, 2012-01-05, 2012-01-06, 2012-01-07, 2012-01-08, 2012-01-09, 2012-01-10, 2012-01-11, 2012-01-12, 2012-01-13, 2012-01-14, 2012-01-15, 2012-01-16, 2012-01-17, 2012-01-18, 2012-01-19, 2012-01-20, ...]
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Columns as sequence
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{take} \DecValTok{2}\NormalTok{ (api/columns ds))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(#tech.ml.dataset.column<packed-local-date>[1461]
+date
+[2012-01-01, 2012-01-02, 2012-01-03, 2012-01-04, 2012-01-05, 2012-01-06, 2012-01-07, 2012-01-08, 2012-01-09, 2012-01-10, 2012-01-11, 2012-01-12, 2012-01-13, 2012-01-14, 2012-01-15, 2012-01-16, 2012-01-17, 2012-01-18, 2012-01-19, 2012-01-20, ...] #tech.ml.dataset.column<float32>[1461]
+precipitation
+[0.000, 10.90, 0.8000, 20.30, 1.300, 2.500, 0.000, 0.000, 4.300, 1.000, 0.000, 0.000, 0.000, 4.100, 5.300, 2.500, 8.100, 19.80, 15.20, 13.50, ...])
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Columns as map
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{keys}\NormalTok{ (api/columns ds }\AttributeTok{:as-map}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+("date" "precipitation" "temp_max" "temp_min" "wind" "weather")
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Rows as sequence of sequences
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{take} \DecValTok{2}\NormalTok{ (api/rows ds))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+([#object[java.time.LocalDate 0x70ca466e "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x506de7eb "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Rows as sequence of maps
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(clojure.pprint/pprint (}\KeywordTok{take} \DecValTok{2}\NormalTok{ (api/rows ds }\AttributeTok{:as-maps}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+({"date" #object[java.time.LocalDate 0x172b080b "2012-01-01"],
+  "precipitation" 0.0,
+  "temp_min" 5.0,
+  "weather" "drizzle",
+  "temp_max" 12.8,
+  "wind" 4.7}
+ {"date" #object[java.time.LocalDate 0x5b83950 "2012-01-02"],
+  "precipitation" 10.9,
+  "temp_min" 2.8,
+  "weather" "rain",
+  "temp_max" 10.6,
+  "wind" 4.5})
+\end{verbatim}
+
+\subsubsection{Group-by}\label{group-by}
+
+Grouping by is an operation which splits dataset into subdatasets and
+pack it into new special type of\ldots{} dataset. I distinguish two
+types of dataset: regular dataset and grouped dataset. The latter is the
+result of grouping.
+
+Grouped dataset is annotated in by \texttt{:grouped?} meta tag and
+consist following columns:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{:name} - group name or structure
+\item
+  \texttt{:group-id} - integer assigned to the group
+\item
+  \texttt{:count} - number of elements in a group
+\item
+  \texttt{:data} - groups as datasets
+\end{itemize}
+
+Almost all functions recognize type of the dataset (grouped or not) and
+operate accordingly.
+
+You can't apply reshaping or join/concat functions on grouped datasets.
+
+\paragraph{Grouping}\label{grouping}
+
+Grouping is done by calling \texttt{group-by} function with arguments:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{ds} - dataset
+\item
+  \texttt{grouping-selector} - what to use for grouping
+\item
+  options:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{:result-type} - what to return:
+
+    \begin{itemize}
+    \tightlist
+    \item
+      \texttt{:as-dataset} (default) - return grouped dataset
+    \item
+      \texttt{:as-indexes} - return rows ids (row number from original
+      dataset)
+    \item
+      \texttt{:as-map} - return map with group names as keys and
+      subdataset as values
+    \item
+      \texttt{:as-seq} - return sequens of subdatasets
+    \end{itemize}
+  \item
+    \texttt{:limit-columns} - list of the columns which should be
+    returned during grouping by function.
+  \end{itemize}
+\end{itemize}
+
+All subdatasets (groups) have set name as the group name, additionally
+\texttt{group-id} is in meta.
+
+Grouping can be done by:
+
+\begin{itemize}
+\tightlist
+\item
+  single column name
+\item
+  seq of column names
+\item
+  map of keys (group names) and row indexes
+\item
+  value returned by function taking row as map
+\end{itemize}
+
+Note: currently dataset inside dataset is printed recursively so it
+renders poorly from markdown. So I will use \texttt{:as-seq} result type
+to show just group names and groups.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+List of columns in groupd dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/column-names (api/group-by DS }\AttributeTok{:V1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(:name :group-id :count :data)
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Content of the grouped dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/columns (api/group-by DS }\AttributeTok{:V1}\NormalTok{) }\AttributeTok{:as-map}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+{:name #tech.ml.dataset.column<int64>[2]
+:name
+[1, 2, ], :group-id #tech.ml.dataset.column<int64>[2]
+:group-id
+[0, 1, ], :count #tech.ml.dataset.column<int32>[2]
+:count
+[5, 4, ], :data #tech.ml.dataset.column<object>[2]
+:data
+[1 [5 4]:
+
+| :V1 | :V2 |    :V3 | :V4 |
+|-----+-----+--------+-----|
+|   1 |   1 | 0.5000 |   A |
+|   1 |   3 |  1.500 |   C |
+|   1 |   5 |  1.000 |   B |
+|   1 |   7 | 0.5000 |   A |
+|   1 |   9 |  1.500 |   C |
+, 2 [4 4]:
+
+| :V1 | :V2 |    :V3 | :V4 |
+|-----+-----+--------+-----|
+|   2 |   2 |  1.000 |   B |
+|   2 |   4 | 0.5000 |   A |
+|   2 |   6 |  1.500 |   C |
+|   2 |   8 |  1.000 |   B |
+, ]}
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Grouped dataset as map
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{keys}\NormalTok{ (api/group-by DS }\AttributeTok{:V1}\NormalTok{ \{}\AttributeTok{:result-type} \AttributeTok{:as-map}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(1 2)
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{vals}\NormalTok{ (api/group-by DS }\AttributeTok{:V1}\NormalTok{ \{}\AttributeTok{:result-type} \AttributeTok{:as-map}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+(1 {[}5 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+2 {[}4 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 2 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+)
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Group dataset as map of indexes (row ids)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/group-by DS }\AttributeTok{:V1}\NormalTok{ \{}\AttributeTok{:result-type} \AttributeTok{:as-indexes}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+{1 [0 2 4 6 8], 2 [1 3 5 7]}
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+To get groups as sequence or a map can be done from grouped dataset
+using \texttt{groups-\textgreater{}seq} and
+\texttt{groups-\textgreater{}map} functions.
+
+Groups as seq can be obtained by just accessing \texttt{:data} column.
+
+I will use temporary dataset here.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{let}\NormalTok{ [ds (}\KeywordTok{->}\NormalTok{ \{}\StringTok{"a"}\NormalTok{ [}\DecValTok{1} \DecValTok{1} \DecValTok{2} \DecValTok{2}\NormalTok{]}
+              \StringTok{"b"}\NormalTok{ [}\StringTok{"a"} \StringTok{"b"} \StringTok{"c"} \StringTok{"d"}\NormalTok{]\}}
+\NormalTok{             (api/dataset)}
+\NormalTok{             (api/group-by }\StringTok{"a"}\NormalTok{))]}
+\NormalTok{  (}\KeywordTok{seq}\NormalTok{ (ds }\AttributeTok{:data}\NormalTok{))) }\CommentTok{;; seq is not necessary but Markdown treats `:data` as command here}
+\end{Highlighting}
+\end{Shaded}
+
+(1 {[}2 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+a & b\tabularnewline
+\midrule
+\endhead
+1 & a\tabularnewline
+1 & b\tabularnewline
+\bottomrule
+\end{longtable}
+
+2 {[}2 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+a & b\tabularnewline
+\midrule
+\endhead
+2 & c\tabularnewline
+2 & d\tabularnewline
+\bottomrule
+\end{longtable}
+
+)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ \{}\StringTok{"a"}\NormalTok{ [}\DecValTok{1} \DecValTok{1} \DecValTok{2} \DecValTok{2}\NormalTok{]}
+     \StringTok{"b"}\NormalTok{ [}\StringTok{"a"} \StringTok{"b"} \StringTok{"c"} \StringTok{"d"}\NormalTok{]\}}
+\NormalTok{    (api/dataset)}
+\NormalTok{    (api/group-by }\StringTok{"a"}\NormalTok{)}
+\NormalTok{    (api/groups->seq))}
+\end{Highlighting}
+\end{Shaded}
+
+(1 {[}2 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+a & b\tabularnewline
+\midrule
+\endhead
+1 & a\tabularnewline
+1 & b\tabularnewline
+\bottomrule
+\end{longtable}
+
+2 {[}2 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+a & b\tabularnewline
+\midrule
+\endhead
+2 & c\tabularnewline
+2 & d\tabularnewline
+\bottomrule
+\end{longtable}
+
+)
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Groups as map
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ \{}\StringTok{"a"}\NormalTok{ [}\DecValTok{1} \DecValTok{1} \DecValTok{2} \DecValTok{2}\NormalTok{]}
+     \StringTok{"b"}\NormalTok{ [}\StringTok{"a"} \StringTok{"b"} \StringTok{"c"} \StringTok{"d"}\NormalTok{]\}}
+\NormalTok{    (api/dataset)}
+\NormalTok{    (api/group-by }\StringTok{"a"}\NormalTok{)}
+\NormalTok{    (api/groups->map))}
+\end{Highlighting}
+\end{Shaded}
+
+\{1 1 {[}2 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+a & b\tabularnewline
+\midrule
+\endhead
+1 & a\tabularnewline
+1 & b\tabularnewline
+\bottomrule
+\end{longtable}
+
+, 2 2 {[}2 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+a & b\tabularnewline
+\midrule
+\endhead
+2 & c\tabularnewline
+2 & d\tabularnewline
+\bottomrule
+\end{longtable}
+
+\}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Grouping by more than one column. You can see that group names are maps.
+When ungrouping is done these maps are used to restore column names.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/group-by DS [}\AttributeTok{:V1} \AttributeTok{:V3}\NormalTok{] \{}\AttributeTok{:result-type} \AttributeTok{:as-seq}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+(\{:V3 1.0, :V1 1\} {[}1 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 5 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\{:V3 0.5, :V1 1\} {[}2 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+\bottomrule
+\end{longtable}
+
+\{:V3 0.5, :V1 2\} {[}1 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 4 & 0.5000 & A\tabularnewline
+\bottomrule
+\end{longtable}
+
+\{:V3 1.0, :V1 2\} {[}2 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 2 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\{:V3 1.5, :V1 1\} {[}2 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 3 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\{:V3 1.5, :V1 2\} {[}1 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 6 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+)
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Grouping can be done by providing just row indexes. This way you can
+assign the same row to more than one group.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/group-by DS \{}\StringTok{"group-a"}\NormalTok{ [}\DecValTok{1} \DecValTok{2} \DecValTok{1} \DecValTok{2}\NormalTok{]}
+                  \StringTok{"group-b"}\NormalTok{ [}\DecValTok{5} \DecValTok{5} \DecValTok{5} \DecValTok{1}\NormalTok{]\} \{}\AttributeTok{:result-type} \AttributeTok{:as-seq}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+(group-a {[}4 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+group-b {[}4 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 6 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+)
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+You can group by a result of gruping function which gets row as map and
+should return group name. When map is used as a group name, ungrouping
+restore original column names.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/group-by DS (}\KeywordTok{fn}\NormalTok{ [row] (}\KeywordTok{*}\NormalTok{ (}\AttributeTok{:V1}\NormalTok{ row)}
+\NormalTok{                             (}\AttributeTok{:V3}\NormalTok{ row))) \{}\AttributeTok{:result-type} \AttributeTok{:as-seq}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+(1.0 {[}2 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+2.0 {[}2 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 2 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+0.5 {[}2 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+\bottomrule
+\end{longtable}
+
+3.0 {[}1 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 6 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+1.5 {[}2 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 3 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+)
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+You can use any predicate on column to split dataset into two groups.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/group-by DS (}\KeywordTok{comp}\NormalTok{ #(}\KeywordTok{<} \VariableTok{%} \FloatTok{1.0}\NormalTok{) }\AttributeTok{:V3}\NormalTok{) \{}\AttributeTok{:result-type} \AttributeTok{:as-seq}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+(false {[}6 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+true {[}3 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+\bottomrule
+\end{longtable}
+
+)
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\texttt{juxt} is also helpful
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/group-by DS (}\KeywordTok{juxt} \AttributeTok{:V1} \AttributeTok{:V3}\NormalTok{) \{}\AttributeTok{:result-type} \AttributeTok{:as-seq}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+({[}1 1.0{]} {[}1 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 5 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+{[}1 0.5{]} {[}2 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+\bottomrule
+\end{longtable}
+
+{[}2 1.5{]} {[}1 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 6 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+{[}1 1.5{]} {[}2 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 3 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+{[}2 0.5{]} {[}1 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 4 & 0.5000 & A\tabularnewline
+\bottomrule
+\end{longtable}
+
+{[}2 1.0{]} {[}2 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 2 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+)
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\texttt{tech.ml.dataset} provides an option to limit columns which are
+passed to grouping functions. It's done for performance purposes.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/group-by DS }\KeywordTok{identity}\NormalTok{ \{}\AttributeTok{:result-type} \AttributeTok{:as-seq}
+                           \AttributeTok{:limit-columns}\NormalTok{ [}\AttributeTok{:V1}\NormalTok{]\})}
+\end{Highlighting}
+\end{Shaded}
+
+(\{:V1 1\} {[}5 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\{:V1 2\} {[}4 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 2 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+)
+
+\paragraph{Ungrouping}\label{ungrouping}
+
+Ungrouping simply concats all the groups into the dataset. Following
+options are possible
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{:order?} - order groups according to the group name ascending
+  order. Default: \texttt{false}
+\item
+  \texttt{:add-group-as-column} - should group name become a column? If
+  yes column is created with provided name (or \texttt{:\$group-name} if
+  argument is \texttt{true}). Default: \texttt{nil}.
+\item
+  \texttt{:add-group-id-as-column} - should group id become a column? If
+  yes column is created with provided name (or \texttt{:\$group-id} if
+  argument is \texttt{true}). Default: \texttt{nil}.
+\item
+  \texttt{:dataset-name} - to name resulting dataset. Default:
+  \texttt{nil} (\_unnamed)
+\end{itemize}
+
+If group name is a map, it will be splitted into separate columns. Be
+sure that groups (subdatasets) doesn't contain the same columns already.
+
+If group name is a vector, it will be splitted into separate columns. If
+you want to name them, set vector of target column names as
+\texttt{:add-group-as-column} argument.
+
+After ungrouping, order of the rows is kept within the groups but groups
+are ordered according to the internal storage.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Grouping and ungrouping.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V3}\NormalTok{)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+null {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 2 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Groups sorted by group name and named.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V3}\NormalTok{)}
+\NormalTok{    (api/ungroup \{}\AttributeTok{:order}\NormalTok{? }\VariableTok{true}
+                  \AttributeTok{:dataset-name} \StringTok{"Ordered by V3"}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+Ordered by V3 {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Let's add group name and id as additional columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by (}\KeywordTok{comp}\NormalTok{ #(}\KeywordTok{<} \VariableTok{%} \DecValTok{4}\NormalTok{) }\AttributeTok{:V2}\NormalTok{))}
+\NormalTok{    (api/ungroup \{}\AttributeTok{:add-group-as-column} \VariableTok{true}
+                  \AttributeTok{:add-group-id-as-column} \VariableTok{true}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+null {[}9 6{]}:
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+:\$group-name & :\$group-id & :V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+false & 0 & 2 & 4 & 0.5000 & A\tabularnewline
+false & 0 & 1 & 5 & 1.000 & B\tabularnewline
+false & 0 & 2 & 6 & 1.500 & C\tabularnewline
+false & 0 & 1 & 7 & 0.5000 & A\tabularnewline
+false & 0 & 2 & 8 & 1.000 & B\tabularnewline
+false & 0 & 1 & 9 & 1.500 & C\tabularnewline
+true & 1 & 1 & 1 & 0.5000 & A\tabularnewline
+true & 1 & 2 & 2 & 1.000 & B\tabularnewline
+true & 1 & 1 & 3 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Let's assign different column names
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by (}\KeywordTok{comp}\NormalTok{ #(}\KeywordTok{<} \VariableTok{%} \DecValTok{4}\NormalTok{) }\AttributeTok{:V2}\NormalTok{))}
+\NormalTok{    (api/ungroup \{}\AttributeTok{:add-group-as-column} \StringTok{"Is V2 less than 4?"}
+                  \AttributeTok{:add-group-id-as-column} \StringTok{"group id"}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+null {[}9 6{]}:
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+Is V2 less than 4? & group id & :V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+false & 0 & 2 & 4 & 0.5000 & A\tabularnewline
+false & 0 & 1 & 5 & 1.000 & B\tabularnewline
+false & 0 & 2 & 6 & 1.500 & C\tabularnewline
+false & 0 & 1 & 7 & 0.5000 & A\tabularnewline
+false & 0 & 2 & 8 & 1.000 & B\tabularnewline
+false & 0 & 1 & 9 & 1.500 & C\tabularnewline
+true & 1 & 1 & 1 & 0.5000 & A\tabularnewline
+true & 1 & 2 & 2 & 1.000 & B\tabularnewline
+true & 1 & 1 & 3 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+If we group by map, we can automatically create new columns out of group
+names.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by (}\KeywordTok{fn}\NormalTok{ [row] \{}\StringTok{"V1 and V3 multiplied"}\NormalTok{ (}\KeywordTok{*}\NormalTok{ (}\AttributeTok{:V1}\NormalTok{ row)}
+\NormalTok{                                                      (}\AttributeTok{:V3}\NormalTok{ row))}
+                            \StringTok{"V4 as string"}\NormalTok{ (}\KeywordTok{str}\NormalTok{ (}\AttributeTok{:V4}\NormalTok{ row))\}))}
+\NormalTok{    (api/ungroup \{}\AttributeTok{:add-group-as-column} \VariableTok{true}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+null {[}9 6{]}:
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+V1 and V3 multiplied & V4 as string & :V1 & :V2 & :V3 &
+:V4\tabularnewline
+\midrule
+\endhead
+3.000 & C & 2 & 6 & 1.500 & C\tabularnewline
+1.500 & C & 1 & 3 & 1.500 & C\tabularnewline
+1.500 & C & 1 & 9 & 1.500 & C\tabularnewline
+1.000 & A & 2 & 4 & 0.5000 & A\tabularnewline
+0.5000 & A & 1 & 1 & 0.5000 & A\tabularnewline
+0.5000 & A & 1 & 7 & 0.5000 & A\tabularnewline
+1.000 & B & 1 & 5 & 1.000 & B\tabularnewline
+2.000 & B & 2 & 2 & 1.000 & B\tabularnewline
+2.000 & B & 2 & 8 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+We can add group names without separation
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by (}\KeywordTok{fn}\NormalTok{ [row] \{}\StringTok{"V1 and V3 multiplied"}\NormalTok{ (}\KeywordTok{*}\NormalTok{ (}\AttributeTok{:V1}\NormalTok{ row)}
+\NormalTok{                                                      (}\AttributeTok{:V3}\NormalTok{ row))}
+                            \StringTok{"V4 as string"}\NormalTok{ (}\KeywordTok{str}\NormalTok{ (}\AttributeTok{:V4}\NormalTok{ row))\}))}
+\NormalTok{    (api/ungroup \{}\AttributeTok{:add-group-as-column} \StringTok{"just map"}
+                  \AttributeTok{:separate}\NormalTok{? }\VariableTok{false}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+null {[}9 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+just map & :V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+\{``V1 and V3 multiplied'' 3.0, ``V4 as string'' ``C''\} & 2 & 6 & 1.500
+& C\tabularnewline
+\{``V1 and V3 multiplied'' 1.5, ``V4 as string'' ``C''\} & 1 & 3 & 1.500
+& C\tabularnewline
+\{``V1 and V3 multiplied'' 1.5, ``V4 as string'' ``C''\} & 1 & 9 & 1.500
+& C\tabularnewline
+\{``V1 and V3 multiplied'' 1.0, ``V4 as string'' ``A''\} & 2 & 4 &
+0.5000 & A\tabularnewline
+\{``V1 and V3 multiplied'' 0.5, ``V4 as string'' ``A''\} & 1 & 1 &
+0.5000 & A\tabularnewline
+\{``V1 and V3 multiplied'' 0.5, ``V4 as string'' ``A''\} & 1 & 7 &
+0.5000 & A\tabularnewline
+\{``V1 and V3 multiplied'' 1.0, ``V4 as string'' ``B''\} & 1 & 5 & 1.000
+& B\tabularnewline
+\{``V1 and V3 multiplied'' 2.0, ``V4 as string'' ``B''\} & 2 & 2 & 1.000
+& B\tabularnewline
+\{``V1 and V3 multiplied'' 2.0, ``V4 as string'' ``B''\} & 2 & 8 & 1.000
+& B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+The same applies to group names as sequences
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by (}\KeywordTok{juxt} \AttributeTok{:V1} \AttributeTok{:V3}\NormalTok{))}
+\NormalTok{    (api/ungroup \{}\AttributeTok{:add-group-as-column} \StringTok{"abc"}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+null {[}9 6{]}:
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+:abc-0 & :abc-1 & :V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1.000 & 1 & 5 & 1.000 & B\tabularnewline
+1 & 0.5000 & 1 & 1 & 0.5000 & A\tabularnewline
+1 & 0.5000 & 1 & 7 & 0.5000 & A\tabularnewline
+2 & 1.500 & 2 & 6 & 1.500 & C\tabularnewline
+1 & 1.500 & 1 & 3 & 1.500 & C\tabularnewline
+1 & 1.500 & 1 & 9 & 1.500 & C\tabularnewline
+2 & 0.5000 & 2 & 4 & 0.5000 & A\tabularnewline
+2 & 1.000 & 2 & 2 & 1.000 & B\tabularnewline
+2 & 1.000 & 2 & 8 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Let's provide column names
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by (}\KeywordTok{juxt} \AttributeTok{:V1} \AttributeTok{:V3}\NormalTok{))}
+\NormalTok{    (api/ungroup \{}\AttributeTok{:add-group-as-column}\NormalTok{ [}\StringTok{"v1"} \StringTok{"v3"}\NormalTok{]\}))}
+\end{Highlighting}
+\end{Shaded}
+
+null {[}9 6{]}:
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+v1 & v3 & :V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1.000 & 1 & 5 & 1.000 & B\tabularnewline
+1 & 0.5000 & 1 & 1 & 0.5000 & A\tabularnewline
+1 & 0.5000 & 1 & 7 & 0.5000 & A\tabularnewline
+2 & 1.500 & 2 & 6 & 1.500 & C\tabularnewline
+1 & 1.500 & 1 & 3 & 1.500 & C\tabularnewline
+1 & 1.500 & 1 & 9 & 1.500 & C\tabularnewline
+2 & 0.5000 & 2 & 4 & 0.5000 & A\tabularnewline
+2 & 1.000 & 2 & 2 & 1.000 & B\tabularnewline
+2 & 1.000 & 2 & 8 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Also we can supress separation
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by (}\KeywordTok{juxt} \AttributeTok{:V1} \AttributeTok{:V3}\NormalTok{))}
+\NormalTok{    (api/ungroup \{}\AttributeTok{:separate}\NormalTok{? }\VariableTok{false}
+                  \AttributeTok{:add-group-as-column} \VariableTok{true}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+null {[}9 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:\$group-name & :V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+{[}1 1.0{]} & 1 & 5 & 1.000 & B\tabularnewline
+{[}1 0.5{]} & 1 & 1 & 0.5000 & A\tabularnewline
+{[}1 0.5{]} & 1 & 7 & 0.5000 & A\tabularnewline
+{[}2 1.5{]} & 2 & 6 & 1.500 & C\tabularnewline
+{[}1 1.5{]} & 1 & 3 & 1.500 & C\tabularnewline
+{[}1 1.5{]} & 1 & 9 & 1.500 & C\tabularnewline
+{[}2 0.5{]} & 2 & 4 & 0.5000 & A\tabularnewline
+{[}2 1.0{]} & 2 & 2 & 1.000 & B\tabularnewline
+{[}2 1.0{]} & 2 & 8 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\paragraph{Other functions}\label{other-functions}
+
+\subsubsection{Columns}\label{columns}
+
+\subsubsection{Rows}\label{rows}
+
+\subsubsection{Aggregate}\label{aggregate}
+
+\subsubsection{Order}\label{order}
+
+\subsubsection{Unique}\label{unique}
+
+\subsubsection{Missing}\label{missing}
+
+\subsubsection{Join/Split Columns}\label{joinsplit-columns}
+
+\subsubsection{Fold/Unroll Rows}\label{foldunroll-rows}
+
+\subsubsection{Reshape}\label{reshape}
+
+\subsubsection{Join/Concat}\label{joinconcat}
+
+\end{document}

@@ -4,7 +4,7 @@
             [tech.v2.datatype :as dtype]
             
 
-            [techtest.api.utils :refer [map-v iterable-sequence?]]
+            [techtest.api.utils :refer [map-v iterable-sequence? ->str]]
             [techtest.api.dataset :refer [dataset]])
   (:refer-clojure :exclude [group-by]))
 
@@ -34,6 +34,10 @@
     (fn? grouping-selector) (ds/group-by->indexes grouping-selector limit-columns ds)
     :else (ds/group-by-column->indexes grouping-selector ds)))
 
+(defn- subgroup
+  [ds id k idxs]
+  (vary-meta (ds/set-dataset-name (ds/select ds :all idxs) k) assoc :group-id id))
+
 (defn- group-indexes->map
   "Create map representing grouped dataset from indexes"
   [ds id [k idxs]]
@@ -41,7 +45,7 @@
     {:name k
      :group-id id
      :count cnt
-     :data (vary-meta (ds/set-dataset-name (ds/select ds :all idxs) k) assoc :group-id id)}))
+     :data (subgroup ds id k idxs)}))
 
 (defn- group-by->dataset
   "Create grouped dataset from indexes"
@@ -62,7 +66,7 @@
   Options are:
 
   - limit-columns - when grouping is done by function, you can limit fields to a `limit-columns` seq.
-  - result-type - return results as dataset (`:as-dataset`, default) or as map of datasets (`:as-map`) or as map of row indexes (`:as-indexes`)
+  - result-type - return results as dataset (`:as-dataset`, default) or as map of datasets (`:as-map`) or as map of row indexes (`:as-indexes`) or as sequence of (sub)datasets
   - other parameters which are passed to `dataset` fn
 
   When dataset is returned, meta contains `:grouped?` set to true. Columns in dataset:
@@ -78,8 +82,10 @@
    (let [group-indexes (find-group-indexes grouping-selector ds limit-columns)]
      (condp = result-type
        :as-indexes group-indexes
+       :as-seq (->> group-indexes ;; java.util.HashMap
+                    (map-indexed (fn [id [k idxs]] (subgroup ds id k idxs))))
        :as-map (->> group-indexes ;; java.util.HashMap
-                    (map (fn [[k v]] [k (ds/select ds :all v)])) 
+                    (map-indexed (fn [id [k idxs]] [k (subgroup ds id k idxs)])) 
                     (into {}))
        (group-by->dataset ds group-indexes options)))))
 
@@ -96,11 +102,16 @@
        (correct-group-count temp)
        temp))))
 
-(defn group-as-map
+(defn groups->map
   "Convert grouped dataset to the map of groups"
   [ds]
   (assert (grouped? ds) "Apply on grouped dataset only")
   (zipmap (ds :name) (ds :data)))
+
+(defn groups->seq
+  [ds]
+  (assert (grouped? ds) "Apply on grouped dataset only")
+  (seq (ds :data)))
 
 ;; ungrouping
 
@@ -119,31 +130,46 @@
   (map (fn [[n v]]
          (col/new-column n (repeat count v))) name))
 
+(defn- maybe-name
+  [possible-name default-name]
+  (if (true? possible-name)
+    default-name
+    possible-name))
+
+(defn- group-name-seq->cols
+  [name add-group-as-column count]
+  (let [cn (if (iterable-sequence? add-group-as-column)
+             add-group-as-column
+             (let [tn (maybe-name add-group-as-column :$group-name)]
+               (map-indexed #(keyword (str %2 "-" %1)) (repeat (->str tn)))))]
+    (group-name-map->cols (map vector cn name) count)))
+
 (defn- group-as-column->seq
   "Convert group name to a seq of columns"
-  [add-group-as-column? name count]
-  (if add-group-as-column?
-    (if (map? name)
-      (group-name-map->cols name count)
-      [(col/new-column :$group-name (repeat count name))])))
+  [add-group-as-column separate? name count]
+  (if add-group-as-column
+    (cond
+      (and separate? (map? name)) (group-name-map->cols name count)
+      (and separate? (iterable-sequence? name)) (group-name-seq->cols name add-group-as-column count)
+      :esle [(col/new-column (maybe-name add-group-as-column :$group-name) (repeat count name))])))
 
 (defn- group-id-as-column->seq
   "Convert group id to as seq of columns"
-  [add-group-id-as-column? count group-id]
-  (if add-group-id-as-column?
-    [(col/new-column :$group-id (dtype/const-reader group-id count {:datatype :int64}))]))
+  [add-group-id-as-column count group-id]
+  (if add-group-id-as-column
+    [(col/new-column (maybe-name add-group-id-as-column :$group-id) (dtype/const-reader group-id count {:datatype :int64}))]))
 
 (defn- prepare-ds-for-ungrouping
   "Add optional group name and/or group-id as columns to a result of ungrouping."
-  [ds add-group-as-column? add-group-id-as-column?]
+  [ds add-group-as-column add-group-id-as-column separate?]
   (->> ds
        (ds/mapseq-reader)
        (map (fn [{:keys [name group-id count data] :as ds}]
-              (if (or add-group-as-column?
-                      add-group-id-as-column?)
+              (if (or add-group-as-column
+                      add-group-id-as-column)
                 (add-groups-as-columns ds
-                                       (group-as-column->seq add-group-as-column? name count)
-                                       (group-id-as-column->seq add-group-id-as-column? count group-id)
+                                       (group-as-column->seq add-group-as-column separate? name count)
+                                       (group-id-as-column->seq add-group-id-as-column count group-id)
                                        (ds/columns data))
                 ds)))))
 
@@ -157,15 +183,16 @@
 (defn ungroup
   "Concat groups into dataset.
 
-  When `add-group-as-column?` or `add-group-id-as-column?` is set to `true`, columns with group name(s) or group id is added to thre result.
+  When `add-group-as-column` or `add-group-id-as-column` is set to `true` or name(s), columns with group name(s) or group id is added to the result.
 
-  Before joining the groups groups can be sorted by group name. "
+  Before joining the groups groups can be sorted by group name."
   ([ds] (ungroup ds nil))
-  ([ds {:keys [order-by-group? add-group-as-column? add-group-id-as-column? dataset-name]}]
-   (assert (grouped? ds) "Work only on grouped dataset")
+  ([ds {:keys [order? add-group-as-column add-group-id-as-column separate? dataset-name]
+        :or {separate? true}}]
+   (assert (grouped? ds) "Works only on grouped dataset")
    (-> ds
-       (prepare-ds-for-ungrouping add-group-as-column? add-group-id-as-column?)
-       (order-ds-for-ungrouping order-by-group?)
+       (prepare-ds-for-ungrouping add-group-as-column add-group-id-as-column separate?)
+       (order-ds-for-ungrouping order?)
        (->> (map :data)
             (apply ds/concat))
        (ds/set-dataset-name dataset-name))))
