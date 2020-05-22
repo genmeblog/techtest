@@ -21,6 +21,8 @@
 
 ;; dataset
 
+
+
 (exporter/export-symbols tech.ml.dataset
                          column-count
                          row-count
@@ -28,7 +30,8 @@
                          dataset-name
                          column
                          has-column?
-                         write-csv!)
+                         write-csv!
+                         dataset->str)
 
 (exporter/export-symbols techtest.api.dataset
                          dataset?
@@ -36,7 +39,8 @@
                          shape
                          info
                          columns
-                         rows)
+                         rows
+                         print-dataset)
 
 (exporter/export-symbols techtest.api.group-by
                          group-by

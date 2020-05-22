@@ -21,7 +21,9 @@
 (defn- mark-as-group
   "Add grouping tag"
   [ds]
-  (vary-meta ds assoc :grouped? true))
+  (vary-meta ds assoc
+             :grouped? true
+             :print-line-policy :single))
 
 (def as-regular-dataset unmark-group)
 

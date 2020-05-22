@@ -95,3 +95,7 @@
    (if (= :as-maps result-type)
      (ds/mapseq-reader ds)
      (ds/value-reader ds))))
+
+(defn print-dataset
+  ([ds] (println (ds/dataset->str ds)))
+  ([ds options] (println (ds/dataset->str ds options))))

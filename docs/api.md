@@ -91,6 +91,9 @@ Empty dataset.
 
     _unnamed [0 0]:
 
+    |  |
+    |--|
+
 ------------------------------------------------------------------------
 
 Dataset from single value.
@@ -380,8 +383,8 @@ General info about dataset. There are three variants:
 <col width="7%" />
 <col width="9%" />
 <col width="9%" />
-<col width="5%" />
 <col width="9%" />
+<col width="5%" />
 <col width="9%" />
 <col width="15%" />
 <col width="7%" />
@@ -392,9 +395,9 @@ General info about dataset. There are three variants:
 <th>:datatype</th>
 <th>:n-valid</th>
 <th>:n-missing</th>
+<th>:min</th>
 <th>:mean</th>
 <th>:mode</th>
-<th>:min</th>
 <th>:max</th>
 <th>:standard-deviation</th>
 <th>:skew</th>
@@ -406,9 +409,9 @@ General info about dataset. There are three variants:
 <td>:packed-local-date</td>
 <td>1461</td>
 <td>0</td>
+<td>2012-01-01</td>
 <td>2013-12-31</td>
 <td></td>
-<td>2012-01-01</td>
 <td>2015-12-31</td>
 <td></td>
 <td></td>
@@ -418,9 +421,9 @@ General info about dataset. There are three variants:
 <td>:float32</td>
 <td>1461</td>
 <td>0</td>
+<td>0.000</td>
 <td>3.029</td>
 <td></td>
-<td>0.000</td>
 <td>55.90</td>
 <td>6.680</td>
 <td>3.506</td>
@@ -430,9 +433,9 @@ General info about dataset. There are three variants:
 <td>:float32</td>
 <td>1461</td>
 <td>0</td>
+<td>-1.600</td>
 <td>16.44</td>
 <td></td>
-<td>-1.600</td>
 <td>35.60</td>
 <td>7.350</td>
 <td>0.2809</td>
@@ -442,9 +445,9 @@ General info about dataset. There are three variants:
 <td>:float32</td>
 <td>1461</td>
 <td>0</td>
+<td>-7.100</td>
 <td>8.235</td>
 <td></td>
-<td>-7.100</td>
 <td>18.30</td>
 <td>5.023</td>
 <td>-0.2495</td>
@@ -455,8 +458,8 @@ General info about dataset. There are three variants:
 <td>1461</td>
 <td>0</td>
 <td></td>
-<td>sun</td>
 <td></td>
+<td>sun</td>
 <td></td>
 <td></td>
 <td></td>
@@ -466,9 +469,9 @@ General info about dataset. There are three variants:
 <td>:float32</td>
 <td>1461</td>
 <td>0</td>
+<td>0.4000</td>
 <td>3.241</td>
 <td></td>
-<td>0.4000</td>
 <td>9.500</td>
 <td>1.438</td>
 <td>0.8917</td>
@@ -588,7 +591,7 @@ Rows as sequence of sequences
 (take 2 (api/rows ds))
 ```
 
-    ([#object[java.time.LocalDate 0x5805c9ce "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x7898fe1f "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+    ([#object[java.time.LocalDate 0x772795f0 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x616d0c9a "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 
 ------------------------------------------------------------------------
 
@@ -598,18 +601,59 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
-    ({"date" #object[java.time.LocalDate 0x218a6320 "2012-01-01"],
+    ({"date" #object[java.time.LocalDate 0x2bb745dc "2012-01-01"],
       "precipitation" 0.0,
       "temp_min" 5.0,
       "weather" "drizzle",
       "temp_max" 12.8,
       "wind" 4.7}
-     {"date" #object[java.time.LocalDate 0x57369c8 "2012-01-02"],
+     {"date" #object[java.time.LocalDate 0x683d1ba4 "2012-01-02"],
       "precipitation" 10.9,
       "temp_min" 2.8,
       "weather" "rain",
       "temp_max" 10.6,
       "wind" 4.5})
+
+#### Printing
+
+Dataset is printed using `dataset->str` or `print-dataset` functions. Options are the same as in `tech.ml.dataset/dataset-data->str`. Most important is `:print-line-policy` which can be one of the: `:single`, `:repl` or `:markdown`.
+
+``` clojure
+(api/print-dataset (api/group-by DS :V1) {:print-line-policy :markdown})
+```
+
+    _unnamed [2 3]:
+
+    | :name | :group-id |                                                                                                                                                                                                                                                                           :data |
+    |-------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    |     1 |         0 | 1 [5 4]:<br><br>\| :V1 \| :V2 \|    :V3 \| :V4 \|<br>\|-----\|-----\|--------\|-----\|<br>\|   1 \|   1 \| 0.5000 \|   A \|<br>\|   1 \|   3 \|  1.500 \|   C \|<br>\|   1 \|   5 \|  1.000 \|   B \|<br>\|   1 \|   7 \| 0.5000 \|   A \|<br>\|   1 \|   9 \|  1.500 \|   C \| |
+    |     2 |         1 |                                      2 [4 4]:<br><br>\| :V1 \| :V2 \|    :V3 \| :V4 \|<br>\|-----\|-----\|--------\|-----\|<br>\|   2 \|   2 \|  1.000 \|   B \|<br>\|   2 \|   4 \| 0.5000 \|   A \|<br>\|   2 \|   6 \|  1.500 \|   C \|<br>\|   2 \|   8 \|  1.000 \|   B \| |
+
+``` clojure
+(api/print-dataset (api/group-by DS :V1) {:print-line-policy :repl})
+```
+
+    _unnamed [2 3]:
+
+    | :name | :group-id |                             :data |
+    |-------|-----------|-----------------------------------|
+    |     1 |         0 | 1 [5 4]:                          |
+    |       |           |                                   |
+    |       |           | \| :V1 \| :V2 \|    :V3 \| :V4 \| |
+    |       |           | \|-----\|-----\|--------\|-----\| |
+    |       |           | \|   1 \|   1 \| 0.5000 \|   A \| |
+    |       |           | \|   1 \|   3 \|  1.500 \|   C \| |
+    |       |           | \|   1 \|   5 \|  1.000 \|   B \| |
+    |       |           | \|   1 \|   7 \| 0.5000 \|   A \| |
+    |       |           | \|   1 \|   9 \|  1.500 \|   C \| |
+    |     2 |         1 | 2 [4 4]:                          |
+    |       |           |                                   |
+    |       |           | \| :V1 \| :V2 \|    :V3 \| :V4 \| |
+    |       |           | \|-----\|-----\|--------\|-----\| |
+    |       |           | \|   2 \|   2 \|  1.000 \|   B \| |
+    |       |           | \|   2 \|   4 \| 0.5000 \|   A \| |
+    |       |           | \|   2 \|   6 \|  1.500 \|   C \| |
+    |       |           | \|   2 \|   8 \|  1.000 \|   B \| |
 
 ### Group-by
 
@@ -677,7 +721,7 @@ Content of the grouped dataset
     [1 [5 4]:
 
     | :V1 | :V2 |    :V3 | :V4 |
-    |-----+-----+--------+-----|
+    |-----|-----|--------|-----|
     |   1 |   1 | 0.5000 |   A |
     |   1 |   3 |  1.500 |   C |
     |   1 |   5 |  1.000 |   B |
@@ -686,7 +730,7 @@ Content of the grouped dataset
     , 2 [4 4]:
 
     | :V1 | :V2 |    :V3 | :V4 |
-    |-----+-----+--------+-----|
+    |-----|-----|--------|-----|
     |   2 |   2 |  1.000 |   B |
     |   2 |   4 | 0.5000 |   A |
     |   2 |   6 |  1.500 |   C |
@@ -737,6 +781,21 @@ Group dataset as map of indexes (row ids)
 ```
 
     {1 [0 2 4 6 8], 2 [1 3 5 7]}
+
+------------------------------------------------------------------------
+
+Grouped datasets are printed as follows by default.
+
+``` clojure
+(api/group-by DS :V1)
+```
+
+\_unnamed \[2 3\]:
+
+| :name | :group-id | :data      |
+|-------|-----------|------------|
+| 1     | 0         | 1 \[5 4\]: |
+| 2     | 1         | 2 \[4 4\]: |
 
 ------------------------------------------------------------------------
 
@@ -1644,7 +1703,7 @@ If you want to rename colums use `rename-columns` and pass map where keys are ol
 
 \_unnamed \[9 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@525b9187> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@564aefd6> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 2   | 2   | 1.000     | B                           |
@@ -1672,7 +1731,7 @@ Function works on grouped dataset
 
 {1 1 \[5 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@7bcbd45b> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@72a8c7ac> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 1   | 3   | 1.500     | C                           |
@@ -1682,7 +1741,7 @@ Function works on grouped dataset
 
 , 2 2 \[4 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@7bcbd45b> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@72a8c7ac> |
 |-----|-----|-----------|-----------------------------|
 | 2   | 2   | 1.000     | B                           |
 | 2   | 4   | 0.5000    | A                           |
@@ -1736,17 +1795,17 @@ Replace one column (column is trimmed)
 
 \_unnamed \[9 4\]:
 
-| :V1     | :V2 | :V3    | :V4 |
-|---------|-----|--------|-----|
-| 0.9627  | 1   | 0.5000 | A   |
-| 0.4363  | 2   | 1.000  | B   |
-| 0.6093  | 3   | 1.500  | C   |
-| 0.8787  | 4   | 0.5000 | A   |
-| 0.01937 | 5   | 1.000  | B   |
-| 0.4287  | 6   | 1.500  | C   |
-| 0.2217  | 7   | 0.5000 | A   |
-| 0.4589  | 8   | 1.000  | B   |
-| 0.1483  | 9   | 1.500  | C   |
+| :V1    | :V2 | :V3    | :V4 |
+|--------|-----|--------|-----|
+| 0.9298 | 1   | 0.5000 | A   |
+| 0.5453 | 2   | 1.000  | B   |
+| 0.7967 | 3   | 1.500  | C   |
+| 0.2766 | 4   | 0.5000 | A   |
+| 0.8202 | 5   | 1.000  | B   |
+| 0.1751 | 6   | 1.500  | C   |
+| 0.7437 | 7   | 0.5000 | A   |
+| 0.4066 | 8   | 1.000  | B   |
+| 0.6971 | 9   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 

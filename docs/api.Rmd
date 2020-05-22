@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output:
     html_document:
         highlight: pygments
-        theme: sandstone
+        theme: simplex
         toc: true
         toc_depth: 4
         toc_float:
@@ -13,6 +13,7 @@ output:
             collapsed: true
         includes:
             in_header: better_tables.html
+        smart: false
     pdf_document:
         highlight: tango
     md_document:
@@ -22,6 +23,7 @@ output:
 
 ```{css echo=FALSE}
 table { width: auto !important; margin-right: auto; margin-left: 2%; }
+h1, h2, h3, h4, h5, h6 { padding-top: 16px; border-bottom: 1px solid; }
 ```
 
 
@@ -346,6 +348,19 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
+#### Printing
+
+Dataset is printed using `dataset->str` or `print-dataset` functions. Options are the same as in `tech.ml.dataset/dataset-data->str`. Most important is `:print-line-policy` which can be one of the: `:single`, `:repl` or `:markdown`.
+
+```{clojure stdout_only=TRUE}
+(api/print-dataset (api/group-by DS :V1) {:print-line-policy :markdown})
+```
+
+```{clojure stdout_only=TRUE}
+(api/print-dataset (api/group-by DS :V1) {:print-line-policy :repl})
+```
+
+
 ### Group-by
 
 Grouping by is an operation which splits dataset into subdatasets and pack it into new special type of... dataset. I distinguish two types of dataset: regular dataset and grouped dataset. The latter is the result of grouping.
@@ -419,6 +434,14 @@ Group dataset as map of indexes (row ids)
 
 ```{clojure}
 (api/group-by DS :V1 {:result-type :as-indexes})
+```
+
+---
+
+Grouped datasets are printed as follows by default.
+
+```{clojure results="asis"}
+(api/group-by DS :V1)
 ```
 
 ---
@@ -1119,3 +1142,4 @@ Function works on the grouped dataset
 #### Concat
 
 ### Functions
+
