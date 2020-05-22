@@ -11,7 +11,7 @@
 
 <meta name="author" content="GenerateMe" />
 
-<meta name="date" content="2020-05-21" />
+<meta name="date" content="2020-05-22" />
 
 <title>Proposed API for tech.ml.dataset</title>
 
@@ -313,7 +313,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Proposed API for tech.ml.dataset</h1>
 <h4 class="author">GenerateMe</h4>
-<h4 class="date">2020-05-21</h4>
+<h4 class="date">2020-05-22</h4>
 
 </div>
 
@@ -334,6 +334,12 @@ table { width: auto !important; margin-right: auto; margin-left: 2%; }
 <li>One function form to enable thread-first on dataset.</li>
 </ul>
 <p>All proposed functions are grouped in tabs below. Select group to see examples and details.</p>
+<p>If you want to know more about <code>tech.ml.dataset</code> and <code>tech.ml.datatype</code> please refer their documentation:</p>
+<ul>
+<li><a href="https://github.com/techascent/tech.datatype/blob/master/docs/cheatsheet.md">Datatype</a></li>
+<li><a href="https://github.com/techascent/tech.datatype/blob/master/docs/datetime.md">Date/time</a></li>
+<li><a href="https://github.com/techascent/tech.ml.dataset/blob/master/docs/walkthrough.md">Dataset</a></li>
+</ul>
 <p>INFO: The future of this API is not known yet. Two directions are possible: integration into <code>tech.ml</code> or development under <code>Scicloj</code> organization. For the time being use this repo if you want to try. Join the discussion on <a href="https://clojurians.zulipchat.com/#narrow/stream/236259-tech.2Eml.2Edataset.2Edev/topic/api">Zulip</a></p>
 <p>Let’s require main namespace and define dataset used in most examples:</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">require</span> '[techtest.api <span class="at">:as</span> api])
@@ -430,15 +436,13 @@ table { width: auto !important; margin-right: auto; margin-left: 2%; }
 <p><code>api/dataset</code> accepts:</p>
 <ul>
 <li>data</li>
-<li>options (see documentation of <code>tech.ml.dataset/-&gt;dataset</code> function for full list):
-<ul>
+<li>options (see documentation of <code>tech.ml.dataset/-&gt;dataset</code> function for full list):</li>
 <li><code>:dataset-name</code> - name of the dataset</li>
 <li><code>:num-rows</code> - number of rows to read from file</li>
 <li><code>:header-row?</code> - indication if first row in file is a header</li>
 <li><code>:key-fn</code> - function applied to column names (eg. <code>keyword</code>, to convert column names to keywords)</li>
 <li><code>:separator</code> - column separator</li>
 <li><code>:single-value-column-name</code> - name of the column when single value is provided</li>
-</ul></li>
 </ul>
 <hr />
 <p>Empty dataset.</p>
@@ -1004,10 +1008,6 @@ true</code></pre>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/column-count ds)</code></pre></div>
 <pre><code>6</code></pre>
 <hr />
-<p>Names of columns.</p>
-<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/column-names ds)</code></pre></div>
-<pre><code>(&quot;date&quot; &quot;precipitation&quot; &quot;temp_max&quot; &quot;temp_min&quot; &quot;wind&quot; &quot;weather&quot;)</code></pre>
-<hr />
 <p>Shape of the dataset, [row count, column count]</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/shape ds)</code></pre></div>
 <pre><code>[1461 6]</code></pre>
@@ -1237,17 +1237,17 @@ precipitation
 <hr />
 <p>Rows as sequence of sequences</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">take</span> <span class="dv">2</span> (api/rows ds))</code></pre></div>
-<pre><code>([#object[java.time.LocalDate 0x125afddf &quot;2012-01-01&quot;] 0.0 12.8 5.0 4.7 &quot;drizzle&quot;] [#object[java.time.LocalDate 0x3971a49f &quot;2012-01-02&quot;] 10.9 10.6 2.8 4.5 &quot;rain&quot;])</code></pre>
+<pre><code>([#object[java.time.LocalDate 0x76cad3ae &quot;2012-01-01&quot;] 0.0 12.8 5.0 4.7 &quot;drizzle&quot;] [#object[java.time.LocalDate 0x53bd3751 &quot;2012-01-02&quot;] 10.9 10.6 2.8 4.5 &quot;rain&quot;])</code></pre>
 <hr />
 <p>Rows as sequence of maps</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(clojure.pprint/pprint (<span class="kw">take</span> <span class="dv">2</span> (api/rows ds <span class="at">:as-maps</span>)))</code></pre></div>
-<pre><code>({&quot;date&quot; #object[java.time.LocalDate 0x60a75cb &quot;2012-01-01&quot;],
+<pre><code>({&quot;date&quot; #object[java.time.LocalDate 0x51d27e84 &quot;2012-01-01&quot;],
   &quot;precipitation&quot; 0.0,
   &quot;temp_min&quot; 5.0,
   &quot;weather&quot; &quot;drizzle&quot;,
   &quot;temp_max&quot; 12.8,
   &quot;wind&quot; 4.7}
- {&quot;date&quot; #object[java.time.LocalDate 0x5f26d16a &quot;2012-01-02&quot;],
+ {&quot;date&quot; #object[java.time.LocalDate 0x75025c72 &quot;2012-01-02&quot;],
   &quot;precipitation&quot; 10.9,
   &quot;temp_min&quot; 2.8,
   &quot;weather&quot; &quot;rain&quot;,
@@ -2908,7 +2908,8 @@ precipitation
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
     (api/group-by (<span class="kw">juxt</span> <span class="at">:V1</span> <span class="at">:V3</span>))
     (api/ungroup {<span class="at">:separate</span>? <span class="va">false</span>
-                  <span class="at">:add-group-as-column</span> <span class="va">true</span>}))</code></pre></div>
+                  <span class="at">:add-group-as-column</span> <span class="va">true</span>}))
+<span class="co">;; =&gt; _unnamed [9 5]:</span></code></pre></div>
 <p>_unnamed [9 5]:</p>
 <table>
 <thead>
@@ -3035,26 +3036,1965 @@ precipitation
 </div>
 <div id="columns" class="section level3">
 <h3>Columns</h3>
+<p>Column is a special <code>tech.ml.dataset</code> structure based on <code>tech.ml.datatype</code> library. For our purposes we cat treat columns as typed and named sequence bound to particular dataset.</p>
+<p>Type of the data is inferred from a sequence during column creation.</p>
 <div id="names" class="section level4">
 <h4>Names</h4>
+<p>To select dataset columns or column names <code>columns-selector</code> is used. <code>columns-selector</code> can be one of the following:</p>
+<ul>
+<li><code>:all</code> keyword - selects all columns</li>
+<li>column name - for single column</li>
+<li>sequence of column names - for collection of columns</li>
+<li>regex - to apply pattern on column names or datatype</li>
+<li>filter predicate - to filter column names or datatype</li>
+</ul>
+<p>Column name can be anything.</p>
+<p><code>column-names</code> function returns names according to <code>columns-selector</code> and optional <code>meta-filed</code>. <code>meta-field</code> is one of the following:</p>
+<ul>
+<li><code>:name</code> (default) - to operate on column names</li>
+<li><code>:datatype</code> - to operated on column types</li>
+<li><code>:all</code> - if you want to process all metadata</li>
+</ul>
+<hr />
+<p>To select all column names you can use <code>column-names</code> function.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/column-names DS)</code></pre></div>
+<pre><code>(:V1 :V2 :V3 :V4)</code></pre>
+<p>or</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/column-names DS <span class="at">:all</span>)</code></pre></div>
+<pre><code>(:V1 :V2 :V3 :V4)</code></pre>
+<p>In case you want to select column which has name <code>:all</code> (or is sequence or map), put it into a vector. Below code returns empty sequence since there is no such column in the dataset.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/column-names DS [<span class="at">:all</span>])</code></pre></div>
+<pre><code>()</code></pre>
+<hr />
+<p>Obviously selecting single name returns it’s name if available</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/column-names DS <span class="at">:V1</span>)
+(api/column-names DS <span class="st">&quot;no such column&quot;</span>)</code></pre></div>
+<pre><code>(:V1)
+()</code></pre>
+<hr />
+<p>Select sequence of column names.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/column-names DS [<span class="at">:V1</span> <span class="st">&quot;V2&quot;</span> <span class="at">:V3</span> <span class="at">:V4</span> <span class="at">:V5</span>])</code></pre></div>
+<pre><code>(:V1 :V3 :V4)</code></pre>
+<hr />
+<p>Select names based on regex, columns ends with <code>1</code> or <code>4</code></p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/column-names DS <span class="ss">#&quot;.*[14]&quot;</span>)</code></pre></div>
+<pre><code>(:V1 :V4)</code></pre>
+<hr />
+<p>Select names based on regex operating on type of the column (to check what are the column types, call <code>(api/info DS :columns)</code>. Here we want to get integer columns only.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/column-names DS <span class="ss">#&quot;^:int.*&quot;</span> <span class="at">:datatype</span>)</code></pre></div>
+<pre><code>(:V1 :V2)</code></pre>
+<hr />
+<p>And finally we can use predicate to select names. Let’s select double precision columns.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/column-names DS #(<span class="kw">=</span> <span class="at">:float64</span> <span class="va">%</span>) <span class="at">:datatype</span>)</code></pre></div>
+<pre><code>(:V3)</code></pre>
+<hr />
+<p>If you want to select all columns but given, use <code>complement</code> function. Works only on a predicate.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/column-names DS (<span class="kw">complement</span> #{<span class="at">:V1</span>}))
+(api/column-names DS (<span class="kw">complement</span> #(<span class="kw">=</span> <span class="at">:float64</span> <span class="va">%</span>)) <span class="at">:datatype</span>)</code></pre></div>
+<pre><code>(:V2 :V3 :V4)
+(:V1 :V2 :V4)</code></pre>
+<hr />
+<p>You can select column names based on all column metadata at once by using <code>:all</code> metadata selector. Below we want to select column names ending with <code>1</code> which have <code>long</code> datatype.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/column-names DS (<span class="kw">fn</span> [<span class="kw">meta</span>]
+                       (<span class="kw">and</span> (<span class="kw">=</span> <span class="at">:int64</span> (<span class="at">:datatype</span> <span class="kw">meta</span>))
+                            (clojure.string/ends-with? (<span class="at">:name</span> <span class="kw">meta</span>) <span class="st">&quot;1&quot;</span>))) <span class="at">:all</span>)</code></pre></div>
+<pre><code>(:V1)</code></pre>
 </div>
 <div id="select" class="section level4">
 <h4>Select</h4>
+<p><code>select-columns</code> creates dataset with columns selected by <code>columns-selector</code> as described above. Function works on regular and grouped dataset.</p>
+<hr />
+<p>Select only float64 columns</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/select-columns DS #(<span class="kw">=</span> <span class="at">:float64</span> <span class="va">%</span>) <span class="at">:datatype</span>)</code></pre></div>
+<p>_unnamed [9 1]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0.5000</td>
+</tr>
+<tr class="even">
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>1.500</td>
+</tr>
+<tr class="even">
+<td>0.5000</td>
+</tr>
+<tr class="odd">
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>1.500</td>
+</tr>
+<tr class="odd">
+<td>0.5000</td>
+</tr>
+<tr class="even">
+<td>1.000</td>
+</tr>
+<tr class="odd">
+<td>1.500</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Select all but <code>:V1</code> columns</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/select-columns DS (<span class="kw">complement</span> #{<span class="at">:V1</span>}))</code></pre></div>
+<p>_unnamed [9 3]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>If we have grouped data set, column selection is applied to every group separately.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by <span class="at">:V1</span>)
+    (api/select-columns [<span class="at">:V2</span> <span class="at">:V3</span>])
+    (api/groups-&gt;map))</code></pre></div>
+<p>{1 1 [5 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V2</th>
+<th>:V3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>0.5000</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>1.500</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>0.5000</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>1.500</td>
+</tr>
+</tbody>
+</table>
+<p>, 2 2 [4 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V2</th>
+<th>:V3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>0.5000</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>1.500</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>1.000</td>
+</tr>
+</tbody>
+</table>
+<p>}</p>
 </div>
 <div id="drop" class="section level4">
 <h4>Drop</h4>
+<p><code>drop-columns</code> creates dataset with removed columns.</p>
+<hr />
+<p>Drop float64 columns</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/drop-columns DS #(<span class="kw">=</span> <span class="at">:float64</span> <span class="va">%</span>) <span class="at">:datatype</span>)</code></pre></div>
+<p>_unnamed [9 3]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Drop all columns but <code>:V1</code> and <code>:V2</code></p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/drop-columns DS (<span class="kw">complement</span> #{<span class="at">:V1</span> <span class="at">:V2</span>}))</code></pre></div>
+<p>_unnamed [9 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>If we have grouped data set, column selection is applied to every group separately. Selected columns are dropped.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by <span class="at">:V1</span>)
+    (api/drop-columns [<span class="at">:V2</span> <span class="at">:V3</span>])
+    (api/groups-&gt;map))</code></pre></div>
+<p>{1 1 [5 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p>, 2 2 [4 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<p>}</p>
+</div>
+<div id="rename" class="section level4">
+<h4>Rename</h4>
+<p>If you want to rename colums use <code>rename-columns</code> and pass map where keys are old names, values new ones.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/rename-columns DS {<span class="at">:V1</span> <span class="st">&quot;v1&quot;</span>
+                        <span class="at">:V2</span> <span class="st">&quot;v2&quot;</span>
+                        <span class="at">:V3</span> [<span class="dv">1</span> <span class="dv">2</span> <span class="dv">3</span>]
+                        <span class="at">:V4</span> (Object.)})</code></pre></div>
+<p>_unnamed [9 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>v1</th>
+<th>v2</th>
+<th>[1 2 3]</th>
+<th><a href="mailto:java.lang.Object@95746d8">java.lang.Object@95746d8</a></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Function works on grouped dataset</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by <span class="at">:V1</span>)
+    (api/rename-columns {<span class="at">:V1</span> <span class="st">&quot;v1&quot;</span>
+                         <span class="at">:V2</span> <span class="st">&quot;v2&quot;</span>
+                         <span class="at">:V3</span> [<span class="dv">1</span> <span class="dv">2</span> <span class="dv">3</span>]
+                         <span class="at">:V4</span> (Object.)})
+    (api/groups-&gt;map))</code></pre></div>
+<p>{1 1 [5 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>v1</th>
+<th>v2</th>
+<th>[1 2 3]</th>
+<th><a href="mailto:java.lang.Object@79dbb015">java.lang.Object@79dbb015</a></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p>, 2 2 [4 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>v1</th>
+<th>v2</th>
+<th>[1 2 3]</th>
+<th><a href="mailto:java.lang.Object@79dbb015">java.lang.Object@79dbb015</a></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<p>}</p>
 </div>
 <div id="add-or-update" class="section level4">
 <h4>Add or update</h4>
+<p>To add (or update existing) column call <code>add-or-update-column</code> function. Function accepts:</p>
+<ul>
+<li><code>ds</code> - a dataset</li>
+<li><code>column-name</code> - if it’s existing column name, column will be replaced</li>
+<li><code>column</code> - can be column (from other dataset), sequence, single value or function. Too big columns are always trimmed. Too small are cycled or extended with missing values (according to <code>size-strategy</code> argument)</li>
+<li><code>size-strategy</code> (optional) - when new column is shorter than dataset row count, following strategies are applied:
+<ul>
+<li><code>:cycle</code> (default) - repeat data</li>
+<li><code>:na</code> - append missing values</li>
+</ul></li>
+</ul>
+<p>Function works on grouped dataset.</p>
+<hr />
+<p>Add single value as column</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-update-column DS <span class="at">:V5</span> <span class="st">&quot;X&quot;</span>)</code></pre></div>
+<p>_unnamed [9 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+<th>:V5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+<td>X</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Replace one column (column is trimmed)</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-update-column DS <span class="at">:V1</span> (<span class="kw">repeatedly</span> <span class="kw">rand</span>))</code></pre></div>
+<p>_unnamed [9 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0.8319</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>0.8089</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>0.1312</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>0.3518</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>0.2848</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>0.5939</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>0.5893</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>0.4379</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>0.3551</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Copy column</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-update-column DS <span class="at">:V5</span> (DS <span class="at">:V1</span>))</code></pre></div>
+<p>_unnamed [9 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+<th>:V5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>When function is used, argument is whole dataset and the result should be column, sequence or single value</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-update-column DS <span class="at">:row-count</span> api/row-count) </code></pre></div>
+<p>_unnamed [9 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+<th>:row-count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+<td>9</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+<td>9</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+<td>9</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+<td>9</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+<td>9</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+<td>9</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+<td>9</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+<td>9</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+<td>9</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Above example run on grouped dataset, applies function on each group separately.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by <span class="at">:V1</span>)
+    (api/add-or-update-column <span class="at">:row-count</span> api/row-count)
+    (api/ungroup))</code></pre></div>
+<p>_unnamed [9 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+<th>:row-count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>When column which is added is longer than row count in dataset, column is trimmed. When column is shorter, it’s cycled or missing values are appended.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-update-column DS <span class="at">:V5</span> [<span class="at">:r</span> <span class="at">:b</span>])</code></pre></div>
+<p>_unnamed [9 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+<th>:V5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+<td>:r</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+<td>:b</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+<td>:r</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+<td>:b</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+<td>:r</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+<td>:b</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+<td>:r</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+<td>:b</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+<td>:r</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-update-column DS <span class="at">:V5</span> [<span class="at">:r</span> <span class="at">:b</span>] <span class="at">:na</span>)</code></pre></div>
+<p>_unnamed [9 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+<th>:V5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+<td>:r</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+<td>:b</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Tha same applies for grouped dataset</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by <span class="at">:V3</span>)
+    (api/add-or-update-column <span class="at">:V5</span> [<span class="at">:r</span> <span class="at">:b</span>] <span class="at">:na</span>)
+    (api/ungroup))</code></pre></div>
+<p>_unnamed [9 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+<th>:V5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+<td>:r</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+<td>:b</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+<td>:r</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+<td>:b</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+<td>:r</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+<td>:b</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Let’s use other column to fill groups</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by <span class="at">:V3</span>)
+    (api/add-or-update-column <span class="at">:V5</span> (DS <span class="at">:V2</span>))
+    (api/ungroup))</code></pre></div>
+<p>_unnamed [9 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+<th>:V5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+<td>3</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>In case you want to add or update several columns you can call <code>add-or-update-columns</code> and provide map where keys are column names, vals are columns.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-update-columns DS {<span class="at">:V1</span> #(<span class="kw">map</span> <span class="kw">inc</span> (<span class="va">%</span> <span class="at">:V1</span>))
+                               <span class="at">:V5</span> #(<span class="kw">map</span> (<span class="kw">comp</span> <span class="kw">keyword</span> <span class="kw">str</span>) (<span class="va">%</span> <span class="at">:V4</span>))
+                               <span class="at">:V6</span> <span class="dv">11</span>})</code></pre></div>
+<p>_unnamed [9 6]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+<th>:V5</th>
+<th>:V6</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+<td>:A</td>
+<td>11</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+<td>:B</td>
+<td>11</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+<td>:C</td>
+<td>11</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+<td>:A</td>
+<td>11</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+<td>:B</td>
+<td>11</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+<td>:C</td>
+<td>11</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+<td>:A</td>
+<td>11</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+<td>:B</td>
+<td>11</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+<td>:C</td>
+<td>11</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="map" class="section level4">
 <h4>Map</h4>
+<p>The other way of creating or updating column is to map columns as regular <code>map</code> function. The arity of mapping function should be the same as number of selected columns.</p>
+<p>Arguments:</p>
+<ul>
+<li><code>ds</code> - dataset</li>
+<li><code>column-name</code> - target column name</li>
+<li><code>map-fn</code> - mapping function</li>
+<li><code>columns-selector</code> - columns selected</li>
+<li><code>meta-field</code> (optional) - column selector option</li>
+</ul>
+<hr />
+<p>Let’s add numerical columns together</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/map-columns DS <span class="at">:sum-of-numbers</span> (<span class="kw">fn</span> [&amp; rows]
+                                      (<span class="kw">reduce</span> <span class="kw">+</span> rows)) #{<span class="at">:int64</span> <span class="at">:float64</span>} <span class="at">:datatype</span>)</code></pre></div>
+<p>_unnamed [9 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+<th>:sum-of-numbers</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+<td>2.500</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+<td>5.000</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+<td>5.500</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+<td>6.500</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+<td>7.000</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+<td>9.500</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+<td>8.500</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+<td>11.00</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+<td>11.50</td>
+</tr>
+</tbody>
+</table>
+<p>The same works on grouped dataset</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by <span class="at">:V4</span>)
+    (api/map-columns <span class="at">:sum-of-numbers</span> (<span class="kw">fn</span> [&amp; rows]
+                                       (<span class="kw">reduce</span> <span class="kw">+</span> rows)) #{<span class="at">:int64</span> <span class="at">:float64</span>} <span class="at">:datatype</span>)
+    (api/ungroup))</code></pre></div>
+<p>_unnamed [9 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+<th>:sum-of-numbers</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+<td>2.500</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+<td>6.500</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+<td>8.500</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+<td>5.000</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+<td>7.000</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+<td>11.00</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+<td>5.500</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+<td>9.500</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+<td>11.50</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="reorder" class="section level4">
 <h4>Reorder</h4>
+<p>To reorder columns use columns selectors to choose what columns go first. The unseleted columns are appended to the end.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/reorder-columns DS <span class="at">:V4</span> [<span class="at">:V3</span> <span class="at">:V2</span>] <span class="at">:V1</span>)</code></pre></div>
+<p>_unnamed [9 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V4</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>1</td>
+<td>0.5000</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>2</td>
+<td>1.000</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>C</td>
+<td>3</td>
+<td>1.500</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>A</td>
+<td>4</td>
+<td>0.5000</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>B</td>
+<td>5</td>
+<td>1.000</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>C</td>
+<td>6</td>
+<td>1.500</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>A</td>
+<td>7</td>
+<td>0.5000</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>8</td>
+<td>1.000</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>C</td>
+<td>9</td>
+<td>1.500</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>This function doesn’t let you select meta field, so you have to call <code>column-names</code> in such case. Below we want to add integer columns at the end.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/reorder-columns DS (api/column-names DS (<span class="kw">complement</span> #{<span class="at">:int64</span>}) <span class="at">:datatype</span>))</code></pre></div>
+<p>_unnamed [9 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V3</th>
+<th>:V4</th>
+<th>:V1</th>
+<th>:V2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0.5000</td>
+<td>A</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>1.000</td>
+<td>B</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>1.500</td>
+<td>C</td>
+<td>1</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>0.5000</td>
+<td>A</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td>1.000</td>
+<td>B</td>
+<td>1</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td>1.500</td>
+<td>C</td>
+<td>2</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<td>0.5000</td>
+<td>A</td>
+<td>1</td>
+<td>7</td>
+</tr>
+<tr class="even">
+<td>1.000</td>
+<td>B</td>
+<td>2</td>
+<td>8</td>
+</tr>
+<tr class="odd">
+<td>1.500</td>
+<td>C</td>
+<td>1</td>
+<td>9</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="type-conversion" class="section level4">
 <h4>Type conversion</h4>
+<p>To convert column into given datatype can be done using <code>convert-column-type</code> function. Not all the types can be converted automatically also some types require slow parsing (every conversion from string). In case where conversion is not possible you can pass conversion function.</p>
+<p>Arguments:</p>
+<ul>
+<li><code>ds</code> - dataset</li>
+<li>Two options:
+<ul>
+<li><code>coltype-map</code> in case when you want to convert several columns, keys are column names, vals are new types</li>
+<li><code>colname</code> and <code>new-type</code> - column name and new datatype</li>
+</ul></li>
+</ul>
+<p><code>new-type</code> can be:</p>
+<ul>
+<li>a type like <code>:int64</code> or <code>:string</code></li>
+<li>or pair of datetime and conversion function</li>
+</ul>
+<p>After conversion additional infomation is given on problematic values</p>
+<hr />
+<p>Basic conversion</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/convert-column-type <span class="at">:V1</span> <span class="at">:float64</span>)
+    (api/info <span class="at">:columns</span>))</code></pre></div>
+<p>_unnamed :column info [4 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:name</th>
+<th>:size</th>
+<th>:datatype</th>
+<th>:unparsed-indexes</th>
+<th>:unparsed-data</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>:V1</td>
+<td>9</td>
+<td>:float64</td>
+<td>{}</td>
+<td>[]</td>
+</tr>
+<tr class="even">
+<td>:V2</td>
+<td>9</td>
+<td>:int64</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>:V3</td>
+<td>9</td>
+<td>:float64</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>:V4</td>
+<td>9</td>
+<td>:object</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Using custom converter. Let’s treat <code>:V4</code> as haxadecimal values. See that this way we can map column to any value.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/convert-column-type <span class="at">:V4</span> [<span class="at">:int16</span> #(Integer/parseInt (<span class="kw">str</span> <span class="va">%</span>) <span class="dv">16</span>)]))</code></pre></div>
+<p>_unnamed [9 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>10</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>11</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>12</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>10</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>11</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>12</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>10</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>11</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>12</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>You can process several columns at once</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/convert-column-type {<span class="at">:V1</span> <span class="at">:float64</span>
+                              <span class="at">:V2</span> <span class="at">:object</span>
+                              <span class="at">:V3</span> [<span class="at">:boolean</span> #(<span class="kw">&lt;</span> <span class="va">%</span> <span class="fl">1.0</span>)]
+                              <span class="at">:V4</span> <span class="at">:string</span>})
+    (api/info <span class="at">:columns</span>))</code></pre></div>
+<p>_unnamed :column info [4 6]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:name</th>
+<th>:size</th>
+<th>:datatype</th>
+<th>:unparsed-indexes</th>
+<th>:unparsed-data</th>
+<th>:categorical?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>:V1</td>
+<td>9</td>
+<td>:float64</td>
+<td>{}</td>
+<td>[]</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>:V2</td>
+<td>9</td>
+<td>:object</td>
+<td>{}</td>
+<td>[]</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>:V3</td>
+<td>9</td>
+<td>:boolean</td>
+<td>{}</td>
+<td>[]</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>:V4</td>
+<td>9</td>
+<td>:string</td>
+<td>{}</td>
+<td>[]</td>
+<td>true</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Function works on the grouped dataset</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by <span class="at">:V1</span>)
+    (api/convert-column-type <span class="at">:V1</span> <span class="at">:float32</span>)
+    (api/ungroup)
+    (api/info <span class="at">:columns</span>))</code></pre></div>
+<p>_unnamed :column info [4 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:name</th>
+<th>:size</th>
+<th>:datatype</th>
+<th>:unparsed-indexes</th>
+<th>:unparsed-data</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>:V1</td>
+<td>9</td>
+<td>:float32</td>
+<td>{}</td>
+<td>[]</td>
+</tr>
+<tr class="even">
+<td>:V2</td>
+<td>9</td>
+<td>:int64</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>:V3</td>
+<td>9</td>
+<td>:float64</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>:V4</td>
+<td>9</td>
+<td>:object</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div id="rows" class="section level3">
@@ -3137,6 +5077,9 @@ precipitation
 <div id="concat" class="section level4">
 <h4>Concat</h4>
 </div>
+</div>
+<div id="functions" class="section level3">
+<h3>Functions</h3>
 </div>
 </div>
 

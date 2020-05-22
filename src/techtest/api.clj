@@ -27,7 +27,6 @@
                          set-dataset-name
                          dataset-name
                          column
-                         column-names
                          has-column?
                          write-csv!)
 
@@ -50,7 +49,7 @@
                          groups->map)
 
 (exporter/export-symbols techtest.api.columns
-                         select-column-names
+                         column-names
                          select-columns
                          drop-columns
                          rename-columns
@@ -160,10 +159,10 @@
 
 (defn- select-or-drop
   "Select columns and rows"
-  [fc fs ds cols-selector rows-selector]
-  (let [ds (if (and cols-selector
-                    (not= :all cols-selector))
-             (fc ds cols-selector)
+  [fc fs ds columns-selector rows-selector]
+  (let [ds (if (and columns-selector
+                    (not= :all columns-selector))
+             (fc ds columns-selector)
              ds)]
     (if (and rows-selector
              (not= :all rows-selector))
@@ -258,24 +257,24 @@
   - :asc
   - :desc
   - custom comparator function"
-  ([ds cols-selector]
-   (order-by ds cols-selector (if (iterable-sequence? cols-selector)
-                                (repeat (count cols-selector) :asc)
+  ([ds columns-selector]
+   (order-by ds columns-selector (if (iterable-sequence? columns-selector)
+                                (repeat (count columns-selector) :asc)
                                 [:asc])))
-  ([ds cols-selector order-or-comparators]
+  ([ds columns-selector order-or-comparators]
    (if (grouped? ds)
 
-     (process-group-data ds #(order-by % cols-selector order-or-comparators))
+     (process-group-data ds #(order-by % columns-selector order-or-comparators))
 
      (let [comp-fn (asc-desc-comparator order-or-comparators)]
        (cond
-         (iterable-sequence? cols-selector) (ds/sort-by (apply juxt (map #(if (fn? %)
+         (iterable-sequence? columns-selector) (ds/sort-by (apply juxt (map #(if (fn? %)
                                                                             %
-                                                                            (fn [ds] (get ds %))) cols-selector)) comp-fn ds)
-         (fn? cols-selector) (ds/sort-by cols-selector
+                                                                            (fn [ds] (get ds %))) columns-selector)) comp-fn ds)
+         (fn? columns-selector) (ds/sort-by columns-selector
                                          comp-fn
                                          ds)
-         :else (ds/sort-by-column cols-selector comp-fn ds))))))
+         :else (ds/sort-by-column columns-selector comp-fn ds))))))
 
 ;;;;;;;;;;;
 ;; UNIQUE
@@ -293,7 +292,7 @@
 (defn- strategy-fold
   ([ds group-by-names] (strategy-fold ds group-by-names nil))
   ([ds group-by-names fold-fn]
-   (let [target-names (select-column-names ds (complement (set group-by-names)))
+   (let [target-names (column-names ds (complement (set group-by-names)))
          fold-fn (or fold-fn vec)]
      (-> (group-by ds group-by-names)
          (process-group-data (fn [ds]
@@ -304,26 +303,26 @@
 
 (defn unique-by
   ([ds] (unique-by ds (ds/column-names ds)))
-  ([ds cols-selector] (unique-by ds cols-selector nil))
-  ([ds cols-selector {:keys [strategy fold-fn limit-columns]
+  ([ds columns-selector] (unique-by ds columns-selector nil))
+  ([ds columns-selector {:keys [strategy fold-fn limit-columns]
                       :or {strategy :first fold-fn vec}
                       :as options}]
    (if (grouped? ds)
-     (process-group-data ds #(unique-by % cols-selector options))
+     (process-group-data ds #(unique-by % columns-selector options))
 
      (if (= 1 (ds/row-count ds))
        ds
        (if (= strategy :fold)
-         (strategy-fold ds (select-column-names ds cols-selector) fold-fn)
+         (strategy-fold ds (column-names ds columns-selector) fold-fn)
          (let [local-options {:keep-fn (get strategies strategy :first)}]
            (cond
-             (iterable-sequence? cols-selector) (if (= (count cols-selector) 1)
-                                                  (ds/unique-by-column (first cols-selector) local-options ds)
-                                                  (ds/unique-by identity (assoc local-options :column-name-seq cols-selector) ds))
-             (fn? cols-selector) (ds/unique-by cols-selector (if limit-columns
+             (iterable-sequence? columns-selector) (if (= (count columns-selector) 1)
+                                                  (ds/unique-by-column (first columns-selector) local-options ds)
+                                                  (ds/unique-by identity (assoc local-options :column-name-seq columns-selector) ds))
+             (fn? columns-selector) (ds/unique-by columns-selector (if limit-columns
                                                                (assoc local-options :column-name-seq limit-columns)
                                                                local-options) ds)
-             :else (ds/unique-by-column cols-selector local-options ds))))))))
+             :else (ds/unique-by-column columns-selector local-options ds))))))))
 
 ;;;;;;;;;;;;
 ;; MISSING
@@ -332,12 +331,12 @@
 (defn- select-or-drop-missing
   "Select rows with missing values"
   ([f ds] (select-or-drop-missing f ds nil))
-  ([f ds cols-selector]
+  ([f ds columns-selector]
    (if (grouped? ds)
-     (process-group-data ds #(select-or-drop-missing f % cols-selector))
+     (process-group-data ds #(select-or-drop-missing f % columns-selector))
 
-     (let [ds- (if cols-selector
-                 (select-columns ds cols-selector)
+     (let [ds- (if columns-selector
+                 (select-columns ds columns-selector)
                  ds)]
        (f ds (ds/missing ds-))))))
 
@@ -345,7 +344,7 @@
   [op]
   (str op " rows with missing values
 
- `cols-selector` selects columns to look at missing values"))
+ `columns-selector` selects columns to look at missing values"))
 
 (def ^{:doc (select-or-drop-missing-docstring "Select")}
   select-missing (partial select-or-drop-missing ds/select-rows))
@@ -403,16 +402,16 @@
       (replace-missing-with-value col missing value))))
 
 (defn replace-missing
-  ([ds cols-selector value] (replace-missing ds cols-selector value nil))
-  ([ds cols-selector value {:keys [strategy]
+  ([ds columns-selector value] (replace-missing ds columns-selector value nil))
+  ([ds columns-selector value {:keys [strategy]
                             :or {strategy :value}
                             :as options}]
 
    (if (grouped? ds)
 
-     (process-group-data ds #(replace-missing % cols-selector value options))
+     (process-group-data ds #(replace-missing % columns-selector value options))
      
-     (let [cols (select-column-names ds cols-selector)]
+     (let [cols (column-names ds columns-selector)]
        (reduce (fn [ds colname]
                  (let [col (ds colname)
                        missing (col/missing col)]
@@ -425,15 +424,15 @@
 ;;;;;;;;;;;;;;;
 
 (defn join-columns
-  ([ds target-column cols-selector] (join-columns ds target-column cols-selector nil))
-  ([ds target-column cols-selector {:keys [separator missing-subst drop-columns? result-type]
-                                    :or {separator "-" drop-columns? true result-type :string}
-                                    :as options}]
+  ([ds target-column columns-selector] (join-columns ds target-column columns-selector nil))
+  ([ds target-column columns-selector {:keys [separator missing-subst drop-columns? result-type]
+                                       :or {separator "-" drop-columns? true result-type :string}
+                                       :as options}]
    (if (grouped? ds)
      
-     (process-group-data ds #(join-columns % target-column cols-selector options))
+     (process-group-data ds #(join-columns % target-column columns-selector options))
 
-     (let [cols (select-columns ds cols-selector)
+     (let [cols (select-columns ds columns-selector)
            missing-subst-fn #(map (fn [row] (or row missing-subst)) %)
            join-function (condp = result-type
                            :map (let [col-names (ds/column-names cols)]
@@ -450,7 +449,7 @@
        (let [result (ds/add-or-update-column ds target-column (->> (ds/value-reader cols options)
                                                                    (map (comp join-function missing-subst-fn))))]
 
-         (if drop-columns? (drop-columns result cols-selector) result))))))
+         (if drop-columns? (drop-columns result columns-selector) result))))))
 
 (defn- separate-column->columns
   [col target-columns replace-missing separator-fn]
@@ -534,12 +533,12 @@
 
 (defn pivot->longer
   "`tidyr` pivot_longer api"
-  ([ds cols-selector] (pivot->longer ds cols-selector nil))
-  ([ds cols-selector {:keys [target-cols value-column-name splitter drop-missing? meta-field datatypes]
-                      :or {target-cols :$column
-                           value-column-name :$value
-                           drop-missing? true}}]
-   (let [cols (select-column-names ds cols-selector meta-field)
+  ([ds columns-selector] (pivot->longer ds columns-selector nil))
+  ([ds columns-selector {:keys [target-cols value-column-name splitter drop-missing? meta-field datatypes]
+                         :or {target-cols :$column
+                              value-column-name :$value
+                              drop-missing? true}}]
+   (let [cols (column-names ds columns-selector meta-field)
          target-cols (if (iterable-sequence? target-cols) target-cols [target-cols])
          groups (cols->pre-longer ds cols target-cols value-column-name splitter)
          cols-to-add (keys (first groups))
@@ -582,21 +581,21 @@
                    (drop-join-leftovers join-name))] ;; drop unnecessary leftovers
       (if (> (ds/row-count data) starting-ds-count) ;; in case when there were multiple values, create vectors
         (if fold-fn
-          (strategy-fold data (select-column-names data (complement (set target-names))) fold-fn)
+          (strategy-fold data (column-names data (complement (set target-names))) fold-fn)
           (do (println "WARNING: multiple values in result detected, data should be rolled in.")
               data))
         data))))
 
 (defn pivot->wider
-  ([ds cols-selector value-columns] (pivot->wider ds cols-selector value-columns nil))
-  ([ds cols-selector value-columns {:keys [fold-fn rename-map]}]
-   (let [col-names (select-column-names ds cols-selector) ;; columns to be unrolled
-         value-names (select-column-names ds value-columns) ;; columns to be used as values
+  ([ds columns-selector value-columns] (pivot->wider ds columns-selector value-columns nil))
+  ([ds columns-selector value-columns {:keys [fold-fn rename-map]}]
+   (let [col-names (column-names ds columns-selector) ;; columns to be unrolled
+         value-names (column-names ds value-columns) ;; columns to be used as values
          single-value? (= (count value-names) 1) ;; maybe this is one column? (different name creation rely on this)
          rest-cols (->> (clojure.core/concat col-names value-names)
                         (set)
                         (complement)
-                        (select-column-names ds)) ;; the columns used in join
+                        (column-names ds)) ;; the columns used in join
          join-on-single? (= (count rest-cols) 1) ;; mayve this is one column? (different join column creation)
          join-name (if join-on-single?
                      (first rest-cols)
@@ -663,11 +662,11 @@
 (select-columns DS [:V1 :V2])
 (select-columns DS {:V1 "v1"
                     :V2 "v2"})
-(select-columns DS #(= :int64 %) {:meta-field :datatype})
+(select-columns DS #(= :int64 %) :datatype)
 
 (drop-columns DS :V1)
 (drop-columns DS [:V1 :V2])
-(drop-columns DS #(= :int64 %) {:meta-field :datatype})
+(drop-columns DS #(= :int64 %) :datatype)
 
 (rename-columns DS {:V1 "v1"
                     :V2 "v2"})
@@ -675,24 +674,24 @@
 (ungroup (select-columns (group-by DS :V1) {:V1 "v1"}))
 (ungroup (drop-columns (group-by DS [:V4]) (comp #{:int64} :datatype)))
 
-(add-or-update-column DS :abc [1 2] {:count-strategy :na})
-(add-or-update-column DS :abc [1 2] {:count-strategy :cycle})
+(add-or-update-column DS :abc [1 2] :na)
+(add-or-update-column DS :abc [1 2] :cycle)
 (add-or-update-column DS :abc "X")
 (add-or-update-columns DS {:abc "X"
                            :xyz [1 2 3]})
 (add-or-update-column DS :abc (fn [ds] (dfn/+ (ds :V1) (ds :V2))))
 
 (add-or-update-columns DS {:abc "X"
-                           :xyz [1 2 3]} {:count-strategy :na})
+                           :xyz [1 2 3]} :na)
 
 (ungroup (add-or-update-column (group-by DS :V4) :abc #(let [mean (dfn/mean (% :V2))
-                                                                stddev (dfn/standard-deviation (% :V2))]
-                                                            (dfn// (dfn/- (% :V2) mean)
-                                                                   stddev))))
+                                                             stddev (dfn/standard-deviation (% :V2))]
+                                                         (dfn// (dfn/- (% :V2) mean)
+                                                                stddev))))
 
 
 (ungroup (add-or-update-columns (group-by DS :V4) {:abc "X"
-                                                   :xyz [-1]} {:count-strategy :na}))
+                                                   :xyz [-1]} :na))
 
 (convert-column-type DS :V1 :float64)
 

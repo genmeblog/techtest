@@ -110,7 +110,7 @@
 
 \title{Proposed API for tech.ml.dataset}
 \author{GenerateMe}
-\date{2020-05-21}
+\date{2020-05-22}
 
 \begin{document}
 \maketitle
@@ -153,6 +153,19 @@ main goals were:
 
 All proposed functions are grouped in tabs below. Select group to see
 examples and details.
+
+If you want to know more about \texttt{tech.ml.dataset} and
+\texttt{tech.ml.datatype} please refer their documentation:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/techascent/tech.datatype/blob/master/docs/cheatsheet.md}{Datatype}
+\item
+  \href{https://github.com/techascent/tech.datatype/blob/master/docs/datetime.md}{Date/time}
+\item
+  \href{https://github.com/techascent/tech.ml.dataset/blob/master/docs/walkthrough.md}{Dataset}
+\end{itemize}
 
 INFO: The future of this API is not known yet. Two directions are
 possible: integration into \texttt{tech.ml} or development under
@@ -240,24 +253,20 @@ files:
   options (see documentation of
   \texttt{tech.ml.dataset/-\textgreater{}dataset} function for full
   list):
-
-  \begin{itemize}
-  \tightlist
-  \item
-    \texttt{:dataset-name} - name of the dataset
-  \item
-    \texttt{:num-rows} - number of rows to read from file
-  \item
-    \texttt{:header-row?} - indication if first row in file is a header
-  \item
-    \texttt{:key-fn} - function applied to column names (eg.
-    \texttt{keyword}, to convert column names to keywords)
-  \item
-    \texttt{:separator} - column separator
-  \item
-    \texttt{:single-value-column-name} - name of the column when single
-    value is provided
-  \end{itemize}
+\item
+  \texttt{:dataset-name} - name of the dataset
+\item
+  \texttt{:num-rows} - number of rows to read from file
+\item
+  \texttt{:header-row?} - indication if first row in file is a header
+\item
+  \texttt{:key-fn} - function applied to column names (eg.
+  \texttt{keyword}, to convert column names to keywords)
+\item
+  \texttt{:separator} - column separator
+\item
+  \texttt{:single-value-column-name} - name of the column when single
+  value is provided
 \end{itemize}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -650,20 +659,6 @@ Number of columns
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-Names of columns.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{(api/column-names ds)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-("date" "precipitation" "temp_max" "temp_min" "wind" "weather")
-\end{verbatim}
-
-\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
-
 Shape of the dataset, {[}row count, column count{]}
 
 \begin{Shaded}
@@ -1000,7 +995,7 @@ Rows as sequence of sequences
 \end{Shaded}
 
 \begin{verbatim}
-([#object[java.time.LocalDate 0x489940d9 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x156af23e "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+([#object[java.time.LocalDate 0x4fd2177e "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x2eea1cca "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -1014,13 +1009,13 @@ Rows as sequence of maps
 \end{Shaded}
 
 \begin{verbatim}
-({"date" #object[java.time.LocalDate 0x3b73ea3d "2012-01-01"],
+({"date" #object[java.time.LocalDate 0x3e89a0d6 "2012-01-01"],
   "precipitation" 0.0,
   "temp_min" 5.0,
   "weather" "drizzle",
   "temp_max" 12.8,
   "wind" 4.7}
- {"date" #object[java.time.LocalDate 0x51191802 "2012-01-02"],
+ {"date" #object[java.time.LocalDate 0xd7dd8f1 "2012-01-02"],
   "precipitation" 10.9,
   "temp_min" 2.8,
   "weather" "rain",
@@ -2022,6 +2017,7 @@ Also we can supress separation
 \NormalTok{    (api/group-by (}\KeywordTok{juxt} \AttributeTok{:V1} \AttributeTok{:V3}\NormalTok{))}
 \NormalTok{    (api/ungroup \{}\AttributeTok{:separate}\NormalTok{? }\VariableTok{false}
                   \AttributeTok{:add-group-as-column} \VariableTok{true}\NormalTok{\}))}
+\CommentTok{;; => _unnamed [9 5]:}
 \end{Highlighting}
 \end{Shaded}
 
@@ -2122,19 +2118,1131 @@ datasets. Result should be a dataset to have ungrouping working.
 
 \subsubsection{Columns}\label{columns}
 
+Column is a special \texttt{tech.ml.dataset} structure based on
+\texttt{tech.ml.datatype} library. For our purposes we cat treat columns
+as typed and named sequence bound to particular dataset.
+
+Type of the data is inferred from a sequence during column creation.
+
 \paragraph{Names}\label{names}
+
+To select dataset columns or column names \texttt{columns-selector} is
+used. \texttt{columns-selector} can be one of the following:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{:all} keyword - selects all columns
+\item
+  column name - for single column
+\item
+  sequence of column names - for collection of columns
+\item
+  regex - to apply pattern on column names or datatype
+\item
+  filter predicate - to filter column names or datatype
+\end{itemize}
+
+Column name can be anything.
+
+\texttt{column-names} function returns names according to
+\texttt{columns-selector} and optional \texttt{meta-filed}.
+\texttt{meta-field} is one of the following:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{:name} (default) - to operate on column names
+\item
+  \texttt{:datatype} - to operated on column types
+\item
+  \texttt{:all} - if you want to process all metadata
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+To select all column names you can use \texttt{column-names} function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/column-names DS)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(:V1 :V2 :V3 :V4)
+\end{verbatim}
+
+or
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/column-names DS }\AttributeTok{:all}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(:V1 :V2 :V3 :V4)
+\end{verbatim}
+
+In case you want to select column which has name \texttt{:all} (or is
+sequence or map), put it into a vector. Below code returns empty
+sequence since there is no such column in the dataset.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/column-names DS [}\AttributeTok{:all}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+()
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Obviously selecting single name returns it's name if available
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/column-names DS }\AttributeTok{:V1}\NormalTok{)}
+\NormalTok{(api/column-names DS }\StringTok{"no such column"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(:V1)
+()
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Select sequence of column names.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/column-names DS [}\AttributeTok{:V1} \StringTok{"V2"} \AttributeTok{:V3} \AttributeTok{:V4} \AttributeTok{:V5}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(:V1 :V3 :V4)
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Select names based on regex, columns ends with \texttt{1} or \texttt{4}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/column-names DS }\SpecialStringTok{#".*[14]"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(:V1 :V4)
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Select names based on regex operating on type of the column (to check
+what are the column types, call \texttt{(api/info\ DS\ :columns)}. Here
+we want to get integer columns only.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/column-names DS }\SpecialStringTok{#"^:int.*"} \AttributeTok{:datatype}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(:V1 :V2)
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+And finally we can use predicate to select names. Let's select double
+precision columns.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/column-names DS #(}\KeywordTok{=} \AttributeTok{:float64} \VariableTok{%}\NormalTok{) }\AttributeTok{:datatype}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(:V3)
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+If you want to select all columns but given, use \texttt{complement}
+function. Works only on a predicate.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/column-names DS (}\KeywordTok{complement}\NormalTok{ #\{}\AttributeTok{:V1}\NormalTok{\}))}
+\NormalTok{(api/column-names DS (}\KeywordTok{complement}\NormalTok{ #(}\KeywordTok{=} \AttributeTok{:float64} \VariableTok{%}\NormalTok{)) }\AttributeTok{:datatype}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(:V2 :V3 :V4)
+(:V1 :V2 :V4)
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+You can select column names based on all column metadata at once by
+using \texttt{:all} metadata selector. Below we want to select column
+names ending with \texttt{1} which have \texttt{long} datatype.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/column-names DS (}\KeywordTok{fn}\NormalTok{ [}\KeywordTok{meta}\NormalTok{]}
+\NormalTok{                       (}\KeywordTok{and}\NormalTok{ (}\KeywordTok{=} \AttributeTok{:int64}\NormalTok{ (}\AttributeTok{:datatype} \KeywordTok{meta}\NormalTok{))}
+\NormalTok{                            (clojure.string/ends-with? (}\AttributeTok{:name} \KeywordTok{meta}\NormalTok{) }\StringTok{"1"}\NormalTok{))) }\AttributeTok{:all}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(:V1)
+\end{verbatim}
 
 \paragraph{Select}\label{select}
 
+\texttt{select-columns} creates dataset with columns selected by
+\texttt{columns-selector} as described above. Function works on regular
+and grouped dataset.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Select only float64 columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/select-columns DS #(}\KeywordTok{=} \AttributeTok{:float64} \VariableTok{%}\NormalTok{) }\AttributeTok{:datatype}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 1{]}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+:V3\tabularnewline
+\midrule
+\endhead
+0.5000\tabularnewline
+1.000\tabularnewline
+1.500\tabularnewline
+0.5000\tabularnewline
+1.000\tabularnewline
+1.500\tabularnewline
+0.5000\tabularnewline
+1.000\tabularnewline
+1.500\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Select all but \texttt{:V1} columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/select-columns DS (}\KeywordTok{complement}\NormalTok{ #\{}\AttributeTok{:V1}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 0.5000 & A\tabularnewline
+2 & 1.000 & B\tabularnewline
+3 & 1.500 & C\tabularnewline
+4 & 0.5000 & A\tabularnewline
+5 & 1.000 & B\tabularnewline
+6 & 1.500 & C\tabularnewline
+7 & 0.5000 & A\tabularnewline
+8 & 1.000 & B\tabularnewline
+9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+If we have grouped data set, column selection is applied to every group
+separately.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V1}\NormalTok{)}
+\NormalTok{    (api/select-columns [}\AttributeTok{:V2} \AttributeTok{:V3}\NormalTok{])}
+\NormalTok{    (api/groups->map))}
+\end{Highlighting}
+\end{Shaded}
+
+\{1 1 {[}5 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V2 & :V3\tabularnewline
+\midrule
+\endhead
+1 & 0.5000\tabularnewline
+3 & 1.500\tabularnewline
+5 & 1.000\tabularnewline
+7 & 0.5000\tabularnewline
+9 & 1.500\tabularnewline
+\bottomrule
+\end{longtable}
+
+, 2 2 {[}4 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V2 & :V3\tabularnewline
+\midrule
+\endhead
+2 & 1.000\tabularnewline
+4 & 0.5000\tabularnewline
+6 & 1.500\tabularnewline
+8 & 1.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\}
+
 \paragraph{Drop}\label{drop}
+
+\texttt{drop-columns} creates dataset with removed columns.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Drop float64 columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/drop-columns DS #(}\KeywordTok{=} \AttributeTok{:float64} \VariableTok{%}\NormalTok{) }\AttributeTok{:datatype}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & A\tabularnewline
+2 & 2 & B\tabularnewline
+1 & 3 & C\tabularnewline
+2 & 4 & A\tabularnewline
+1 & 5 & B\tabularnewline
+2 & 6 & C\tabularnewline
+1 & 7 & A\tabularnewline
+2 & 8 & B\tabularnewline
+1 & 9 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Drop all columns but \texttt{:V1} and \texttt{:V2}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/drop-columns DS (}\KeywordTok{complement}\NormalTok{ #\{}\AttributeTok{:V1} \AttributeTok{:V2}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V1 & :V2\tabularnewline
+\midrule
+\endhead
+1 & 1\tabularnewline
+2 & 2\tabularnewline
+1 & 3\tabularnewline
+2 & 4\tabularnewline
+1 & 5\tabularnewline
+2 & 6\tabularnewline
+1 & 7\tabularnewline
+2 & 8\tabularnewline
+1 & 9\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+If we have grouped data set, column selection is applied to every group
+separately. Selected columns are dropped.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V1}\NormalTok{)}
+\NormalTok{    (api/drop-columns [}\AttributeTok{:V2} \AttributeTok{:V3}\NormalTok{])}
+\NormalTok{    (api/groups->map))}
+\end{Highlighting}
+\end{Shaded}
+
+\{1 1 {[}5 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V1 & :V4\tabularnewline
+\midrule
+\endhead
+1 & A\tabularnewline
+1 & C\tabularnewline
+1 & B\tabularnewline
+1 & A\tabularnewline
+1 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+, 2 2 {[}4 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V1 & :V4\tabularnewline
+\midrule
+\endhead
+2 & B\tabularnewline
+2 & A\tabularnewline
+2 & C\tabularnewline
+2 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\}
+
+\paragraph{Rename}\label{rename}
+
+If you want to rename colums use \texttt{rename-columns} and pass map
+where keys are old names, values new ones.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/rename-columns DS \{}\AttributeTok{:V1} \StringTok{"v1"}
+                        \AttributeTok{:V2} \StringTok{"v2"}
+                        \AttributeTok{:V3}\NormalTok{ [}\DecValTok{1} \DecValTok{2} \DecValTok{3}\NormalTok{]}
+                        \AttributeTok{:V4}\NormalTok{ (Object.)\})}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+v1 & v2 & {[}1 2 3{]} &
+\href{mailto:java.lang.Object@2b0acee5}{\nolinkurl{java.lang.Object@2b0acee5}}\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Function works on grouped dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V1}\NormalTok{)}
+\NormalTok{    (api/rename-columns \{}\AttributeTok{:V1} \StringTok{"v1"}
+                         \AttributeTok{:V2} \StringTok{"v2"}
+                         \AttributeTok{:V3}\NormalTok{ [}\DecValTok{1} \DecValTok{2} \DecValTok{3}\NormalTok{]}
+                         \AttributeTok{:V4}\NormalTok{ (Object.)\})}
+\NormalTok{    (api/groups->map))}
+\end{Highlighting}
+\end{Shaded}
+
+\{1 1 {[}5 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+v1 & v2 & {[}1 2 3{]} &
+\href{mailto:java.lang.Object@60b39df5}{\nolinkurl{java.lang.Object@60b39df5}}\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+, 2 2 {[}4 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+v1 & v2 & {[}1 2 3{]} &
+\href{mailto:java.lang.Object@60b39df5}{\nolinkurl{java.lang.Object@60b39df5}}\tabularnewline
+\midrule
+\endhead
+2 & 2 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\}
 
 \paragraph{Add or update}\label{add-or-update}
 
+To add (or update existing) column call \texttt{add-or-update-column}
+function. Function accepts:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{ds} - a dataset
+\item
+  \texttt{column-name} - if it's existing column name, column will be
+  replaced
+\item
+  \texttt{column} - can be column (from other dataset), sequence, single
+  value or function. Too big columns are always trimmed. Too small are
+  cycled or extended with missing values (according to
+  \texttt{size-strategy} argument)
+\item
+  \texttt{size-strategy} (optional) - when new column is shorter than
+  dataset row count, following strategies are applied:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{:cycle} (default) - repeat data
+  \item
+    \texttt{:na} - append missing values
+  \end{itemize}
+\end{itemize}
+
+Function works on grouped dataset.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Add single value as column
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/add-or-update-column DS }\AttributeTok{:V5} \StringTok{"X"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4 & :V5\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A & X\tabularnewline
+2 & 2 & 1.000 & B & X\tabularnewline
+1 & 3 & 1.500 & C & X\tabularnewline
+2 & 4 & 0.5000 & A & X\tabularnewline
+1 & 5 & 1.000 & B & X\tabularnewline
+2 & 6 & 1.500 & C & X\tabularnewline
+1 & 7 & 0.5000 & A & X\tabularnewline
+2 & 8 & 1.000 & B & X\tabularnewline
+1 & 9 & 1.500 & C & X\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Replace one column (column is trimmed)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/add-or-update-column DS }\AttributeTok{:V1}\NormalTok{ (}\KeywordTok{repeatedly} \KeywordTok{rand}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+0.3120 & 1 & 0.5000 & A\tabularnewline
+0.4625 & 2 & 1.000 & B\tabularnewline
+0.4346 & 3 & 1.500 & C\tabularnewline
+0.05148 & 4 & 0.5000 & A\tabularnewline
+0.2961 & 5 & 1.000 & B\tabularnewline
+0.1465 & 6 & 1.500 & C\tabularnewline
+0.6781 & 7 & 0.5000 & A\tabularnewline
+0.008779 & 8 & 1.000 & B\tabularnewline
+0.4155 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Copy column
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/add-or-update-column DS }\AttributeTok{:V5}\NormalTok{ (DS }\AttributeTok{:V1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4 & :V5\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A & 1\tabularnewline
+2 & 2 & 1.000 & B & 2\tabularnewline
+1 & 3 & 1.500 & C & 1\tabularnewline
+2 & 4 & 0.5000 & A & 2\tabularnewline
+1 & 5 & 1.000 & B & 1\tabularnewline
+2 & 6 & 1.500 & C & 2\tabularnewline
+1 & 7 & 0.5000 & A & 1\tabularnewline
+2 & 8 & 1.000 & B & 2\tabularnewline
+1 & 9 & 1.500 & C & 1\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+When function is used, argument is whole dataset and the result should
+be column, sequence or single value
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/add-or-update-column DS }\AttributeTok{:row-count}\NormalTok{ api/row-count) }
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4 & :row-count\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A & 9\tabularnewline
+2 & 2 & 1.000 & B & 9\tabularnewline
+1 & 3 & 1.500 & C & 9\tabularnewline
+2 & 4 & 0.5000 & A & 9\tabularnewline
+1 & 5 & 1.000 & B & 9\tabularnewline
+2 & 6 & 1.500 & C & 9\tabularnewline
+1 & 7 & 0.5000 & A & 9\tabularnewline
+2 & 8 & 1.000 & B & 9\tabularnewline
+1 & 9 & 1.500 & C & 9\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Above example run on grouped dataset, applies function on each group
+separately.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V1}\NormalTok{)}
+\NormalTok{    (api/add-or-update-column }\AttributeTok{:row-count}\NormalTok{ api/row-count)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4 & :row-count\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A & 5\tabularnewline
+1 & 3 & 1.500 & C & 5\tabularnewline
+1 & 5 & 1.000 & B & 5\tabularnewline
+1 & 7 & 0.5000 & A & 5\tabularnewline
+1 & 9 & 1.500 & C & 5\tabularnewline
+2 & 2 & 1.000 & B & 4\tabularnewline
+2 & 4 & 0.5000 & A & 4\tabularnewline
+2 & 6 & 1.500 & C & 4\tabularnewline
+2 & 8 & 1.000 & B & 4\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+When column which is added is longer than row count in dataset, column
+is trimmed. When column is shorter, it's cycled or missing values are
+appended.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/add-or-update-column DS }\AttributeTok{:V5}\NormalTok{ [}\AttributeTok{:r} \AttributeTok{:b}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4 & :V5\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A & :r\tabularnewline
+2 & 2 & 1.000 & B & :b\tabularnewline
+1 & 3 & 1.500 & C & :r\tabularnewline
+2 & 4 & 0.5000 & A & :b\tabularnewline
+1 & 5 & 1.000 & B & :r\tabularnewline
+2 & 6 & 1.500 & C & :b\tabularnewline
+1 & 7 & 0.5000 & A & :r\tabularnewline
+2 & 8 & 1.000 & B & :b\tabularnewline
+1 & 9 & 1.500 & C & :r\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/add-or-update-column DS }\AttributeTok{:V5}\NormalTok{ [}\AttributeTok{:r} \AttributeTok{:b}\NormalTok{] }\AttributeTok{:na}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4 & :V5\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A & :r\tabularnewline
+2 & 2 & 1.000 & B & :b\tabularnewline
+1 & 3 & 1.500 & C &\tabularnewline
+2 & 4 & 0.5000 & A &\tabularnewline
+1 & 5 & 1.000 & B &\tabularnewline
+2 & 6 & 1.500 & C &\tabularnewline
+1 & 7 & 0.5000 & A &\tabularnewline
+2 & 8 & 1.000 & B &\tabularnewline
+1 & 9 & 1.500 & C &\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Tha same applies for grouped dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V3}\NormalTok{)}
+\NormalTok{    (api/add-or-update-column }\AttributeTok{:V5}\NormalTok{ [}\AttributeTok{:r} \AttributeTok{:b}\NormalTok{] }\AttributeTok{:na}\NormalTok{)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4 & :V5\tabularnewline
+\midrule
+\endhead
+2 & 2 & 1.000 & B & :r\tabularnewline
+1 & 5 & 1.000 & B & :b\tabularnewline
+2 & 8 & 1.000 & B &\tabularnewline
+1 & 1 & 0.5000 & A & :r\tabularnewline
+2 & 4 & 0.5000 & A & :b\tabularnewline
+1 & 7 & 0.5000 & A &\tabularnewline
+1 & 3 & 1.500 & C & :r\tabularnewline
+2 & 6 & 1.500 & C & :b\tabularnewline
+1 & 9 & 1.500 & C &\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Let's use other column to fill groups
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V3}\NormalTok{)}
+\NormalTok{    (api/add-or-update-column }\AttributeTok{:V5}\NormalTok{ (DS }\AttributeTok{:V2}\NormalTok{))}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4 & :V5\tabularnewline
+\midrule
+\endhead
+2 & 2 & 1.000 & B & 1\tabularnewline
+1 & 5 & 1.000 & B & 2\tabularnewline
+2 & 8 & 1.000 & B & 3\tabularnewline
+1 & 1 & 0.5000 & A & 1\tabularnewline
+2 & 4 & 0.5000 & A & 2\tabularnewline
+1 & 7 & 0.5000 & A & 3\tabularnewline
+1 & 3 & 1.500 & C & 1\tabularnewline
+2 & 6 & 1.500 & C & 2\tabularnewline
+1 & 9 & 1.500 & C & 3\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+In case you want to add or update several columns you can call
+\texttt{add-or-update-columns} and provide map where keys are column
+names, vals are columns.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/add-or-update-columns DS \{}\AttributeTok{:V1}\NormalTok{ #(}\KeywordTok{map} \KeywordTok{inc}\NormalTok{ (}\VariableTok{%} \AttributeTok{:V1}\NormalTok{))}
+                               \AttributeTok{:V5}\NormalTok{ #(}\KeywordTok{map}\NormalTok{ (}\KeywordTok{comp} \KeywordTok{keyword} \KeywordTok{str}\NormalTok{) (}\VariableTok{%} \AttributeTok{:V4}\NormalTok{))}
+                               \AttributeTok{:V6} \DecValTok{11}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 6{]}:
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4 & :V5 & :V6\tabularnewline
+\midrule
+\endhead
+2 & 1 & 0.5000 & A & :A & 11\tabularnewline
+3 & 2 & 1.000 & B & :B & 11\tabularnewline
+2 & 3 & 1.500 & C & :C & 11\tabularnewline
+3 & 4 & 0.5000 & A & :A & 11\tabularnewline
+2 & 5 & 1.000 & B & :B & 11\tabularnewline
+3 & 6 & 1.500 & C & :C & 11\tabularnewline
+2 & 7 & 0.5000 & A & :A & 11\tabularnewline
+3 & 8 & 1.000 & B & :B & 11\tabularnewline
+2 & 9 & 1.500 & C & :C & 11\tabularnewline
+\bottomrule
+\end{longtable}
+
 \paragraph{Map}\label{map}
+
+The other way of creating or updating column is to map columns as
+regular \texttt{map} function. The arity of mapping function should be
+the same as number of selected columns.
+
+Arguments:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{ds} - dataset
+\item
+  \texttt{column-name} - target column name
+\item
+  \texttt{map-fn} - mapping function
+\item
+  \texttt{columns-selector} - columns selected
+\item
+  \texttt{meta-field} (optional) - column selector option
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Let's add numerical columns together
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/map-columns DS }\AttributeTok{:sum-of-numbers}\NormalTok{ (}\KeywordTok{fn}\NormalTok{ [& rows]}
+\NormalTok{                                      (}\KeywordTok{reduce} \KeywordTok{+}\NormalTok{ rows)) #\{}\AttributeTok{:int64} \AttributeTok{:float64}\NormalTok{\} }\AttributeTok{:datatype}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4 & :sum-of-numbers\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A & 2.500\tabularnewline
+2 & 2 & 1.000 & B & 5.000\tabularnewline
+1 & 3 & 1.500 & C & 5.500\tabularnewline
+2 & 4 & 0.5000 & A & 6.500\tabularnewline
+1 & 5 & 1.000 & B & 7.000\tabularnewline
+2 & 6 & 1.500 & C & 9.500\tabularnewline
+1 & 7 & 0.5000 & A & 8.500\tabularnewline
+2 & 8 & 1.000 & B & 11.00\tabularnewline
+1 & 9 & 1.500 & C & 11.50\tabularnewline
+\bottomrule
+\end{longtable}
+
+The same works on grouped dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/map-columns }\AttributeTok{:sum-of-numbers}\NormalTok{ (}\KeywordTok{fn}\NormalTok{ [& rows]}
+\NormalTok{                                       (}\KeywordTok{reduce} \KeywordTok{+}\NormalTok{ rows)) #\{}\AttributeTok{:int64} \AttributeTok{:float64}\NormalTok{\} }\AttributeTok{:datatype}\NormalTok{)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4 & :sum-of-numbers\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A & 2.500\tabularnewline
+2 & 4 & 0.5000 & A & 6.500\tabularnewline
+1 & 7 & 0.5000 & A & 8.500\tabularnewline
+2 & 2 & 1.000 & B & 5.000\tabularnewline
+1 & 5 & 1.000 & B & 7.000\tabularnewline
+2 & 8 & 1.000 & B & 11.00\tabularnewline
+1 & 3 & 1.500 & C & 5.500\tabularnewline
+2 & 6 & 1.500 & C & 9.500\tabularnewline
+1 & 9 & 1.500 & C & 11.50\tabularnewline
+\bottomrule
+\end{longtable}
 
 \paragraph{Reorder}\label{reorder}
 
+To reorder columns use columns selectors to choose what columns go
+first. The unseleted columns are appended to the end.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/reorder-columns DS }\AttributeTok{:V4}\NormalTok{ [}\AttributeTok{:V3} \AttributeTok{:V2}\NormalTok{] }\AttributeTok{:V1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V4 & :V2 & :V3 & :V1\tabularnewline
+\midrule
+\endhead
+A & 1 & 0.5000 & 1\tabularnewline
+B & 2 & 1.000 & 2\tabularnewline
+C & 3 & 1.500 & 1\tabularnewline
+A & 4 & 0.5000 & 2\tabularnewline
+B & 5 & 1.000 & 1\tabularnewline
+C & 6 & 1.500 & 2\tabularnewline
+A & 7 & 0.5000 & 1\tabularnewline
+B & 8 & 1.000 & 2\tabularnewline
+C & 9 & 1.500 & 1\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+This function doesn't let you select meta field, so you have to call
+\texttt{column-names} in such case. Below we want to add integer columns
+at the end.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/reorder-columns DS (api/column-names DS (}\KeywordTok{complement}\NormalTok{ #\{}\AttributeTok{:int64}\NormalTok{\}) }\AttributeTok{:datatype}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V3 & :V4 & :V1 & :V2\tabularnewline
+\midrule
+\endhead
+0.5000 & A & 1 & 1\tabularnewline
+1.000 & B & 2 & 2\tabularnewline
+1.500 & C & 1 & 3\tabularnewline
+0.5000 & A & 2 & 4\tabularnewline
+1.000 & B & 1 & 5\tabularnewline
+1.500 & C & 2 & 6\tabularnewline
+0.5000 & A & 1 & 7\tabularnewline
+1.000 & B & 2 & 8\tabularnewline
+1.500 & C & 1 & 9\tabularnewline
+\bottomrule
+\end{longtable}
+
 \paragraph{Type conversion}\label{type-conversion}
+
+To convert column into given datatype can be done using
+\texttt{convert-column-type} function. Not all the types can be
+converted automatically also some types require slow parsing (every
+conversion from string). In case where conversion is not possible you
+can pass conversion function.
+
+Arguments:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{ds} - dataset
+\item
+  Two options:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{coltype-map} in case when you want to convert several
+    columns, keys are column names, vals are new types
+  \item
+    \texttt{colname} and \texttt{new-type} - column name and new
+    datatype
+  \end{itemize}
+\end{itemize}
+
+\texttt{new-type} can be:
+
+\begin{itemize}
+\tightlist
+\item
+  a type like \texttt{:int64} or \texttt{:string}
+\item
+  or pair of datetime and conversion function
+\end{itemize}
+
+After conversion additional infomation is given on problematic values
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Basic conversion
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/convert-column-type }\AttributeTok{:V1} \AttributeTok{:float64}\NormalTok{)}
+\NormalTok{    (api/info }\AttributeTok{:columns}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed :column info {[}4 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:name & :size & :datatype & :unparsed-indexes &
+:unparsed-data\tabularnewline
+\midrule
+\endhead
+:V1 & 9 & :float64 & \{\} & {[}{]}\tabularnewline
+:V2 & 9 & :int64 & &\tabularnewline
+:V3 & 9 & :float64 & &\tabularnewline
+:V4 & 9 & :object & &\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Using custom converter. Let's treat \texttt{:V4} as haxadecimal values.
+See that this way we can map column to any value.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/convert-column-type }\AttributeTok{:V4}\NormalTok{ [}\AttributeTok{:int16}\NormalTok{ #(Integer/parseInt (}\KeywordTok{str} \VariableTok{%}\NormalTok{) }\DecValTok{16}\NormalTok{)]))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & 10\tabularnewline
+2 & 2 & 1.000 & 11\tabularnewline
+1 & 3 & 1.500 & 12\tabularnewline
+2 & 4 & 0.5000 & 10\tabularnewline
+1 & 5 & 1.000 & 11\tabularnewline
+2 & 6 & 1.500 & 12\tabularnewline
+1 & 7 & 0.5000 & 10\tabularnewline
+2 & 8 & 1.000 & 11\tabularnewline
+1 & 9 & 1.500 & 12\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+You can process several columns at once
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/convert-column-type \{}\AttributeTok{:V1} \AttributeTok{:float64}
+                              \AttributeTok{:V2} \AttributeTok{:object}
+                              \AttributeTok{:V3}\NormalTok{ [}\AttributeTok{:boolean}\NormalTok{ #(}\KeywordTok{<} \VariableTok{%} \FloatTok{1.0}\NormalTok{)]}
+                              \AttributeTok{:V4} \AttributeTok{:string}\NormalTok{\})}
+\NormalTok{    (api/info }\AttributeTok{:columns}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed :column info {[}4 6{]}:
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+:name & :size & :datatype & :unparsed-indexes & :unparsed-data &
+:categorical?\tabularnewline
+\midrule
+\endhead
+:V1 & 9 & :float64 & \{\} & {[}{]} &\tabularnewline
+:V2 & 9 & :object & \{\} & {[}{]} &\tabularnewline
+:V3 & 9 & :boolean & \{\} & {[}{]} &\tabularnewline
+:V4 & 9 & :string & \{\} & {[}{]} & true\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Function works on the grouped dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V1}\NormalTok{)}
+\NormalTok{    (api/convert-column-type }\AttributeTok{:V1} \AttributeTok{:float32}\NormalTok{)}
+\NormalTok{    (api/ungroup)}
+\NormalTok{    (api/info }\AttributeTok{:columns}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed :column info {[}4 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:name & :size & :datatype & :unparsed-indexes &
+:unparsed-data\tabularnewline
+\midrule
+\endhead
+:V1 & 9 & :float32 & \{\} & {[}{]}\tabularnewline
+:V2 & 9 & :int64 & &\tabularnewline
+:V3 & 9 & :float64 & &\tabularnewline
+:V4 & 9 & :object & &\tabularnewline
+\bottomrule
+\end{longtable}
 
 \subsubsection{Rows}\label{rows}
 
@@ -2189,5 +3297,7 @@ datasets. Result should be a dataset to have ungrouping working.
 \paragraph{Hash}\label{hash}
 
 \paragraph{Concat}\label{concat}
+
+\subsubsection{Functions}\label{functions}
 
 \end{document}

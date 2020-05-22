@@ -15,6 +15,12 @@ During conversions of the examples I've come up how to reorganized existing `tec
 
 All proposed functions are grouped in tabs below. Select group to see examples and details.
 
+If you want to know more about `tech.ml.dataset` and `tech.ml.datatype` please refer their documentation:
+
+-   [Datatype](https://github.com/techascent/tech.datatype/blob/master/docs/cheatsheet.md)
+-   [Date/time](https://github.com/techascent/tech.datatype/blob/master/docs/datetime.md)
+-   [Dataset](https://github.com/techascent/tech.ml.dataset/blob/master/docs/walkthrough.md)
+
 INFO: The future of this API is not known yet. Two directions are possible: integration into `tech.ml` or development under `Scicloj` organization. For the time being use this repo if you want to try. Join the discussion on [Zulip](https://clojurians.zulipchat.com/#narrow/stream/236259-tech.2Eml.2Edataset.2Edev/topic/api)
 
 Let's require main namespace and define dataset used in most examples:
@@ -68,12 +74,12 @@ Dataset can be created from various of types of Clojure structures and files:
 
 -   data
 -   options (see documentation of `tech.ml.dataset/->dataset` function for full list):
-    -   `:dataset-name` - name of the dataset
-    -   `:num-rows` - number of rows to read from file
-    -   `:header-row?` - indication if first row in file is a header
-    -   `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
-    -   `:separator` - column separator
-    -   `:single-value-column-name` - name of the column when single value is provided
+-   `:dataset-name` - name of the dataset
+-   `:num-rows` - number of rows to read from file
+-   `:header-row?` - indication if first row in file is a header
+-   `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
+-   `:separator` - column separator
+-   `:single-value-column-name` - name of the column when single value is provided
 
 ------------------------------------------------------------------------
 
@@ -343,16 +349,6 @@ Number of columns
 
 ------------------------------------------------------------------------
 
-Names of columns.
-
-``` clojure
-(api/column-names ds)
-```
-
-    ("date" "precipitation" "temp_max" "temp_min" "wind" "weather")
-
-------------------------------------------------------------------------
-
 Shape of the dataset, \[row count, column count\]
 
 ``` clojure
@@ -592,7 +588,7 @@ Rows as sequence of sequences
 (take 2 (api/rows ds))
 ```
 
-    ([#object[java.time.LocalDate 0x2bf3d90c "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x1d369205 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+    ([#object[java.time.LocalDate 0x5805c9ce "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x7898fe1f "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 
 ------------------------------------------------------------------------
 
@@ -602,13 +598,13 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
-    ({"date" #object[java.time.LocalDate 0x793036cf "2012-01-01"],
+    ({"date" #object[java.time.LocalDate 0x218a6320 "2012-01-01"],
       "precipitation" 0.0,
       "temp_min" 5.0,
       "weather" "drizzle",
       "temp_max" 12.8,
       "wind" 4.7}
-     {"date" #object[java.time.LocalDate 0x4e8b61bc "2012-01-02"],
+     {"date" #object[java.time.LocalDate 0x57369c8 "2012-01-02"],
       "precipitation" 10.9,
       "temp_min" 2.8,
       "weather" "rain",
@@ -1281,6 +1277,7 @@ Also we can supress separation
     (api/group-by (juxt :V1 :V3))
     (api/ungroup {:separate? false
                   :add-group-as-column true}))
+;; => _unnamed [9 5]:
 ```
 
 \_unnamed \[9 5\]:
@@ -1350,19 +1347,795 @@ If you want to implement your own mapping function on grouped dataset you can ca
 
 ### Columns
 
+Column is a special `tech.ml.dataset` structure based on `tech.ml.datatype` library. For our purposes we cat treat columns as typed and named sequence bound to particular dataset.
+
+Type of the data is inferred from a sequence during column creation.
+
 #### Names
+
+To select dataset columns or column names `columns-selector` is used. `columns-selector` can be one of the following:
+
+-   `:all` keyword - selects all columns
+-   column name - for single column
+-   sequence of column names - for collection of columns
+-   regex - to apply pattern on column names or datatype
+-   filter predicate - to filter column names or datatype
+
+Column name can be anything.
+
+`column-names` function returns names according to `columns-selector` and optional `meta-filed`. `meta-field` is one of the following:
+
+-   `:name` (default) - to operate on column names
+-   `:datatype` - to operated on column types
+-   `:all` - if you want to process all metadata
+
+------------------------------------------------------------------------
+
+To select all column names you can use `column-names` function.
+
+``` clojure
+(api/column-names DS)
+```
+
+    (:V1 :V2 :V3 :V4)
+
+or
+
+``` clojure
+(api/column-names DS :all)
+```
+
+    (:V1 :V2 :V3 :V4)
+
+In case you want to select column which has name `:all` (or is sequence or map), put it into a vector. Below code returns empty sequence since there is no such column in the dataset.
+
+``` clojure
+(api/column-names DS [:all])
+```
+
+    ()
+
+------------------------------------------------------------------------
+
+Obviously selecting single name returns it's name if available
+
+``` clojure
+(api/column-names DS :V1)
+(api/column-names DS "no such column")
+```
+
+    (:V1)
+    ()
+
+------------------------------------------------------------------------
+
+Select sequence of column names.
+
+``` clojure
+(api/column-names DS [:V1 "V2" :V3 :V4 :V5])
+```
+
+    (:V1 :V3 :V4)
+
+------------------------------------------------------------------------
+
+Select names based on regex, columns ends with `1` or `4`
+
+``` clojure
+(api/column-names DS #".*[14]")
+```
+
+    (:V1 :V4)
+
+------------------------------------------------------------------------
+
+Select names based on regex operating on type of the column (to check what are the column types, call `(api/info DS :columns)`. Here we want to get integer columns only.
+
+``` clojure
+(api/column-names DS #"^:int.*" :datatype)
+```
+
+    (:V1 :V2)
+
+------------------------------------------------------------------------
+
+And finally we can use predicate to select names. Let's select double precision columns.
+
+``` clojure
+(api/column-names DS #(= :float64 %) :datatype)
+```
+
+    (:V3)
+
+------------------------------------------------------------------------
+
+If you want to select all columns but given, use `complement` function. Works only on a predicate.
+
+``` clojure
+(api/column-names DS (complement #{:V1}))
+(api/column-names DS (complement #(= :float64 %)) :datatype)
+```
+
+    (:V2 :V3 :V4)
+    (:V1 :V2 :V4)
+
+------------------------------------------------------------------------
+
+You can select column names based on all column metadata at once by using `:all` metadata selector. Below we want to select column names ending with `1` which have `long` datatype.
+
+``` clojure
+(api/column-names DS (fn [meta]
+                       (and (= :int64 (:datatype meta))
+                            (clojure.string/ends-with? (:name meta) "1"))) :all)
+```
+
+    (:V1)
 
 #### Select
 
+`select-columns` creates dataset with columns selected by `columns-selector` as described above. Function works on regular and grouped dataset.
+
+------------------------------------------------------------------------
+
+Select only float64 columns
+
+``` clojure
+(api/select-columns DS #(= :float64 %) :datatype)
+```
+
+\_unnamed \[9 1\]:
+
+| :V3    |
+|--------|
+| 0.5000 |
+| 1.000  |
+| 1.500  |
+| 0.5000 |
+| 1.000  |
+| 1.500  |
+| 0.5000 |
+| 1.000  |
+| 1.500  |
+
+------------------------------------------------------------------------
+
+Select all but `:V1` columns
+
+``` clojure
+(api/select-columns DS (complement #{:V1}))
+```
+
+\_unnamed \[9 3\]:
+
+| :V2 | :V3    | :V4 |
+|-----|--------|-----|
+| 1   | 0.5000 | A   |
+| 2   | 1.000  | B   |
+| 3   | 1.500  | C   |
+| 4   | 0.5000 | A   |
+| 5   | 1.000  | B   |
+| 6   | 1.500  | C   |
+| 7   | 0.5000 | A   |
+| 8   | 1.000  | B   |
+| 9   | 1.500  | C   |
+
+------------------------------------------------------------------------
+
+If we have grouped data set, column selection is applied to every group separately.
+
+``` clojure
+(-> DS
+    (api/group-by :V1)
+    (api/select-columns [:V2 :V3])
+    (api/groups->map))
+```
+
+{1 1 \[5 2\]:
+
+| :V2 | :V3    |
+|-----|--------|
+| 1   | 0.5000 |
+| 3   | 1.500  |
+| 5   | 1.000  |
+| 7   | 0.5000 |
+| 9   | 1.500  |
+
+, 2 2 \[4 2\]:
+
+| :V2 | :V3    |
+|-----|--------|
+| 2   | 1.000  |
+| 4   | 0.5000 |
+| 6   | 1.500  |
+| 8   | 1.000  |
+
+}
+
 #### Drop
+
+`drop-columns` creates dataset with removed columns.
+
+------------------------------------------------------------------------
+
+Drop float64 columns
+
+``` clojure
+(api/drop-columns DS #(= :float64 %) :datatype)
+```
+
+\_unnamed \[9 3\]:
+
+| :V1 | :V2 | :V4 |
+|-----|-----|-----|
+| 1   | 1   | A   |
+| 2   | 2   | B   |
+| 1   | 3   | C   |
+| 2   | 4   | A   |
+| 1   | 5   | B   |
+| 2   | 6   | C   |
+| 1   | 7   | A   |
+| 2   | 8   | B   |
+| 1   | 9   | C   |
+
+------------------------------------------------------------------------
+
+Drop all columns but `:V1` and `:V2`
+
+``` clojure
+(api/drop-columns DS (complement #{:V1 :V2}))
+```
+
+\_unnamed \[9 2\]:
+
+| :V1 | :V2 |
+|-----|-----|
+| 1   | 1   |
+| 2   | 2   |
+| 1   | 3   |
+| 2   | 4   |
+| 1   | 5   |
+| 2   | 6   |
+| 1   | 7   |
+| 2   | 8   |
+| 1   | 9   |
+
+------------------------------------------------------------------------
+
+If we have grouped data set, column selection is applied to every group separately. Selected columns are dropped.
+
+``` clojure
+(-> DS
+    (api/group-by :V1)
+    (api/drop-columns [:V2 :V3])
+    (api/groups->map))
+```
+
+{1 1 \[5 2\]:
+
+| :V1 | :V4 |
+|-----|-----|
+| 1   | A   |
+| 1   | C   |
+| 1   | B   |
+| 1   | A   |
+| 1   | C   |
+
+, 2 2 \[4 2\]:
+
+| :V1 | :V4 |
+|-----|-----|
+| 2   | B   |
+| 2   | A   |
+| 2   | C   |
+| 2   | B   |
+
+}
+
+#### Rename
+
+If you want to rename colums use `rename-columns` and pass map where keys are old names, values new ones.
+
+``` clojure
+(api/rename-columns DS {:V1 "v1"
+                        :V2 "v2"
+                        :V3 [1 2 3]
+                        :V4 (Object.)})
+```
+
+\_unnamed \[9 4\]:
+
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@525b9187> |
+|-----|-----|-----------|-----------------------------|
+| 1   | 1   | 0.5000    | A                           |
+| 2   | 2   | 1.000     | B                           |
+| 1   | 3   | 1.500     | C                           |
+| 2   | 4   | 0.5000    | A                           |
+| 1   | 5   | 1.000     | B                           |
+| 2   | 6   | 1.500     | C                           |
+| 1   | 7   | 0.5000    | A                           |
+| 2   | 8   | 1.000     | B                           |
+| 1   | 9   | 1.500     | C                           |
+
+------------------------------------------------------------------------
+
+Function works on grouped dataset
+
+``` clojure
+(-> DS
+    (api/group-by :V1)
+    (api/rename-columns {:V1 "v1"
+                         :V2 "v2"
+                         :V3 [1 2 3]
+                         :V4 (Object.)})
+    (api/groups->map))
+```
+
+{1 1 \[5 4\]:
+
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@7bcbd45b> |
+|-----|-----|-----------|-----------------------------|
+| 1   | 1   | 0.5000    | A                           |
+| 1   | 3   | 1.500     | C                           |
+| 1   | 5   | 1.000     | B                           |
+| 1   | 7   | 0.5000    | A                           |
+| 1   | 9   | 1.500     | C                           |
+
+, 2 2 \[4 4\]:
+
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@7bcbd45b> |
+|-----|-----|-----------|-----------------------------|
+| 2   | 2   | 1.000     | B                           |
+| 2   | 4   | 0.5000    | A                           |
+| 2   | 6   | 1.500     | C                           |
+| 2   | 8   | 1.000     | B                           |
+
+}
 
 #### Add or update
 
+To add (or update existing) column call `add-or-update-column` function. Function accepts:
+
+-   `ds` - a dataset
+-   `column-name` - if it's existing column name, column will be replaced
+-   `column` - can be column (from other dataset), sequence, single value or function. Too big columns are always trimmed. Too small are cycled or extended with missing values (according to `size-strategy` argument)
+-   `size-strategy` (optional) - when new column is shorter than dataset row count, following strategies are applied:
+    -   `:cycle` (default) - repeat data
+    -   `:na` - append missing values
+
+Function works on grouped dataset.
+
+------------------------------------------------------------------------
+
+Add single value as column
+
+``` clojure
+(api/add-or-update-column DS :V5 "X")
+```
+
+\_unnamed \[9 5\]:
+
+| :V1 | :V2 | :V3    | :V4 | :V5 |
+|-----|-----|--------|-----|-----|
+| 1   | 1   | 0.5000 | A   | X   |
+| 2   | 2   | 1.000  | B   | X   |
+| 1   | 3   | 1.500  | C   | X   |
+| 2   | 4   | 0.5000 | A   | X   |
+| 1   | 5   | 1.000  | B   | X   |
+| 2   | 6   | 1.500  | C   | X   |
+| 1   | 7   | 0.5000 | A   | X   |
+| 2   | 8   | 1.000  | B   | X   |
+| 1   | 9   | 1.500  | C   | X   |
+
+------------------------------------------------------------------------
+
+Replace one column (column is trimmed)
+
+``` clojure
+(api/add-or-update-column DS :V1 (repeatedly rand))
+```
+
+\_unnamed \[9 4\]:
+
+| :V1     | :V2 | :V3    | :V4 |
+|---------|-----|--------|-----|
+| 0.9627  | 1   | 0.5000 | A   |
+| 0.4363  | 2   | 1.000  | B   |
+| 0.6093  | 3   | 1.500  | C   |
+| 0.8787  | 4   | 0.5000 | A   |
+| 0.01937 | 5   | 1.000  | B   |
+| 0.4287  | 6   | 1.500  | C   |
+| 0.2217  | 7   | 0.5000 | A   |
+| 0.4589  | 8   | 1.000  | B   |
+| 0.1483  | 9   | 1.500  | C   |
+
+------------------------------------------------------------------------
+
+Copy column
+
+``` clojure
+(api/add-or-update-column DS :V5 (DS :V1))
+```
+
+\_unnamed \[9 5\]:
+
+| :V1 | :V2 | :V3    | :V4 | :V5 |
+|-----|-----|--------|-----|-----|
+| 1   | 1   | 0.5000 | A   | 1   |
+| 2   | 2   | 1.000  | B   | 2   |
+| 1   | 3   | 1.500  | C   | 1   |
+| 2   | 4   | 0.5000 | A   | 2   |
+| 1   | 5   | 1.000  | B   | 1   |
+| 2   | 6   | 1.500  | C   | 2   |
+| 1   | 7   | 0.5000 | A   | 1   |
+| 2   | 8   | 1.000  | B   | 2   |
+| 1   | 9   | 1.500  | C   | 1   |
+
+------------------------------------------------------------------------
+
+When function is used, argument is whole dataset and the result should be column, sequence or single value
+
+``` clojure
+(api/add-or-update-column DS :row-count api/row-count) 
+```
+
+\_unnamed \[9 5\]:
+
+| :V1 | :V2 | :V3    | :V4 | :row-count |
+|-----|-----|--------|-----|------------|
+| 1   | 1   | 0.5000 | A   | 9          |
+| 2   | 2   | 1.000  | B   | 9          |
+| 1   | 3   | 1.500  | C   | 9          |
+| 2   | 4   | 0.5000 | A   | 9          |
+| 1   | 5   | 1.000  | B   | 9          |
+| 2   | 6   | 1.500  | C   | 9          |
+| 1   | 7   | 0.5000 | A   | 9          |
+| 2   | 8   | 1.000  | B   | 9          |
+| 1   | 9   | 1.500  | C   | 9          |
+
+------------------------------------------------------------------------
+
+Above example run on grouped dataset, applies function on each group separately.
+
+``` clojure
+(-> DS
+    (api/group-by :V1)
+    (api/add-or-update-column :row-count api/row-count)
+    (api/ungroup))
+```
+
+\_unnamed \[9 5\]:
+
+| :V1 | :V2 | :V3    | :V4 | :row-count |
+|-----|-----|--------|-----|------------|
+| 1   | 1   | 0.5000 | A   | 5          |
+| 1   | 3   | 1.500  | C   | 5          |
+| 1   | 5   | 1.000  | B   | 5          |
+| 1   | 7   | 0.5000 | A   | 5          |
+| 1   | 9   | 1.500  | C   | 5          |
+| 2   | 2   | 1.000  | B   | 4          |
+| 2   | 4   | 0.5000 | A   | 4          |
+| 2   | 6   | 1.500  | C   | 4          |
+| 2   | 8   | 1.000  | B   | 4          |
+
+------------------------------------------------------------------------
+
+When column which is added is longer than row count in dataset, column is trimmed. When column is shorter, it's cycled or missing values are appended.
+
+``` clojure
+(api/add-or-update-column DS :V5 [:r :b])
+```
+
+\_unnamed \[9 5\]:
+
+| :V1 | :V2 | :V3    | :V4 | :V5 |
+|-----|-----|--------|-----|-----|
+| 1   | 1   | 0.5000 | A   | :r  |
+| 2   | 2   | 1.000  | B   | :b  |
+| 1   | 3   | 1.500  | C   | :r  |
+| 2   | 4   | 0.5000 | A   | :b  |
+| 1   | 5   | 1.000  | B   | :r  |
+| 2   | 6   | 1.500  | C   | :b  |
+| 1   | 7   | 0.5000 | A   | :r  |
+| 2   | 8   | 1.000  | B   | :b  |
+| 1   | 9   | 1.500  | C   | :r  |
+
+``` clojure
+(api/add-or-update-column DS :V5 [:r :b] :na)
+```
+
+\_unnamed \[9 5\]:
+
+| :V1 | :V2 | :V3    | :V4 | :V5 |
+|-----|-----|--------|-----|-----|
+| 1   | 1   | 0.5000 | A   | :r  |
+| 2   | 2   | 1.000  | B   | :b  |
+| 1   | 3   | 1.500  | C   |     |
+| 2   | 4   | 0.5000 | A   |     |
+| 1   | 5   | 1.000  | B   |     |
+| 2   | 6   | 1.500  | C   |     |
+| 1   | 7   | 0.5000 | A   |     |
+| 2   | 8   | 1.000  | B   |     |
+| 1   | 9   | 1.500  | C   |     |
+
+------------------------------------------------------------------------
+
+Tha same applies for grouped dataset
+
+``` clojure
+(-> DS
+    (api/group-by :V3)
+    (api/add-or-update-column :V5 [:r :b] :na)
+    (api/ungroup))
+```
+
+\_unnamed \[9 5\]:
+
+| :V1 | :V2 | :V3    | :V4 | :V5 |
+|-----|-----|--------|-----|-----|
+| 2   | 2   | 1.000  | B   | :r  |
+| 1   | 5   | 1.000  | B   | :b  |
+| 2   | 8   | 1.000  | B   |     |
+| 1   | 1   | 0.5000 | A   | :r  |
+| 2   | 4   | 0.5000 | A   | :b  |
+| 1   | 7   | 0.5000 | A   |     |
+| 1   | 3   | 1.500  | C   | :r  |
+| 2   | 6   | 1.500  | C   | :b  |
+| 1   | 9   | 1.500  | C   |     |
+
+------------------------------------------------------------------------
+
+Let's use other column to fill groups
+
+``` clojure
+(-> DS
+    (api/group-by :V3)
+    (api/add-or-update-column :V5 (DS :V2))
+    (api/ungroup))
+```
+
+\_unnamed \[9 5\]:
+
+| :V1 | :V2 | :V3    | :V4 | :V5 |
+|-----|-----|--------|-----|-----|
+| 2   | 2   | 1.000  | B   | 1   |
+| 1   | 5   | 1.000  | B   | 2   |
+| 2   | 8   | 1.000  | B   | 3   |
+| 1   | 1   | 0.5000 | A   | 1   |
+| 2   | 4   | 0.5000 | A   | 2   |
+| 1   | 7   | 0.5000 | A   | 3   |
+| 1   | 3   | 1.500  | C   | 1   |
+| 2   | 6   | 1.500  | C   | 2   |
+| 1   | 9   | 1.500  | C   | 3   |
+
+------------------------------------------------------------------------
+
+In case you want to add or update several columns you can call `add-or-update-columns` and provide map where keys are column names, vals are columns.
+
+``` clojure
+(api/add-or-update-columns DS {:V1 #(map inc (% :V1))
+                               :V5 #(map (comp keyword str) (% :V4))
+                               :V6 11})
+```
+
+\_unnamed \[9 6\]:
+
+| :V1 | :V2 | :V3    | :V4 | :V5 | :V6 |
+|-----|-----|--------|-----|-----|-----|
+| 2   | 1   | 0.5000 | A   | :A  | 11  |
+| 3   | 2   | 1.000  | B   | :B  | 11  |
+| 2   | 3   | 1.500  | C   | :C  | 11  |
+| 3   | 4   | 0.5000 | A   | :A  | 11  |
+| 2   | 5   | 1.000  | B   | :B  | 11  |
+| 3   | 6   | 1.500  | C   | :C  | 11  |
+| 2   | 7   | 0.5000 | A   | :A  | 11  |
+| 3   | 8   | 1.000  | B   | :B  | 11  |
+| 2   | 9   | 1.500  | C   | :C  | 11  |
+
 #### Map
+
+The other way of creating or updating column is to map columns as regular `map` function. The arity of mapping function should be the same as number of selected columns.
+
+Arguments:
+
+-   `ds` - dataset
+-   `column-name` - target column name
+-   `map-fn` - mapping function
+-   `columns-selector` - columns selected
+-   `meta-field` (optional) - column selector option
+
+------------------------------------------------------------------------
+
+Let's add numerical columns together
+
+``` clojure
+(api/map-columns DS :sum-of-numbers (fn [& rows]
+                                      (reduce + rows)) #{:int64 :float64} :datatype)
+```
+
+\_unnamed \[9 5\]:
+
+| :V1 | :V2 | :V3    | :V4 | :sum-of-numbers |
+|-----|-----|--------|-----|-----------------|
+| 1   | 1   | 0.5000 | A   | 2.500           |
+| 2   | 2   | 1.000  | B   | 5.000           |
+| 1   | 3   | 1.500  | C   | 5.500           |
+| 2   | 4   | 0.5000 | A   | 6.500           |
+| 1   | 5   | 1.000  | B   | 7.000           |
+| 2   | 6   | 1.500  | C   | 9.500           |
+| 1   | 7   | 0.5000 | A   | 8.500           |
+| 2   | 8   | 1.000  | B   | 11.00           |
+| 1   | 9   | 1.500  | C   | 11.50           |
+
+The same works on grouped dataset
+
+``` clojure
+(-> DS
+    (api/group-by :V4)
+    (api/map-columns :sum-of-numbers (fn [& rows]
+                                       (reduce + rows)) #{:int64 :float64} :datatype)
+    (api/ungroup))
+```
+
+\_unnamed \[9 5\]:
+
+| :V1 | :V2 | :V3    | :V4 | :sum-of-numbers |
+|-----|-----|--------|-----|-----------------|
+| 1   | 1   | 0.5000 | A   | 2.500           |
+| 2   | 4   | 0.5000 | A   | 6.500           |
+| 1   | 7   | 0.5000 | A   | 8.500           |
+| 2   | 2   | 1.000  | B   | 5.000           |
+| 1   | 5   | 1.000  | B   | 7.000           |
+| 2   | 8   | 1.000  | B   | 11.00           |
+| 1   | 3   | 1.500  | C   | 5.500           |
+| 2   | 6   | 1.500  | C   | 9.500           |
+| 1   | 9   | 1.500  | C   | 11.50           |
 
 #### Reorder
 
+To reorder columns use columns selectors to choose what columns go first. The unseleted columns are appended to the end.
+
+``` clojure
+(api/reorder-columns DS :V4 [:V3 :V2] :V1)
+```
+
+\_unnamed \[9 4\]:
+
+| :V4 | :V2 | :V3    | :V1 |
+|-----|-----|--------|-----|
+| A   | 1   | 0.5000 | 1   |
+| B   | 2   | 1.000  | 2   |
+| C   | 3   | 1.500  | 1   |
+| A   | 4   | 0.5000 | 2   |
+| B   | 5   | 1.000  | 1   |
+| C   | 6   | 1.500  | 2   |
+| A   | 7   | 0.5000 | 1   |
+| B   | 8   | 1.000  | 2   |
+| C   | 9   | 1.500  | 1   |
+
+------------------------------------------------------------------------
+
+This function doesn't let you select meta field, so you have to call `column-names` in such case. Below we want to add integer columns at the end.
+
+``` clojure
+(api/reorder-columns DS (api/column-names DS (complement #{:int64}) :datatype))
+```
+
+\_unnamed \[9 4\]:
+
+| :V3    | :V4 | :V1 | :V2 |
+|--------|-----|-----|-----|
+| 0.5000 | A   | 1   | 1   |
+| 1.000  | B   | 2   | 2   |
+| 1.500  | C   | 1   | 3   |
+| 0.5000 | A   | 2   | 4   |
+| 1.000  | B   | 1   | 5   |
+| 1.500  | C   | 2   | 6   |
+| 0.5000 | A   | 1   | 7   |
+| 1.000  | B   | 2   | 8   |
+| 1.500  | C   | 1   | 9   |
+
 #### Type conversion
+
+To convert column into given datatype can be done using `convert-column-type` function. Not all the types can be converted automatically also some types require slow parsing (every conversion from string). In case where conversion is not possible you can pass conversion function.
+
+Arguments:
+
+-   `ds` - dataset
+-   Two options:
+    -   `coltype-map` in case when you want to convert several columns, keys are column names, vals are new types
+    -   `colname` and `new-type` - column name and new datatype
+
+`new-type` can be:
+
+-   a type like `:int64` or `:string`
+-   or pair of datetime and conversion function
+
+After conversion additional infomation is given on problematic values
+
+------------------------------------------------------------------------
+
+Basic conversion
+
+``` clojure
+(-> DS
+    (api/convert-column-type :V1 :float64)
+    (api/info :columns))
+```
+
+\_unnamed :column info \[4 5\]:
+
+| :name | :size | :datatype | :unparsed-indexes | :unparsed-data |
+|-------|-------|-----------|-------------------|----------------|
+| :V1   | 9     | :float64  | {}                | \[\]           |
+| :V2   | 9     | :int64    |                   |                |
+| :V3   | 9     | :float64  |                   |                |
+| :V4   | 9     | :object   |                   |                |
+
+------------------------------------------------------------------------
+
+Using custom converter. Let's treat `:V4` as haxadecimal values. See that this way we can map column to any value.
+
+``` clojure
+(-> DS
+    (api/convert-column-type :V4 [:int16 #(Integer/parseInt (str %) 16)]))
+```
+
+\_unnamed \[9 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | 10  |
+| 2   | 2   | 1.000  | 11  |
+| 1   | 3   | 1.500  | 12  |
+| 2   | 4   | 0.5000 | 10  |
+| 1   | 5   | 1.000  | 11  |
+| 2   | 6   | 1.500  | 12  |
+| 1   | 7   | 0.5000 | 10  |
+| 2   | 8   | 1.000  | 11  |
+| 1   | 9   | 1.500  | 12  |
+
+------------------------------------------------------------------------
+
+You can process several columns at once
+
+``` clojure
+(-> DS
+    (api/convert-column-type {:V1 :float64
+                              :V2 :object
+                              :V3 [:boolean #(< % 1.0)]
+                              :V4 :string})
+    (api/info :columns))
+```
+
+\_unnamed :column info \[4 6\]:
+
+| :name | :size | :datatype | :unparsed-indexes | :unparsed-data | :categorical? |
+|-------|-------|-----------|-------------------|----------------|---------------|
+| :V1   | 9     | :float64  | {}                | \[\]           |               |
+| :V2   | 9     | :object   | {}                | \[\]           |               |
+| :V3   | 9     | :boolean  | {}                | \[\]           |               |
+| :V4   | 9     | :string   | {}                | \[\]           | true          |
+
+------------------------------------------------------------------------
+
+Function works on the grouped dataset
+
+``` clojure
+(-> DS
+    (api/group-by :V1)
+    (api/convert-column-type :V1 :float32)
+    (api/ungroup)
+    (api/info :columns))
+```
+
+\_unnamed :column info \[4 5\]:
+
+| :name | :size | :datatype | :unparsed-indexes | :unparsed-data |
+|-------|-------|-----------|-------------------|----------------|
+| :V1   | 9     | :float32  | {}                | \[\]           |
+| :V2   | 9     | :int64    |                   |                |
+| :V3   | 9     | :float64  |                   |                |
+| :V4   | 9     | :object   |                   |                |
 
 ### Rows
 
@@ -1417,3 +2190,5 @@ If you want to implement your own mapping function on grouped dataset you can ca
 #### Hash
 
 #### Concat
+
+### Functions

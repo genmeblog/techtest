@@ -4,39 +4,44 @@
             [tech.v2.datatype :as dtype]
 
             [techtest.api.utils :refer [iterable-sequence?]]
+            [techtest.api.dataset :refer [dataset]]
             [techtest.api.group-by :refer [grouped? process-group-data]]))
+
 
 (defn- filter-column-names
   "Filter column names"
-  [ds cols-selector meta-field]
+  [ds columns-selector meta-field]
   (let [field-fn (if (= :all meta-field)
                    identity
                    (or meta-field :name))]
     (->> ds
          (ds/columns)
          (map meta)
-         (filter (comp cols-selector field-fn))
+         (filter (comp columns-selector field-fn))
          (map :name))))
 
-(defn select-column-names
-  ([ds cols-selector] (select-column-names ds cols-selector :name))
-  ([ds cols-selector meta-field]
-   (cond
-     (= :all cols-selector) (ds/column-names ds)
-     (map? cols-selector) (keys cols-selector)
-     (iterable-sequence? cols-selector) cols-selector
-     (instance? java.util.regex.Pattern cols-selector) (filter-column-names ds #(re-matches cols-selector (str %)) meta-field)
-     (fn? cols-selector) (filter-column-names ds cols-selector meta-field)
-     :else [cols-selector])))
+(defn column-names
+  ([ds] (ds/column-names ds))
+  ([ds columns-selector] (column-names ds columns-selector :name))
+  ([ds columns-selector meta-field]
+   (if (= :all columns-selector)
+     (ds/column-names ds)
+     (let [csel-fn (cond
+                     (map? columns-selector) (set (keys columns-selector))
+                     (iterable-sequence? columns-selector) (set columns-selector)
+                     (instance? java.util.regex.Pattern columns-selector) #(re-matches columns-selector (str %))
+                     (fn? columns-selector) columns-selector
+                     :else #{columns-selector})]
+       (filter-column-names ds csel-fn meta-field)))))
 
 (defn- select-or-drop-columns
   "Select or drop columns."
   ([f ds] (select-or-drop-columns f ds :all))
-  ([f ds cols-selector] (select-or-drop-columns f ds cols-selector nil))
-  ([f ds cols-selector {:keys [meta-field]}]
+  ([f ds columns-selector] (select-or-drop-columns f ds columns-selector nil))
+  ([f ds columns-selector meta-field]
    (if (grouped? ds)
-     (process-group-data ds #(select-or-drop-columns f % cols-selector))
-     (f ds (select-column-names ds cols-selector meta-field)))))
+     (process-group-data ds #(select-or-drop-columns f % columns-selector))
+     (f ds (column-names ds columns-selector meta-field)))))
 
 (defn- select-or-drop-colums-docstring
   [op]
@@ -55,65 +60,97 @@
 
 (defn rename-columns
   "Rename columns with provided old -> new name map"
-  [ds col-map]
+  [ds columns-map]
   (if (grouped? ds)
-    (process-group-data ds #(ds/rename-columns % col-map))
-    (ds/rename-columns ds col-map)))
+    (process-group-data ds #(ds/rename-columns % columns-map))
+    (ds/rename-columns ds columns-map)))
+
+;;
+
+(defn- cycle-column
+  [column col-cnt cnt]
+  (let [q (quot cnt col-cnt)
+        r (rem cnt col-cnt)
+        col-name (col/column-name column)]
+    (let [tmp-ds (->> (dataset [column])
+                      (repeat q)
+                      (apply ds/concat))]
+      (if (zero? r)
+        (tmp-ds col-name)
+        ((-> (ds/concat tmp-ds
+                        (dataset [(dtype/sub-buffer column 0 r)]))) col-name)))))
+
+(defn- fix-column-size-column
+  [column strategy cnt]
+  (let [ec (dtype/ecount column)]
+    (cond
+      (> ec cnt) (dtype/sub-buffer column 0 cnt)
+      (< ec cnt) (if (= strategy :cycle)
+                   (cycle-column column ec cnt)
+                   (col/extend-column-with-empty column (- cnt ec)))
+      :else column)))
+
+
+(defn- fix-column-size-seq
+  [column strategy cnt]
+  (let [column (take cnt column)
+        seq-cnt (count column)]
+    (if (< seq-cnt cnt)
+      (if (= strategy :cycle)
+        (take cnt (cycle column))
+        (clojure.core/concat column (repeat (- cnt seq-cnt) nil)))
+      column)))
 
 (defn- fix-column-size
-  [col-or-seq strategy cnt]
-  (let [seq-cnt (count col-or-seq)]
-    (cond
-      (> seq-cnt cnt) (take cnt col-or-seq)
-      (< seq-cnt cnt) (if (= strategy :cycle)
-                        (take cnt (cycle col-or-seq))
-                        (if (col/is-column? col-or-seq)
-                          (col/extend-column-with-empty col-or-seq (- cnt seq-cnt))
-                          (clojure.core/concat col-or-seq (repeat (- cnt seq-cnt) nil))))
-      :else col-or-seq)))
+  [f ds column-name column strategy]
+  (->> (ds/row-count ds)
+       (f column strategy)
+       (ds/add-or-update-column ds column-name)))
+
+(declare add-or-update-column)
+
+(defn- prepare-add-or-update-column-fn
+  [column-name column size-strategy]
+  (cond
+    (col/is-column? column) #(fix-column-size fix-column-size-column % column-name column size-strategy)
+    (iterable-sequence? column) #(fix-column-size fix-column-size-seq % column-name column size-strategy)
+    (fn? column) #(add-or-update-column % column-name (column %) size-strategy)
+    :else #(ds/add-or-update-column % column-name (repeat (ds/row-count %) column))))
 
 (defn add-or-update-column
-  "Add or update (modify) column under `col-name`.
+  "Add or update (modify) column under `column-name`.
 
-  `column-seq-or-gen` can be sequence of values or generator function (which gets `ds` as input)."
-  ([ds col-name column-seq-or-gen] (add-or-update-column ds col-name column-seq-or-gen nil))
-  ([ds col-name column-seq-or-gen {:keys [count-strategy]
-                                   :or {count-strategy :cycle}
-                                   :as options}]
-   (if (grouped? ds)
-
-     (process-group-data ds #(add-or-update-column % col-name column-seq-or-gen options))
+  `column` can be sequence of values or generator function (which gets `ds` as input)."
+  ([ds column-name column] (add-or-update-column ds column-name column nil))
+  ([ds column-name column size-strategy]
+   (let [process-fn (prepare-add-or-update-column-fn column-name column (or size-strategy :cycle))]
      
-     (cond
-       (or (col/is-column? column-seq-or-gen)
-           (iterable-sequence? column-seq-or-gen)) (->> (ds/row-count ds)
-                                                        (fix-column-size column-seq-or-gen count-strategy)
-                                                        (ds/add-or-update-column ds col-name))
-       (fn? column-seq-or-gen) (add-or-update-column ds col-name (column-seq-or-gen ds))
-       :else (ds/add-or-update-column ds col-name (repeat (ds/row-count ds) column-seq-or-gen))))))
+     (if (grouped? ds)
+       (process-group-data ds process-fn)
+       (process-fn ds)))))
 
 (defn add-or-update-columns
-  "Add or updade (modify) columns defined in `columns-map` (mapping: name -> column-seq-or-gen) "
+  "Add or updade (modify) columns defined in `columns-map` (mapping: name -> column) "
   ([ds columns-map] (add-or-update-columns ds columns-map nil))
-  ([ds columns-map options]
-   (reduce-kv (fn [ds k v] (add-or-update-column ds k v options)) ds columns-map)))
+  ([ds columns-map size-strategy]
+   (reduce-kv (fn [ds k v] (add-or-update-column ds k v size-strategy)) ds columns-map)))
 
 (defn map-columns
-  ([ds target-column map-fn cols-selector] (map-columns ds target-column map-fn cols-selector nil))
-  ([ds target-column map-fn cols-selector {:keys [meta-field]
-                                           :as options}]
+  ([ds column-name map-fn columns-selector] (map-columns ds column-name map-fn columns-selector nil))
+  ([ds column-name map-fn columns-selector meta-field]
    (if (grouped? ds)
-     (process-group-data ds #(map-columns % target-column map-fn cols-selector options))
-     (apply ds/column-map ds target-column map-fn (select-column-names ds cols-selector meta-field)))))
+     (process-group-data ds #(map-columns % column-name map-fn columns-selector meta-field))
+     (apply ds/column-map ds column-name map-fn (column-names ds columns-selector meta-field)))))
 
 (defn reorder-columns
   "Reorder columns using column selector(s). When column names are incomplete, the missing will be attached at the end."
-  [ds cols-selector & cols-selectors]
-  (let [selected-cols (->> cols-selectors
-                           (map (partial select-column-names ds))
-                           (reduce clojure.core/concat (select-column-names ds cols-selector)))
-        rest-cols (select-column-names ds (complement (set selected-cols)))]
+  [ds columns-selector & columns-selectors]
+  (let [selected-cols (->> columns-selectors
+                           (map (partial column-names ds))
+                           (apply clojure.core/concat (column-names ds columns-selector)))
+        rest-cols (column-names ds (complement (set selected-cols)))]
     (ds/select-columns ds (clojure.core/concat selected-cols rest-cols))))
+;;
 
 (defn- try-convert-to-type
   [ds colname new-type]

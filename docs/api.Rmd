@@ -78,8 +78,13 @@ During conversions of the examples I've come up how to reorganized existing `tec
 
 All proposed functions are grouped in tabs below. Select group to see examples and details.
 
-INFO: The future of this API is not known yet. Two directions are possible: integration into `tech.ml` or development under `Scicloj` organization. For the time being use this repo if you want to try. Join the discussion on [Zulip](https://clojurians.zulipchat.com/#narrow/stream/236259-tech.2Eml.2Edataset.2Edev/topic/api)
+If you want to know more about `tech.ml.dataset` and `tech.ml.datatype` please refer their documentation:
 
+* [Datatype](https://github.com/techascent/tech.datatype/blob/master/docs/cheatsheet.md)
+* [Date/time](https://github.com/techascent/tech.datatype/blob/master/docs/datetime.md)
+* [Dataset](https://github.com/techascent/tech.ml.dataset/blob/master/docs/walkthrough.md)
+
+INFO: The future of this API is not known yet. Two directions are possible: integration into `tech.ml` or development under `Scicloj` organization. For the time being use this repo if you want to try. Join the discussion on [Zulip](https://clojurians.zulipchat.com/#narrow/stream/236259-tech.2Eml.2Edataset.2Edev/topic/api)
 
 Let's require main namespace and define dataset used in most examples:
 
@@ -118,12 +123,12 @@ Dataset can be created from various of types of Clojure structures and files:
 
 * data
 * options (see documentation of `tech.ml.dataset/->dataset` function for full list):
-    - `:dataset-name` - name of the dataset
-    - `:num-rows` - number of rows to read from file
-    - `:header-row?` - indication if first row in file is a header
-    - `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
-    - `:separator` - column separator
-    - `:single-value-column-name` - name of the column when single value is provided
+- `:dataset-name` - name of the dataset
+- `:num-rows` - number of rows to read from file
+- `:header-row?` - indication if first row in file is a header
+- `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
+- `:separator` - column separator
+- `:single-value-column-name` - name of the column when single value is provided
 
 ---
 
@@ -254,14 +259,6 @@ Number of columns
 
 ```{clojure}
 (api/column-count ds)
-```
-
----
-
-Names of columns.
-
-```{clojure}
-(api/column-names ds)
 ```
 
 ---
@@ -623,6 +620,9 @@ Also we can supress separation
     (api/group-by (juxt :V1 :V3))
     (api/ungroup {:separate? false
                   :add-group-as-column true}))
+;; => _unnamed [9 5]:
+
+
 ```
 
 #### Other functions
@@ -663,22 +663,406 @@ If you want to implement your own mapping function on grouped dataset you can ca
     (api/as-regular-dataset))
 ```
 
-
 ### Columns
+
+Column is a special `tech.ml.dataset` structure based on `tech.ml.datatype` library. For our purposes we cat treat columns as typed and named sequence bound to particular dataset. 
+
+Type of the data is inferred from a sequence during column creation. 
 
 #### Names
 
+To select dataset columns or column names `columns-selector` is used. `columns-selector` can be one of the following:
+
+* `:all` keyword - selects all columns
+* column name - for single column
+* sequence of column names - for collection of columns
+* regex - to apply pattern on column names or datatype
+* filter predicate - to filter column names or datatype
+
+Column name can be anything.
+
+`column-names` function returns names according to `columns-selector` and optional `meta-filed`. `meta-field` is one of the following:
+
+* `:name` (default) - to operate on column names
+* `:datatype` - to operated on column types
+* `:all` - if you want to process all metadata
+
+---
+
+To select all column names you can use `column-names` function.
+
+```{clojure}
+(api/column-names DS)
+```
+
+or
+
+```{clojure}
+(api/column-names DS :all)
+```
+
+In case you want to select column which has name `:all` (or is sequence or map), put it into a vector. Below code returns empty sequence since there is no such column in the dataset.
+
+```{clojure}
+(api/column-names DS [:all])
+```
+
+---
+
+Obviously selecting single name returns it's name if available
+
+```{clojure}
+(api/column-names DS :V1)
+(api/column-names DS "no such column")
+```
+
+---
+
+Select sequence of column names.
+
+```{clojure}
+(api/column-names DS [:V1 "V2" :V3 :V4 :V5])
+```
+
+---
+
+Select names based on regex, columns ends with `1` or `4`
+
+```{clojure}
+(api/column-names DS #".*[14]")
+```
+
+---
+
+Select names based on regex operating on type of the column (to check what are the column types, call `(api/info DS :columns)`. Here we want to get integer columns only.
+
+```{clojure}
+(api/column-names DS #"^:int.*" :datatype)
+```
+
+---
+
+And finally we can use predicate to select names. Let's select double precision columns.
+
+```{clojure}
+(api/column-names DS #(= :float64 %) :datatype)
+```
+
+---
+
+If you want to select all columns but given, use `complement` function. Works only on a predicate.
+
+```{clojure}
+(api/column-names DS (complement #{:V1}))
+(api/column-names DS (complement #(= :float64 %)) :datatype)
+```
+
+---
+
+You can select column names based on all column metadata at once by using `:all` metadata selector. Below we want to select column names ending with `1` which have `long` datatype.
+
+```{clojure}
+(api/column-names DS (fn [meta]
+                       (and (= :int64 (:datatype meta))
+                            (clojure.string/ends-with? (:name meta) "1"))) :all)
+```
+
 #### Select
+
+`select-columns` creates dataset with columns selected by `columns-selector` as described above. Function works on regular and grouped dataset.
+
+---
+
+Select only float64 columns
+
+```{clojure results="asis"}
+(api/select-columns DS #(= :float64 %) :datatype)
+```
+
+---
+
+Select all but `:V1` columns
+
+```{clojure results="asis"}
+(api/select-columns DS (complement #{:V1}))
+```
+
+---
+
+If we have grouped data set, column selection is applied to every group separately.
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V1)
+    (api/select-columns [:V2 :V3])
+    (api/groups->map))
+```
 
 #### Drop
 
+`drop-columns` creates dataset with removed columns.
+
+---
+
+Drop float64 columns
+
+```{clojure results="asis"}
+(api/drop-columns DS #(= :float64 %) :datatype)
+```
+
+---
+
+Drop all columns but `:V1` and `:V2`
+
+```{clojure results="asis"}
+(api/drop-columns DS (complement #{:V1 :V2}))
+```
+
+---
+
+If we have grouped data set, column selection is applied to every group separately. Selected columns are dropped.
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V1)
+    (api/drop-columns [:V2 :V3])
+    (api/groups->map))
+```
+
+#### Rename
+
+If you want to rename colums use `rename-columns` and pass map where keys are old names, values new ones.
+
+```{clojure results="asis"}
+(api/rename-columns DS {:V1 "v1"
+                        :V2 "v2"
+                        :V3 [1 2 3]
+                        :V4 (Object.)})
+```
+
+---
+
+Function works on grouped dataset
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V1)
+    (api/rename-columns {:V1 "v1"
+                         :V2 "v2"
+                         :V3 [1 2 3]
+                         :V4 (Object.)})
+    (api/groups->map))
+```
+
+
 #### Add or update
+
+To add (or update existing) column call `add-or-update-column` function. Function accepts:
+
+* `ds` - a dataset
+* `column-name` - if it's existing column name, column will be replaced
+* `column` - can be column (from other dataset), sequence, single value or function. Too big columns are always trimmed. Too small are cycled or extended with missing values (according to `size-strategy` argument)
+* `size-strategy` (optional) - when new column is shorter than dataset row count, following strategies are applied:
+    - `:cycle` (default) - repeat data
+    - `:na` - append missing values
+
+Function works on grouped dataset.
+
+---
+
+Add single value as column
+
+```{clojure results="asis"}
+(api/add-or-update-column DS :V5 "X")
+```
+
+---
+
+Replace one column (column is trimmed)
+
+```{clojure results="asis"}
+(api/add-or-update-column DS :V1 (repeatedly rand))
+```
+
+---
+
+Copy column
+
+```{clojure results="asis"}
+(api/add-or-update-column DS :V5 (DS :V1))
+```
+
+---
+
+When function is used, argument is whole dataset and the result should be column, sequence or single value
+
+```{clojure results="asis"}
+(api/add-or-update-column DS :row-count api/row-count) 
+```
+
+---
+
+Above example run on grouped dataset, applies function on each group separately.
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V1)
+    (api/add-or-update-column :row-count api/row-count)
+    (api/ungroup))
+```
+
+---
+
+When column which is added is longer than row count in dataset, column is trimmed. When column is shorter, it's cycled or missing values are appended.
+
+```{clojure results="asis"}
+(api/add-or-update-column DS :V5 [:r :b])
+```
+
+```{clojure results="asis"}
+(api/add-or-update-column DS :V5 [:r :b] :na)
+```
+
+---
+
+Tha same applies for grouped dataset
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V3)
+    (api/add-or-update-column :V5 [:r :b] :na)
+    (api/ungroup))
+```
+
+---
+
+Let's use other column to fill groups
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V3)
+    (api/add-or-update-column :V5 (DS :V2))
+    (api/ungroup))
+```
+
+---
+
+In case you want to add or update several columns you can call `add-or-update-columns` and provide map where keys are column names, vals are columns.
+
+```{clojure results="asis"}
+(api/add-or-update-columns DS {:V1 #(map inc (% :V1))
+                               :V5 #(map (comp keyword str) (% :V4))
+                               :V6 11})
+```
 
 #### Map
 
+The other way of creating or updating column is to map columns as regular `map` function. The arity of mapping function should be the same as number of selected columns.
+
+Arguments:
+
+* `ds` - dataset
+* `column-name` - target column name
+* `map-fn` - mapping function
+* `columns-selector` - columns selected
+* `meta-field` (optional) - column selector option
+
+---
+
+Let's add numerical columns together
+
+```{clojure results="asis"}
+(api/map-columns DS :sum-of-numbers (fn [& rows]
+                                      (reduce + rows)) #{:int64 :float64} :datatype)
+```
+
+The same works on grouped dataset
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V4)
+    (api/map-columns :sum-of-numbers (fn [& rows]
+                                       (reduce + rows)) #{:int64 :float64} :datatype)
+    (api/ungroup))
+```
+
 #### Reorder
 
+To reorder columns use columns selectors to choose what columns go first. The unseleted columns are appended to the end.
+
+```{clojure results="asis"}
+(api/reorder-columns DS :V4 [:V3 :V2] :V1)
+```
+
+---
+
+This function doesn't let you select meta field, so you have to call `column-names` in such case. Below we want to add integer columns at the end.
+
+```{clojure results="asis"}
+(api/reorder-columns DS (api/column-names DS (complement #{:int64}) :datatype))
+```
+
 #### Type conversion
+
+To convert column into given datatype can be done using `convert-column-type` function. Not all the types can be converted automatically also some types require slow parsing (every conversion from string). In case where conversion is not possible you can pass conversion function.
+
+Arguments:
+
+* `ds` - dataset
+* Two options:
+    - `coltype-map` in case when you want to convert several columns, keys are column names, vals are new types
+    - `colname` and `new-type` - column name and new datatype
+
+`new-type` can be:
+
+* a type like `:int64` or `:string` 
+* or pair of datetime and conversion function
+
+After conversion additional infomation is given on problematic values
+
+---
+
+Basic conversion
+
+```{clojure results="asis"}
+(-> DS
+    (api/convert-column-type :V1 :float64)
+    (api/info :columns))
+```
+
+---
+
+Using custom converter. Let's treat `:V4` as haxadecimal values. See that this way we can map column to any value.
+
+```{clojure results="asis"}
+(-> DS
+    (api/convert-column-type :V4 [:int16 #(Integer/parseInt (str %) 16)]))
+```
+
+---
+
+You can process several columns at once
+
+```{clojure results="asis"}
+(-> DS
+    (api/convert-column-type {:V1 :float64
+                              :V2 :object
+                              :V3 [:boolean #(< % 1.0)]
+                              :V4 :string})
+    (api/info :columns))
+```
+
+---
+
+Function works on the grouped dataset
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V1)
+    (api/convert-column-type :V1 :float32)
+    (api/ungroup)
+    (api/info :columns))
+```
 
 ### Rows
 
@@ -733,3 +1117,5 @@ If you want to implement your own mapping function on grouped dataset you can ca
 #### Hash
 
 #### Concat
+
+### Functions
