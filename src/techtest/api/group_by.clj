@@ -29,7 +29,7 @@
 
 (defn- find-group-indexes
   "Calulate indexes for groups"
-  [grouping-selector ds limit-columns]
+  [ds grouping-selector limit-columns]
   (cond
     (map? grouping-selector) grouping-selector
     (iterable-sequence? grouping-selector) (ds/group-by->indexes identity grouping-selector ds)
@@ -81,7 +81,7 @@
   ([ds grouping-selector {:keys [limit-columns result-type]
                           :or {result-type :as-dataset}
                           :as options}]
-   (let [group-indexes (find-group-indexes grouping-selector ds limit-columns)]
+   (let [group-indexes (find-group-indexes ds grouping-selector limit-columns)]
      (condp = result-type
        :as-indexes group-indexes
        :as-seq (->> group-indexes ;; java.util.HashMap

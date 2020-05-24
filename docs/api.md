@@ -30,7 +30,7 @@ Let's require main namespace and define dataset used in most examples:
 (def DS (api/dataset {:V1 (take 9 (cycle [1 2]))
                       :V2 (range 1 10)
                       :V3 (take 9 (cycle [0.5 1.0 1.5]))
-                      :V4 (take 9 (cycle [\A \B \C]))}))
+                      :V4 (take 9 (cycle ["A" "B" "C"]))}))
 ```
 
 ``` clojure
@@ -591,7 +591,7 @@ Rows as sequence of sequences
 (take 2 (api/rows ds))
 ```
 
-    ([#object[java.time.LocalDate 0x2025be13 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x2f37ffe4 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+    ([#object[java.time.LocalDate 0x510b7613 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x58d9dae4 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 
 ------------------------------------------------------------------------
 
@@ -601,13 +601,13 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
-    ({"date" #object[java.time.LocalDate 0x2544bfef "2012-01-01"],
+    ({"date" #object[java.time.LocalDate 0x764707e6 "2012-01-01"],
       "precipitation" 0.0,
       "temp_min" 5.0,
       "weather" "drizzle",
       "temp_max" 12.8,
       "wind" 4.7}
-     {"date" #object[java.time.LocalDate 0x144a85aa "2012-01-02"],
+     {"date" #object[java.time.LocalDate 0x7a4dccd4 "2012-01-02"],
       "precipitation" 10.9,
       "temp_min" 2.8,
       "weather" "rain",
@@ -1234,23 +1234,23 @@ If we group by map, we can automatically create new columns out of group names.
 (-> DS
     (api/group-by (fn [row] {"V1 and V3 multiplied" (* (:V1 row)
                                                       (:V3 row))
-                            "V4 as string" (str (:V4 row))}))
+                            "V4 as lowercase" (clojure.string/lower-case (:V4 row))}))
     (api/ungroup {:add-group-as-column true}))
 ```
 
 \_unnamed \[9 6\]:
 
-| V1 and V3 multiplied | V4 as string | :V1 | :V2 | :V3    | :V4 |
-|----------------------|--------------|-----|-----|--------|-----|
-| 3.000                | C            | 2   | 6   | 1.500  | C   |
-| 1.500                | C            | 1   | 3   | 1.500  | C   |
-| 1.500                | C            | 1   | 9   | 1.500  | C   |
-| 1.000                | A            | 2   | 4   | 0.5000 | A   |
-| 0.5000               | A            | 1   | 1   | 0.5000 | A   |
-| 0.5000               | A            | 1   | 7   | 0.5000 | A   |
-| 1.000                | B            | 1   | 5   | 1.000  | B   |
-| 2.000                | B            | 2   | 2   | 1.000  | B   |
-| 2.000                | B            | 2   | 8   | 1.000  | B   |
+| V1 and V3 multiplied | V4 as lowercase | :V1 | :V2 | :V3    | :V4 |
+|----------------------|-----------------|-----|-----|--------|-----|
+| 1.000                | a               | 2   | 4   | 0.5000 | A   |
+| 0.5000               | a               | 1   | 1   | 0.5000 | A   |
+| 0.5000               | a               | 1   | 7   | 0.5000 | A   |
+| 1.000                | b               | 1   | 5   | 1.000  | B   |
+| 2.000                | b               | 2   | 2   | 1.000  | B   |
+| 2.000                | b               | 2   | 8   | 1.000  | B   |
+| 3.000                | c               | 2   | 6   | 1.500  | C   |
+| 1.500                | c               | 1   | 3   | 1.500  | C   |
+| 1.500                | c               | 1   | 9   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -1260,24 +1260,24 @@ We can add group names without separation
 (-> DS
     (api/group-by (fn [row] {"V1 and V3 multiplied" (* (:V1 row)
                                                       (:V3 row))
-                            "V4 as string" (str (:V4 row))}))
+                            "V4 as lowercase" (clojure.string/lower-case (:V4 row))}))
     (api/ungroup {:add-group-as-column "just map"
                   :separate? false}))
 ```
 
 \_unnamed \[9 5\]:
 
-| just map                                         | :V1 | :V2 | :V3    | :V4 |
-|--------------------------------------------------|-----|-----|--------|-----|
-| {"V1 and V3 multiplied" 3.0, "V4 as string" "C"} | 2   | 6   | 1.500  | C   |
-| {"V1 and V3 multiplied" 1.5, "V4 as string" "C"} | 1   | 3   | 1.500  | C   |
-| {"V1 and V3 multiplied" 1.5, "V4 as string" "C"} | 1   | 9   | 1.500  | C   |
-| {"V1 and V3 multiplied" 1.0, "V4 as string" "A"} | 2   | 4   | 0.5000 | A   |
-| {"V1 and V3 multiplied" 0.5, "V4 as string" "A"} | 1   | 1   | 0.5000 | A   |
-| {"V1 and V3 multiplied" 0.5, "V4 as string" "A"} | 1   | 7   | 0.5000 | A   |
-| {"V1 and V3 multiplied" 1.0, "V4 as string" "B"} | 1   | 5   | 1.000  | B   |
-| {"V1 and V3 multiplied" 2.0, "V4 as string" "B"} | 2   | 2   | 1.000  | B   |
-| {"V1 and V3 multiplied" 2.0, "V4 as string" "B"} | 2   | 8   | 1.000  | B   |
+| just map                                            | :V1 | :V2 | :V3    | :V4 |
+|-----------------------------------------------------|-----|-----|--------|-----|
+| {"V1 and V3 multiplied" 1.0, "V4 as lowercase" "a"} | 2   | 4   | 0.5000 | A   |
+| {"V1 and V3 multiplied" 0.5, "V4 as lowercase" "a"} | 1   | 1   | 0.5000 | A   |
+| {"V1 and V3 multiplied" 0.5, "V4 as lowercase" "a"} | 1   | 7   | 0.5000 | A   |
+| {"V1 and V3 multiplied" 1.0, "V4 as lowercase" "b"} | 1   | 5   | 1.000  | B   |
+| {"V1 and V3 multiplied" 2.0, "V4 as lowercase" "b"} | 2   | 2   | 1.000  | B   |
+| {"V1 and V3 multiplied" 2.0, "V4 as lowercase" "b"} | 2   | 8   | 1.000  | B   |
+| {"V1 and V3 multiplied" 3.0, "V4 as lowercase" "c"} | 2   | 6   | 1.500  | C   |
+| {"V1 and V3 multiplied" 1.5, "V4 as lowercase" "c"} | 1   | 3   | 1.500  | C   |
+| {"V1 and V3 multiplied" 1.5, "V4 as lowercase" "c"} | 1   | 9   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -1703,7 +1703,7 @@ If you want to rename colums use `rename-columns` and pass map where keys are ol
 
 \_unnamed \[9 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@3cf27b2f> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@1440c1bc> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 2   | 2   | 1.000     | B                           |
@@ -1731,7 +1731,7 @@ Function works on grouped dataset
 
 {1 Group: 1 \[5 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@6a664390> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@702ff3ed> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 1   | 3   | 1.500     | C                           |
@@ -1741,7 +1741,7 @@ Function works on grouped dataset
 
 , 2 Group: 2 \[4 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@6a664390> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@702ff3ed> |
 |-----|-----|-----------|-----------------------------|
 | 2   | 2   | 1.000     | B                           |
 | 2   | 4   | 0.5000    | A                           |
@@ -1797,15 +1797,15 @@ Replace one column (column is trimmed)
 
 | :V1     | :V2 | :V3    | :V4 |
 |---------|-----|--------|-----|
-| 0.6295  | 1   | 0.5000 | A   |
-| 0.6101  | 2   | 1.000  | B   |
-| 0.2126  | 3   | 1.500  | C   |
-| 0.7686  | 4   | 0.5000 | A   |
-| 0.7458  | 5   | 1.000  | B   |
-| 0.04302 | 6   | 1.500  | C   |
-| 0.2580  | 7   | 0.5000 | A   |
-| 0.8796  | 8   | 1.000  | B   |
-| 0.3005  | 9   | 1.500  | C   |
+| 0.7821  | 1   | 0.5000 | A   |
+| 0.06650 | 2   | 1.000  | B   |
+| 0.3074  | 3   | 1.500  | C   |
+| 0.4944  | 4   | 0.5000 | A   |
+| 0.4858  | 5   | 1.000  | B   |
+| 0.1704  | 6   | 1.500  | C   |
+| 0.08792 | 7   | 0.5000 | A   |
+| 0.5966  | 8   | 1.000  | B   |
+| 0.06713 | 9   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -2123,14 +2123,14 @@ Basic conversion
     (api/info :columns))
 ```
 
-\_unnamed :column info \[4 5\]:
+\_unnamed :column info \[4 6\]:
 
-| :name | :size | :datatype | :unparsed-indexes | :unparsed-data |
-|-------|-------|-----------|-------------------|----------------|
-| :V1   | 9     | :float64  | {}                | \[\]           |
-| :V2   | 9     | :int64    |                   |                |
-| :V3   | 9     | :float64  |                   |                |
-| :V4   | 9     | :object   |                   |                |
+| :name | :size | :datatype | :unparsed-indexes | :unparsed-data | :categorical? |
+|-------|-------|-----------|-------------------|----------------|---------------|
+| :V1   | 9     | :float64  | {}                | \[\]           |               |
+| :V2   | 9     | :int64    |                   |                |               |
+| :V3   | 9     | :float64  |                   |                |               |
+| :V4   | 9     | :string   |                   |                | true          |
 
 ------------------------------------------------------------------------
 
@@ -2138,7 +2138,7 @@ Using custom converter. Let's treat `:V4` as haxadecimal values. See that this w
 
 ``` clojure
 (-> DS
-    (api/convert-column-type :V4 [:int16 #(Integer/parseInt (str %) 16)]))
+    (api/convert-column-type :V4 [:int16 #(Integer/parseInt % 16)]))
 ```
 
 \_unnamed \[9 4\]:
@@ -2164,18 +2164,18 @@ You can process several columns at once
     (api/convert-column-type {:V1 :float64
                               :V2 :object
                               :V3 [:boolean #(< % 1.0)]
-                              :V4 :string})
+                              :V4 :object})
     (api/info :columns))
 ```
 
-\_unnamed :column info \[4 6\]:
+\_unnamed :column info \[4 5\]:
 
-| :name | :size | :datatype | :unparsed-indexes | :unparsed-data | :categorical? |
-|-------|-------|-----------|-------------------|----------------|---------------|
-| :V1   | 9     | :float64  | {}                | \[\]           |               |
-| :V2   | 9     | :object   | {}                | \[\]           |               |
-| :V3   | 9     | :boolean  | {}                | \[\]           |               |
-| :V4   | 9     | :string   | {}                | \[\]           | true          |
+| :name | :size | :datatype | :unparsed-indexes | :unparsed-data |
+|-------|-------|-----------|-------------------|----------------|
+| :V1   | 9     | :float64  | {}                | \[\]           |
+| :V2   | 9     | :object   | {}                | \[\]           |
+| :V3   | 9     | :boolean  | {}                | \[\]           |
+| :V4   | 9     | :object   |                   |                |
 
 ------------------------------------------------------------------------
 
@@ -2189,14 +2189,14 @@ Function works on the grouped dataset
     (api/info :columns))
 ```
 
-\_unnamed :column info \[4 5\]:
+\_unnamed :column info \[4 6\]:
 
-| :name | :size | :datatype | :unparsed-indexes | :unparsed-data |
-|-------|-------|-----------|-------------------|----------------|
-| :V1   | 9     | :float32  | {}                | \[\]           |
-| :V2   | 9     | :int64    |                   |                |
-| :V3   | 9     | :float64  |                   |                |
-| :V4   | 9     | :object   |                   |                |
+| :name | :size | :datatype | :unparsed-indexes | :unparsed-data | :categorical? |
+|-------|-------|-----------|-------------------|----------------|---------------|
+| :V1   | 9     | :float32  | {}                | \[\]           |               |
+| :V2   | 9     | :int64    |                   |                |               |
+| :V3   | 9     | :float64  |                   |                |               |
+| :V4   | 9     | :string   |                   |                | true          |
 
 ------------------------------------------------------------------------
 
@@ -2206,7 +2206,7 @@ Double array conversion.
 (api/->array DS :V1)
 ```
 
-    #object["[J" 0x7d8d8c8c "[J@7d8d8c8c"]
+    #object["[J" 0x606d47af "[J@606d47af"]
 
 ------------------------------------------------------------------------
 
@@ -2218,7 +2218,7 @@ Function also works on grouped dataset
     (api/->array :V2))
 ```
 
-    (#object["[J" 0x610ddd89 "[J@610ddd89"] #object["[J" 0x7dffd897 "[J@7dffd897"] #object["[J" 0x611d78a4 "[J@611d78a4"])
+    (#object["[J" 0x5b0c2766 "[J@5b0c2766"] #object["[J" 0x3c8897cb "[J@3c8897cb"] #object["[J" 0x18f46d75 "[J@18f46d75"])
 
 ------------------------------------------------------------------------
 
@@ -2229,8 +2229,8 @@ You can also cast the type to the other one (if casting is possible):
 (api/->array DS :V1 :float32)
 ```
 
-    #object["[Ljava.lang.String;" 0x3cbe70ca "[Ljava.lang.String;@3cbe70ca"]
-    #object["[F" 0x27ba7b7f "[F@27ba7b7f"]
+    #object["[Ljava.lang.String;" 0x6dfb485 "[Ljava.lang.String;@6dfb485"]
+    #object["[F" 0x1ddb3877 "[F@1ddb3877"]
 
 ### Rows
 
@@ -2414,7 +2414,7 @@ Random row (single)
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 7   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2426,17 +2426,17 @@ Random `n` (default: row count) rows with repetition.
 
 \_unnamed \[9 4\]:
 
-| :V1 | :V2 | :V3    | :V4 |
-|-----|-----|--------|-----|
-| 1   | 1   | 0.5000 | A   |
-| 1   | 5   | 1.000  | B   |
-| 1   | 7   | 0.5000 | A   |
-| 2   | 6   | 1.500  | C   |
-| 2   | 8   | 1.000  | B   |
-| 1   | 3   | 1.500  | C   |
-| 1   | 9   | 1.500  | C   |
-| 2   | 4   | 0.5000 | A   |
-| 1   | 5   | 1.000  | B   |
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 1   | 5   | 1.000 | B   |
+| 1   | 5   | 1.000 | B   |
+| 2   | 8   | 1.000 | B   |
+| 1   | 3   | 1.500 | C   |
+| 2   | 2   | 1.000 | B   |
+| 2   | 8   | 1.000 | B   |
+| 2   | 8   | 1.000 | B   |
+| 1   | 3   | 1.500 | C   |
+| 1   | 9   | 1.500 | C   |
 
 ------------------------------------------------------------------------
 
@@ -2450,11 +2450,11 @@ Five random rows with repetition
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 7   | 0.5000 | A   |
-| 1   | 9   | 1.500  | C   |
-| 1   | 7   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
 | 2   | 2   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2468,11 +2468,11 @@ Five random, non-repeating rows
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
+| 1   | 3   | 1.500  | C   |
 | 2   | 2   | 1.000  | B   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
 | 1   | 1   | 0.5000 | A   |
-| 2   | 6   | 1.500  | C   |
-| 2   | 8   | 1.000  | B   |
-| 2   | 4   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2486,14 +2486,14 @@ Shuffle dataset
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 9   | 1.500  | C   |
-| 2   | 6   | 1.500  | C   |
-| 2   | 2   | 1.000  | B   |
-| 1   | 3   | 1.500  | C   |
-| 1   | 5   | 1.000  | B   |
-| 2   | 4   | 0.5000 | A   |
 | 2   | 8   | 1.000  | B   |
 | 1   | 7   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
 | 1   | 1   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
@@ -2548,36 +2548,933 @@ Select 5 random rows from each group
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
 | 1   | 1   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
 | 1   | 7   | 0.5000 | A   |
 | 1   | 7   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
-| 2   | 8   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
 | 2   | 8   | 1.000  | B   |
 | 2   | 2   | 1.000  | B   |
 | 1   | 5   | 1.000  | B   |
-| 2   | 8   | 1.000  | B   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
 | 1   | 9   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
 | 1   | 3   | 1.500  | C   |
-| 2   | 6   | 1.500  | C   |
-| 2   | 6   | 1.500  | C   |
 | 2   | 6   | 1.500  | C   |
 
 ### Aggregate
 
+Aggregating is a function which produces single row out of dataset.
+
+Aggregator is a function or sequence or map of functions which accept dataset as an argument and result single value, sequence of values or map.
+
+Where map is given as an input or result, keys are treated as column names.
+
+Grouped dataset is ungrouped after aggreation. This can be turned of by setting `:ungroup` to false. In case you want to pass additional ungrouping parameters add them to the options.
+
+By default resulting column names are prefixed with `summary` prefix (set it with `:default-column-name-prefix` option).
+
+------------------------------------------------------------------------
+
+Let's calculate mean of some columns
+
+``` clojure
+(api/aggregate DS #(reduce + (% :V2)))
+```
+
+\_unnamed \[1 1\]:
+
+| :summary |
+|----------|
+| 45       |
+
+------------------------------------------------------------------------
+
+Let's give resulting column a name.
+
+``` clojure
+(api/aggregate DS {:sum-of-V2 #(reduce + (% :V2))})
+```
+
+\_unnamed \[1 1\]:
+
+| :sum-of-V2 |
+|------------|
+| 45         |
+
+------------------------------------------------------------------------
+
+Sequential result is spread into separate columns
+
+``` clojure
+(api/aggregate DS #(take 5(% :V2)))
+```
+
+\_unnamed \[1 5\]:
+
+| :summary-0 | :summary-1 | :summary-2 | :summary-3 | :summary-4 |
+|------------|------------|------------|------------|------------|
+| 1          | 2          | 3          | 4          | 5          |
+
+------------------------------------------------------------------------
+
+You can combine all variants and rename default prefix
+
+``` clojure
+(api/aggregate DS [#(take 3 (% :V2))
+                   (fn [ds] {:sum-v1 (reduce + (ds :V1))
+                            :prod-v3 (reduce * (ds :V3))})] {:default-column-name-prefix "V2-value"})
+```
+
+\_unnamed \[1 5\]:
+
+| :V2-value-0-0 | :V2-value-0-1 | :V2-value-0-2 | :sum-v1 | :prod-v3 |
+|---------------|---------------|---------------|---------|----------|
+| 1             | 2             | 3             | 13      | 0.4219   |
+
+------------------------------------------------------------------------
+
+Processing grouped dataset
+
+``` clojure
+(-> DS
+    (api/group-by [:V4])
+    (api/aggregate [#(take 3 (% :V2))
+                    (fn [ds] {:sum-v1 (reduce + (ds :V1))
+                             :prod-v3 (reduce * (ds :V3))})] {:default-column-name-prefix "V2-value"}))
+```
+
+\_unnamed \[3 6\]:
+
+| :V4 | :V2-value-0-0 | :V2-value-0-1 | :V2-value-0-2 | :sum-v1 | :prod-v3 |
+|-----|---------------|---------------|---------------|---------|----------|
+| B   | 2             | 5             | 8             | 5       | 1.000    |
+| C   | 3             | 6             | 9             | 4       | 3.375    |
+| A   | 1             | 4             | 7             | 4       | 0.1250   |
+
+Result of aggregating is automatically ungrouped, you can skip this step by stetting `:ungroup` option to `false`.
+
+``` clojure
+(-> DS
+    (api/group-by [:V3])
+    (api/aggregate [#(take 3 (% :V2))
+                    (fn [ds] {:sum-v1 (reduce + (ds :V1))
+                             :prod-v3 (reduce * (ds :V3))})] {:default-column-name-prefix "V2-value"
+                                                              :ungroup? false}))
+```
+
+\_unnamed \[3 3\]:
+
+| :name     | :group-id | :data              |
+|-----------|-----------|--------------------|
+| {:V3 1.0} | 0         | \_unnamed \[1 5\]: |
+| {:V3 0.5} | 1         | \_unnamed \[1 5\]: |
+| {:V3 1.5} | 2         | \_unnamed \[1 5\]: |
+
 ### Order
+
+Ordering can be done by column(s) or any function operating on row. Possible order can be:
+
+-   `:asc` for ascending order (default)
+-   `:desc` for descending order
+-   custom comparator
+
+`:limit-columns` limits row map provided to ordering functions.
+
+------------------------------------------------------------------------
+
+Order by single column, ascending
+
+``` clojure
+(api/order-by DS :V1)
+```
+
+\_unnamed \[9 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 9   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 8   | 1.000  | B   |
+| 2   | 2   | 1.000  | B   |
+
+------------------------------------------------------------------------
+
+Descending order
+
+``` clojure
+(api/order-by DS :V1 :desc)
+```
+
+\_unnamed \[9 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 2   | 2   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 6   | 1.500  | C   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
+| 1   | 9   | 1.500  | C   |
+
+------------------------------------------------------------------------
+
+Order by two columns
+
+``` clojure
+(api/order-by DS [:V1 :V2])
+```
+
+\_unnamed \[9 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 9   | 1.500  | C   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 6   | 1.500  | C   |
+| 2   | 8   | 1.000  | B   |
+
+------------------------------------------------------------------------
+
+Use different orders for columns
+
+``` clojure
+(api/order-by DS [:V1 :V2] [:asc :desc])
+```
+
+\_unnamed \[9 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 9   | 1.500  | C   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 1   | 0.5000 | A   |
+| 2   | 8   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+
+``` clojure
+(api/order-by DS [:V1 :V2] [:desc :desc])
+```
+
+\_unnamed \[9 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 2   | 8   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 1   | 0.5000 | A   |
+
+``` clojure
+(api/order-by DS [:V1 :V3] [:desc :asc])
+```
+
+\_unnamed \[9 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 2   | 4   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 8   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 1   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
+
+------------------------------------------------------------------------
+
+Custom function can be used to provied ordering key. Here order by `:V4` descending, then by product of other columns ascending.
+
+``` clojure
+(api/order-by DS [:V4 (fn [row] (* (:V1 row)
+                                  (:V2 row)
+                                  (:V3 row)))] [:desc :asc] {:limit-columns [:V1 :V2 :V3]})
+```
+
+\_unnamed \[9 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 9   | 1.500  | C   |
+| 2   | 8   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
+
+------------------------------------------------------------------------
+
+Custom comparator also can be used in case objects are not comparable by default. Let's define artificial one: if euclidean distance is lower than 2, compare along `z` else along `x` and `y`. We use first three columns for that.
+
+``` clojure
+(defn dist
+  [v1 v2]
+  (->> v2
+       (map - v1)
+       (map #(* % %))
+       (reduce +)
+       (Math/sqrt)))
+```
+
+    #'user/dist
+
+``` clojure
+(api/order-by DS [:V1 :V2 :V3] (fn [[x1 y1 z1 :as v1] [x2 y2 z2 :as v2]]
+                                 (let [d (dist v1 v2)]
+                                   (if (< d 2.0)
+                                     (compare z1 z2)
+                                     (compare [x1 y1] [x2 y2])))))
+```
+
+\_unnamed \[9 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 9   | 1.500  | C   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
+| 2   | 8   | 1.000  | B   |
 
 ### Unique
 
+Remove rows which contains the same data. By default `unique-by` removes duplicates from whole dataset. You can also pass list of columns or functions (similar as in `group-by`) to remove duplicates limited by them. Default strategy is to keep the first row. More strategies below.
+
+`unique-by` works on groups
+
+------------------------------------------------------------------------
+
+Remove duplicates from whole dataset
+
+``` clojure
+(api/unique-by DS)
+```
+
+\_unnamed \[9 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 9   | 1.500  | C   |
+
+------------------------------------------------------------------------
+
+Remove duplicates from each group selected by column.
+
+``` clojure
+(api/unique-by DS :V1)
+```
+
+\_unnamed \[2 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+
+------------------------------------------------------------------------
+
+Pair of columns
+
+``` clojure
+(api/unique-by DS [:V1 :V3])
+```
+
+\_unnamed \[6 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
+
+------------------------------------------------------------------------
+
+Also function can be used, split dataset by modulo 3 on columns `:V2`
+
+``` clojure
+(api/unique-by DS (fn [m] (mod (:V2 m) 3)))
+```
+
+\_unnamed \[3 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+
+------------------------------------------------------------------------
+
+The same can be achived with `group-by`
+
+``` clojure
+(-> DS
+    (api/group-by (fn [m] (mod (:V2 m) 3)))
+    (api/first)
+    (api/ungroup))
+```
+
+\_unnamed \[3 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 3   | 1.500  | C   |
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+
+------------------------------------------------------------------------
+
+Grouped dataset
+
+``` clojure
+(-> DS
+    (api/group-by :V4)
+    (api/unique-by :V1)
+    (api/ungroup))
+```
+
+\_unnamed \[6 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
+
 #### Strategies
+
+There are 4 strategies defined:
+
+-   `:first` - select first row (default)
+-   `:last` - select last row
+-   `:random` - select random row
+-   any function - apply function to a columns which are subject of uniqueness
+
+------------------------------------------------------------------------
+
+Last
+
+``` clojure
+(api/unique-by DS :V1 {:strategy :last})
+```
+
+\_unnamed \[2 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 2   | 8   | 1.000 | B   |
+| 1   | 9   | 1.500 | C   |
+
+------------------------------------------------------------------------
+
+Random
+
+``` clojure
+(api/unique-by DS :V1 {:strategy :random})
+```
+
+\_unnamed \[2 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 2   | 4   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+
+------------------------------------------------------------------------
+
+Pack columns into vector
+
+``` clojure
+(api/unique-by DS :V4 {:strategy vec})
+```
+
+\_unnamed \[3 3\]:
+
+| :V1       | :V2       | :V3             |
+|-----------|-----------|-----------------|
+| \[2 1 2\] | \[2 5 8\] | \[1.0 1.0 1.0\] |
+| \[1 2 1\] | \[3 6 9\] | \[1.5 1.5 1.5\] |
+| \[1 2 1\] | \[1 4 7\] | \[0.5 0.5 0.5\] |
+
+------------------------------------------------------------------------
+
+Sum columns
+
+``` clojure
+(api/unique-by DS :V4 {:strategy (partial reduce +)})
+```
+
+\_unnamed \[3 3\]:
+
+| :V1 | :V2 | :V3   |
+|-----|-----|-------|
+| 5   | 15  | 3.000 |
+| 4   | 18  | 4.500 |
+| 4   | 12  | 1.500 |
+
+------------------------------------------------------------------------
+
+Group by function and apply functions
+
+``` clojure
+(api/unique-by DS (fn [m] (mod (:V2 m) 3)) {:strategy vec})
+```
+
+\_unnamed \[3 4\]:
+
+| :V1       | :V2       | :V3             | :V4             |
+|-----------|-----------|-----------------|-----------------|
+| \[1 2 1\] | \[3 6 9\] | \[1.5 1.5 1.5\] | \["C" "C" "C"\] |
+| \[1 2 1\] | \[1 4 7\] | \[0.5 0.5 0.5\] | \["A" "A" "A"\] |
+| \[2 1 2\] | \[2 5 8\] | \[1.0 1.0 1.0\] | \["B" "B" "B"\] |
+
+------------------------------------------------------------------------
+
+Grouped dataset
+
+``` clojure
+(-> DS
+    (api/group-by :V1)
+    (api/unique-by (fn [m] (mod (:V2 m) 3)) {:strategy vec})
+    (api/ungroup {:add-group-as-column :from-V1}))
+```
+
+\_unnamed \[6 5\]:
+
+| :from-V1 | :V1     | :V2     | :V3         | :V4         |
+|----------|---------|---------|-------------|-------------|
+| 1        | \[1 1\] | \[3 9\] | \[1.5 1.5\] | \["C" "C"\] |
+| 1        | \[1 1\] | \[1 7\] | \[0.5 0.5\] | \["A" "A"\] |
+| 1        | \[1\]   | \[5\]   | \[1.0\]     | \["B"\]     |
+| 2        | \[2\]   | \[6\]   | \[1.5\]     | \["C"\]     |
+| 2        | \[2\]   | \[4\]   | \[0.5\]     | \["A"\]     |
+| 2        | \[2 2\] | \[2 8\] | \[1.0 1.0\] | \["B" "B"\] |
 
 ### Missing
 
+When dataset contains missing values you can select or drop rows with missing values or replace them using some strategy.
+
+`column-selector` can be used to limit considered columns
+
+Let's define dataset which contains missing values
+
+``` clojure
+(def DSm (api/dataset {:V1 (take 9 (cycle [1 2 nil]))
+                       :V2 (range 1 10)
+                       :V3 (take 9 (cycle [0.5 1.0 nil 1.5]))
+                       :V4 (take 9 (cycle [\A \B \C]))}))
+```
+
+``` clojure
+DSm
+```
+
+\_unnamed \[9 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+|     | 3   |        | C   |
+| 1   | 4   | 1.500  | A   |
+| 2   | 5   | 0.5000 | B   |
+|     | 6   | 1.000  | C   |
+| 1   | 7   |        | A   |
+| 2   | 8   | 1.500  | B   |
+|     | 9   | 0.5000 | C   |
+
 #### Select
+
+Select rows with missing values
+
+``` clojure
+(api/select-missing DSm)
+```
+
+\_unnamed \[4 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+|     | 3   |        | C   |
+|     | 6   | 1.000  | C   |
+| 1   | 7   |        | A   |
+|     | 9   | 0.5000 | C   |
+
+------------------------------------------------------------------------
+
+Select rows with missing values in `:V1`
+
+``` clojure
+(api/select-missing DSm :V1)
+```
+
+\_unnamed \[3 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+|     | 3   |        | C   |
+|     | 6   | 1.000  | C   |
+|     | 9   | 0.5000 | C   |
+
+------------------------------------------------------------------------
+
+The same with grouped dataset
+
+``` clojure
+(-> DSm
+    (api/group-by :V4)
+    (api/select-missing :V3)
+    (api/ungroup))
+```
+
+\_unnamed \[2 4\]:
+
+| :V1 | :V2 | :V3 | :V4 |
+|-----|-----|-----|-----|
+| 1   | 7   |     | A   |
+|     | 3   |     | C   |
 
 #### Drop
 
+Drop rows with missing values
+
+``` clojure
+(api/drop-missing DSm)
+```
+
+\_unnamed \[5 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 4   | 1.500  | A   |
+| 2   | 5   | 0.5000 | B   |
+| 2   | 8   | 1.500  | B   |
+
+------------------------------------------------------------------------
+
+Drop rows with missing values in `:V1`
+
+``` clojure
+(api/drop-missing DSm :V1)
+```
+
+\_unnamed \[6 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 4   | 1.500  | A   |
+| 2   | 5   | 0.5000 | B   |
+| 1   | 7   |        | A   |
+| 2   | 8   | 1.500  | B   |
+
+------------------------------------------------------------------------
+
+The same with grouped dataset
+
+``` clojure
+(-> DSm
+    (api/group-by :V4)
+    (api/drop-missing :V1)
+    (api/ungroup))
+```
+
+\_unnamed \[6 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 1   | 4   | 1.500  | A   |
+| 1   | 7   |        | A   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 5   | 0.5000 | B   |
+| 2   | 8   | 1.500  | B   |
+
 #### Replace
+
+Missing values can be replaced using several strategies. `replace-missing` accepts:
+
+-   dataset
+-   column selector
+-   value
+    -   single value
+    -   sequence of values (cycled)
+    -   function, applied on column(s) with stripped missings
+-   strategy (optional)
+
+Strategies are:
+
+-   `:value` - replace with given value (default)
+-   `:up` - copy values up
+-   `:down` - copy values down
+
+Let's define special dataset here:
+
+``` clojure
+(def DSm2 (api/dataset {:a [nil nil nil 1.0 2   nil 4   nil  11 nil nil]
+                        :b [2.0   2   2 nil nil 3   nil   3  4  5 5]}))
+```
+
+``` clojure
+DSm2
+```
+
+\_unnamed \[11 2\]:
+
+| :a    | :b    |
+|-------|-------|
+|       | 2.000 |
+|       | 2.000 |
+|       | 2.000 |
+| 1.000 |       |
+| 2.000 |       |
+|       | 3.000 |
+| 4.000 |       |
+|       | 3.000 |
+| 11.00 | 4.000 |
+|       | 5.000 |
+|       | 5.000 |
+
+------------------------------------------------------------------------
+
+Replace missing with single value in whole dataset
+
+``` clojure
+(api/replace-missing DSm2 999)
+```
+
+\_unnamed \[11 2\]:
+
+| :a    | :b    |
+|-------|-------|
+| 999.0 | 2.000 |
+| 999.0 | 2.000 |
+| 999.0 | 2.000 |
+| 1.000 | 999.0 |
+| 2.000 | 999.0 |
+| 999.0 | 3.000 |
+| 4.000 | 999.0 |
+| 999.0 | 3.000 |
+| 11.00 | 4.000 |
+| 999.0 | 5.000 |
+| 999.0 | 5.000 |
+
+------------------------------------------------------------------------
+
+Replace missing with single value in `:a` column
+
+``` clojure
+(api/replace-missing DSm2 :a 999)
+```
+
+\_unnamed \[11 2\]:
+
+| :a    | :b    |
+|-------|-------|
+| 999.0 | 2.000 |
+| 999.0 | 2.000 |
+| 999.0 | 2.000 |
+| 1.000 |       |
+| 2.000 |       |
+| 999.0 | 3.000 |
+| 4.000 |       |
+| 999.0 | 3.000 |
+| 11.00 | 4.000 |
+| 999.0 | 5.000 |
+| 999.0 | 5.000 |
+
+------------------------------------------------------------------------
+
+Replace missing with sequence in `:a` column
+
+``` clojure
+(api/replace-missing DSm2 :a [-999 -998 -997])
+```
+
+\_unnamed \[11 2\]:
+
+| :a     | :b    |
+|--------|-------|
+| -999.0 | 2.000 |
+| -998.0 | 2.000 |
+| -997.0 | 2.000 |
+| 1.000  |       |
+| 2.000  |       |
+| -999.0 | 3.000 |
+| 4.000  |       |
+| -998.0 | 3.000 |
+| 11.00  | 4.000 |
+| -997.0 | 5.000 |
+| -999.0 | 5.000 |
+
+------------------------------------------------------------------------
+
+Replace missing with a function (mean)
+
+``` clojure
+(api/replace-missing DSm2 :a tech.v2.datatype.functional/mean)
+```
+
+\_unnamed \[11 2\]:
+
+| :a    | :b    |
+|-------|-------|
+| 4.500 | 2.000 |
+| 4.500 | 2.000 |
+| 4.500 | 2.000 |
+| 1.000 |       |
+| 2.000 |       |
+| 4.500 | 3.000 |
+| 4.000 |       |
+| 4.500 | 3.000 |
+| 11.00 | 4.000 |
+| 4.500 | 5.000 |
+| 4.500 | 5.000 |
+
+------------------------------------------------------------------------
+
+Using `:down` strategy, fills gaps with values from above. You can see that if missings are at the beginning, they are left missing.
+
+``` clojure
+(api/replace-missing DSm2 [:a :b] nil :down)
+```
+
+\_unnamed \[11 2\]:
+
+| :a    | :b    |
+|-------|-------|
+|       | 2.000 |
+|       | 2.000 |
+|       | 2.000 |
+| 1.000 | 2.000 |
+| 2.000 | 2.000 |
+| 2.000 | 3.000 |
+| 4.000 | 3.000 |
+| 4.000 | 3.000 |
+| 11.00 | 4.000 |
+| 11.00 | 5.000 |
+| 11.00 | 5.000 |
+
+------------------------------------------------------------------------
+
+To fix above issue you can provide value
+
+``` clojure
+(api/replace-missing DSm2 [:a :b] 999 :down)
+```
+
+\_unnamed \[11 2\]:
+
+| :a    | :b    |
+|-------|-------|
+| 999.0 | 2.000 |
+| 999.0 | 2.000 |
+| 999.0 | 2.000 |
+| 1.000 | 2.000 |
+| 2.000 | 2.000 |
+| 2.000 | 3.000 |
+| 4.000 | 3.000 |
+| 4.000 | 3.000 |
+| 11.00 | 4.000 |
+| 11.00 | 5.000 |
+| 11.00 | 5.000 |
+
+------------------------------------------------------------------------
+
+The same applies for `:up` strategy which is opposite direction.
+
+``` clojure
+(api/replace-missing DSm2 [:a :b] 999 :up)
+```
+
+\_unnamed \[11 2\]:
+
+| :a    | :b    |
+|-------|-------|
+| 1.000 | 2.000 |
+| 1.000 | 2.000 |
+| 1.000 | 2.000 |
+| 1.000 | 3.000 |
+| 2.000 | 3.000 |
+| 4.000 | 3.000 |
+| 4.000 | 3.000 |
+| 11.00 | 3.000 |
+| 11.00 | 4.000 |
+| 999.0 | 5.000 |
+| 999.0 | 5.000 |
+
+------------------------------------------------------------------------
+
+We can use a function which is applied after applying `:up` or `:down`
+
+``` clojure
+(api/replace-missing DSm2 [:a :b] tech.v2.datatype.functional/mean :down)
+```
+
+\_unnamed \[11 2\]:
+
+| :a    | :b    |
+|-------|-------|
+| 4.500 | 2.000 |
+| 4.500 | 2.000 |
+| 4.500 | 2.000 |
+| 1.000 | 2.000 |
+| 2.000 | 2.000 |
+| 2.000 | 3.000 |
+| 4.000 | 3.000 |
+| 4.000 | 3.000 |
+| 11.00 | 4.000 |
+| 11.00 | 5.000 |
+| 11.00 | 5.000 |
 
 ### Join/Separate Columns
 

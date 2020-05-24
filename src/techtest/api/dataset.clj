@@ -23,7 +23,8 @@
                                   (first))]
             (count first-seq)
             1)]
-    (map-v #(if (iterable-sequence? %) % (repeat c %)) map-ds)))
+    (apply array-map (interleave (keys map-ds)
+                                 (map #(if (iterable-sequence? %) % (repeat c %)) (vals map-ds))))))
 
 (defn dataset
   "Create `dataset`.
@@ -46,7 +47,7 @@
      (map? data) (apply ds/name-values-seq->dataset (fix-map-dataset data) [:dataset-name (:dataset-name options)])
      (and (iterable-sequence? data)
           (every? iterable-sequence? data)
-          (every? #(= 2 (count %)) data)) (dataset (into {} data) options)
+          (every? #(= 2 (count %)) data)) (dataset (apply array-map (mapcat identity data)) options)
      (and (iterable-sequence? data)
           (every? col/is-column? data)) (ds/new-dataset options data)
      (not (seqable? data)) (ds/->dataset [{single-value-column-name data}] options)

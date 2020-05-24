@@ -17,3 +17,4 @@
 (defn ->str
   [v]
   (if (instance? clojure.lang.Named v) (name v) (str v)))
+

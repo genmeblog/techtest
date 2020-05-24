@@ -110,7 +110,7 @@
 
 \title{Proposed API for tech.ml.dataset}
 \author{GenerateMe}
-\date{2020-05-24}
+\date{2020-05-25}
 
 \begin{document}
 \maketitle
@@ -181,7 +181,7 @@ Let's require main namespace and define dataset used in most examples:
 \NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(api/dataset \{}\AttributeTok{:V1}\NormalTok{ (}\KeywordTok{take} \DecValTok{9}\NormalTok{ (}\KeywordTok{cycle}\NormalTok{ [}\DecValTok{1} \DecValTok{2}\NormalTok{]))}
                       \AttributeTok{:V2}\NormalTok{ (}\KeywordTok{range} \DecValTok{1} \DecValTok{10}\NormalTok{)}
                       \AttributeTok{:V3}\NormalTok{ (}\KeywordTok{take} \DecValTok{9}\NormalTok{ (}\KeywordTok{cycle}\NormalTok{ [}\FloatTok{0.5} \FloatTok{1.0} \FloatTok{1.5}\NormalTok{]))}
-                      \AttributeTok{:V4}\NormalTok{ (}\KeywordTok{take} \DecValTok{9}\NormalTok{ (}\KeywordTok{cycle}\NormalTok{ [}\CharTok{\textbackslash{}A} \CharTok{\textbackslash{}B} \CharTok{\textbackslash{}C}\NormalTok{]))\}))}
+                      \AttributeTok{:V4}\NormalTok{ (}\KeywordTok{take} \DecValTok{9}\NormalTok{ (}\KeywordTok{cycle}\NormalTok{ [}\StringTok{"A"} \StringTok{"B"} \StringTok{"C"}\NormalTok{]))\}))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -998,7 +998,7 @@ Rows as sequence of sequences
 \end{Shaded}
 
 \begin{verbatim}
-([#object[java.time.LocalDate 0x46611b46 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x206b2a4d "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+([#object[java.time.LocalDate 0x45bdf90a "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x5ab4506 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -1012,13 +1012,13 @@ Rows as sequence of maps
 \end{Shaded}
 
 \begin{verbatim}
-({"date" #object[java.time.LocalDate 0x4ec8d100 "2012-01-01"],
+({"date" #object[java.time.LocalDate 0x1ca7510b "2012-01-01"],
   "precipitation" 0.0,
   "temp_min" 5.0,
   "weather" "drizzle",
   "temp_max" 12.8,
   "wind" 4.7}
- {"date" #object[java.time.LocalDate 0x621ce061 "2012-01-02"],
+ {"date" #object[java.time.LocalDate 0x2ce7ae0 "2012-01-02"],
   "precipitation" 10.9,
   "temp_min" 2.8,
   "weather" "rain",
@@ -1955,7 +1955,7 @@ names.
 \NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
 \NormalTok{    (api/group-by (}\KeywordTok{fn}\NormalTok{ [row] \{}\StringTok{"V1 and V3 multiplied"}\NormalTok{ (}\KeywordTok{*}\NormalTok{ (}\AttributeTok{:V1}\NormalTok{ row)}
 \NormalTok{                                                      (}\AttributeTok{:V3}\NormalTok{ row))}
-                            \StringTok{"V4 as string"}\NormalTok{ (}\KeywordTok{str}\NormalTok{ (}\AttributeTok{:V4}\NormalTok{ row))\}))}
+                            \StringTok{"V4 as lowercase"}\NormalTok{ (clojure.string/lower-case (}\AttributeTok{:V4}\NormalTok{ row))\}))}
 \NormalTok{    (api/ungroup \{}\AttributeTok{:add-group-as-column} \VariableTok{true}\NormalTok{\}))}
 \end{Highlighting}
 \end{Shaded}
@@ -1964,19 +1964,19 @@ names.
 
 \begin{longtable}[]{@{}llllll@{}}
 \toprule
-V1 and V3 multiplied & V4 as string & :V1 & :V2 & :V3 &
+V1 and V3 multiplied & V4 as lowercase & :V1 & :V2 & :V3 &
 :V4\tabularnewline
 \midrule
 \endhead
-3.000 & C & 2 & 6 & 1.500 & C\tabularnewline
-1.500 & C & 1 & 3 & 1.500 & C\tabularnewline
-1.500 & C & 1 & 9 & 1.500 & C\tabularnewline
-1.000 & A & 2 & 4 & 0.5000 & A\tabularnewline
-0.5000 & A & 1 & 1 & 0.5000 & A\tabularnewline
-0.5000 & A & 1 & 7 & 0.5000 & A\tabularnewline
-1.000 & B & 1 & 5 & 1.000 & B\tabularnewline
-2.000 & B & 2 & 2 & 1.000 & B\tabularnewline
-2.000 & B & 2 & 8 & 1.000 & B\tabularnewline
+1.000 & a & 2 & 4 & 0.5000 & A\tabularnewline
+0.5000 & a & 1 & 1 & 0.5000 & A\tabularnewline
+0.5000 & a & 1 & 7 & 0.5000 & A\tabularnewline
+1.000 & b & 1 & 5 & 1.000 & B\tabularnewline
+2.000 & b & 2 & 2 & 1.000 & B\tabularnewline
+2.000 & b & 2 & 8 & 1.000 & B\tabularnewline
+3.000 & c & 2 & 6 & 1.500 & C\tabularnewline
+1.500 & c & 1 & 3 & 1.500 & C\tabularnewline
+1.500 & c & 1 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1989,7 +1989,7 @@ We can add group names without separation
 \NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
 \NormalTok{    (api/group-by (}\KeywordTok{fn}\NormalTok{ [row] \{}\StringTok{"V1 and V3 multiplied"}\NormalTok{ (}\KeywordTok{*}\NormalTok{ (}\AttributeTok{:V1}\NormalTok{ row)}
 \NormalTok{                                                      (}\AttributeTok{:V3}\NormalTok{ row))}
-                            \StringTok{"V4 as string"}\NormalTok{ (}\KeywordTok{str}\NormalTok{ (}\AttributeTok{:V4}\NormalTok{ row))\}))}
+                            \StringTok{"V4 as lowercase"}\NormalTok{ (clojure.string/lower-case (}\AttributeTok{:V4}\NormalTok{ row))\}))}
 \NormalTok{    (api/ungroup \{}\AttributeTok{:add-group-as-column} \StringTok{"just map"}
                   \AttributeTok{:separate}\NormalTok{? }\VariableTok{false}\NormalTok{\}))}
 \end{Highlighting}
@@ -2002,24 +2002,24 @@ We can add group names without separation
 just map & :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-\{``V1 and V3 multiplied'' 3.0, ``V4 as string'' ``C''\} & 2 & 6 & 1.500
-& C\tabularnewline
-\{``V1 and V3 multiplied'' 1.5, ``V4 as string'' ``C''\} & 1 & 3 & 1.500
-& C\tabularnewline
-\{``V1 and V3 multiplied'' 1.5, ``V4 as string'' ``C''\} & 1 & 9 & 1.500
-& C\tabularnewline
-\{``V1 and V3 multiplied'' 1.0, ``V4 as string'' ``A''\} & 2 & 4 &
+\{``V1 and V3 multiplied'' 1.0, ``V4 as lowercase'' ``a''\} & 2 & 4 &
 0.5000 & A\tabularnewline
-\{``V1 and V3 multiplied'' 0.5, ``V4 as string'' ``A''\} & 1 & 1 &
+\{``V1 and V3 multiplied'' 0.5, ``V4 as lowercase'' ``a''\} & 1 & 1 &
 0.5000 & A\tabularnewline
-\{``V1 and V3 multiplied'' 0.5, ``V4 as string'' ``A''\} & 1 & 7 &
+\{``V1 and V3 multiplied'' 0.5, ``V4 as lowercase'' ``a''\} & 1 & 7 &
 0.5000 & A\tabularnewline
-\{``V1 and V3 multiplied'' 1.0, ``V4 as string'' ``B''\} & 1 & 5 & 1.000
-& B\tabularnewline
-\{``V1 and V3 multiplied'' 2.0, ``V4 as string'' ``B''\} & 2 & 2 & 1.000
-& B\tabularnewline
-\{``V1 and V3 multiplied'' 2.0, ``V4 as string'' ``B''\} & 2 & 8 & 1.000
-& B\tabularnewline
+\{``V1 and V3 multiplied'' 1.0, ``V4 as lowercase'' ``b''\} & 1 & 5 &
+1.000 & B\tabularnewline
+\{``V1 and V3 multiplied'' 2.0, ``V4 as lowercase'' ``b''\} & 2 & 2 &
+1.000 & B\tabularnewline
+\{``V1 and V3 multiplied'' 2.0, ``V4 as lowercase'' ``b''\} & 2 & 8 &
+1.000 & B\tabularnewline
+\{``V1 and V3 multiplied'' 3.0, ``V4 as lowercase'' ``c''\} & 2 & 6 &
+1.500 & C\tabularnewline
+\{``V1 and V3 multiplied'' 1.5, ``V4 as lowercase'' ``c''\} & 1 & 3 &
+1.500 & C\tabularnewline
+\{``V1 and V3 multiplied'' 1.5, ``V4 as lowercase'' ``c''\} & 1 & 9 &
+1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -2622,7 +2622,7 @@ where keys are old names, values new ones.
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@524213b3}{\nolinkurl{java.lang.Object@524213b3}}\tabularnewline
+\href{mailto:java.lang.Object@33744e2a}{\nolinkurl{java.lang.Object@33744e2a}}\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2658,7 +2658,7 @@ Function works on grouped dataset
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@1ab72e7}{\nolinkurl{java.lang.Object@1ab72e7}}\tabularnewline
+\href{mailto:java.lang.Object@4c085888}{\nolinkurl{java.lang.Object@4c085888}}\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2674,7 +2674,7 @@ v1 & v2 & {[}1 2 3{]} &
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@1ab72e7}{\nolinkurl{java.lang.Object@1ab72e7}}\tabularnewline
+\href{mailto:java.lang.Object@4c085888}{\nolinkurl{java.lang.Object@4c085888}}\tabularnewline
 \midrule
 \endhead
 2 & 2 & 1.000 & B\tabularnewline
@@ -2764,15 +2764,15 @@ Replace one column (column is trimmed)
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-0.4895 & 1 & 0.5000 & A\tabularnewline
-0.4692 & 2 & 1.000 & B\tabularnewline
-0.5038 & 3 & 1.500 & C\tabularnewline
-0.02315 & 4 & 0.5000 & A\tabularnewline
-0.8854 & 5 & 1.000 & B\tabularnewline
-0.9962 & 6 & 1.500 & C\tabularnewline
-0.1997 & 7 & 0.5000 & A\tabularnewline
-0.2879 & 8 & 1.000 & B\tabularnewline
-0.1290 & 9 & 1.500 & C\tabularnewline
+0.8802 & 1 & 0.5000 & A\tabularnewline
+0.5721 & 2 & 1.000 & B\tabularnewline
+0.2709 & 3 & 1.500 & C\tabularnewline
+0.6425 & 4 & 0.5000 & A\tabularnewline
+0.02530 & 5 & 1.000 & B\tabularnewline
+0.2051 & 6 & 1.500 & C\tabularnewline
+0.8565 & 7 & 0.5000 & A\tabularnewline
+0.8923 & 8 & 1.000 & B\tabularnewline
+0.5194 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3221,18 +3221,18 @@ Basic conversion
 \end{Highlighting}
 \end{Shaded}
 
-\_unnamed :column info {[}4 5{]}:
+\_unnamed :column info {[}4 6{]}:
 
-\begin{longtable}[]{@{}lllll@{}}
+\begin{longtable}[]{@{}llllll@{}}
 \toprule
-:name & :size & :datatype & :unparsed-indexes &
-:unparsed-data\tabularnewline
+:name & :size & :datatype & :unparsed-indexes & :unparsed-data &
+:categorical?\tabularnewline
 \midrule
 \endhead
-:V1 & 9 & :float64 & \{\} & {[}{]}\tabularnewline
-:V2 & 9 & :int64 & &\tabularnewline
-:V3 & 9 & :float64 & &\tabularnewline
-:V4 & 9 & :object & &\tabularnewline
+:V1 & 9 & :float64 & \{\} & {[}{]} &\tabularnewline
+:V2 & 9 & :int64 & & &\tabularnewline
+:V3 & 9 & :float64 & & &\tabularnewline
+:V4 & 9 & :string & & & true\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3244,7 +3244,7 @@ See that this way we can map column to any value.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
-\NormalTok{    (api/convert-column-type }\AttributeTok{:V4}\NormalTok{ [}\AttributeTok{:int16}\NormalTok{ #(Integer/parseInt (}\KeywordTok{str} \VariableTok{%}\NormalTok{) }\DecValTok{16}\NormalTok{)]))}
+\NormalTok{    (api/convert-column-type }\AttributeTok{:V4}\NormalTok{ [}\AttributeTok{:int16}\NormalTok{ #(Integer/parseInt }\VariableTok{%} \DecValTok{16}\NormalTok{)]))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -3277,23 +3277,23 @@ You can process several columns at once
 \NormalTok{    (api/convert-column-type \{}\AttributeTok{:V1} \AttributeTok{:float64}
                               \AttributeTok{:V2} \AttributeTok{:object}
                               \AttributeTok{:V3}\NormalTok{ [}\AttributeTok{:boolean}\NormalTok{ #(}\KeywordTok{<} \VariableTok{%} \FloatTok{1.0}\NormalTok{)]}
-                              \AttributeTok{:V4} \AttributeTok{:string}\NormalTok{\})}
+                              \AttributeTok{:V4} \AttributeTok{:object}\NormalTok{\})}
 \NormalTok{    (api/info }\AttributeTok{:columns}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
-\_unnamed :column info {[}4 6{]}:
+\_unnamed :column info {[}4 5{]}:
 
-\begin{longtable}[]{@{}llllll@{}}
+\begin{longtable}[]{@{}lllll@{}}
 \toprule
-:name & :size & :datatype & :unparsed-indexes & :unparsed-data &
-:categorical?\tabularnewline
+:name & :size & :datatype & :unparsed-indexes &
+:unparsed-data\tabularnewline
 \midrule
 \endhead
-:V1 & 9 & :float64 & \{\} & {[}{]} &\tabularnewline
-:V2 & 9 & :object & \{\} & {[}{]} &\tabularnewline
-:V3 & 9 & :boolean & \{\} & {[}{]} &\tabularnewline
-:V4 & 9 & :string & \{\} & {[}{]} & true\tabularnewline
+:V1 & 9 & :float64 & \{\} & {[}{]}\tabularnewline
+:V2 & 9 & :object & \{\} & {[}{]}\tabularnewline
+:V3 & 9 & :boolean & \{\} & {[}{]}\tabularnewline
+:V4 & 9 & :object & &\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3311,18 +3311,18 @@ Function works on the grouped dataset
 \end{Highlighting}
 \end{Shaded}
 
-\_unnamed :column info {[}4 5{]}:
+\_unnamed :column info {[}4 6{]}:
 
-\begin{longtable}[]{@{}lllll@{}}
+\begin{longtable}[]{@{}llllll@{}}
 \toprule
-:name & :size & :datatype & :unparsed-indexes &
-:unparsed-data\tabularnewline
+:name & :size & :datatype & :unparsed-indexes & :unparsed-data &
+:categorical?\tabularnewline
 \midrule
 \endhead
-:V1 & 9 & :float32 & \{\} & {[}{]}\tabularnewline
-:V2 & 9 & :int64 & &\tabularnewline
-:V3 & 9 & :float64 & &\tabularnewline
-:V4 & 9 & :object & &\tabularnewline
+:V1 & 9 & :float32 & \{\} & {[}{]} &\tabularnewline
+:V2 & 9 & :int64 & & &\tabularnewline
+:V3 & 9 & :float64 & & &\tabularnewline
+:V4 & 9 & :string & & & true\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3337,7 +3337,7 @@ Double array conversion.
 \end{Shaded}
 
 \begin{verbatim}
-#object["[J" 0x632d640d "[J@632d640d"]
+#object["[J" 0x2bc4c65e "[J@2bc4c65e"]
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3353,7 +3353,7 @@ Function also works on grouped dataset
 \end{Shaded}
 
 \begin{verbatim}
-(#object["[J" 0x43551e7 "[J@43551e7"] #object["[J" 0x6c53711b "[J@6c53711b"] #object["[J" 0x5c7f105f "[J@5c7f105f"])
+(#object["[J" 0x727c71e5 "[J@727c71e5"] #object["[J" 0x4bfda218 "[J@4bfda218"] #object["[J" 0x7c33ab47 "[J@7c33ab47"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3368,8 +3368,8 @@ You can also cast the type to the other one (if casting is possible):
 \end{Shaded}
 
 \begin{verbatim}
-#object["[Ljava.lang.String;" 0xa4fcf21 "[Ljava.lang.String;@a4fcf21"]
-#object["[F" 0x114ba4fa "[F@114ba4fa"]
+#object["[Ljava.lang.String;" 0x76fe0562 "[Ljava.lang.String;@76fe0562"]
+#object["[F" 0x6dfa099e "[F@6dfa099e"]
 \end{verbatim}
 
 \subsubsection{Rows}\label{rows}
@@ -3660,15 +3660,15 @@ Random \texttt{n} (default: row count) rows with repetition.
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 7 & 0.5000 & A\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3689,11 +3689,11 @@ Five random rows with repetition
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 3 & 1.500 & C\tabularnewline
 1 & 1 & 0.5000 & A\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3714,11 +3714,11 @@ Five random, non-repeating rows
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 2 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3739,15 +3739,15 @@ Shuffle dataset
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 6 & 1.500 & C\tabularnewline
 2 & 8 & 1.000 & B\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3821,19 +3821,19 @@ Select 5 random rows from each group
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
+1 & 7 & 0.5000 & A\tabularnewline
 1 & 1 & 0.5000 & A\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
 \bottomrule
@@ -3841,19 +3841,1282 @@ Select 5 random rows from each group
 
 \subsubsection{Aggregate}\label{aggregate}
 
+Aggregating is a function which produces single row out of dataset.
+
+Aggregator is a function or sequence or map of functions which accept
+dataset as an argument and result single value, sequence of values or
+map.
+
+Where map is given as an input or result, keys are treated as column
+names.
+
+Grouped dataset is ungrouped after aggreation. This can be turned of by
+setting \texttt{:ungroup} to false. In case you want to pass additional
+ungrouping parameters add them to the options.
+
+By default resulting column names are prefixed with \texttt{summary}
+prefix (set it with \texttt{:default-column-name-prefix} option).
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Let's calculate mean of some columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/aggregate DS #(}\KeywordTok{reduce} \KeywordTok{+}\NormalTok{ (}\VariableTok{%} \AttributeTok{:V2}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 1{]}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+:summary\tabularnewline
+\midrule
+\endhead
+45\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Let's give resulting column a name.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/aggregate DS \{}\AttributeTok{:sum-of-V2}\NormalTok{ #(}\KeywordTok{reduce} \KeywordTok{+}\NormalTok{ (}\VariableTok{%} \AttributeTok{:V2}\NormalTok{))\})}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 1{]}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+:sum-of-V2\tabularnewline
+\midrule
+\endhead
+45\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Sequential result is spread into separate columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/aggregate DS #(}\KeywordTok{take} \DecValTok{5}\NormalTok{(}\VariableTok{%} \AttributeTok{:V2}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:summary-0 & :summary-1 & :summary-2 & :summary-3 &
+:summary-4\tabularnewline
+\midrule
+\endhead
+1 & 2 & 3 & 4 & 5\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+You can combine all variants and rename default prefix
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/aggregate DS [#(}\KeywordTok{take} \DecValTok{3}\NormalTok{ (}\VariableTok{%} \AttributeTok{:V2}\NormalTok{))}
+\NormalTok{                   (}\KeywordTok{fn}\NormalTok{ [ds] \{}\AttributeTok{:sum-v1}\NormalTok{ (}\KeywordTok{reduce} \KeywordTok{+}\NormalTok{ (ds }\AttributeTok{:V1}\NormalTok{))}
+                            \AttributeTok{:prod-v3}\NormalTok{ (}\KeywordTok{reduce} \KeywordTok{*}\NormalTok{ (ds }\AttributeTok{:V3}\NormalTok{))\})] \{}\AttributeTok{:default-column-name-prefix} \StringTok{"V2-value"}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:V2-value-0-0 & :V2-value-0-1 & :V2-value-0-2 & :sum-v1 &
+:prod-v3\tabularnewline
+\midrule
+\endhead
+1 & 2 & 3 & 13 & 0.4219\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Processing grouped dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by [}\AttributeTok{:V4}\NormalTok{])}
+\NormalTok{    (api/aggregate [#(}\KeywordTok{take} \DecValTok{3}\NormalTok{ (}\VariableTok{%} \AttributeTok{:V2}\NormalTok{))}
+\NormalTok{                    (}\KeywordTok{fn}\NormalTok{ [ds] \{}\AttributeTok{:sum-v1}\NormalTok{ (}\KeywordTok{reduce} \KeywordTok{+}\NormalTok{ (ds }\AttributeTok{:V1}\NormalTok{))}
+                             \AttributeTok{:prod-v3}\NormalTok{ (}\KeywordTok{reduce} \KeywordTok{*}\NormalTok{ (ds }\AttributeTok{:V3}\NormalTok{))\})] \{}\AttributeTok{:default-column-name-prefix} \StringTok{"V2-value"}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 6{]}:
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+:V4 & :V2-value-0-0 & :V2-value-0-1 & :V2-value-0-2 & :sum-v1 &
+:prod-v3\tabularnewline
+\midrule
+\endhead
+B & 2 & 5 & 8 & 5 & 1.000\tabularnewline
+C & 3 & 6 & 9 & 4 & 3.375\tabularnewline
+A & 1 & 4 & 7 & 4 & 0.1250\tabularnewline
+\bottomrule
+\end{longtable}
+
+Result of aggregating is automatically ungrouped, you can skip this step
+by stetting \texttt{:ungroup} option to \texttt{false}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by [}\AttributeTok{:V3}\NormalTok{])}
+\NormalTok{    (api/aggregate [#(}\KeywordTok{take} \DecValTok{3}\NormalTok{ (}\VariableTok{%} \AttributeTok{:V2}\NormalTok{))}
+\NormalTok{                    (}\KeywordTok{fn}\NormalTok{ [ds] \{}\AttributeTok{:sum-v1}\NormalTok{ (}\KeywordTok{reduce} \KeywordTok{+}\NormalTok{ (ds }\AttributeTok{:V1}\NormalTok{))}
+                             \AttributeTok{:prod-v3}\NormalTok{ (}\KeywordTok{reduce} \KeywordTok{*}\NormalTok{ (ds }\AttributeTok{:V3}\NormalTok{))\})] \{}\AttributeTok{:default-column-name-prefix} \StringTok{"V2-value"}
+                                                              \AttributeTok{:ungroup}\NormalTok{? }\VariableTok{false}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:name & :group-id & :data\tabularnewline
+\midrule
+\endhead
+\{:V3 1.0\} & 0 & \_unnamed {[}1 5{]}:\tabularnewline
+\{:V3 0.5\} & 1 & \_unnamed {[}1 5{]}:\tabularnewline
+\{:V3 1.5\} & 2 & \_unnamed {[}1 5{]}:\tabularnewline
+\bottomrule
+\end{longtable}
+
 \subsubsection{Order}\label{order}
+
+Ordering can be done by column(s) or any function operating on row.
+Possible order can be:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{:asc} for ascending order (default)
+\item
+  \texttt{:desc} for descending order
+\item
+  custom comparator
+\end{itemize}
+
+\texttt{:limit-columns} limits row map provided to ordering functions.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Order by single column, ascending
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/order-by DS }\AttributeTok{:V1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Descending order
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/order-by DS }\AttributeTok{:V1} \AttributeTok{:desc}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 2 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Order by two columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/order-by DS [}\AttributeTok{:V1} \AttributeTok{:V2}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Use different orders for columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/order-by DS [}\AttributeTok{:V1} \AttributeTok{:V2}\NormalTok{] [}\AttributeTok{:asc} \AttributeTok{:desc}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 9 & 1.500 & C\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/order-by DS [}\AttributeTok{:V1} \AttributeTok{:V2}\NormalTok{] [}\AttributeTok{:desc} \AttributeTok{:desc}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 8 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/order-by DS [}\AttributeTok{:V1} \AttributeTok{:V3}\NormalTok{] [}\AttributeTok{:desc} \AttributeTok{:asc}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 4 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Custom function can be used to provied ordering key. Here order by
+\texttt{:V4} descending, then by product of other columns ascending.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/order-by DS [}\AttributeTok{:V4}\NormalTok{ (}\KeywordTok{fn}\NormalTok{ [row] (}\KeywordTok{*}\NormalTok{ (}\AttributeTok{:V1}\NormalTok{ row)}
+\NormalTok{                                  (}\AttributeTok{:V2}\NormalTok{ row)}
+\NormalTok{                                  (}\AttributeTok{:V3}\NormalTok{ row)))] [}\AttributeTok{:desc} \AttributeTok{:asc}\NormalTok{] \{}\AttributeTok{:limit-columns}\NormalTok{ [}\AttributeTok{:V1} \AttributeTok{:V2} \AttributeTok{:V3}\NormalTok{]\})}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Custom comparator also can be used in case objects are not comparable by
+default. Let's define artificial one: if euclidean distance is lower
+than 2, compare along \texttt{z} else along \texttt{x} and \texttt{y}.
+We use first three columns for that.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{defn}\FunctionTok{ dist}
+\NormalTok{  [v1 v2]}
+\NormalTok{  (}\KeywordTok{->>}\NormalTok{ v2}
+\NormalTok{       (}\KeywordTok{map} \KeywordTok{-}\NormalTok{ v1)}
+\NormalTok{       (}\KeywordTok{map}\NormalTok{ #(}\KeywordTok{*} \VariableTok{%} \VariableTok{%}\NormalTok{))}
+\NormalTok{       (}\KeywordTok{reduce} \KeywordTok{+}\NormalTok{)}
+\NormalTok{       (Math/sqrt)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#'user/dist
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/order-by DS [}\AttributeTok{:V1} \AttributeTok{:V2} \AttributeTok{:V3}\NormalTok{] (}\KeywordTok{fn}\NormalTok{ [[x1 y1 z1 }\AttributeTok{:as}\NormalTok{ v1] [x2 y2 z2 }\AttributeTok{:as}\NormalTok{ v2]]}
+\NormalTok{                                 (}\KeywordTok{let}\NormalTok{ [d (dist v1 v2)]}
+\NormalTok{                                   (}\KeywordTok{if}\NormalTok{ (}\KeywordTok{<}\NormalTok{ d }\FloatTok{2.0}\NormalTok{)}
+\NormalTok{                                     (}\KeywordTok{compare}\NormalTok{ z1 z2)}
+\NormalTok{                                     (}\KeywordTok{compare}\NormalTok{ [x1 y1] [x2 y2])))))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
 
 \subsubsection{Unique}\label{unique}
 
+Remove rows which contains the same data. By default \texttt{unique-by}
+removes duplicates from whole dataset. You can also pass list of columns
+or functions (similar as in \texttt{group-by}) to remove duplicates
+limited by them. Default strategy is to keep the first row. More
+strategies below.
+
+\texttt{unique-by} works on groups
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Remove duplicates from whole dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/unique-by DS)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Remove duplicates from each group selected by column.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/unique-by DS }\AttributeTok{:V1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}2 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Pair of columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/unique-by DS [}\AttributeTok{:V1} \AttributeTok{:V3}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}6 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Also function can be used, split dataset by modulo 3 on columns
+\texttt{:V2}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/unique-by DS (}\KeywordTok{fn}\NormalTok{ [m] (}\KeywordTok{mod}\NormalTok{ (}\AttributeTok{:V2}\NormalTok{ m) }\DecValTok{3}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+The same can be achived with \texttt{group-by}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by (}\KeywordTok{fn}\NormalTok{ [m] (}\KeywordTok{mod}\NormalTok{ (}\AttributeTok{:V2}\NormalTok{ m) }\DecValTok{3}\NormalTok{)))}
+\NormalTok{    (api/first)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 3 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Grouped dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/unique-by }\AttributeTok{:V1}\NormalTok{)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}6 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
 \paragraph{Strategies}\label{strategies}
+
+There are 4 strategies defined:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{:first} - select first row (default)
+\item
+  \texttt{:last} - select last row
+\item
+  \texttt{:random} - select random row
+\item
+  any function - apply function to a columns which are subject of
+  uniqueness
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Last
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/unique-by DS }\AttributeTok{:V1}\NormalTok{ \{}\AttributeTok{:strategy} \AttributeTok{:last}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}2 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 8 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Random
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/unique-by DS }\AttributeTok{:V1}\NormalTok{ \{}\AttributeTok{:strategy} \AttributeTok{:random}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}2 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Pack columns into vector
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/unique-by DS }\AttributeTok{:V4}\NormalTok{ \{}\AttributeTok{:strategy} \KeywordTok{vec}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V3\tabularnewline
+\midrule
+\endhead
+{[}2 1 2{]} & {[}2 5 8{]} & {[}1.0 1.0 1.0{]}\tabularnewline
+{[}1 2 1{]} & {[}3 6 9{]} & {[}1.5 1.5 1.5{]}\tabularnewline
+{[}1 2 1{]} & {[}1 4 7{]} & {[}0.5 0.5 0.5{]}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Sum columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/unique-by DS }\AttributeTok{:V4}\NormalTok{ \{}\AttributeTok{:strategy}\NormalTok{ (}\KeywordTok{partial} \KeywordTok{reduce} \KeywordTok{+}\NormalTok{)\})}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V3\tabularnewline
+\midrule
+\endhead
+5 & 15 & 3.000\tabularnewline
+4 & 18 & 4.500\tabularnewline
+4 & 12 & 1.500\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Group by function and apply functions
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/unique-by DS (}\KeywordTok{fn}\NormalTok{ [m] (}\KeywordTok{mod}\NormalTok{ (}\AttributeTok{:V2}\NormalTok{ m) }\DecValTok{3}\NormalTok{)) \{}\AttributeTok{:strategy} \KeywordTok{vec}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+{[}1 2 1{]} & {[}3 6 9{]} & {[}1.5 1.5 1.5{]} & {[}``C'' ``C''
+``C''{]}\tabularnewline
+{[}1 2 1{]} & {[}1 4 7{]} & {[}0.5 0.5 0.5{]} & {[}``A'' ``A''
+``A''{]}\tabularnewline
+{[}2 1 2{]} & {[}2 5 8{]} & {[}1.0 1.0 1.0{]} & {[}``B'' ``B''
+``B''{]}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Grouped dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V1}\NormalTok{)}
+\NormalTok{    (api/unique-by (}\KeywordTok{fn}\NormalTok{ [m] (}\KeywordTok{mod}\NormalTok{ (}\AttributeTok{:V2}\NormalTok{ m) }\DecValTok{3}\NormalTok{)) \{}\AttributeTok{:strategy} \KeywordTok{vec}\NormalTok{\})}
+\NormalTok{    (api/ungroup \{}\AttributeTok{:add-group-as-column} \AttributeTok{:from-V1}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}6 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:from-V1 & :V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & {[}1 1{]} & {[}3 9{]} & {[}1.5 1.5{]} & {[}``C''
+``C''{]}\tabularnewline
+1 & {[}1 1{]} & {[}1 7{]} & {[}0.5 0.5{]} & {[}``A''
+``A''{]}\tabularnewline
+1 & {[}1{]} & {[}5{]} & {[}1.0{]} & {[}``B''{]}\tabularnewline
+2 & {[}2{]} & {[}6{]} & {[}1.5{]} & {[}``C''{]}\tabularnewline
+2 & {[}2{]} & {[}4{]} & {[}0.5{]} & {[}``A''{]}\tabularnewline
+2 & {[}2 2{]} & {[}2 8{]} & {[}1.0 1.0{]} & {[}``B''
+``B''{]}\tabularnewline
+\bottomrule
+\end{longtable}
 
 \subsubsection{Missing}\label{missing}
 
+When dataset contains missing values you can select or drop rows with
+missing values or replace them using some strategy.
+
+\texttt{column-selector} can be used to limit considered columns
+
+Let's define dataset which contains missing values
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DSm }\NormalTok{(api/dataset \{}\AttributeTok{:V1}\NormalTok{ (}\KeywordTok{take} \DecValTok{9}\NormalTok{ (}\KeywordTok{cycle}\NormalTok{ [}\DecValTok{1} \DecValTok{2} \VariableTok{nil}\NormalTok{]))}
+                       \AttributeTok{:V2}\NormalTok{ (}\KeywordTok{range} \DecValTok{1} \DecValTok{10}\NormalTok{)}
+                       \AttributeTok{:V3}\NormalTok{ (}\KeywordTok{take} \DecValTok{9}\NormalTok{ (}\KeywordTok{cycle}\NormalTok{ [}\FloatTok{0.5} \FloatTok{1.0} \VariableTok{nil} \FloatTok{1.5}\NormalTok{]))}
+                       \AttributeTok{:V4}\NormalTok{ (}\KeywordTok{take} \DecValTok{9}\NormalTok{ (}\KeywordTok{cycle}\NormalTok{ [}\CharTok{\textbackslash{}A} \CharTok{\textbackslash{}B} \CharTok{\textbackslash{}C}\NormalTok{]))\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DSm}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+& 3 & & C\tabularnewline
+1 & 4 & 1.500 & A\tabularnewline
+2 & 5 & 0.5000 & B\tabularnewline
+& 6 & 1.000 & C\tabularnewline
+1 & 7 & & A\tabularnewline
+2 & 8 & 1.500 & B\tabularnewline
+& 9 & 0.5000 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
 \paragraph{Select}\label{select-2}
+
+Select rows with missing values
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/select-missing DSm)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}4 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+& 3 & & C\tabularnewline
+& 6 & 1.000 & C\tabularnewline
+1 & 7 & & A\tabularnewline
+& 9 & 0.5000 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Select rows with missing values in \texttt{:V1}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/select-missing DSm }\AttributeTok{:V1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+& 3 & & C\tabularnewline
+& 6 & 1.000 & C\tabularnewline
+& 9 & 0.5000 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+The same with grouped dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DSm}
+\NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/select-missing }\AttributeTok{:V3}\NormalTok{)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}2 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 7 & & A\tabularnewline
+& 3 & & C\tabularnewline
+\bottomrule
+\end{longtable}
 
 \paragraph{Drop}\label{drop-2}
 
+Drop rows with missing values
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/drop-missing DSm)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}5 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 4 & 1.500 & A\tabularnewline
+2 & 5 & 0.5000 & B\tabularnewline
+2 & 8 & 1.500 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Drop rows with missing values in \texttt{:V1}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/drop-missing DSm }\AttributeTok{:V1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}6 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 4 & 1.500 & A\tabularnewline
+2 & 5 & 0.5000 & B\tabularnewline
+1 & 7 & & A\tabularnewline
+2 & 8 & 1.500 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+The same with grouped dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DSm}
+\NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/drop-missing }\AttributeTok{:V1}\NormalTok{)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}6 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 4 & 1.500 & A\tabularnewline
+1 & 7 & & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 5 & 0.5000 & B\tabularnewline
+2 & 8 & 1.500 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
 \paragraph{Replace}\label{replace}
+
+Missing values can be replaced using several strategies.
+\texttt{replace-missing} accepts:
+
+\begin{itemize}
+\tightlist
+\item
+  dataset
+\item
+  column selector
+\item
+  value
+
+  \begin{itemize}
+  \tightlist
+  \item
+    single value
+  \item
+    sequence of values (cycled)
+  \item
+    function, applied on column(s) with stripped missings
+  \end{itemize}
+\item
+  strategy (optional)
+\end{itemize}
+
+Strategies are:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{:value} - replace with given value (default)
+\item
+  \texttt{:up} - copy values up
+\item
+  \texttt{:down} - copy values down
+\end{itemize}
+
+Let's define special dataset here:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DSm2 }\NormalTok{(api/dataset \{}\AttributeTok{:a}\NormalTok{ [}\VariableTok{nil} \VariableTok{nil} \VariableTok{nil} \FloatTok{1.0} \DecValTok{2}   \VariableTok{nil} \DecValTok{4}   \VariableTok{nil}  \DecValTok{11} \VariableTok{nil} \VariableTok{nil}\NormalTok{]}
+                        \AttributeTok{:b}\NormalTok{ [}\FloatTok{2.0}   \DecValTok{2}   \DecValTok{2} \VariableTok{nil} \VariableTok{nil} \DecValTok{3}   \VariableTok{nil}   \DecValTok{3}  \DecValTok{4}  \DecValTok{5} \DecValTok{5}\NormalTok{]\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DSm2}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}11 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:a & :b\tabularnewline
+\midrule
+\endhead
+& 2.000\tabularnewline
+& 2.000\tabularnewline
+& 2.000\tabularnewline
+1.000 &\tabularnewline
+2.000 &\tabularnewline
+& 3.000\tabularnewline
+4.000 &\tabularnewline
+& 3.000\tabularnewline
+11.00 & 4.000\tabularnewline
+& 5.000\tabularnewline
+& 5.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Replace missing with single value in whole dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/replace-missing DSm2 }\DecValTok{999}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}11 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:a & :b\tabularnewline
+\midrule
+\endhead
+999.0 & 2.000\tabularnewline
+999.0 & 2.000\tabularnewline
+999.0 & 2.000\tabularnewline
+1.000 & 999.0\tabularnewline
+2.000 & 999.0\tabularnewline
+999.0 & 3.000\tabularnewline
+4.000 & 999.0\tabularnewline
+999.0 & 3.000\tabularnewline
+11.00 & 4.000\tabularnewline
+999.0 & 5.000\tabularnewline
+999.0 & 5.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Replace missing with single value in \texttt{:a} column
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/replace-missing DSm2 }\AttributeTok{:a} \DecValTok{999}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}11 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:a & :b\tabularnewline
+\midrule
+\endhead
+999.0 & 2.000\tabularnewline
+999.0 & 2.000\tabularnewline
+999.0 & 2.000\tabularnewline
+1.000 &\tabularnewline
+2.000 &\tabularnewline
+999.0 & 3.000\tabularnewline
+4.000 &\tabularnewline
+999.0 & 3.000\tabularnewline
+11.00 & 4.000\tabularnewline
+999.0 & 5.000\tabularnewline
+999.0 & 5.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Replace missing with sequence in \texttt{:a} column
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/replace-missing DSm2 }\AttributeTok{:a}\NormalTok{ [-}\DecValTok{999} \DecValTok{-998} \DecValTok{-997}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}11 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:a & :b\tabularnewline
+\midrule
+\endhead
+-999.0 & 2.000\tabularnewline
+-998.0 & 2.000\tabularnewline
+-997.0 & 2.000\tabularnewline
+1.000 &\tabularnewline
+2.000 &\tabularnewline
+-999.0 & 3.000\tabularnewline
+4.000 &\tabularnewline
+-998.0 & 3.000\tabularnewline
+11.00 & 4.000\tabularnewline
+-997.0 & 5.000\tabularnewline
+-999.0 & 5.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Replace missing with a function (mean)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/replace-missing DSm2 }\AttributeTok{:a}\NormalTok{ tech.v2.datatype.functional/mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}11 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:a & :b\tabularnewline
+\midrule
+\endhead
+4.500 & 2.000\tabularnewline
+4.500 & 2.000\tabularnewline
+4.500 & 2.000\tabularnewline
+1.000 &\tabularnewline
+2.000 &\tabularnewline
+4.500 & 3.000\tabularnewline
+4.000 &\tabularnewline
+4.500 & 3.000\tabularnewline
+11.00 & 4.000\tabularnewline
+4.500 & 5.000\tabularnewline
+4.500 & 5.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Using \texttt{:down} strategy, fills gaps with values from above. You
+can see that if missings are at the beginning, they are left missing.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/replace-missing DSm2 [}\AttributeTok{:a} \AttributeTok{:b}\NormalTok{] }\VariableTok{nil} \AttributeTok{:down}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}11 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:a & :b\tabularnewline
+\midrule
+\endhead
+& 2.000\tabularnewline
+& 2.000\tabularnewline
+& 2.000\tabularnewline
+1.000 & 2.000\tabularnewline
+2.000 & 2.000\tabularnewline
+2.000 & 3.000\tabularnewline
+4.000 & 3.000\tabularnewline
+4.000 & 3.000\tabularnewline
+11.00 & 4.000\tabularnewline
+11.00 & 5.000\tabularnewline
+11.00 & 5.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+To fix above issue you can provide value
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/replace-missing DSm2 [}\AttributeTok{:a} \AttributeTok{:b}\NormalTok{] }\DecValTok{999} \AttributeTok{:down}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}11 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:a & :b\tabularnewline
+\midrule
+\endhead
+999.0 & 2.000\tabularnewline
+999.0 & 2.000\tabularnewline
+999.0 & 2.000\tabularnewline
+1.000 & 2.000\tabularnewline
+2.000 & 2.000\tabularnewline
+2.000 & 3.000\tabularnewline
+4.000 & 3.000\tabularnewline
+4.000 & 3.000\tabularnewline
+11.00 & 4.000\tabularnewline
+11.00 & 5.000\tabularnewline
+11.00 & 5.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+The same applies for \texttt{:up} strategy which is opposite direction.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/replace-missing DSm2 [}\AttributeTok{:a} \AttributeTok{:b}\NormalTok{] }\DecValTok{999} \AttributeTok{:up}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}11 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:a & :b\tabularnewline
+\midrule
+\endhead
+1.000 & 2.000\tabularnewline
+1.000 & 2.000\tabularnewline
+1.000 & 2.000\tabularnewline
+1.000 & 3.000\tabularnewline
+2.000 & 3.000\tabularnewline
+4.000 & 3.000\tabularnewline
+4.000 & 3.000\tabularnewline
+11.00 & 3.000\tabularnewline
+11.00 & 4.000\tabularnewline
+999.0 & 5.000\tabularnewline
+999.0 & 5.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+We can use a function which is applied after applying \texttt{:up} or
+\texttt{:down}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/replace-missing DSm2 [}\AttributeTok{:a} \AttributeTok{:b}\NormalTok{] tech.v2.datatype.functional/mean }\AttributeTok{:down}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}11 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:a & :b\tabularnewline
+\midrule
+\endhead
+4.500 & 2.000\tabularnewline
+4.500 & 2.000\tabularnewline
+4.500 & 2.000\tabularnewline
+1.000 & 2.000\tabularnewline
+2.000 & 2.000\tabularnewline
+2.000 & 3.000\tabularnewline
+4.000 & 3.000\tabularnewline
+4.000 & 3.000\tabularnewline
+11.00 & 4.000\tabularnewline
+11.00 & 5.000\tabularnewline
+11.00 & 5.000\tabularnewline
+\bottomrule
+\end{longtable}
 
 \subsubsection{Join/Separate Columns}\label{joinseparate-columns}
 

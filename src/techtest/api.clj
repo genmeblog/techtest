@@ -74,6 +74,19 @@
                          first
                          last)
 
+(exporter/export-symbols techtest.api.aggregate
+                         aggregate)
+
+(exporter/export-symbols techtest.api.order-by
+                         order-by)
+
+(exporter/export-symbols techtest.api.unique-by
+                         unique-by)
+
+(exporter/export-symbols techtest.api.missing
+                         select-missing
+                         drop-missing
+                         replace-missing)
 ;; concat
 
 (defn concat
@@ -136,248 +149,22 @@
 ;; AGGREGATING
 ;;;;;;;;;;;;;;;;
 
-(defn- add-agg-result
-  [tot-res k agg-res]
-  (cond
-    (map? agg-res) (reduce conj tot-res agg-res)
-    (iterable-sequence? agg-res) (->> agg-res
-                                      (map-indexed vector)
-                                      (reduce (fn [b [id v]]
-                                                (conj b [(keyword (str (name k) "-" id)) v])) tot-res))
-    :else (conj tot-res [k agg-res])))
-
-(defn aggregate
-  "Aggregate dataset by providing:
-
-  - aggregation function
-  - map with column names and functions
-  - sequence of aggregation functions
-
-  Aggregation functions can return:
-  - single value
-  - seq of values
-  - map of values with column names"
-  ([ds fn-map-or-seq] (aggregate ds fn-map-or-seq nil))
-  ([ds fn-map-or-seq {:keys [default-column-name-prefix]
-                      :or {default-column-name-prefix "summary"}
-                      :as options}]
-   (if (grouped? ds)
-     (-> ds
-         (process-group-data #(aggregate % fn-map-or-seq options))
-         (ungroup {:add-group-as-column true}))
-     (cond
-       (fn? fn-map-or-seq) (aggregate ds {:summary fn-map-or-seq})
-       (iterable-sequence? fn-map-or-seq) (->> fn-map-or-seq
-                                               (zipmap (map #(->> %
-                                                                  (str default-column-name-prefix "-")
-                                                                  keyword) (range)))
-                                               (aggregate ds))
-       :else (dataset (reduce (fn [res [k f]]
-                                (add-agg-result res k (f ds))) [] fn-map-or-seq) options)))))
 
 
 ;;;;;;;;;;;;;
 ;; ORDERING
 ;;;;;;;;;;;;;
 
-(defn- comparator->fn
-  [c]
-  (cond
-    (fn? c) c
-    (= :desc c) (comp - compare)
-    :else compare))
-
-(defn asc-desc-comparator
-  [orders]
-  (if-not (iterable-sequence? orders)
-    (comparator->fn orders)
-    (if (every? #(= % :asc) orders)
-      compare
-      (let [comparators (map comparator->fn orders)]
-        (fn [v1 v2]
-          (loop [v1 v1
-                 v2 v2
-                 cmptrs comparators]
-            (if-let [cmptr (clojure.core/first cmptrs)]
-              (let [c (cmptr (clojure.core/first v1) (clojure.core/first v2))]
-                (if-not (zero? c)
-                  c
-                  (recur (rest v1) (rest v2) (rest cmptrs))))
-              0)))))))
-
-(defn order-by
-  "Order dataset by:
-
-  - column name
-  - columns (as sequence of names)
-  - key-fn
-  - sequence of columns / key-fn
-
-  Additionally you can ask the order by:
-  - :asc
-  - :desc
-  - custom comparator function"
-  ([ds columns-selector]
-   (order-by ds columns-selector (if (iterable-sequence? columns-selector)
-                                (repeat (count columns-selector) :asc)
-                                [:asc])))
-  ([ds columns-selector order-or-comparators]
-   (if (grouped? ds)
-
-     (process-group-data ds #(order-by % columns-selector order-or-comparators))
-
-     (let [comp-fn (asc-desc-comparator order-or-comparators)]
-       (cond
-         (iterable-sequence? columns-selector) (ds/sort-by (apply juxt (map #(if (fn? %)
-                                                                            %
-                                                                            (fn [ds] (get ds %))) columns-selector)) comp-fn ds)
-         (fn? columns-selector) (ds/sort-by columns-selector
-                                         comp-fn
-                                         ds)
-         :else (ds/sort-by-column columns-selector comp-fn ds))))))
 
 ;;;;;;;;;;;
 ;; UNIQUE
 ;;;;;;;;;;;
 
-(defn- strategy-first [k idxs] (clojure.core/first idxs))
-(defn- strategy-last [k idxs] (clojure.core/last idxs))
-(defn- strategy-random [k idxs] (clojure.core/rand-nth idxs))
-
-(def ^:private strategies
-  {:first strategy-first
-   :last strategy-last
-   :random strategy-random})
-
-(defn- strategy-fold
-  ([ds group-by-names] (strategy-fold ds group-by-names nil))
-  ([ds group-by-names fold-fn]
-   (let [target-names (column-names ds (complement (set group-by-names)))
-         fold-fn (or fold-fn vec)]
-     (-> (group-by ds group-by-names)
-         (process-group-data (fn [ds]
-                               (as-> ds ds
-                                 (select-columns ds target-names)
-                                 (dataset [(zipmap target-names (map fold-fn (ds/columns ds)))]))))
-         (ungroup {:add-group-as-column true})))))
-
-(defn unique-by
-  ([ds] (unique-by ds (ds/column-names ds)))
-  ([ds columns-selector] (unique-by ds columns-selector nil))
-  ([ds columns-selector {:keys [strategy fold-fn limit-columns]
-                         :or {strategy :first fold-fn vec}
-                         :as options}]
-   (if (grouped? ds)
-     (process-group-data ds #(unique-by % columns-selector options))
-
-     (if (= 1 (ds/row-count ds))
-       ds
-       (if (= strategy :fold)
-         (strategy-fold ds (column-names ds columns-selector) fold-fn)
-         (let [local-options {:keep-fn (get strategies strategy :first)}]
-           (cond
-             (iterable-sequence? columns-selector) (if (= (count columns-selector) 1)
-                                                     (ds/unique-by-column (clojure.core/first columns-selector) local-options ds)
-                                                     (ds/unique-by identity (assoc local-options :column-name-seq columns-selector) ds))
-             (fn? columns-selector) (ds/unique-by columns-selector (if limit-columns
-                                                                     (assoc local-options :column-name-seq limit-columns)
-                                                                     local-options) ds)
-             :else (ds/unique-by-column columns-selector local-options ds))))))))
 
 ;;;;;;;;;;;;
 ;; MISSING
 ;;;;;;;;;;;;
 
-(defn- select-or-drop-missing
-  "Select rows with missing values"
-  ([f ds] (select-or-drop-missing f ds nil))
-  ([f ds columns-selector]
-   (if (grouped? ds)
-     (process-group-data ds #(select-or-drop-missing f % columns-selector))
-
-     (let [ds- (if columns-selector
-                 (select-columns ds columns-selector)
-                 ds)]
-       (f ds (ds/missing ds-))))))
-
-(defn- select-or-drop-missing-docstring
-  [op]
-  (str op " rows with missing values
-
- `columns-selector` selects columns to look at missing values"))
-
-(def ^{:doc (select-or-drop-missing-docstring "Select")}
-  select-missing (partial select-or-drop-missing ds/select-rows))
-
-(def ^{:doc (select-or-drop-missing-docstring "Drop")}
-  drop-missing (partial select-or-drop-missing ds/drop-rows))
-
-(defn- remove-from-rbitmap
-  ^RoaringBitmap [^RoaringBitmap rb ks]
-  (let [rb (.clone rb)]
-    (reduce (fn [^RoaringBitmap rb ^long k]
-              (.remove rb k)
-              rb) rb ks)))
-
-(defn- replace-missing-with-value
-  [col missing value]
-  (col/new-column (col/column-name col)
-                  (update-rdr/update-reader col (cond
-                                                  (map? value) value
-                                                  (iterable-sequence? value) (zipmap missing (cycle value))
-                                                  :else (bitmap/bitmap-value->bitmap-map missing value)))
-                  {} (if (map? value)
-                       (remove-from-rbitmap missing (keys value))
-                       (RoaringBitmap.))))
-
-(defn- missing-direction-prev
-  ^long [^RoaringBitmap rb ^long idx]
-  (.previousAbsentValue rb idx))
-
-(defn- missing-direction-next
-  ^long [^RoaringBitmap rb ^long idx]
-  (.nextAbsentValue rb idx))
-
-(defn- replace-missing-with-direction
-  [f col missing value]
-  (let [cnt (dtype/ecount col)
-        step1 (replace-missing-with-value col missing (reduce (fn [m v]
-                                                                (let [vv (f missing v)]
-                                                                  (if (< -1 vv cnt)
-                                                                    (assoc m v (dtype/get-value col vv))
-                                                                    m))) {} missing))]
-    (if (or (nil? value)
-            (empty? (col/missing step1)))
-      step1
-      (replace-missing-with-value step1 (col/missing step1) value))))
-
-(defn- replace-missing-with-strategy
-  [col missing value strategy]
-  (let [value (if (fn? value)
-                (value (dtype/->reader col (dtype/get-datatype col) {:missing-policy :elide}))
-                value)]
-    (condp = strategy
-      :down (replace-missing-with-direction missing-direction-prev col missing value)
-      :up (replace-missing-with-direction missing-direction-next col missing value)
-      (replace-missing-with-value col missing value))))
-
-(defn replace-missing
-  ([ds columns-selector value] (replace-missing ds columns-selector value nil))
-  ([ds columns-selector value {:keys [strategy]
-                            :or {strategy :value}
-                            :as options}]
-
-   (if (grouped? ds)
-
-     (process-group-data ds #(replace-missing % columns-selector value options))
-     
-     (let [cols (column-names ds columns-selector)]
-       (reduce (fn [ds colname]
-                 (let [col (ds colname)
-                       missing (col/missing col)]
-                   (if-not (empty? missing)
-                     (ds/add-or-update-column ds (replace-missing-with-strategy col missing value strategy))
-                     ds))) ds cols)))))
 
 ;;;;;;;;;;;;;;;
 ;; JOIN/SPLIT
@@ -697,7 +484,7 @@
 
 (order-by DS [:V4 (fn [row] (* (:V1 row)
                               (:V2 row)
-                              (:V3 row)))] [#(if (= %1 %2) -1 0) :asc])
+                              (:V3 row)))] [:desc :asc])
 
 (ungroup (order-by (group-by DS :V4) [:V1 :V2] [:desc :desc]))
 
@@ -708,8 +495,13 @@
 (unique-by DS :V1 {:strategy :random})
 (unique-by DS :V1 {:strategy :fold})
 
-(unique-by DS :V4 {:strategy :fold
-                   :fold-fn dfn/sum})
+(unique-by DS :V4 {:strategy vec})
+
+(unique-by DS :V4 {:strategy (partial reduce +)})
+
+
+(unique-by DS (fn [m] (mod (:V2 m) 3)) {:strategy vec})
+
 
 (unique-by DS [:V1 :V4])
 (unique-by DS [:V1 :V4] {:strategy :last})

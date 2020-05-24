@@ -16,6 +16,7 @@ output:
         smart: false
     pdf_document:
         highlight: tango
+        latex_engine: xelatex
     md_document:
         variant: markdown_github
 ---
@@ -95,7 +96,7 @@ Let's require main namespace and define dataset used in most examples:
 (def DS (api/dataset {:V1 (take 9 (cycle [1 2]))
                       :V2 (range 1 10)
                       :V3 (take 9 (cycle [0.5 1.0 1.5]))
-                      :V4 (take 9 (cycle [\A \B \C]))}))
+                      :V4 (take 9 (cycle ["A" "B" "C"]))}))
 ```
 
 ```{clojure results="asis"}
@@ -597,7 +598,7 @@ If we group by map, we can automatically create new columns out of group names.
 (-> DS
     (api/group-by (fn [row] {"V1 and V3 multiplied" (* (:V1 row)
                                                       (:V3 row))
-                            "V4 as string" (str (:V4 row))}))
+                            "V4 as lowercase" (clojure.string/lower-case (:V4 row))}))
     (api/ungroup {:add-group-as-column true}))
 ```
 
@@ -609,7 +610,7 @@ We can add group names without separation
 (-> DS
     (api/group-by (fn [row] {"V1 and V3 multiplied" (* (:V1 row)
                                                       (:V3 row))
-                            "V4 as string" (str (:V4 row))}))
+                            "V4 as lowercase" (clojure.string/lower-case (:V4 row))}))
     (api/ungroup {:add-group-as-column "just map"
                   :separate? false}))
 ```
@@ -1061,7 +1062,7 @@ Using custom converter. Let's treat `:V4` as haxadecimal values. See that this w
 
 ```{clojure results="asis"}
 (-> DS
-    (api/convert-column-type :V4 [:int16 #(Integer/parseInt (str %) 16)]))
+    (api/convert-column-type :V4 [:int16 #(Integer/parseInt % 16)]))
 ```
 
 ---
@@ -1073,7 +1074,7 @@ You can process several columns at once
     (api/convert-column-type {:V1 :float64
                               :V2 :object
                               :V3 [:boolean #(< % 1.0)]
-                              :V4 :string})
+                              :V4 :object})
     (api/info :columns))
 ```
 
@@ -1288,19 +1289,440 @@ Select 5 random rows from each group
 
 ### Aggregate
 
+Aggregating is a function which produces single row out of dataset. 
+
+Aggregator is a function or sequence or map of functions which accept dataset as an argument and result single value, sequence of values or map.
+
+Where map is given as an input or result, keys are treated as column names.
+
+Grouped dataset is ungrouped after aggreation. This can be turned of by setting `:ungroup` to false. In case you want to pass additional ungrouping parameters add them to the options.
+
+By default resulting column names are prefixed with `summary` prefix (set it with `:default-column-name-prefix` option).
+
+---
+
+Let's calculate mean of some columns
+
+```{clojure results="asis"}
+(api/aggregate DS #(reduce + (% :V2)))
+```
+
+---
+
+Let's give resulting column a name.
+
+```{clojure results="asis"}
+(api/aggregate DS {:sum-of-V2 #(reduce + (% :V2))})
+```
+
+--- 
+
+Sequential result is spread into separate columns
+
+```{clojure results="asis"}
+(api/aggregate DS #(take 5(% :V2)))
+```
+
+---
+
+You can combine all variants and rename default prefix
+
+```{clojure results="asis"}
+(api/aggregate DS [#(take 3 (% :V2))
+                   (fn [ds] {:sum-v1 (reduce + (ds :V1))
+                            :prod-v3 (reduce * (ds :V3))})] {:default-column-name-prefix "V2-value"})
+```
+
+---
+
+Processing grouped dataset
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by [:V4])
+    (api/aggregate [#(take 3 (% :V2))
+                    (fn [ds] {:sum-v1 (reduce + (ds :V1))
+                             :prod-v3 (reduce * (ds :V3))})] {:default-column-name-prefix "V2-value"}))
+```
+
+Result of aggregating is automatically ungrouped, you can skip this step by stetting `:ungroup` option to `false`.
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by [:V3])
+    (api/aggregate [#(take 3 (% :V2))
+                    (fn [ds] {:sum-v1 (reduce + (ds :V1))
+                             :prod-v3 (reduce * (ds :V3))})] {:default-column-name-prefix "V2-value"
+                                                              :ungroup? false}))
+```
+
 ### Order
+
+Ordering can be done by column(s) or any function operating on row. Possible order can be:
+
+* `:asc` for ascending order (default)
+* `:desc` for descending order
+* custom comparator
+
+`:limit-columns` limits row map provided to ordering functions.
+
+---
+
+Order by single column, ascending
+
+```{clojure results="asis"}
+(api/order-by DS :V1)
+```
+
+---
+
+Descending order
+
+```{clojure results="asis"}
+(api/order-by DS :V1 :desc)
+```
+
+---
+
+Order by two columns
+
+```{clojure results="asis"}
+(api/order-by DS [:V1 :V2])
+```
+
+---
+
+Use different orders for columns
+
+```{clojure results="asis"}
+(api/order-by DS [:V1 :V2] [:asc :desc])
+```
+
+```{clojure results="asis"}
+(api/order-by DS [:V1 :V2] [:desc :desc])
+```
+
+```{clojure results="asis"}
+(api/order-by DS [:V1 :V3] [:desc :asc])
+```
+
+---
+
+Custom function can be used to provied ordering key. Here order by `:V4` descending, then by product of other columns ascending.
+
+```{clojure results="asis"}
+(api/order-by DS [:V4 (fn [row] (* (:V1 row)
+                                  (:V2 row)
+                                  (:V3 row)))] [:desc :asc] {:limit-columns [:V1 :V2 :V3]})
+```
+
+---
+
+Custom comparator also can be used in case objects are not comparable by default. Let's define artificial one: if euclidean distance is lower than 2, compare along `z` else along `x` and `y`. We use first three columns for that.
+
+```{clojure}
+(defn dist
+  [v1 v2]
+  (->> v2
+       (map - v1)
+       (map #(* % %))
+       (reduce +)
+       (Math/sqrt)))
+```
+
+```{clojure results="asis"}
+(api/order-by DS [:V1 :V2 :V3] (fn [[x1 y1 z1 :as v1] [x2 y2 z2 :as v2]]
+                                 (let [d (dist v1 v2)]
+                                   (if (< d 2.0)
+                                     (compare z1 z2)
+                                     (compare [x1 y1] [x2 y2])))))
+```
 
 ### Unique
 
+Remove rows which contains the same data. By default `unique-by` removes duplicates from whole dataset. You can also pass list of columns or functions (similar as in `group-by`) to remove duplicates limited by them. Default strategy is to keep the first row. More strategies below.
+
+`unique-by` works on groups
+
+---
+
+Remove duplicates from whole dataset
+
+```{clojure results="asis"}
+(api/unique-by DS)
+```
+
+---
+
+Remove duplicates from each group selected by column.
+
+```{clojure results="asis"}
+(api/unique-by DS :V1)
+```
+
+--- 
+
+Pair of columns
+
+```{clojure results="asis"}
+(api/unique-by DS [:V1 :V3])
+```
+
+---
+
+Also function can be used, split dataset by modulo 3 on columns `:V2`
+
+```{clojure results="asis"}
+(api/unique-by DS (fn [m] (mod (:V2 m) 3)))
+```
+
+---
+
+The same can be achived with `group-by`
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by (fn [m] (mod (:V2 m) 3)))
+    (api/first)
+    (api/ungroup))
+```
+
+---
+
+Grouped dataset
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V4)
+    (api/unique-by :V1)
+    (api/ungroup))
+```
+
 #### Strategies
+
+There are 4 strategies defined:
+
+* `:first` - select first row (default)
+* `:last` - select last row
+* `:random` - select random row
+* any function - apply function to a columns which are subject of uniqueness
+
+---
+
+Last
+
+```{clojure results="asis"}
+(api/unique-by DS :V1 {:strategy :last})
+```
+
+---
+
+Random
+
+```{clojure results="asis"}
+(api/unique-by DS :V1 {:strategy :random})
+```
+
+---
+
+Pack columns into vector
+
+```{clojure results="asis"}
+(api/unique-by DS :V4 {:strategy vec})
+```
+
+---
+
+Sum columns
+
+```{clojure results="asis"}
+(api/unique-by DS :V4 {:strategy (partial reduce +)})
+```
+
+---
+
+Group by function and apply functions
+
+```{clojure results="asis"}
+(api/unique-by DS (fn [m] (mod (:V2 m) 3)) {:strategy vec})
+```
+
+---
+
+Grouped dataset
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V1)
+    (api/unique-by (fn [m] (mod (:V2 m) 3)) {:strategy vec})
+    (api/ungroup {:add-group-as-column :from-V1}))
+```
 
 ### Missing
 
+When dataset contains missing values you can select or drop rows with missing values or replace them using some strategy.
+
+`column-selector` can be used to limit considered columns
+
+Let's define dataset which contains missing values
+
+```{clojure results="hide"}
+(def DSm (api/dataset {:V1 (take 9 (cycle [1 2 nil]))
+                       :V2 (range 1 10)
+                       :V3 (take 9 (cycle [0.5 1.0 nil 1.5]))
+                       :V4 (take 9 (cycle [\A \B \C]))}))
+```
+
+```{clojure results="asis"}
+DSm
+```
+
 #### Select
+
+Select rows with missing values
+
+```{clojure results="asis"}
+(api/select-missing DSm)
+```
+
+---
+
+Select rows with missing values in `:V1`
+
+```{clojure results="asis"}
+(api/select-missing DSm :V1)
+```
+
+---
+
+The same with grouped dataset
+
+```{clojure results="asis"}
+(-> DSm
+    (api/group-by :V4)
+    (api/select-missing :V3)
+    (api/ungroup))
+```
 
 #### Drop
 
+Drop rows with missing values
+
+```{clojure results="asis"}
+(api/drop-missing DSm)
+```
+
+---
+
+Drop rows with missing values in `:V1`
+
+```{clojure results="asis"}
+(api/drop-missing DSm :V1)
+```
+
+---
+
+The same with grouped dataset
+
+```{clojure results="asis"}
+(-> DSm
+    (api/group-by :V4)
+    (api/drop-missing :V1)
+    (api/ungroup))
+```
+
 #### Replace
+
+Missing values can be replaced using several strategies. `replace-missing` accepts:
+
+* dataset
+* column selector
+* value
+    - single value
+    - sequence of values (cycled)
+    - function, applied on column(s) with stripped missings
+* strategy (optional)
+
+Strategies are:
+
+* `:value` - replace with given value (default)
+* `:up` - copy values up
+* `:down` - copy values down
+
+Let's define special dataset here:
+
+```{clojure results="hide"}
+(def DSm2 (api/dataset {:a [nil nil nil 1.0 2   nil 4   nil  11 nil nil]
+                        :b [2.0   2   2 nil nil 3   nil   3  4  5 5]}))
+```
+
+```{clojure results="asis"}
+DSm2
+```
+
+---
+
+Replace missing with single value in whole dataset
+
+```{clojure results="asis"}
+(api/replace-missing DSm2 999)
+```
+
+---
+
+Replace missing with single value in `:a` column
+
+```{clojure results="asis"}
+(api/replace-missing DSm2 :a 999)
+```
+
+---
+
+Replace missing with sequence in `:a` column
+
+```{clojure results="asis"}
+(api/replace-missing DSm2 :a [-999 -998 -997])
+```
+
+---
+
+Replace missing with a function (mean)
+
+```{clojure results="asis"}
+(api/replace-missing DSm2 :a tech.v2.datatype.functional/mean)
+```
+
+---
+
+Using `:down` strategy, fills gaps with values from above. You can see that if missings are at the beginning, they are left missing.
+
+```{clojure results="asis"}
+(api/replace-missing DSm2 [:a :b] nil :down)
+```
+
+---
+
+To fix above issue you can provide value
+
+```{clojure results="asis"}
+(api/replace-missing DSm2 [:a :b] 999 :down)
+```
+
+---
+
+The same applies for `:up` strategy which is opposite direction.
+
+```{clojure results="asis"}
+(api/replace-missing DSm2 [:a :b] 999 :up)
+```
+
+---
+
+We can use a function which is applied after applying `:up` or `:down`
+
+```{clojure results="asis"}
+(api/replace-missing DSm2 [:a :b] tech.v2.datatype.functional/mean :down)
+```
 
 ### Join/Separate Columns
 
