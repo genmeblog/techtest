@@ -5,7 +5,8 @@
 
             [techtest.api.utils :refer [iterable-sequence?]]
             [techtest.api.dataset :refer [dataset]]
-            [techtest.api.group-by :refer [grouped? process-group-data]]))
+            [techtest.api.group-by :refer [grouped? process-group-data]])
+  (:refer-clojure :exclude [group-by]))
 
 
 (defn- filter-column-names
@@ -179,3 +180,16 @@
                                 (ds/add-or-update-column ds colname)))
                        (try-convert-to-type ds colname new-type))
              (try-convert-to-type ds colname new-type))))))))
+
+(defn ->array
+  "Convert numerical column(s) to java array"
+  ([ds colname] (->array ds colname nil))
+  ([ds colname datatype]
+   (if (grouped? ds)
+     (map  #(->array % colname datatype) (ds :data))
+     (let [c (ds colname)]
+       (if (and datatype (not= datatype (dtype/get-datatype c)))
+         (dtype/make-array-of-type datatype c)
+         (dtype/->array-copy c))))))
+
+

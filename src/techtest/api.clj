@@ -12,7 +12,7 @@
 
             [tech.parallel.utils :as exporter]
             [techtest.api.utils :refer [map-kv map-v iterable-sequence?]])
-  (:refer-clojure :exclude [group-by drop concat])
+  (:refer-clojure :exclude [group-by drop concat rand-nth first last shuffle])
   (:import [org.roaringbitmap RoaringBitmap]))
 
 #_(set! *warn-on-reflection* true)
@@ -20,7 +20,6 @@
 ;; attempt to reorganized api
 
 ;; dataset
-
 
 
 (exporter/export-symbols tech.ml.dataset
@@ -61,7 +60,19 @@
                          add-or-update-columns
                          map-columns
                          reorder-columns
-                         convert-column-type)
+                         convert-column-type
+                         ->array)
+
+(exporter/export-symbols techtest.api.rows
+                         select-rows
+                         drop-rows
+                         head
+                         tail
+                         shuffle
+                         random
+                         rand-nth
+                         first
+                         last)
 
 ;; concat
 
@@ -78,7 +89,7 @@
   - map: column name -> column type"
   [ds columns-selector]
   (cond
-    (map? columns-selector) (reduce #(ds/unroll-column %1 (first %2) {:datatype (second %2)}) ds columns-selector)
+    (map? columns-selector) (reduce #(ds/unroll-column %1 (clojure.core/first %2) {:datatype (second %2)}) ds columns-selector)
     (iterable-sequence? columns-selector) (reduce #(ds/unroll-column %1 %2) ds columns-selector)
     :else (ds/unroll-column ds columns-selector)))
 
@@ -101,61 +112,6 @@
 ;; ROWS OPERATIONS
 ;;;;;;;;;;;;;;;;;;;;
 
-(defn- find-indexes-from-seq
-  "Find row indexes based on true/false values or indexes"
-  [ds rows-selector]
-  (if (number? (first rows-selector))
-    rows-selector
-    (->> rows-selector
-         (take (ds/row-count ds))
-         (map-indexed vector)
-         (filter second)
-         (map first))))
-
-(defn- find-indexes-from-fn
-  "Filter rows"
-  [ds rows-selector limit-columns]
-  (->> (or limit-columns :all)
-       (ds/select-columns ds)
-       (ds/mapseq-reader)
-       (map-indexed vector)
-       (filter (comp rows-selector second))
-       (map first)))
-
-(defn- find-indexes
-  ([ds rows-selector] (find-indexes ds rows-selector nil))
-  ([ds rows-selector limit-columns]
-   (cond
-     (number? rows-selector) [(long rows-selector)]
-     (iterable-sequence? rows-selector) (find-indexes-from-seq ds rows-selector)
-     (fn? rows-selector) (find-indexes-from-fn ds rows-selector limit-columns))))
-
-(defn- select-or-drop-rows
-  "Select or drop rows."
-  ([f ds rows-selector] (select-or-drop-rows f ds rows-selector nil))
-  ([f ds rows-selector {:keys [limit-columns pre]
-                        :as options}]
-   (if (grouped? ds)
-     (let [pre-ds (map #(add-or-update-columns % pre) (ds :data))
-           indices (map #(find-indexes % rows-selector limit-columns) pre-ds)]       
-       (ds/add-or-update-column ds :data (map #(select-or-drop-rows f %1 %2) (ds :data) indices)))
-     
-     (f ds (find-indexes (add-or-update-columns ds pre) rows-selector limit-columns)))))
-
-(defn- select-or-drop-rows-docstring
-  [op]
-  (str op " rows using:
-
-  - row id
-  - seq of row ids
-  - seq of true/false
-  - fn with predicate"))
-
-(def ^{:doc (select-or-drop-rows-docstring "Select")}
-  select-rows (partial select-or-drop-rows ds/select-rows))
-
-(def ^{:doc (select-or-drop-rows-docstring "Drop")}
-  drop-rows (partial select-or-drop-rows ds/drop-rows))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;; COMBINED OPERATIONS
@@ -242,8 +198,8 @@
           (loop [v1 v1
                  v2 v2
                  cmptrs comparators]
-            (if-let [cmptr (first cmptrs)]
-              (let [c (cmptr (first v1) (first v2))]
+            (if-let [cmptr (clojure.core/first cmptrs)]
+              (let [c (cmptr (clojure.core/first v1) (clojure.core/first v2))]
                 (if-not (zero? c)
                   c
                   (recur (rest v1) (rest v2) (rest cmptrs))))
@@ -284,9 +240,9 @@
 ;; UNIQUE
 ;;;;;;;;;;;
 
-(defn- strategy-first [k idxs] (first idxs))
-(defn- strategy-last [k idxs] (last idxs))
-(defn- strategy-random [k idxs] (rand-nth idxs))
+(defn- strategy-first [k idxs] (clojure.core/first idxs))
+(defn- strategy-last [k idxs] (clojure.core/last idxs))
+(defn- strategy-random [k idxs] (clojure.core/rand-nth idxs))
 
 (def ^:private strategies
   {:first strategy-first
@@ -309,8 +265,8 @@
   ([ds] (unique-by ds (ds/column-names ds)))
   ([ds columns-selector] (unique-by ds columns-selector nil))
   ([ds columns-selector {:keys [strategy fold-fn limit-columns]
-                      :or {strategy :first fold-fn vec}
-                      :as options}]
+                         :or {strategy :first fold-fn vec}
+                         :as options}]
    (if (grouped? ds)
      (process-group-data ds #(unique-by % columns-selector options))
 
@@ -321,11 +277,11 @@
          (let [local-options {:keep-fn (get strategies strategy :first)}]
            (cond
              (iterable-sequence? columns-selector) (if (= (count columns-selector) 1)
-                                                  (ds/unique-by-column (first columns-selector) local-options ds)
-                                                  (ds/unique-by identity (assoc local-options :column-name-seq columns-selector) ds))
+                                                     (ds/unique-by-column (clojure.core/first columns-selector) local-options ds)
+                                                     (ds/unique-by identity (assoc local-options :column-name-seq columns-selector) ds))
              (fn? columns-selector) (ds/unique-by columns-selector (if limit-columns
-                                                               (assoc local-options :column-name-seq limit-columns)
-                                                               local-options) ds)
+                                                                     (assoc local-options :column-name-seq limit-columns)
+                                                                     local-options) ds)
              :else (ds/unique-by-column columns-selector local-options ds))))))))
 
 ;;;;;;;;;;;;
@@ -545,7 +501,7 @@
    (let [cols (column-names ds columns-selector meta-field)
          target-cols (if (iterable-sequence? target-cols) target-cols [target-cols])
          groups (cols->pre-longer ds cols target-cols value-column-name splitter)
-         cols-to-add (keys (first groups))
+         cols-to-add (keys (clojure.core/first groups))
          ds-template (drop-columns ds cols)
          cnt (ds/row-count ds-template)]
      (as-> (ds/set-metadata (->> groups                                        
@@ -602,7 +558,7 @@
                         (column-names ds)) ;; the columns used in join
          join-on-single? (= (count rest-cols) 1) ;; mayve this is one column? (different join column creation)
          join-name (if join-on-single?
-                     (first rest-cols)
+                     (clojure.core/first rest-cols)
                      (gensym (apply str "^____" rest-cols))) ;; generate join column name
          ;; col-to-drop (col-to-drop-name join-name) ;; what to drop after join
          pre-ds (if join-on-single?
@@ -701,6 +657,7 @@
 
 (select-rows DS 3)
 (drop-rows DS 3)
+
 
 (select-rows DS [3 4 7])
 (drop-rows DS [3 4 7])
@@ -819,10 +776,6 @@
 
 ;; private tests
 
-(find-indexes DS 1)
-(find-indexes DS [2 3])
-(find-indexes DS [true nil nil true])
-(find-indexes DS (comp #(< 1 %) :V1))
 
 ;;;;
 
@@ -1550,4 +1503,5 @@ df
 ;;    |----+----+----|
 ;;    |  5 |  a |  3 |
 ;;    |  6 |  b |  4 |
+
 

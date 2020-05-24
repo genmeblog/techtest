@@ -38,7 +38,10 @@
 
 (defn- subdataset
   [ds id k idxs]
-  (vary-meta (ds/set-dataset-name (ds/select ds :all idxs) k) assoc :group-id id))
+  (-> ds
+      (ds/select :all idxs)
+      (ds/set-dataset-name (str "Group: " k))
+      (vary-meta assoc :group-id id)))
 
 (defn- group-indexes->map
   "Create map representing grouped dataset from indexes"

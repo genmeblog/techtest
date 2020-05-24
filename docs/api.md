@@ -591,7 +591,7 @@ Rows as sequence of sequences
 (take 2 (api/rows ds))
 ```
 
-    ([#object[java.time.LocalDate 0x772795f0 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x616d0c9a "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+    ([#object[java.time.LocalDate 0x2025be13 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x2f37ffe4 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 
 ------------------------------------------------------------------------
 
@@ -601,13 +601,13 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
-    ({"date" #object[java.time.LocalDate 0x2bb745dc "2012-01-01"],
+    ({"date" #object[java.time.LocalDate 0x2544bfef "2012-01-01"],
       "precipitation" 0.0,
       "temp_min" 5.0,
       "weather" "drizzle",
       "temp_max" 12.8,
       "wind" 4.7}
-     {"date" #object[java.time.LocalDate 0x683d1ba4 "2012-01-02"],
+     {"date" #object[java.time.LocalDate 0x144a85aa "2012-01-02"],
       "precipitation" 10.9,
       "temp_min" 2.8,
       "weather" "rain",
@@ -624,10 +624,10 @@ Dataset is printed using `dataset->str` or `print-dataset` functions. Options ar
 
     _unnamed [2 3]:
 
-    | :name | :group-id |                                                                                                                                                                                                                                                                           :data |
-    |-------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-    |     1 |         0 | 1 [5 4]:<br><br>\| :V1 \| :V2 \|    :V3 \| :V4 \|<br>\|-----\|-----\|--------\|-----\|<br>\|   1 \|   1 \| 0.5000 \|   A \|<br>\|   1 \|   3 \|  1.500 \|   C \|<br>\|   1 \|   5 \|  1.000 \|   B \|<br>\|   1 \|   7 \| 0.5000 \|   A \|<br>\|   1 \|   9 \|  1.500 \|   C \| |
-    |     2 |         1 |                                      2 [4 4]:<br><br>\| :V1 \| :V2 \|    :V3 \| :V4 \|<br>\|-----\|-----\|--------\|-----\|<br>\|   2 \|   2 \|  1.000 \|   B \|<br>\|   2 \|   4 \| 0.5000 \|   A \|<br>\|   2 \|   6 \|  1.500 \|   C \|<br>\|   2 \|   8 \|  1.000 \|   B \| |
+    | :name | :group-id |                                                                                                                                                                                                                                                                                  :data |
+    |-------|-----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    |     1 |         0 | Group: 1 [5 4]:<br><br>\| :V1 \| :V2 \|    :V3 \| :V4 \|<br>\|-----\|-----\|--------\|-----\|<br>\|   1 \|   1 \| 0.5000 \|   A \|<br>\|   1 \|   3 \|  1.500 \|   C \|<br>\|   1 \|   5 \|  1.000 \|   B \|<br>\|   1 \|   7 \| 0.5000 \|   A \|<br>\|   1 \|   9 \|  1.500 \|   C \| |
+    |     2 |         1 |                                      Group: 2 [4 4]:<br><br>\| :V1 \| :V2 \|    :V3 \| :V4 \|<br>\|-----\|-----\|--------\|-----\|<br>\|   2 \|   2 \|  1.000 \|   B \|<br>\|   2 \|   4 \| 0.5000 \|   A \|<br>\|   2 \|   6 \|  1.500 \|   C \|<br>\|   2 \|   8 \|  1.000 \|   B \| |
 
 ``` clojure
 (api/print-dataset (api/group-by DS :V1) {:print-line-policy :repl})
@@ -637,7 +637,7 @@ Dataset is printed using `dataset->str` or `print-dataset` functions. Options ar
 
     | :name | :group-id |                             :data |
     |-------|-----------|-----------------------------------|
-    |     1 |         0 | 1 [5 4]:                          |
+    |     1 |         0 | Group: 1 [5 4]:                   |
     |       |           |                                   |
     |       |           | \| :V1 \| :V2 \|    :V3 \| :V4 \| |
     |       |           | \|-----\|-----\|--------\|-----\| |
@@ -646,7 +646,7 @@ Dataset is printed using `dataset->str` or `print-dataset` functions. Options ar
     |       |           | \|   1 \|   5 \|  1.000 \|   B \| |
     |       |           | \|   1 \|   7 \| 0.5000 \|   A \| |
     |       |           | \|   1 \|   9 \|  1.500 \|   C \| |
-    |     2 |         1 | 2 [4 4]:                          |
+    |     2 |         1 | Group: 2 [4 4]:                   |
     |       |           |                                   |
     |       |           | \| :V1 \| :V2 \|    :V3 \| :V4 \| |
     |       |           | \|-----\|-----\|--------\|-----\| |
@@ -718,7 +718,7 @@ Content of the grouped dataset
     :group-id
     [0, 1, ], :data #tech.ml.dataset.column<object>[2]
     :data
-    [1 [5 4]:
+    [Group: 1 [5 4]:
 
     | :V1 | :V2 |    :V3 | :V4 |
     |-----|-----|--------|-----|
@@ -727,7 +727,7 @@ Content of the grouped dataset
     |   1 |   5 |  1.000 |   B |
     |   1 |   7 | 0.5000 |   A |
     |   1 |   9 |  1.500 |   C |
-    , 2 [4 4]:
+    , Group: 2 [4 4]:
 
     | :V1 | :V2 |    :V3 | :V4 |
     |-----|-----|--------|-----|
@@ -751,7 +751,7 @@ Grouped dataset as map
 (vals (api/group-by DS :V1 {:result-type :as-map}))
 ```
 
-(1 \[5 4\]:
+(Group: 1 \[5 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
@@ -761,7 +761,7 @@ Grouped dataset as map
 | 1   | 7   | 0.5000 | A   |
 | 1   | 9   | 1.500  | C   |
 
-2 \[4 4\]:
+Group: 2 \[4 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
@@ -792,10 +792,10 @@ Grouped datasets are printed as follows by default.
 
 \_unnamed \[2 3\]:
 
-| :name | :group-id | :data      |
-|-------|-----------|------------|
-| 1     | 0         | 1 \[5 4\]: |
-| 2     | 1         | 2 \[4 4\]: |
+| :name | :group-id | :data             |
+|-------|-----------|-------------------|
+| 1     | 0         | Group: 1 \[5 4\]: |
+| 2     | 1         | Group: 2 \[4 4\]: |
 
 ------------------------------------------------------------------------
 
@@ -813,14 +813,14 @@ I will use temporary dataset here.
   (seq (ds :data))) ;; seq is not necessary but Markdown treats `:data` as command here
 ```
 
-(1 \[2 2\]:
+(Group: 1 \[2 2\]:
 
 | a   | b   |
 |-----|-----|
 | 1   | a   |
 | 1   | b   |
 
-2 \[2 2\]:
+Group: 2 \[2 2\]:
 
 | a   | b   |
 |-----|-----|
@@ -837,14 +837,14 @@ I will use temporary dataset here.
     (api/groups->seq))
 ```
 
-(1 \[2 2\]:
+(Group: 1 \[2 2\]:
 
 | a   | b   |
 |-----|-----|
 | 1   | a   |
 | 1   | b   |
 
-2 \[2 2\]:
+Group: 2 \[2 2\]:
 
 | a   | b   |
 |-----|-----|
@@ -865,14 +865,14 @@ Groups as map
     (api/groups->map))
 ```
 
-{1 1 \[2 2\]:
+{1 Group: 1 \[2 2\]:
 
 | a   | b   |
 |-----|-----|
 | 1   | a   |
 | 1   | b   |
 
-, 2 2 \[2 2\]:
+, 2 Group: 2 \[2 2\]:
 
 | a   | b   |
 |-----|-----|
@@ -889,40 +889,40 @@ Grouping by more than one column. You can see that group names are maps. When un
 (api/group-by DS [:V1 :V3] {:result-type :as-seq})
 ```
 
-({:V3 1.0, :V1 1} \[1 4\]:
+(Group: {:V3 1.0, :V1 1} \[1 4\]:
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
 | 1   | 5   | 1.000 | B   |
 
-{:V3 0.5, :V1 1} \[2 4\]:
+Group: {:V3 0.5, :V1 1} \[2 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
 | 1   | 1   | 0.5000 | A   |
 | 1   | 7   | 0.5000 | A   |
 
-{:V3 0.5, :V1 2} \[1 4\]:
+Group: {:V3 0.5, :V1 2} \[1 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
 | 2   | 4   | 0.5000 | A   |
 
-{:V3 1.0, :V1 2} \[2 4\]:
+Group: {:V3 1.0, :V1 2} \[2 4\]:
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
 | 2   | 2   | 1.000 | B   |
 | 2   | 8   | 1.000 | B   |
 
-{:V3 1.5, :V1 1} \[2 4\]:
+Group: {:V3 1.5, :V1 1} \[2 4\]:
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
 | 1   | 3   | 1.500 | C   |
 | 1   | 9   | 1.500 | C   |
 
-{:V3 1.5, :V1 2} \[1 4\]:
+Group: {:V3 1.5, :V1 2} \[1 4\]:
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
@@ -939,7 +939,7 @@ Grouping can be done by providing just row indexes. This way you can assign the 
                   "group-b" [5 5 5 1]} {:result-type :as-seq})
 ```
 
-(group-a \[4 4\]:
+(Group: group-a \[4 4\]:
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
@@ -948,7 +948,7 @@ Grouping can be done by providing just row indexes. This way you can assign the 
 | 2   | 2   | 1.000 | B   |
 | 1   | 3   | 1.500 | C   |
 
-group-b \[4 4\]:
+Group: group-b \[4 4\]:
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
@@ -968,34 +968,34 @@ You can group by a result of gruping function which gets row as map and should r
                              (:V3 row))) {:result-type :as-seq})
 ```
 
-(1.0 \[2 4\]:
+(Group: 1.0 \[2 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
 | 2   | 4   | 0.5000 | A   |
 | 1   | 5   | 1.000  | B   |
 
-2.0 \[2 4\]:
+Group: 2.0 \[2 4\]:
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
 | 2   | 2   | 1.000 | B   |
 | 2   | 8   | 1.000 | B   |
 
-0.5 \[2 4\]:
+Group: 0.5 \[2 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
 | 1   | 1   | 0.5000 | A   |
 | 1   | 7   | 0.5000 | A   |
 
-3.0 \[1 4\]:
+Group: 3.0 \[1 4\]:
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
 | 2   | 6   | 1.500 | C   |
 
-1.5 \[2 4\]:
+Group: 1.5 \[2 4\]:
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
@@ -1012,7 +1012,7 @@ You can use any predicate on column to split dataset into two groups.
 (api/group-by DS (comp #(< % 1.0) :V3) {:result-type :as-seq})
 ```
 
-(false \[6 4\]:
+(Group: false \[6 4\]:
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
@@ -1023,7 +1023,7 @@ You can use any predicate on column to split dataset into two groups.
 | 2   | 8   | 1.000 | B   |
 | 1   | 9   | 1.500 | C   |
 
-true \[3 4\]:
+Group: true \[3 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
@@ -1041,39 +1041,39 @@ true \[3 4\]:
 (api/group-by DS (juxt :V1 :V3) {:result-type :as-seq})
 ```
 
-(\[1 1.0\] \[1 4\]:
+(Group: \[1 1.0\] \[1 4\]:
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
 | 1   | 5   | 1.000 | B   |
 
-\[1 0.5\] \[2 4\]:
+Group: \[1 0.5\] \[2 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
 | 1   | 1   | 0.5000 | A   |
 | 1   | 7   | 0.5000 | A   |
 
-\[2 1.5\] \[1 4\]:
+Group: \[2 1.5\] \[1 4\]:
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
 | 2   | 6   | 1.500 | C   |
 
-\[1 1.5\] \[2 4\]:
+Group: \[1 1.5\] \[2 4\]:
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
 | 1   | 3   | 1.500 | C   |
 | 1   | 9   | 1.500 | C   |
 
-\[2 0.5\] \[1 4\]:
+Group: \[2 0.5\] \[1 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
 | 2   | 4   | 0.5000 | A   |
 
-\[2 1.0\] \[2 4\]:
+Group: \[2 1.0\] \[2 4\]:
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
@@ -1091,7 +1091,7 @@ true \[3 4\]:
                            :limit-columns [:V1]})
 ```
 
-({:V1 1} \[5 4\]:
+(Group: {:V1 1} \[5 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
@@ -1101,7 +1101,7 @@ true \[3 4\]:
 | 1   | 7   | 0.5000 | A   |
 | 1   | 9   | 1.500  | C   |
 
-{:V1 2} \[4 4\]:
+Group: {:V1 2} \[4 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
@@ -1589,7 +1589,7 @@ If we have grouped data set, column selection is applied to every group separate
     (api/groups->map))
 ```
 
-{1 1 \[5 2\]:
+{1 Group: 1 \[5 2\]:
 
 | :V2 | :V3    |
 |-----|--------|
@@ -1599,7 +1599,7 @@ If we have grouped data set, column selection is applied to every group separate
 | 7   | 0.5000 |
 | 9   | 1.500  |
 
-, 2 2 \[4 2\]:
+, 2 Group: 2 \[4 2\]:
 
 | :V2 | :V3    |
 |-----|--------|
@@ -1669,7 +1669,7 @@ If we have grouped data set, column selection is applied to every group separate
     (api/groups->map))
 ```
 
-{1 1 \[5 2\]:
+{1 Group: 1 \[5 2\]:
 
 | :V1 | :V4 |
 |-----|-----|
@@ -1679,7 +1679,7 @@ If we have grouped data set, column selection is applied to every group separate
 | 1   | A   |
 | 1   | C   |
 
-, 2 2 \[4 2\]:
+, 2 Group: 2 \[4 2\]:
 
 | :V1 | :V4 |
 |-----|-----|
@@ -1703,7 +1703,7 @@ If you want to rename colums use `rename-columns` and pass map where keys are ol
 
 \_unnamed \[9 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@564aefd6> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@3cf27b2f> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 2   | 2   | 1.000     | B                           |
@@ -1729,9 +1729,9 @@ Function works on grouped dataset
     (api/groups->map))
 ```
 
-{1 1 \[5 4\]:
+{1 Group: 1 \[5 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@72a8c7ac> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@6a664390> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 1   | 3   | 1.500     | C                           |
@@ -1739,9 +1739,9 @@ Function works on grouped dataset
 | 1   | 7   | 0.5000    | A                           |
 | 1   | 9   | 1.500     | C                           |
 
-, 2 2 \[4 4\]:
+, 2 Group: 2 \[4 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@72a8c7ac> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@6a664390> |
 |-----|-----|-----------|-----------------------------|
 | 2   | 2   | 1.000     | B                           |
 | 2   | 4   | 0.5000    | A                           |
@@ -1795,17 +1795,17 @@ Replace one column (column is trimmed)
 
 \_unnamed \[9 4\]:
 
-| :V1    | :V2 | :V3    | :V4 |
-|--------|-----|--------|-----|
-| 0.9298 | 1   | 0.5000 | A   |
-| 0.5453 | 2   | 1.000  | B   |
-| 0.7967 | 3   | 1.500  | C   |
-| 0.2766 | 4   | 0.5000 | A   |
-| 0.8202 | 5   | 1.000  | B   |
-| 0.1751 | 6   | 1.500  | C   |
-| 0.7437 | 7   | 0.5000 | A   |
-| 0.4066 | 8   | 1.000  | B   |
-| 0.6971 | 9   | 1.500  | C   |
+| :V1     | :V2 | :V3    | :V4 |
+|---------|-----|--------|-----|
+| 0.6295  | 1   | 0.5000 | A   |
+| 0.6101  | 2   | 1.000  | B   |
+| 0.2126  | 3   | 1.500  | C   |
+| 0.7686  | 4   | 0.5000 | A   |
+| 0.7458  | 5   | 1.000  | B   |
+| 0.04302 | 6   | 1.500  | C   |
+| 0.2580  | 7   | 0.5000 | A   |
+| 0.8796  | 8   | 1.000  | B   |
+| 0.3005  | 9   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -2109,7 +2109,9 @@ Arguments:
 -   a type like `:int64` or `:string`
 -   or pair of datetime and conversion function
 
-After conversion additional infomation is given on problematic values
+After conversion additional infomation is given on problematic values.
+
+The other conversion is casting column into java array (`->array`) of the type column or provided as argument. Grouped dataset returns sequence of arrays.
 
 ------------------------------------------------------------------------
 
@@ -2196,13 +2198,370 @@ Function works on the grouped dataset
 | :V3   | 9     | :float64  |                   |                |
 | :V4   | 9     | :object   |                   |                |
 
+------------------------------------------------------------------------
+
+Double array conversion.
+
+``` clojure
+(api/->array DS :V1)
+```
+
+    #object["[J" 0x7d8d8c8c "[J@7d8d8c8c"]
+
+------------------------------------------------------------------------
+
+Function also works on grouped dataset
+
+``` clojure
+(-> DS
+    (api/group-by :V3)
+    (api/->array :V2))
+```
+
+    (#object["[J" 0x610ddd89 "[J@610ddd89"] #object["[J" 0x7dffd897 "[J@7dffd897"] #object["[J" 0x611d78a4 "[J@611d78a4"])
+
+------------------------------------------------------------------------
+
+You can also cast the type to the other one (if casting is possible):
+
+``` clojure
+(api/->array DS :V4 :string)
+(api/->array DS :V1 :float32)
+```
+
+    #object["[Ljava.lang.String;" 0x3cbe70ca "[Ljava.lang.String;@3cbe70ca"]
+    #object["[F" 0x27ba7b7f "[F@27ba7b7f"]
+
 ### Rows
+
+Rows can be selected or dropped using various selectors:
+
+-   row id(s) - row index as number or seqence of numbers (first row has index `0`, second `1` and so on)
+-   sequence of true/false values
+-   filter by predicate (argument is row as a map)
+
+When predicate is used you may want to limit columns passed to the function (`limit-columns` option).
+
+Additionally you may want to precalculate some values which will be visible for predicate as additional columns. It's done internally by calling `add-or-update-columns` on a dataset. `:pre` is used as a column definitions.
 
 #### Select
 
+Select fourth row
+
+``` clojure
+(api/select-rows DS 4)
+```
+
+\_unnamed \[1 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 1   | 5   | 1.000 | B   |
+
+------------------------------------------------------------------------
+
+Select 3 rows
+
+``` clojure
+(api/select-rows DS [1 4 5])
+```
+
+\_unnamed \[3 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 2   | 2   | 1.000 | B   |
+| 1   | 5   | 1.000 | B   |
+| 2   | 6   | 1.500 | C   |
+
+------------------------------------------------------------------------
+
+Select rows using sequence of true/false values
+
+``` clojure
+(api/select-rows DS [true nil nil true])
+```
+
+\_unnamed \[2 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+
+------------------------------------------------------------------------
+
+Select rows using predicate
+
+``` clojure
+(api/select-rows DS (comp #(< % 1) :V3))
+```
+
+\_unnamed \[3 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+
+------------------------------------------------------------------------
+
+The same works on grouped dataset, let's select first row from every group.
+
+``` clojure
+(-> DS
+    (api/group-by :V1)
+    (api/select-rows 0)
+    (api/ungroup))
+```
+
+\_unnamed \[2 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+
+------------------------------------------------------------------------
+
+If you want to select `:V2` values which are lower than or equal mean in grouped dataset you have to precalculate it using `:pre`.
+
+``` clojure
+(-> DS
+    (api/group-by :V4)
+    (api/select-rows (fn [row] (<= (:V2 row) (:mean row)))
+                     {:pre {:mean #(tech.v2.datatype.functional/mean (% :V2))}})
+    (api/ungroup))
+```
+
+\_unnamed \[6 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
+
 #### Drop
 
+`drop-rows` removes rows, and accepts exactly the same parameters as `select-rows`
+
+------------------------------------------------------------------------
+
+Drop values lower than or equal `:V2` column mean in grouped dataset.
+
+``` clojure
+(-> DS
+    (api/group-by :V4)
+    (api/drop-rows (fn [row] (<= (:V2 row) (:mean row)))
+                   {:pre {:mean #(tech.v2.datatype.functional/mean (% :V2))}})
+    (api/ungroup))
+```
+
+\_unnamed \[3 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 7   | 0.5000 | A   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 9   | 1.500  | C   |
+
 #### Other
+
+There are several function to select first, last, random rows, or display head, tail of the dataset. All functions work on grouped dataset.
+
+------------------------------------------------------------------------
+
+First row
+
+``` clojure
+(api/first DS)
+```
+
+\_unnamed \[1 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+
+------------------------------------------------------------------------
+
+Last row
+
+``` clojure
+(api/last DS)
+```
+
+\_unnamed \[1 4\]:
+
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 1   | 9   | 1.500 | C   |
+
+------------------------------------------------------------------------
+
+Random row (single)
+
+``` clojure
+(api/rand-nth DS)
+```
+
+\_unnamed \[1 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 7   | 0.5000 | A   |
+
+------------------------------------------------------------------------
+
+Random `n` (default: row count) rows with repetition.
+
+``` clojure
+(api/random DS)
+```
+
+\_unnamed \[9 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 6   | 1.500  | C   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+
+------------------------------------------------------------------------
+
+Five random rows with repetition
+
+``` clojure
+(api/random DS 5)
+```
+
+\_unnamed \[5 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 7   | 0.5000 | A   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+
+------------------------------------------------------------------------
+
+Five random, non-repeating rows
+
+``` clojure
+(api/random DS 5 {:repeat? false})
+```
+
+\_unnamed \[5 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 2   | 2   | 1.000  | B   |
+| 1   | 1   | 0.5000 | A   |
+| 2   | 6   | 1.500  | C   |
+| 2   | 8   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
+
+------------------------------------------------------------------------
+
+Shuffle dataset
+
+``` clojure
+(api/shuffle DS)
+```
+
+\_unnamed \[9 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 9   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
+
+------------------------------------------------------------------------
+
+First `n` rows (default 5)
+
+``` clojure
+(api/head DS)
+```
+
+\_unnamed \[5 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+
+------------------------------------------------------------------------
+
+Last `n` rows (default 5)
+
+``` clojure
+(api/tail DS)
+```
+
+\_unnamed \[5 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 5   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 9   | 1.500  | C   |
+
+------------------------------------------------------------------------
+
+Select 5 random rows from each group
+
+``` clojure
+(-> DS
+    (api/group-by :V4)
+    (api/random 5)
+    (api/ungroup))
+```
+
+\_unnamed \[15 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 8   | 1.000  | B   |
+| 2   | 8   | 1.000  | B   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
 
 ### Aggregate
 
@@ -2214,11 +2573,11 @@ Function works on the grouped dataset
 
 ### Missing
 
-### Select
+#### Select
 
-### Drop
+#### Drop
 
-### Replace
+#### Replace
 
 ### Join/Separate Columns
 

@@ -1041,7 +1041,9 @@ Arguments:
 * a type like `:int64` or `:string` 
 * or pair of datetime and conversion function
 
-After conversion additional infomation is given on problematic values
+After conversion additional infomation is given on problematic values.
+
+The other conversion is casting column into java array (`->array`) of the type column or provided as argument. Grouped dataset returns sequence of arrays.
 
 ---
 
@@ -1087,13 +1089,202 @@ Function works on the grouped dataset
     (api/info :columns))
 ```
 
+---
+
+Double array conversion.
+
+```{clojure}
+(api/->array DS :V1)
+```
+
+---
+
+Function also works on grouped dataset
+
+```{clojure}
+(-> DS
+    (api/group-by :V3)
+    (api/->array :V2))
+```
+
+---
+
+You can also cast the type to the other one (if casting is possible):
+
+```{clojure}
+(api/->array DS :V4 :string)
+(api/->array DS :V1 :float32)
+```
+
 ### Rows
+
+Rows can be selected or dropped using various selectors:
+
+* row id(s) - row index as number or seqence of numbers (first row has index `0`, second `1` and so on)
+* sequence of true/false values
+* filter by predicate (argument is row as a map)
+
+When predicate is used you may want to limit columns passed to the function (`limit-columns` option).
+
+Additionally you may want to precalculate some values which will be visible for predicate as additional columns. It's done internally by calling `add-or-update-columns` on a dataset. `:pre` is used as a column definitions.
 
 #### Select
 
+Select fourth row
+
+```{clojure results="asis"}
+(api/select-rows DS 4)
+```
+
+---
+
+Select 3 rows
+
+```{clojure results="asis"}
+(api/select-rows DS [1 4 5])
+```
+
+---
+
+Select rows using sequence of true/false values
+
+```{clojure results="asis"}
+(api/select-rows DS [true nil nil true])
+```
+
+---
+
+Select rows using predicate
+
+```{clojure results="asis"}
+(api/select-rows DS (comp #(< % 1) :V3))
+```
+
+---
+
+The same works on grouped dataset, let's select first row from every group.
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V1)
+    (api/select-rows 0)
+    (api/ungroup))
+```
+
+---
+
+If you want to select `:V2` values which are lower than or equal mean in grouped dataset you have to precalculate it using `:pre`.
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V4)
+    (api/select-rows (fn [row] (<= (:V2 row) (:mean row)))
+                     {:pre {:mean #(tech.v2.datatype.functional/mean (% :V2))}})
+    (api/ungroup))
+```
+
 #### Drop
 
+`drop-rows` removes rows, and accepts exactly the same parameters as `select-rows`
+
+---
+
+Drop values lower than or equal `:V2` column mean in grouped dataset.
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V4)
+    (api/drop-rows (fn [row] (<= (:V2 row) (:mean row)))
+                   {:pre {:mean #(tech.v2.datatype.functional/mean (% :V2))}})
+    (api/ungroup))
+```
+
 #### Other
+
+There are several function to select first, last, random rows, or display head, tail of the dataset. All functions work on grouped dataset.
+
+---
+
+First row
+
+```{clojure results="asis"}
+(api/first DS)
+```
+
+---
+
+Last row
+
+```{clojure results="asis"}
+(api/last DS)
+```
+
+---
+
+Random row (single)
+
+```{clojure results="asis"}
+(api/rand-nth DS)
+```
+
+---
+
+Random `n` (default: row count) rows with repetition.
+
+```{clojure results="asis"}
+(api/random DS)
+```
+
+---
+
+Five random rows with repetition
+
+```{clojure results="asis"}
+(api/random DS 5)
+```
+
+---
+
+Five random, non-repeating rows
+
+```{clojure results="asis"}
+(api/random DS 5 {:repeat? false})
+```
+
+---
+
+Shuffle dataset
+
+```{clojure results="asis"}
+(api/shuffle DS)
+```
+
+---
+
+First `n` rows (default 5)
+
+```{clojure results="asis"}
+(api/head DS)
+```
+
+---
+
+Last `n` rows (default 5)
+
+```{clojure results="asis"}
+(api/tail DS)
+```
+
+---
+
+Select 5 random rows from each group
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V4)
+    (api/random 5)
+    (api/ungroup))
+```
 
 ### Aggregate
 
@@ -1105,11 +1296,11 @@ Function works on the grouped dataset
 
 ### Missing
 
-### Select
+#### Select
 
-### Drop
+#### Drop
 
-### Replace
+#### Replace
 
 ### Join/Separate Columns
 

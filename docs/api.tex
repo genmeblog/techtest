@@ -110,7 +110,7 @@
 
 \title{Proposed API for tech.ml.dataset}
 \author{GenerateMe}
-\date{2020-05-22}
+\date{2020-05-24}
 
 \begin{document}
 \maketitle
@@ -998,7 +998,7 @@ Rows as sequence of sequences
 \end{Shaded}
 
 \begin{verbatim}
-([#object[java.time.LocalDate 0x37d7602d "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0xc150723 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+([#object[java.time.LocalDate 0x46611b46 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x206b2a4d "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -1012,13 +1012,13 @@ Rows as sequence of maps
 \end{Shaded}
 
 \begin{verbatim}
-({"date" #object[java.time.LocalDate 0x364c8742 "2012-01-01"],
+({"date" #object[java.time.LocalDate 0x4ec8d100 "2012-01-01"],
   "precipitation" 0.0,
   "temp_min" 5.0,
   "weather" "drizzle",
   "temp_max" 12.8,
   "wind" 4.7}
- {"date" #object[java.time.LocalDate 0x328898fe "2012-01-02"],
+ {"date" #object[java.time.LocalDate 0x621ce061 "2012-01-02"],
   "precipitation" 10.9,
   "temp_min" 2.8,
   "weather" "rain",
@@ -1043,10 +1043,10 @@ is \texttt{:print-line-policy} which can be one of the:
 \begin{verbatim}
 _unnamed [2 3]:
 
-| :name | :group-id |                                                                                                                                                                                                                                                                           :data |
-|-------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|     1 |         0 | 1 [5 4]:<br><br>\| :V1 \| :V2 \|    :V3 \| :V4 \|<br>\|-----\|-----\|--------\|-----\|<br>\|   1 \|   1 \| 0.5000 \|   A \|<br>\|   1 \|   3 \|  1.500 \|   C \|<br>\|   1 \|   5 \|  1.000 \|   B \|<br>\|   1 \|   7 \| 0.5000 \|   A \|<br>\|   1 \|   9 \|  1.500 \|   C \| |
-|     2 |         1 |                                      2 [4 4]:<br><br>\| :V1 \| :V2 \|    :V3 \| :V4 \|<br>\|-----\|-----\|--------\|-----\|<br>\|   2 \|   2 \|  1.000 \|   B \|<br>\|   2 \|   4 \| 0.5000 \|   A \|<br>\|   2 \|   6 \|  1.500 \|   C \|<br>\|   2 \|   8 \|  1.000 \|   B \| |
+| :name | :group-id |                                                                                                                                                                                                                                                                                  :data |
+|-------|-----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|     1 |         0 | Group: 1 [5 4]:<br><br>\| :V1 \| :V2 \|    :V3 \| :V4 \|<br>\|-----\|-----\|--------\|-----\|<br>\|   1 \|   1 \| 0.5000 \|   A \|<br>\|   1 \|   3 \|  1.500 \|   C \|<br>\|   1 \|   5 \|  1.000 \|   B \|<br>\|   1 \|   7 \| 0.5000 \|   A \|<br>\|   1 \|   9 \|  1.500 \|   C \| |
+|     2 |         1 |                                      Group: 2 [4 4]:<br><br>\| :V1 \| :V2 \|    :V3 \| :V4 \|<br>\|-----\|-----\|--------\|-----\|<br>\|   2 \|   2 \|  1.000 \|   B \|<br>\|   2 \|   4 \| 0.5000 \|   A \|<br>\|   2 \|   6 \|  1.500 \|   C \|<br>\|   2 \|   8 \|  1.000 \|   B \| |
 \end{verbatim}
 
 \begin{Shaded}
@@ -1060,7 +1060,7 @@ _unnamed [2 3]:
 
 | :name | :group-id |                             :data |
 |-------|-----------|-----------------------------------|
-|     1 |         0 | 1 [5 4]:                          |
+|     1 |         0 | Group: 1 [5 4]:                   |
 |       |           |                                   |
 |       |           | \| :V1 \| :V2 \|    :V3 \| :V4 \| |
 |       |           | \|-----\|-----\|--------\|-----\| |
@@ -1069,7 +1069,7 @@ _unnamed [2 3]:
 |       |           | \|   1 \|   5 \|  1.000 \|   B \| |
 |       |           | \|   1 \|   7 \| 0.5000 \|   A \| |
 |       |           | \|   1 \|   9 \|  1.500 \|   C \| |
-|     2 |         1 | 2 [4 4]:                          |
+|     2 |         1 | Group: 2 [4 4]:                   |
 |       |           |                                   |
 |       |           | \| :V1 \| :V2 \|    :V3 \| :V4 \| |
 |       |           | \|-----\|-----\|--------\|-----\| |
@@ -1193,7 +1193,7 @@ Content of the grouped dataset
 :group-id
 [0, 1, ], :data #tech.ml.dataset.column<object>[2]
 :data
-[1 [5 4]:
+[Group: 1 [5 4]:
 
 | :V1 | :V2 |    :V3 | :V4 |
 |-----|-----|--------|-----|
@@ -1202,7 +1202,7 @@ Content of the grouped dataset
 |   1 |   5 |  1.000 |   B |
 |   1 |   7 | 0.5000 |   A |
 |   1 |   9 |  1.500 |   C |
-, 2 [4 4]:
+, Group: 2 [4 4]:
 
 | :V1 | :V2 |    :V3 | :V4 |
 |-----|-----|--------|-----|
@@ -1233,7 +1233,7 @@ Grouped dataset as map
 \end{Highlighting}
 \end{Shaded}
 
-(1 {[}5 4{]}:
+(Group: 1 {[}5 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1248,7 +1248,7 @@ Grouped dataset as map
 \bottomrule
 \end{longtable}
 
-2 {[}4 4{]}:
+Group: 2 {[}4 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1295,8 +1295,8 @@ Grouped datasets are printed as follows by default.
 :name & :group-id & :data\tabularnewline
 \midrule
 \endhead
-1 & 0 & 1 {[}5 4{]}:\tabularnewline
-2 & 1 & 2 {[}4 4{]}:\tabularnewline
+1 & 0 & Group: 1 {[}5 4{]}:\tabularnewline
+2 & 1 & Group: 2 {[}4 4{]}:\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1320,7 +1320,7 @@ I will use temporary dataset here.
 \end{Highlighting}
 \end{Shaded}
 
-(1 {[}2 2{]}:
+(Group: 1 {[}2 2{]}:
 
 \begin{longtable}[]{@{}ll@{}}
 \toprule
@@ -1332,7 +1332,7 @@ a & b\tabularnewline
 \bottomrule
 \end{longtable}
 
-2 {[}2 2{]}:
+Group: 2 {[}2 2{]}:
 
 \begin{longtable}[]{@{}ll@{}}
 \toprule
@@ -1356,7 +1356,7 @@ a & b\tabularnewline
 \end{Highlighting}
 \end{Shaded}
 
-(1 {[}2 2{]}:
+(Group: 1 {[}2 2{]}:
 
 \begin{longtable}[]{@{}ll@{}}
 \toprule
@@ -1368,7 +1368,7 @@ a & b\tabularnewline
 \bottomrule
 \end{longtable}
 
-2 {[}2 2{]}:
+Group: 2 {[}2 2{]}:
 
 \begin{longtable}[]{@{}ll@{}}
 \toprule
@@ -1396,7 +1396,7 @@ Groups as map
 \end{Highlighting}
 \end{Shaded}
 
-\{1 1 {[}2 2{]}:
+\{1 Group: 1 {[}2 2{]}:
 
 \begin{longtable}[]{@{}ll@{}}
 \toprule
@@ -1408,7 +1408,7 @@ a & b\tabularnewline
 \bottomrule
 \end{longtable}
 
-, 2 2 {[}2 2{]}:
+, 2 Group: 2 {[}2 2{]}:
 
 \begin{longtable}[]{@{}ll@{}}
 \toprule
@@ -1433,7 +1433,7 @@ When ungrouping is done these maps are used to restore column names.
 \end{Highlighting}
 \end{Shaded}
 
-(\{:V3 1.0, :V1 1\} {[}1 4{]}:
+(Group: \{:V3 1.0, :V1 1\} {[}1 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1444,7 +1444,7 @@ When ungrouping is done these maps are used to restore column names.
 \bottomrule
 \end{longtable}
 
-\{:V3 0.5, :V1 1\} {[}2 4{]}:
+Group: \{:V3 0.5, :V1 1\} {[}2 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1456,7 +1456,7 @@ When ungrouping is done these maps are used to restore column names.
 \bottomrule
 \end{longtable}
 
-\{:V3 0.5, :V1 2\} {[}1 4{]}:
+Group: \{:V3 0.5, :V1 2\} {[}1 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1467,7 +1467,7 @@ When ungrouping is done these maps are used to restore column names.
 \bottomrule
 \end{longtable}
 
-\{:V3 1.0, :V1 2\} {[}2 4{]}:
+Group: \{:V3 1.0, :V1 2\} {[}2 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1479,7 +1479,7 @@ When ungrouping is done these maps are used to restore column names.
 \bottomrule
 \end{longtable}
 
-\{:V3 1.5, :V1 1\} {[}2 4{]}:
+Group: \{:V3 1.5, :V1 1\} {[}2 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1491,7 +1491,7 @@ When ungrouping is done these maps are used to restore column names.
 \bottomrule
 \end{longtable}
 
-\{:V3 1.5, :V1 2\} {[}1 4{]}:
+Group: \{:V3 1.5, :V1 2\} {[}1 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1516,7 +1516,7 @@ assign the same row to more than one group.
 \end{Highlighting}
 \end{Shaded}
 
-(group-a {[}4 4{]}:
+(Group: group-a {[}4 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1530,7 +1530,7 @@ assign the same row to more than one group.
 \bottomrule
 \end{longtable}
 
-group-b {[}4 4{]}:
+Group: group-b {[}4 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1559,7 +1559,7 @@ restore original column names.
 \end{Highlighting}
 \end{Shaded}
 
-(1.0 {[}2 4{]}:
+(Group: 1.0 {[}2 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1571,7 +1571,7 @@ restore original column names.
 \bottomrule
 \end{longtable}
 
-2.0 {[}2 4{]}:
+Group: 2.0 {[}2 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1583,7 +1583,7 @@ restore original column names.
 \bottomrule
 \end{longtable}
 
-0.5 {[}2 4{]}:
+Group: 0.5 {[}2 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1595,7 +1595,7 @@ restore original column names.
 \bottomrule
 \end{longtable}
 
-3.0 {[}1 4{]}:
+Group: 3.0 {[}1 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1606,7 +1606,7 @@ restore original column names.
 \bottomrule
 \end{longtable}
 
-1.5 {[}2 4{]}:
+Group: 1.5 {[}2 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1630,7 +1630,7 @@ You can use any predicate on column to split dataset into two groups.
 \end{Highlighting}
 \end{Shaded}
 
-(false {[}6 4{]}:
+(Group: false {[}6 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1646,7 +1646,7 @@ You can use any predicate on column to split dataset into two groups.
 \bottomrule
 \end{longtable}
 
-true {[}3 4{]}:
+Group: true {[}3 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1671,7 +1671,7 @@ true {[}3 4{]}:
 \end{Highlighting}
 \end{Shaded}
 
-({[}1 1.0{]} {[}1 4{]}:
+(Group: {[}1 1.0{]} {[}1 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1682,7 +1682,7 @@ true {[}3 4{]}:
 \bottomrule
 \end{longtable}
 
-{[}1 0.5{]} {[}2 4{]}:
+Group: {[}1 0.5{]} {[}2 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1694,7 +1694,7 @@ true {[}3 4{]}:
 \bottomrule
 \end{longtable}
 
-{[}2 1.5{]} {[}1 4{]}:
+Group: {[}2 1.5{]} {[}1 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1705,7 +1705,7 @@ true {[}3 4{]}:
 \bottomrule
 \end{longtable}
 
-{[}1 1.5{]} {[}2 4{]}:
+Group: {[}1 1.5{]} {[}2 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1717,7 +1717,7 @@ true {[}3 4{]}:
 \bottomrule
 \end{longtable}
 
-{[}2 0.5{]} {[}1 4{]}:
+Group: {[}2 0.5{]} {[}1 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1728,7 +1728,7 @@ true {[}3 4{]}:
 \bottomrule
 \end{longtable}
 
-{[}2 1.0{]} {[}2 4{]}:
+Group: {[}2 1.0{]} {[}2 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1754,7 +1754,7 @@ passed to grouping functions. It's done for performance purposes.
 \end{Highlighting}
 \end{Shaded}
 
-(\{:V1 1\} {[}5 4{]}:
+(Group: \{:V1 1\} {[}5 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1769,7 +1769,7 @@ passed to grouping functions. It's done for performance purposes.
 \bottomrule
 \end{longtable}
 
-\{:V1 2\} {[}4 4{]}:
+Group: \{:V1 2\} {[}4 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -2465,7 +2465,7 @@ separately.
 \end{Highlighting}
 \end{Shaded}
 
-\{1 1 {[}5 2{]}:
+\{1 Group: 1 {[}5 2{]}:
 
 \begin{longtable}[]{@{}ll@{}}
 \toprule
@@ -2480,7 +2480,7 @@ separately.
 \bottomrule
 \end{longtable}
 
-, 2 2 {[}4 2{]}:
+, 2 Group: 2 {[}4 2{]}:
 
 \begin{longtable}[]{@{}ll@{}}
 \toprule
@@ -2572,7 +2572,7 @@ separately. Selected columns are dropped.
 \end{Highlighting}
 \end{Shaded}
 
-\{1 1 {[}5 2{]}:
+\{1 Group: 1 {[}5 2{]}:
 
 \begin{longtable}[]{@{}ll@{}}
 \toprule
@@ -2587,7 +2587,7 @@ separately. Selected columns are dropped.
 \bottomrule
 \end{longtable}
 
-, 2 2 {[}4 2{]}:
+, 2 Group: 2 {[}4 2{]}:
 
 \begin{longtable}[]{@{}ll@{}}
 \toprule
@@ -2622,7 +2622,7 @@ where keys are old names, values new ones.
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@4b9b0e44}{\nolinkurl{java.lang.Object@4b9b0e44}}\tabularnewline
+\href{mailto:java.lang.Object@524213b3}{\nolinkurl{java.lang.Object@524213b3}}\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2653,12 +2653,12 @@ Function works on grouped dataset
 \end{Highlighting}
 \end{Shaded}
 
-\{1 1 {[}5 4{]}:
+\{1 Group: 1 {[}5 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@2e8bb0f0}{\nolinkurl{java.lang.Object@2e8bb0f0}}\tabularnewline
+\href{mailto:java.lang.Object@1ab72e7}{\nolinkurl{java.lang.Object@1ab72e7}}\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2669,12 +2669,12 @@ v1 & v2 & {[}1 2 3{]} &
 \bottomrule
 \end{longtable}
 
-, 2 2 {[}4 4{]}:
+, 2 Group: 2 {[}4 4{]}:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@2e8bb0f0}{\nolinkurl{java.lang.Object@2e8bb0f0}}\tabularnewline
+\href{mailto:java.lang.Object@1ab72e7}{\nolinkurl{java.lang.Object@1ab72e7}}\tabularnewline
 \midrule
 \endhead
 2 & 2 & 1.000 & B\tabularnewline
@@ -2764,15 +2764,15 @@ Replace one column (column is trimmed)
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-0.9643 & 1 & 0.5000 & A\tabularnewline
-0.3937 & 2 & 1.000 & B\tabularnewline
-0.1984 & 3 & 1.500 & C\tabularnewline
-0.04429 & 4 & 0.5000 & A\tabularnewline
-0.9117 & 5 & 1.000 & B\tabularnewline
-0.4247 & 6 & 1.500 & C\tabularnewline
-0.07693 & 7 & 0.5000 & A\tabularnewline
-0.04858 & 8 & 1.000 & B\tabularnewline
-0.8801 & 9 & 1.500 & C\tabularnewline
+0.4895 & 1 & 0.5000 & A\tabularnewline
+0.4692 & 2 & 1.000 & B\tabularnewline
+0.5038 & 3 & 1.500 & C\tabularnewline
+0.02315 & 4 & 0.5000 & A\tabularnewline
+0.8854 & 5 & 1.000 & B\tabularnewline
+0.9962 & 6 & 1.500 & C\tabularnewline
+0.1997 & 7 & 0.5000 & A\tabularnewline
+0.2879 & 8 & 1.000 & B\tabularnewline
+0.1290 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3203,7 +3203,11 @@ Arguments:
   or pair of datetime and conversion function
 \end{itemize}
 
-After conversion additional infomation is given on problematic values
+After conversion additional infomation is given on problematic values.
+
+The other conversion is casting column into java array
+(\texttt{-\textgreater{}array}) of the type column or provided as
+argument. Grouped dataset returns sequence of arrays.
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -3322,13 +3326,518 @@ Function works on the grouped dataset
 \bottomrule
 \end{longtable}
 
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Double array conversion.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/->array DS }\AttributeTok{:V1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#object["[J" 0x632d640d "[J@632d640d"]
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Function also works on grouped dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V3}\NormalTok{)}
+\NormalTok{    (api/->array }\AttributeTok{:V2}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(#object["[J" 0x43551e7 "[J@43551e7"] #object["[J" 0x6c53711b "[J@6c53711b"] #object["[J" 0x5c7f105f "[J@5c7f105f"])
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+You can also cast the type to the other one (if casting is possible):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/->array DS }\AttributeTok{:V4} \AttributeTok{:string}\NormalTok{)}
+\NormalTok{(api/->array DS }\AttributeTok{:V1} \AttributeTok{:float32}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#object["[Ljava.lang.String;" 0xa4fcf21 "[Ljava.lang.String;@a4fcf21"]
+#object["[F" 0x114ba4fa "[F@114ba4fa"]
+\end{verbatim}
+
 \subsubsection{Rows}\label{rows}
+
+Rows can be selected or dropped using various selectors:
+
+\begin{itemize}
+\tightlist
+\item
+  row id(s) - row index as number or seqence of numbers (first row has
+  index \texttt{0}, second \texttt{1} and so on)
+\item
+  sequence of true/false values
+\item
+  filter by predicate (argument is row as a map)
+\end{itemize}
+
+When predicate is used you may want to limit columns passed to the
+function (\texttt{limit-columns} option).
+
+Additionally you may want to precalculate some values which will be
+visible for predicate as additional columns. It's done internally by
+calling \texttt{add-or-update-columns} on a dataset. \texttt{:pre} is
+used as a column definitions.
 
 \paragraph{Select}\label{select-1}
 
+Select fourth row
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/select-rows DS }\DecValTok{4}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 5 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Select 3 rows
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/select-rows DS [}\DecValTok{1} \DecValTok{4} \DecValTok{5}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 2 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Select rows using sequence of true/false values
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/select-rows DS [}\VariableTok{true} \VariableTok{nil} \VariableTok{nil} \VariableTok{true}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}2 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Select rows using predicate
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/select-rows DS (}\KeywordTok{comp}\NormalTok{ #(}\KeywordTok{<} \VariableTok{%} \DecValTok{1}\NormalTok{) }\AttributeTok{:V3}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+The same works on grouped dataset, let's select first row from every
+group.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V1}\NormalTok{)}
+\NormalTok{    (api/select-rows }\DecValTok{0}\NormalTok{)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}2 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+If you want to select \texttt{:V2} values which are lower than or equal
+mean in grouped dataset you have to precalculate it using \texttt{:pre}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/select-rows (}\KeywordTok{fn}\NormalTok{ [row] (}\KeywordTok{<=}\NormalTok{ (}\AttributeTok{:V2}\NormalTok{ row) (}\AttributeTok{:mean}\NormalTok{ row)))}
+\NormalTok{                     \{}\AttributeTok{:pre}\NormalTok{ \{}\AttributeTok{:mean}\NormalTok{ #(tech.v2.datatype.functional/mean (}\VariableTok{%} \AttributeTok{:V2}\NormalTok{))\}\})}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}6 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
 \paragraph{Drop}\label{drop-1}
 
+\texttt{drop-rows} removes rows, and accepts exactly the same parameters
+as \texttt{select-rows}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Drop values lower than or equal \texttt{:V2} column mean in grouped
+dataset.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/drop-rows (}\KeywordTok{fn}\NormalTok{ [row] (}\KeywordTok{<=}\NormalTok{ (}\AttributeTok{:V2}\NormalTok{ row) (}\AttributeTok{:mean}\NormalTok{ row)))}
+\NormalTok{                   \{}\AttributeTok{:pre}\NormalTok{ \{}\AttributeTok{:mean}\NormalTok{ #(tech.v2.datatype.functional/mean (}\VariableTok{%} \AttributeTok{:V2}\NormalTok{))\}\})}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
 \paragraph{Other}\label{other}
+
+There are several function to select first, last, random rows, or
+display head, tail of the dataset. All functions work on grouped
+dataset.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+First row
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/first DS)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Last row
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/last DS)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Random row (single)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/rand-nth DS)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 3 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Random \texttt{n} (default: row count) rows with repetition.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/random DS)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Five random rows with repetition
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/random DS }\DecValTok{5}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}5 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 3 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Five random, non-repeating rows
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/random DS }\DecValTok{5}\NormalTok{ \{}\AttributeTok{:repeat}\NormalTok{? }\VariableTok{false}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}5 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 2 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Shuffle dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/shuffle DS)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+2 & 6 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+First \texttt{n} rows (default 5)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/head DS)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}5 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Last \texttt{n} rows (default 5)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/tail DS)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}5 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 5 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Select 5 random rows from each group
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/random }\DecValTok{5}\NormalTok{)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}15 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
 
 \subsubsection{Aggregate}\label{aggregate}
 
@@ -3340,11 +3849,11 @@ Function works on the grouped dataset
 
 \subsubsection{Missing}\label{missing}
 
-\subsubsection{Select}\label{select-2}
+\paragraph{Select}\label{select-2}
 
-\subsubsection{Drop}\label{drop-2}
+\paragraph{Drop}\label{drop-2}
 
-\subsubsection{Replace}\label{replace}
+\paragraph{Replace}\label{replace}
 
 \subsubsection{Join/Separate Columns}\label{joinseparate-columns}
 
