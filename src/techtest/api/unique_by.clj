@@ -17,7 +17,8 @@
 
 (defn strategy-fold
   ([ds columns-selector] (strategy-fold ds columns-selector nil))
-  ([ds columns-selector fold-fn]
+  ([ds columns-selector fold-fn] (strategy-fold ds columns-selector fold-fn nil))
+  ([ds columns-selector fold-fn ungroup-options]
    (let [[group-by-selector target-names] (if (fn? columns-selector)
                                             [columns-selector (ds/column-names ds)]
                                             (let [group-by-names (column-names ds columns-selector)]
@@ -28,7 +29,7 @@
                                (as-> ds ds
                                  (select-columns ds target-names)
                                  (dataset [(zipmap target-names (map fold-fn (ds/columns ds)))]))))
-         (ungroup)))))
+         (ungroup ungroup-options)))))
 
 (defn- unique-by-fn
   [strategy columns-selector limit-columns]

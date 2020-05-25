@@ -93,7 +93,7 @@
 
 (defn process-group-data  
   [ds f]
-  (ds/column-map ds :data f :data))
+  (ds/add-or-update-column ds :data (map f (ds :data))))
 
 (defn groups->map
   "Convert grouped dataset to the map of groups"

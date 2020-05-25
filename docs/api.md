@@ -591,7 +591,7 @@ Rows as sequence of sequences
 (take 2 (api/rows ds))
 ```
 
-    ([#object[java.time.LocalDate 0x510b7613 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x58d9dae4 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+    ([#object[java.time.LocalDate 0x12a3d78d "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x2a61a9d7 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 
 ------------------------------------------------------------------------
 
@@ -601,13 +601,13 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
-    ({"date" #object[java.time.LocalDate 0x764707e6 "2012-01-01"],
+    ({"date" #object[java.time.LocalDate 0x3304a84c "2012-01-01"],
       "precipitation" 0.0,
       "temp_min" 5.0,
       "weather" "drizzle",
       "temp_max" 12.8,
       "wind" 4.7}
-     {"date" #object[java.time.LocalDate 0x7a4dccd4 "2012-01-02"],
+     {"date" #object[java.time.LocalDate 0x5d7e907c "2012-01-02"],
       "precipitation" 10.9,
       "temp_min" 2.8,
       "weather" "rain",
@@ -1703,17 +1703,17 @@ If you want to rename colums use `rename-columns` and pass map where keys are ol
 
 \_unnamed \[9 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@1440c1bc> |
-|-----|-----|-----------|-----------------------------|
-| 1   | 1   | 0.5000    | A                           |
-| 2   | 2   | 1.000     | B                           |
-| 1   | 3   | 1.500     | C                           |
-| 2   | 4   | 0.5000    | A                           |
-| 1   | 5   | 1.000     | B                           |
-| 2   | 6   | 1.500     | C                           |
-| 1   | 7   | 0.5000    | A                           |
-| 2   | 8   | 1.000     | B                           |
-| 1   | 9   | 1.500     | C                           |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@ecc4ac8> |
+|-----|-----|-----------|----------------------------|
+| 1   | 1   | 0.5000    | A                          |
+| 2   | 2   | 1.000     | B                          |
+| 1   | 3   | 1.500     | C                          |
+| 2   | 4   | 0.5000    | A                          |
+| 1   | 5   | 1.000     | B                          |
+| 2   | 6   | 1.500     | C                          |
+| 1   | 7   | 0.5000    | A                          |
+| 2   | 8   | 1.000     | B                          |
+| 1   | 9   | 1.500     | C                          |
 
 ------------------------------------------------------------------------
 
@@ -1731,7 +1731,7 @@ Function works on grouped dataset
 
 {1 Group: 1 \[5 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@702ff3ed> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@75abc0fe> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 1   | 3   | 1.500     | C                           |
@@ -1741,7 +1741,7 @@ Function works on grouped dataset
 
 , 2 Group: 2 \[4 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@702ff3ed> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@75abc0fe> |
 |-----|-----|-----------|-----------------------------|
 | 2   | 2   | 1.000     | B                           |
 | 2   | 4   | 0.5000    | A                           |
@@ -1795,17 +1795,17 @@ Replace one column (column is trimmed)
 
 \_unnamed \[9 4\]:
 
-| :V1     | :V2 | :V3    | :V4 |
-|---------|-----|--------|-----|
-| 0.7821  | 1   | 0.5000 | A   |
-| 0.06650 | 2   | 1.000  | B   |
-| 0.3074  | 3   | 1.500  | C   |
-| 0.4944  | 4   | 0.5000 | A   |
-| 0.4858  | 5   | 1.000  | B   |
-| 0.1704  | 6   | 1.500  | C   |
-| 0.08792 | 7   | 0.5000 | A   |
-| 0.5966  | 8   | 1.000  | B   |
-| 0.06713 | 9   | 1.500  | C   |
+| :V1    | :V2 | :V3    | :V4 |
+|--------|-----|--------|-----|
+| 0.7822 | 1   | 0.5000 | A   |
+| 0.8335 | 2   | 1.000  | B   |
+| 0.6244 | 3   | 1.500  | C   |
+| 0.6856 | 4   | 0.5000 | A   |
+| 0.1081 | 5   | 1.000  | B   |
+| 0.6571 | 6   | 1.500  | C   |
+| 0.8577 | 7   | 0.5000 | A   |
+| 0.3413 | 8   | 1.000  | B   |
+| 0.9629 | 9   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -2206,7 +2206,7 @@ Double array conversion.
 (api/->array DS :V1)
 ```
 
-    #object["[J" 0x606d47af "[J@606d47af"]
+    #object["[J" 0x583b41d4 "[J@583b41d4"]
 
 ------------------------------------------------------------------------
 
@@ -2218,7 +2218,7 @@ Function also works on grouped dataset
     (api/->array :V2))
 ```
 
-    (#object["[J" 0x5b0c2766 "[J@5b0c2766"] #object["[J" 0x3c8897cb "[J@3c8897cb"] #object["[J" 0x18f46d75 "[J@18f46d75"])
+    (#object["[J" 0x444b21a9 "[J@444b21a9"] #object["[J" 0x1aab6810 "[J@1aab6810"] #object["[J" 0x2d3d6462 "[J@2d3d6462"])
 
 ------------------------------------------------------------------------
 
@@ -2229,8 +2229,8 @@ You can also cast the type to the other one (if casting is possible):
 (api/->array DS :V1 :float32)
 ```
 
-    #object["[Ljava.lang.String;" 0x6dfb485 "[Ljava.lang.String;@6dfb485"]
-    #object["[F" 0x1ddb3877 "[F@1ddb3877"]
+    #object["[Ljava.lang.String;" 0x377e8abd "[Ljava.lang.String;@377e8abd"]
+    #object["[F" 0x2c7aa0f9 "[F@2c7aa0f9"]
 
 ### Rows
 
@@ -2414,7 +2414,7 @@ Random row (single)
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 2   | 4   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2426,17 +2426,17 @@ Random `n` (default: row count) rows with repetition.
 
 \_unnamed \[9 4\]:
 
-| :V1 | :V2 | :V3   | :V4 |
-|-----|-----|-------|-----|
-| 1   | 5   | 1.000 | B   |
-| 1   | 5   | 1.000 | B   |
-| 2   | 8   | 1.000 | B   |
-| 1   | 3   | 1.500 | C   |
-| 2   | 2   | 1.000 | B   |
-| 2   | 8   | 1.000 | B   |
-| 2   | 8   | 1.000 | B   |
-| 1   | 3   | 1.500 | C   |
-| 1   | 9   | 1.500 | C   |
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 7   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 1   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2450,11 +2450,11 @@ Five random rows with repetition
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 3   | 1.500  | C   |
+| 1   | 1   | 0.5000 | A   |
 | 1   | 5   | 1.000  | B   |
-| 2   | 6   | 1.500  | C   |
 | 2   | 2   | 1.000  | B   |
-| 2   | 4   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
 
 ------------------------------------------------------------------------
 
@@ -2468,11 +2468,11 @@ Five random, non-repeating rows
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 3   | 1.500  | C   |
+| 1   | 1   | 0.5000 | A   |
 | 2   | 2   | 1.000  | B   |
 | 1   | 5   | 1.000  | B   |
+| 1   | 9   | 1.500  | C   |
 | 1   | 7   | 0.5000 | A   |
-| 1   | 1   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2487,14 +2487,14 @@ Shuffle dataset
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
 | 2   | 8   | 1.000  | B   |
-| 1   | 7   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
 | 1   | 3   | 1.500  | C   |
-| 2   | 2   | 1.000  | B   |
-| 1   | 5   | 1.000  | B   |
 | 2   | 6   | 1.500  | C   |
-| 1   | 9   | 1.500  | C   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
 | 1   | 1   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 9   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -2548,19 +2548,19 @@ Select 5 random rows from each group
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
 | 1   | 1   | 0.5000 | A   |
-| 1   | 7   | 0.5000 | A   |
-| 1   | 7   | 0.5000 | A   |
-| 1   | 7   | 0.5000 | A   |
 | 1   | 1   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
 | 2   | 2   | 1.000  | B   |
-| 2   | 8   | 1.000  | B   |
 | 2   | 2   | 1.000  | B   |
-| 1   | 5   | 1.000  | B   |
 | 2   | 2   | 1.000  | B   |
-| 2   | 6   | 1.500  | C   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
 | 1   | 9   | 1.500  | C   |
 | 2   | 6   | 1.500  | C   |
-| 1   | 3   | 1.500  | C   |
 | 2   | 6   | 1.500  | C   |
 
 ### Aggregate
@@ -3021,10 +3021,10 @@ Random
 
 \_unnamed \[2 4\]:
 
-| :V1 | :V2 | :V3    | :V4 |
-|-----|-----|--------|-----|
-| 2   | 4   | 0.5000 | A   |
-| 1   | 7   | 0.5000 | A   |
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 2   | 2   | 1.000 | B   |
+| 1   | 3   | 1.500 | C   |
 
 ------------------------------------------------------------------------
 
@@ -3108,7 +3108,7 @@ Let's define dataset which contains missing values
 (def DSm (api/dataset {:V1 (take 9 (cycle [1 2 nil]))
                        :V2 (range 1 10)
                        :V3 (take 9 (cycle [0.5 1.0 nil 1.5]))
-                       :V4 (take 9 (cycle [\A \B \C]))}))
+                       :V4 (take 9 (cycle ["A" "B" "C"]))}))
 ```
 
 ``` clojure
@@ -3478,9 +3478,647 @@ We can use a function which is applied after applying `:up` or `:down`
 
 ### Join/Separate Columns
 
+Joining or separating columns are operations which can help to tidy messy dataset.
+
+-   `join-columns` joins content of the columns (as string concatenation or other structure) and stores it in new column
+-   `separate-column` splits content of the columns into set of new columns
+
 #### Join
 
+`join-columns` accepts:
+
+-   dataset
+-   column selector (as in `select-columns`)
+-   options
+    -   `:separator` (default `"-"`)
+    -   `:drop-columns?` - whether to drop source columns or not (default `true`)
+    -   `:result-type`
+        -   `:map` - packs data into map
+        -   `:seq` - packs data into sequence
+        -   `:string` - join strings with separator (default)
+        -   or custom function which gets row as a vector
+    -   `:missing-subst` - substitution for missing value
+
+------------------------------------------------------------------------
+
+Default usage. Create `:joined` column out of other columns.
+
+``` clojure
+(api/join-columns DSm :joined [:V1 :V2 :V4])
+```
+
+\_unnamed \[9 2\]:
+
+| :V3    | :joined |
+|--------|---------|
+| 0.5000 | 1-1-A   |
+| 1.000  | 2-2-B   |
+|        | 3-C     |
+| 1.500  | 1-4-A   |
+| 0.5000 | 2-5-B   |
+| 1.000  | 6-C     |
+|        | 1-7-A   |
+| 1.500  | 2-8-B   |
+| 0.5000 | 9-C     |
+
+------------------------------------------------------------------------
+
+Without dropping source columns.
+
+``` clojure
+(api/join-columns DSm :joined [:V1 :V2 :V4] {:drop-columns? false})
+```
+
+\_unnamed \[9 5\]:
+
+| :V1 | :V2 | :V3    | :V4 | :joined |
+|-----|-----|--------|-----|---------|
+| 1   | 1   | 0.5000 | A   | 1-1-A   |
+| 2   | 2   | 1.000  | B   | 2-2-B   |
+|     | 3   |        | C   | 3-C     |
+| 1   | 4   | 1.500  | A   | 1-4-A   |
+| 2   | 5   | 0.5000 | B   | 2-5-B   |
+|     | 6   | 1.000  | C   | 6-C     |
+| 1   | 7   |        | A   | 1-7-A   |
+| 2   | 8   | 1.500  | B   | 2-8-B   |
+|     | 9   | 0.5000 | C   | 9-C     |
+
+------------------------------------------------------------------------
+
+Let's replace missing value with "NA" string.
+
+``` clojure
+(api/join-columns DSm :joined [:V1 :V2 :V4] {:missing-subst "NA"})
+```
+
+\_unnamed \[9 2\]:
+
+| :V3    | :joined |
+|--------|---------|
+| 0.5000 | 1-1-A   |
+| 1.000  | 2-2-B   |
+|        | NA-3-C  |
+| 1.500  | 1-4-A   |
+| 0.5000 | 2-5-B   |
+| 1.000  | NA-6-C  |
+|        | 1-7-A   |
+| 1.500  | 2-8-B   |
+| 0.5000 | NA-9-C  |
+
+------------------------------------------------------------------------
+
+We can use custom separator.
+
+``` clojure
+(api/join-columns DSm :joined [:V1 :V2 :V4] {:separator "/"
+                                             :missing-subst "."})
+```
+
+\_unnamed \[9 2\]:
+
+| :V3    | :joined |
+|--------|---------|
+| 0.5000 | 1/1/A   |
+| 1.000  | 2/2/B   |
+|        | ./3/C   |
+| 1.500  | 1/4/A   |
+| 0.5000 | 2/5/B   |
+| 1.000  | ./6/C   |
+|        | 1/7/A   |
+| 1.500  | 2/8/B   |
+| 0.5000 | ./9/C   |
+
+------------------------------------------------------------------------
+
+Or even sequence of separators.
+
+``` clojure
+(api/join-columns DSm :joined [:V1 :V2 :V4] {:separator ["-" "/"]
+                                             :missing-subst "."})
+```
+
+\_unnamed \[9 2\]:
+
+| :V3    | :joined |
+|--------|---------|
+| 0.5000 | 1-1/A   |
+| 1.000  | 2-2/B   |
+|        | .-3/C   |
+| 1.500  | 1-4/A   |
+| 0.5000 | 2-5/B   |
+| 1.000  | .-6/C   |
+|        | 1-7/A   |
+| 1.500  | 2-8/B   |
+| 0.5000 | .-9/C   |
+
+------------------------------------------------------------------------
+
+The other types of results, map:
+
+``` clojure
+(api/join-columns DSm :joined [:V1 :V2 :V4] {:result-type :map})
+```
+
+\_unnamed \[9 2\]:
+
+| :V3    | :joined                   |
+|--------|---------------------------|
+| 0.5000 | {:V1 1, :V2 1, :V4 "A"}   |
+| 1.000  | {:V1 2, :V2 2, :V4 "B"}   |
+|        | {:V1 nil, :V2 3, :V4 "C"} |
+| 1.500  | {:V1 1, :V2 4, :V4 "A"}   |
+| 0.5000 | {:V1 2, :V2 5, :V4 "B"}   |
+| 1.000  | {:V1 nil, :V2 6, :V4 "C"} |
+|        | {:V1 1, :V2 7, :V4 "A"}   |
+| 1.500  | {:V1 2, :V2 8, :V4 "B"}   |
+| 0.5000 | {:V1 nil, :V2 9, :V4 "C"} |
+
+------------------------------------------------------------------------
+
+Sequence
+
+``` clojure
+(api/join-columns DSm :joined [:V1 :V2 :V4] {:result-type :seq})
+```
+
+\_unnamed \[9 2\]:
+
+| :V3    | :joined     |
+|--------|-------------|
+| 0.5000 | (1 1 "A")   |
+| 1.000  | (2 2 "B")   |
+|        | (nil 3 "C") |
+| 1.500  | (1 4 "A")   |
+| 0.5000 | (2 5 "B")   |
+| 1.000  | (nil 6 "C") |
+|        | (1 7 "A")   |
+| 1.500  | (2 8 "B")   |
+| 0.5000 | (nil 9 "C") |
+
+------------------------------------------------------------------------
+
+Custom function, calculate hash
+
+``` clojure
+(api/join-columns DSm :joined [:V1 :V2 :V4] {:result-type hash})
+```
+
+\_unnamed \[9 2\]:
+
+| :V3    | :joined     |
+|--------|-------------|
+| 0.5000 | 535226087   |
+| 1.000  | 1128801549  |
+|        | -1842240303 |
+| 1.500  | 2022347171  |
+| 0.5000 | 1884312041  |
+| 1.000  | -1555412370 |
+|        | 1640237355  |
+| 1.500  | -967279152  |
+| 0.5000 | 1128367958  |
+
+------------------------------------------------------------------------
+
+Grouped dataset
+
+``` clojure
+(-> DSm
+    (api/group-by :V4)
+    (api/join-columns :joined [:V1 :V2 :V4])
+    (api/ungroup))
+```
+
+\_unnamed \[9 2\]:
+
+| :V3    | :joined |
+|--------|---------|
+| 0.5000 | 1-1-A   |
+| 1.500  | 1-4-A   |
+|        | 1-7-A   |
+| 1.000  | 2-2-B   |
+| 0.5000 | 2-5-B   |
+| 1.500  | 2-8-B   |
+|        | 3-C     |
+| 1.000  | 6-C     |
+| 0.5000 | 9-C     |
+
+------------------------------------------------------------------------
+
+##### Tidyr examples
+
+[source](https://tidyr.tidyverse.org/reference/unite.html)
+
+``` clojure
+(def df (api/dataset {:x ["a" "a" nil nil]
+                      :y ["b" nil "b" nil]}))
+```
+
+    #'user/df
+
+``` clojure
+df
+```
+
+\_unnamed \[4 2\]:
+
+| :x  | :y  |
+|-----|-----|
+| a   | b   |
+| a   |     |
+|     | b   |
+
+------------------------------------------------------------------------
+
+``` clojure
+(api/join-columns df "z" [:x :y] {:drop-columns? false
+                                  :missing-subst "NA"
+                                  :separator "_"})
+```
+
+\_unnamed \[4 3\]:
+
+| :x  | :y  | z      |
+|-----|-----|--------|
+| a   | b   | a\_b   |
+| a   |     | a\_NA  |
+|     | b   | NA\_b  |
+|     |     | NA\_NA |
+
+------------------------------------------------------------------------
+
+``` clojure
+(api/join-columns df "z" [:x :y] {:drop-columns? false
+                                  :separator "_"})
+```
+
+\_unnamed \[4 3\]:
+
+| :x  | :y  | z    |
+|-----|-----|------|
+| a   | b   | a\_b |
+| a   |     | a    |
+|     | b   | b    |
+|     |     |      |
+
 #### Separate
+
+Column can be also separated into several other columns using string as separator, regex or custom function. Arguments:
+
+-   dataset
+-   source column
+-   target columns
+-   separator as:
+    -   string - it's converted to regular expression and passed to `clojure.string/split` function
+    -   regex
+    -   or custom function (default: identity)
+-   options
+    -   `:drop-columns?` - whether drop source column or not (default: `true`)
+    -   `:missing-subst` - values which should be treated as missing, can be set, sequence, value or function (default: `""`)
+
+Custom function (as separator) should return seqence of values for given value.
+
+------------------------------------------------------------------------
+
+Separate float into integer and factional values
+
+``` clojure
+(api/separate-column DS :V3 [:int-part :frac-part] (fn [^double v]
+                                                     [(int (quot v 1.0))
+                                                      (mod v 1.0)]))
+```
+
+\_unnamed \[9 5\]:
+
+| :V1 | :V2 | :int-part | :frac-part | :V4 |
+|-----|-----|-----------|------------|-----|
+| 1   | 1   | 0.000     | 0.5000     | A   |
+| 2   | 2   | 1.000     | 0.000      | B   |
+| 1   | 3   | 1.000     | 0.5000     | C   |
+| 2   | 4   | 0.000     | 0.5000     | A   |
+| 1   | 5   | 1.000     | 0.000      | B   |
+| 2   | 6   | 1.000     | 0.5000     | C   |
+| 1   | 7   | 0.000     | 0.5000     | A   |
+| 2   | 8   | 1.000     | 0.000      | B   |
+| 1   | 9   | 1.000     | 0.5000     | C   |
+
+------------------------------------------------------------------------
+
+Source column can be kept
+
+``` clojure
+(api/separate-column DS :V3 [:int-part :frac-part] (fn [^double v]
+                                                     [(int (quot v 1.0))
+                                                      (mod v 1.0)]) {:drop-column? false})
+```
+
+\_unnamed \[9 6\]:
+
+| :V1 | :V2 | :V3    | :int-part | :frac-part | :V4 |
+|-----|-----|--------|-----------|------------|-----|
+| 1   | 1   | 0.5000 | 0.000     | 0.5000     | A   |
+| 2   | 2   | 1.000  | 1.000     | 0.000      | B   |
+| 1   | 3   | 1.500  | 1.000     | 0.5000     | C   |
+| 2   | 4   | 0.5000 | 0.000     | 0.5000     | A   |
+| 1   | 5   | 1.000  | 1.000     | 0.000      | B   |
+| 2   | 6   | 1.500  | 1.000     | 0.5000     | C   |
+| 1   | 7   | 0.5000 | 0.000     | 0.5000     | A   |
+| 2   | 8   | 1.000  | 1.000     | 0.000      | B   |
+| 1   | 9   | 1.500  | 1.000     | 0.5000     | C   |
+
+------------------------------------------------------------------------
+
+We can treat `0` or `0.0` as missing value
+
+``` clojure
+(api/separate-column DS :V3 [:int-part :frac-part] (fn [^double v]
+                                                     [(int (quot v 1.0))
+                                                      (mod v 1.0)]) {:missing-subst [0 0.0]})
+```
+
+\_unnamed \[9 5\]:
+
+| :V1 | :V2 | :int-part | :frac-part | :V4 |
+|-----|-----|-----------|------------|-----|
+| 1   | 1   |           | 0.5000     | A   |
+| 2   | 2   | 1         |            | B   |
+| 1   | 3   | 1         | 0.5000     | C   |
+| 2   | 4   |           | 0.5000     | A   |
+| 1   | 5   | 1         |            | B   |
+| 2   | 6   | 1         | 0.5000     | C   |
+| 1   | 7   |           | 0.5000     | A   |
+| 2   | 8   | 1         |            | B   |
+| 1   | 9   | 1         | 0.5000     | C   |
+
+------------------------------------------------------------------------
+
+Works on grouped dataset
+
+``` clojure
+(-> DS
+    (api/group-by :V4)
+    (api/separate-column :V3 [:int-part :fract-part] (fn [^double v]
+                                                       [(int (quot v 1.0))
+                                                        (mod v 1.0)]))
+    (api/ungroup))
+```
+
+\_unnamed \[9 5\]:
+
+| :V1 | :V2 | :int-part | :fract-part | :V4 |
+|-----|-----|-----------|-------------|-----|
+| 1   | 1   | 0.000     | 0.5000      | A   |
+| 2   | 4   | 0.000     | 0.5000      | A   |
+| 1   | 7   | 0.000     | 0.5000      | A   |
+| 2   | 2   | 1.000     | 0.000       | B   |
+| 1   | 5   | 1.000     | 0.000       | B   |
+| 2   | 8   | 1.000     | 0.000       | B   |
+| 1   | 3   | 1.000     | 0.5000      | C   |
+| 2   | 6   | 1.000     | 0.5000      | C   |
+| 1   | 9   | 1.000     | 0.5000      | C   |
+
+------------------------------------------------------------------------
+
+Join and separate together.
+
+``` clojure
+(-> DSm
+    (api/join-columns :joined [:V1 :V2 :V4] {:result-type :map})
+    (api/separate-column :joined [:v1 :v2 :v4] (juxt :V1 :V2 :V4)))
+```
+
+\_unnamed \[9 4\]:
+
+| :V3    | :v1   | :v2   | :v4 |
+|--------|-------|-------|-----|
+| 0.5000 | 1.000 | 1.000 | A   |
+| 1.000  | 2.000 | 2.000 | B   |
+|        |       | 3.000 | C   |
+| 1.500  | 1.000 | 4.000 | A   |
+| 0.5000 | 2.000 | 5.000 | B   |
+| 1.000  |       | 6.000 | C   |
+|        | 1.000 | 7.000 | A   |
+| 1.500  | 2.000 | 8.000 | B   |
+| 0.5000 |       | 9.000 | C   |
+
+``` clojure
+(-> DSm
+    (api/join-columns :joined [:V1 :V2 :V4] {:result-type :seq})
+    (api/separate-column :joined [:v1 :v2 :v4] identity))
+```
+
+\_unnamed \[9 4\]:
+
+| :V3    | :v1   | :v2   | :v4 |
+|--------|-------|-------|-----|
+| 0.5000 | 1.000 | 1.000 | A   |
+| 1.000  | 2.000 | 2.000 | B   |
+|        |       | 3.000 | C   |
+| 1.500  | 1.000 | 4.000 | A   |
+| 0.5000 | 2.000 | 5.000 | B   |
+| 1.000  |       | 6.000 | C   |
+|        | 1.000 | 7.000 | A   |
+| 1.500  | 2.000 | 8.000 | B   |
+| 0.5000 |       | 9.000 | C   |
+
+##### Tidyr examples
+
+[separate source](https://tidyr.tidyverse.org/reference/separate.html) [extract source](https://tidyr.tidyverse.org/reference/extract.html)
+
+``` clojure
+(def df-separate (api/dataset {:x [nil "a.b" "a.d" "b.c"]}))
+(def df-separate2 (api/dataset {:x ["a" "a b" nil "a b c"]}))
+(def df-separate3 (api/dataset {:x ["a?b" nil "a.b" "b:c"]}))
+(def df-extract (api/dataset {:x [nil "a-b" "a-d" "b-c" "d-e"]}))
+```
+
+    #'user/df-separate
+    #'user/df-separate2
+    #'user/df-separate3
+    #'user/df-extract
+
+``` clojure
+df-separate
+```
+
+\_unnamed \[4 1\]:
+
+| :x  |
+|-----|
+| a.b |
+| a.d |
+| b.c |
+
+``` clojure
+df-separate2
+```
+
+\_unnamed \[4 1\]:
+
+| :x    |
+|-------|
+| a     |
+| a b   |
+| a b c |
+
+``` clojure
+df-separate3
+```
+
+\_unnamed \[4 1\]:
+
+| :x  |
+|-----|
+| a?b |
+| a.b |
+| b:c |
+
+``` clojure
+df-extract
+```
+
+\_unnamed \[5 1\]:
+
+| :x  |
+|-----|
+| a-b |
+| a-d |
+| b-c |
+| d-e |
+
+------------------------------------------------------------------------
+
+``` clojure
+(api/separate-column df-separate :x [:A :B] "\\.")
+```
+
+\_unnamed \[4 2\]:
+
+| :A  | :B  |
+|-----|-----|
+|     |     |
+| a   | b   |
+| a   | d   |
+| b   | c   |
+
+------------------------------------------------------------------------
+
+You can drop columns after separation by setting `nil` as a name. We need second value here.
+
+``` clojure
+(api/separate-column df-separate :x [nil :B] "\\.")
+```
+
+\_unnamed \[4 1\]:
+
+| :B  |
+|-----|
+|     |
+| b   |
+| d   |
+| c   |
+
+------------------------------------------------------------------------
+
+Extra data is dropped
+
+``` clojure
+(api/separate-column df-separate2 :x ["a" "b"] " ")
+```
+
+\_unnamed \[4 2\]:
+
+| a   | b   |
+|-----|-----|
+| a   |     |
+| a   | b   |
+|     |     |
+| a   | b   |
+
+------------------------------------------------------------------------
+
+Split with regular expression
+
+``` clojure
+(api/separate-column df-separate3 :x ["a" "b"] "[?\\.:]")
+```
+
+\_unnamed \[4 2\]:
+
+| a   | b   |
+|-----|-----|
+| a   | b   |
+| a   | b   |
+| b   | c   |
+
+------------------------------------------------------------------------
+
+Or just regular expression to extract values
+
+``` clojure
+(api/separate-column df-separate3 :x ["a" "b"] #"(.).(.)")
+```
+
+\_unnamed \[4 2\]:
+
+| a   | b   |
+|-----|-----|
+| a   | b   |
+| a   | b   |
+| b   | c   |
+
+------------------------------------------------------------------------
+
+Extract first value only
+
+``` clojure
+(api/separate-column df-extract :x ["A"] "-")
+```
+
+\_unnamed \[5 1\]:
+
+| A   |
+|-----|
+|     |
+| a   |
+| a   |
+| b   |
+| d   |
+
+------------------------------------------------------------------------
+
+Split with regex
+
+``` clojure
+(api/separate-column df-extract :x ["A" "B"] #"(\p{Alnum})-(\p{Alnum})")
+```
+
+\_unnamed \[5 2\]:
+
+| A   | B   |
+|-----|-----|
+|     |     |
+| a   | b   |
+| a   | d   |
+| b   | c   |
+| d   | e   |
+
+------------------------------------------------------------------------
+
+Only `a,b,c,d` strings
+
+``` clojure
+(api/separate-column df-extract :x ["A" "B"] #"([a-d]+)-([a-d]+)")
+```
+
+\_unnamed \[5 2\]:
+
+| A   | B   |
+|-----|-----|
+|     |     |
+| a   | b   |
+| a   | d   |
+| b   | c   |
+|     |     |
 
 ### Fold/Unroll Rows
 

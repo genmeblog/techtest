@@ -2,6 +2,7 @@
   (:require [tech.ml.dataset :as ds]
             [tech.ml.dataset.column :as col]
             [tech.ml.protocols.dataset :as prot]
+            [tech.v2.datatype :as dtype]
 
             [techtest.api.utils :refer [map-v iterable-sequence?]]))
 
@@ -100,3 +101,4 @@
 (defn print-dataset
   ([ds] (println (ds/dataset->str ds)))
   ([ds options] (println (ds/dataset->str ds options))))
+

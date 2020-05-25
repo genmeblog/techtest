@@ -1570,7 +1570,7 @@ Let's define dataset which contains missing values
 (def DSm (api/dataset {:V1 (take 9 (cycle [1 2 nil]))
                        :V2 (range 1 10)
                        :V3 (take 9 (cycle [0.5 1.0 nil 1.5]))
-                       :V4 (take 9 (cycle [\A \B \C]))}))
+                       :V4 (take 9 (cycle ["A" "B" "C"]))}))
 ```
 
 ```{clojure results="asis"}
@@ -1726,11 +1726,304 @@ We can use a function which is applied after applying `:up` or `:down`
 
 ### Join/Separate Columns
 
+Joining or separating columns are operations which can help to tidy messy dataset.
+
+* `join-columns` joins content of the columns (as string concatenation or other structure) and stores it in new column
+* `separate-column` splits content of the columns into set of new columns
+
 #### Join
+
+`join-columns` accepts:
+
+* dataset
+* column selector (as in `select-columns`)
+* options
+    - `:separator` (default `"-"`)
+    - `:drop-columns?` - whether to drop source columns or not (default `true`)
+    - `:result-type`
+        * `:map` - packs data into map
+        * `:seq` - packs data into sequence
+        * `:string` - join strings with separator (default)
+        * or custom function which gets row as a vector
+    - `:missing-subst` - substitution for missing value
+
+---
+
+Default usage. Create `:joined` column out of other columns.
+
+```{clojure results="asis"}
+(api/join-columns DSm :joined [:V1 :V2 :V4])
+```
+
+---
+
+Without dropping source columns.
+
+```{clojure results="asis"}
+(api/join-columns DSm :joined [:V1 :V2 :V4] {:drop-columns? false})
+```
+
+---
+
+Let's replace missing value with "NA" string.
+
+```{clojure results="asis"}
+(api/join-columns DSm :joined [:V1 :V2 :V4] {:missing-subst "NA"})
+```
+
+---
+
+We can use custom separator.
+
+```{clojure results="asis"}
+(api/join-columns DSm :joined [:V1 :V2 :V4] {:separator "/"
+                                             :missing-subst "."})
+```
+
+---
+
+Or even sequence of separators.
+
+```{clojure results="asis"}
+(api/join-columns DSm :joined [:V1 :V2 :V4] {:separator ["-" "/"]
+                                             :missing-subst "."})
+```
+
+---
+
+The other types of results, map:
+
+```{clojure results="asis"}
+(api/join-columns DSm :joined [:V1 :V2 :V4] {:result-type :map})
+```
+
+---
+
+Sequence
+
+```{clojure results="asis"}
+(api/join-columns DSm :joined [:V1 :V2 :V4] {:result-type :seq})
+```
+
+---
+
+Custom function, calculate hash
+
+```{clojure results="asis"}
+(api/join-columns DSm :joined [:V1 :V2 :V4] {:result-type hash})
+```
+
+---
+
+Grouped dataset
+
+```{clojure results="asis"}
+(-> DSm
+    (api/group-by :V4)
+    (api/join-columns :joined [:V1 :V2 :V4])
+    (api/ungroup))
+```
+
+---
+
+##### Tidyr examples
+
+[source](https://tidyr.tidyverse.org/reference/unite.html)
+
+```{clojure}
+(def df (api/dataset {:x ["a" "a" nil nil]
+                      :y ["b" nil "b" nil]}))
+```
+
+```{clojure results="asis"}
+df
+```
+
+---
+
+```{clojure results="asis"}
+(api/join-columns df "z" [:x :y] {:drop-columns? false
+                                  :missing-subst "NA"
+                                  :separator "_"})
+```
+
+---
+
+```{clojure results="asis"}
+(api/join-columns df "z" [:x :y] {:drop-columns? false
+                                  :separator "_"})
+```
+
 
 #### Separate
 
+Column can be also separated into several other columns using string as separator, regex or custom function. Arguments:
+
+* dataset
+* source column
+* target columns
+* separator as:
+    - string - it's converted to regular expression and passed to `clojure.string/split` function
+    - regex
+    - or custom function (default: identity)
+* options
+    - `:drop-columns?` - whether drop source column or not (default: `true`)
+    - `:missing-subst` - values which should be treated as missing, can be set, sequence, value or function (default: `""`)
+
+Custom function (as separator) should return seqence of values for given value.
+
+---
+
+Separate float into integer and factional values
+
+```{clojure results="asis"}
+(api/separate-column DS :V3 [:int-part :frac-part] (fn [^double v]
+                                                     [(int (quot v 1.0))
+                                                      (mod v 1.0)]))
+```
+
+---
+
+Source column can be kept
+
+```{clojure results="asis"}
+(api/separate-column DS :V3 [:int-part :frac-part] (fn [^double v]
+                                                     [(int (quot v 1.0))
+                                                      (mod v 1.0)]) {:drop-column? false})
+```
+
+---
+
+We can treat `0` or `0.0` as missing value
+
+```{clojure results="asis"}
+(api/separate-column DS :V3 [:int-part :frac-part] (fn [^double v]
+                                                     [(int (quot v 1.0))
+                                                      (mod v 1.0)]) {:missing-subst [0 0.0]})
+```
+
+---
+
+Works on grouped dataset
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V4)
+    (api/separate-column :V3 [:int-part :fract-part] (fn [^double v]
+                                                       [(int (quot v 1.0))
+                                                        (mod v 1.0)]))
+    (api/ungroup))
+```
+
+---
+
+Join and separate together.
+
+```{clojure results="asis"}
+(-> DSm
+    (api/join-columns :joined [:V1 :V2 :V4] {:result-type :map})
+    (api/separate-column :joined [:v1 :v2 :v4] (juxt :V1 :V2 :V4)))
+```
+
+```{clojure results="asis"}
+(-> DSm
+    (api/join-columns :joined [:V1 :V2 :V4] {:result-type :seq})
+    (api/separate-column :joined [:v1 :v2 :v4] identity))
+```
+
+##### Tidyr examples
+
+[separate source](https://tidyr.tidyverse.org/reference/separate.html)
+[extract source](https://tidyr.tidyverse.org/reference/extract.html)
+
+```{clojure}
+(def df-separate (api/dataset {:x [nil "a.b" "a.d" "b.c"]}))
+(def df-separate2 (api/dataset {:x ["a" "a b" nil "a b c"]}))
+(def df-separate3 (api/dataset {:x ["a?b" nil "a.b" "b:c"]}))
+(def df-extract (api/dataset {:x [nil "a-b" "a-d" "b-c" "d-e"]}))
+```
+
+```{clojure results="asis"}
+df-separate
+```
+
+```{clojure results="asis"}
+df-separate2
+```
+
+```{clojure results="asis"}
+df-separate3
+```
+
+```{clojure results="asis"}
+df-extract
+```
+
+---
+
+```{clojure results="asis"}
+(api/separate-column df-separate :x [:A :B] "\\.")
+```
+
+---
+
+You can drop columns after separation by setting `nil` as a name. We need second value here.
+
+```{clojure results="asis"}
+(api/separate-column df-separate :x [nil :B] "\\.")
+```
+
+---
+
+Extra data is dropped
+
+```{clojure results="asis"}
+(api/separate-column df-separate2 :x ["a" "b"] " ")
+```
+
+---
+
+Split with regular expression
+
+```{clojure results="asis"}
+(api/separate-column df-separate3 :x ["a" "b"] "[?\\.:]")
+```
+
+---
+
+Or just regular expression to extract values
+
+```{clojure results="asis"}
+(api/separate-column df-separate3 :x ["a" "b"] #"(.).(.)")
+```
+
+---
+
+Extract first value only
+
+```{clojure results="asis"}
+(api/separate-column df-extract :x ["A"] "-")
+```
+
+---
+
+Split with regex
+
+```{clojure results="asis"}
+(api/separate-column df-extract :x ["A" "B"] #"(\p{Alnum})-(\p{Alnum})")
+```
+
+---
+
+Only `a,b,c,d` strings
+
+```{clojure results="asis"}
+(api/separate-column df-extract :x ["A" "B"] #"([a-d]+)-([a-d]+)")
+```
+
 ### Fold/Unroll Rows
+
+Rows 
 
 #### Fold
 

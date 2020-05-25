@@ -11,7 +11,8 @@
             [clojure.string :as str]
 
             [tech.parallel.utils :as exporter]
-            [techtest.api.utils :refer [map-kv map-v iterable-sequence?]])
+            [techtest.api.utils :refer [map-kv map-v iterable-sequence?]]
+            [techtest.api.unique-by :refer [strategy-fold]])
   (:refer-clojure :exclude [group-by drop concat rand-nth first last shuffle])
   (:import [org.roaringbitmap RoaringBitmap]))
 
@@ -21,6 +22,8 @@
 
 ;; dataset
 
+(exporter/export-symbols tech.v2.datatype
+                         clone)
 
 (exporter/export-symbols tech.ml.dataset
                          column-count
@@ -87,6 +90,14 @@
                          select-missing
                          drop-missing
                          replace-missing)
+
+(exporter/export-symbols techtest.api.join-separate
+                         join-columns
+                         separate-column)
+
+(exporter/export-symbols techtest.api.fold-unroll
+                         unroll)
+
 ;; concat
 
 (defn concat
@@ -94,17 +105,6 @@
   (apply ds/concat datasets))
 
 
-(defn unroll
-  "Unroll columns if they are sequences. Selector can be one of:
-
-  - column name
-  - seq of column names
-  - map: column name -> column type"
-  [ds columns-selector]
-  (cond
-    (map? columns-selector) (reduce #(ds/unroll-column %1 (clojure.core/first %2) {:datatype (second %2)}) ds columns-selector)
-    (iterable-sequence? columns-selector) (reduce #(ds/unroll-column %1 %2) ds columns-selector)
-    :else (ds/unroll-column ds columns-selector)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -170,76 +170,6 @@
 ;; JOIN/SPLIT
 ;;;;;;;;;;;;;;;
 
-(defn join-columns
-  ([ds target-column columns-selector] (join-columns ds target-column columns-selector nil))
-  ([ds target-column columns-selector {:keys [separator missing-subst drop-columns? result-type]
-                                       :or {separator "-" drop-columns? true result-type :string}
-                                       :as options}]
-   (if (grouped? ds)
-     
-     (process-group-data ds #(join-columns % target-column columns-selector options))
-
-     (let [cols (select-columns ds columns-selector)
-           missing-subst-fn #(map (fn [row] (or row missing-subst)) %)
-           join-function (condp = result-type
-                           :map (let [col-names (ds/column-names cols)]
-                                  #(zipmap col-names %))
-                           :seq seq
-                           (let [sep (if (iterable-sequence? separator)
-                                       (cycle separator)
-                                       (repeat separator))]
-                             (fn [row] (->> row
-                                           (interleave sep)
-                                           (rest)
-                                           (apply str)))))]
-       
-       (let [result (ds/add-or-update-column ds target-column (->> (ds/value-reader cols options)
-                                                                   (map (comp join-function missing-subst-fn))))]
-
-         (if drop-columns? (drop-columns result columns-selector) result))))))
-
-(defn- separate-column->columns
-  [col target-columns replace-missing separator-fn]
-  (let [res (pmap separator-fn col)]
-    (pmap (fn [idx colname]
-            (col/new-column colname (map #(replace-missing (nth % idx)) res))) (range) target-columns)))
-
-(defn- prepare-missing-subst-fn
-  [missing-subst]
-  (let [missing-subst-fn (if (or (set? missing-subst)
-                                 (fn? missing-subst))
-                           missing-subst
-                           (partial = missing-subst))]
-    (fn [res]
-      (map #(if (missing-subst-fn %) nil %) res))))
-
-(defn separate-column
-  ([ds column target-columns] (separate-column ds column target-columns identity))
-  ([ds column target-columns separator] (separate-column ds column target-columns separator nil))
-  ([ds column target-columns separator {:keys [missing-subst drop-column?]
-                                        :or {drop-column? true}
-                                        :as options}]
-   (if (grouped? ds)
-     
-     (process-group-data ds #(separate-column % column target-columns separator options))
-
-     (let [separator-fn (cond
-                          (string? separator) (let [pat (re-pattern separator)]
-                                                #(str/split (str %) pat))
-                          (instance? java.util.regex.Pattern separator) #(rest (re-matches separator (str %)))
-                          :else separator)
-           replace-missing (if missing-subst
-                             (prepare-missing-subst-fn missing-subst)
-                             identity)
-           result (separate-column->columns (ds column) target-columns replace-missing separator-fn)
-           [dataset-before dataset-after] (map (partial ds/select-columns ds)
-                                               (split-with #(not= % column)
-                                                           (ds/column-names ds)))]
-       (-> (if drop-column?
-             dataset-before
-             (ds/add-column dataset-before (ds column)))
-           (ds/append-columns result)
-           (ds/append-columns (ds/columns (ds/drop-columns dataset-after [column]))))))))
 
 ;;;;;;;;;;;;
 ;; RESHAPE
@@ -328,7 +258,7 @@
                    (drop-join-leftovers join-name))] ;; drop unnecessary leftovers
       (if (> (ds/row-count data) starting-ds-count) ;; in case when there were multiple values, create vectors
         (if fold-fn
-          (strategy-fold data (column-names data (complement (set target-names))) fold-fn)
+          (strategy-fold data (column-names data (complement (set target-names))) fold-fn {:add-group-as-column true})
           (do (println "WARNING: multiple values in result detected, data should be rolled in.")
               data))
         data))))
@@ -534,11 +464,11 @@
 (ungroup (replace-missing (group-by DSm2 :b) [:a] 11 {:strategy :up}))
 
 (join-columns DSm :joined [:V1 :V2 :V4])
-(join-columns DSm :joined [:V1 :V2 :V4] {:drop-columns? true})
+(join-columns DSm :joined [:V1 :V2 :V4] {:drop-columns? false})
 (join-columns DSm :joined [:V1 :V2 :V4] {:separator "!" :missing-subst "NA"})
 (join-columns DSm :joined :all {:separator ["|" "-"] :missing-subst "NA"})
 (ungroup (join-columns (group-by DSm :V4) :joined [:V1 :V2 :V4]))
-(ungroup (join-columns (group-by DSm :V4) :joined [:V1 :V2 :V4] {:drop-columns? true}))
+(ungroup (join-columns (group-by DSm :V4) :joined [:V1 :V2 :V4] {:drop-columns? false}))
 (ungroup (join-columns (group-by DSm :V2) :joined [:V1 :V2 :V4] {:separator "!" :missing-subst "NA"}))
 
 (join-columns DSm :joined [:V1 :V2 :V4] {:result-type :map})
