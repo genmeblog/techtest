@@ -59,9 +59,9 @@
   ([ds columns-or-fn] (order-by ds columns-or-fn nil))
   ([ds columns-or-fn comparators] (order-by ds columns-or-fn comparators nil))
   ([ds columns-or-fn comparators {:keys [limit-columns]}]
-   (let [comparators (if (iterable-sequence? columns-or-fn)
-                       (repeat (count columns-or-fn) :asc)
-                       [:asc])
+   (let [comparators (or comparators (if (iterable-sequence? columns-or-fn)
+                                       (repeat (count columns-or-fn) :asc)
+                                       [:asc]))
          sorting-fn (->> comparators
                          asc-desc-comparator
                          (sort-fn columns-or-fn limit-columns))]
