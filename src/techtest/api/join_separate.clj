@@ -51,11 +51,15 @@
 (defn- separate-column->columns
   [col target-columns replace-missing separator-fn]
   (let [res (map separator-fn col)]
-    (remove nil? (map (fn [idx colname]
-                        (when colname
-                          (let [{:keys [data missing]} (col/scan-data-for-missing
-                                                        (map #(replace-missing (nth % idx)) res))]
-                            (col/new-column colname data nil missing)))) (range) target-columns))))
+    (->> (map-indexed vector target-columns)
+         (reduce (fn [curr [idx colname]]
+                   (if-not colname
+                     curr
+                     (conj curr colname (map #(replace-missing (nth % idx)) res)))) [])
+         (apply array-map)
+         (ds/name-values-seq->dataset)
+         (ds/columns))))
+
 
 (defn- prepare-missing-subst-fn
   [missing-subst]
@@ -100,3 +104,4 @@
      (if (grouped? ds)       
        (process-group-data ds #(process-separate-columns % column target-columns replace-missing separator-fn drop-column?))
        (process-separate-columns ds column target-columns replace-missing separator-fn drop-column?)))))
+
