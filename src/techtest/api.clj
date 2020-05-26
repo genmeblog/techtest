@@ -1,4 +1,5 @@
 (ns techtest.api
+  (:refer-clojure :exclude [group-by drop concat rand-nth first last shuffle])
   (:require [tech.ml.dataset :as ds]
             [tech.ml.dataset.column :as col]
             [tech.v2.datatype.functional :as dfn]
@@ -12,15 +13,9 @@
 
             [tech.parallel.utils :as exporter]
             [techtest.api.utils :refer [map-kv map-v iterable-sequence?]]
-            [techtest.api.unique-by :refer [strategy-fold]])
-  (:refer-clojure :exclude [group-by drop concat rand-nth first last shuffle])
-  (:import [org.roaringbitmap RoaringBitmap]))
+            [techtest.api.unique-by :refer [strategy-fold]]))
 
 #_(set! *warn-on-reflection* true)
-
-;; attempt to reorganized api
-
-;; dataset
 
 (exporter/export-symbols tech.v2.datatype
                          clone)
@@ -33,7 +28,11 @@
                          column
                          has-column?
                          write-csv!
-                         dataset->str)
+                         dataset->str
+                         hash-join
+                         left-join
+                         right-join
+                         inner-join)
 
 (exporter/export-symbols techtest.api.dataset
                          dataset?
@@ -99,37 +98,16 @@
                          fold-by
                          unroll)
 
+(exporter/export-symbols techtest.api.reshape
+                         pivot->longer
+                         pivot->wider)
+
 ;; concat
 
 (defn concat
   [datasets]
   (apply ds/concat datasets))
 
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; DESCRIPTIVE FUNCTIONS
-;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;;;;;;;;;;;
-;; GROUPING
-;;;;;;;;;;;;;
-
-
-;;;;;;;;;;;;;;;;;;;;;;;
-;; COLUMNS OPERATIONS
-;;;;;;;;;;;;;;;;;;;;;;;
-
-
-;;;;;;;;;;;;;;;;;;;;
-;; ROWS OPERATIONS
-;;;;;;;;;;;;;;;;;;;;
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;
-;; COMBINED OPERATIONS
-;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn- select-or-drop
   "Select columns and rows"
@@ -146,353 +124,6 @@
 (def select (partial select-or-drop select-columns select-rows))
 (def drop (partial select-or-drop drop-columns drop-rows))
 
-;;;;;;;;;;;;;;;;
-;; AGGREGATING
-;;;;;;;;;;;;;;;;
-
-
-
-;;;;;;;;;;;;;
-;; ORDERING
-;;;;;;;;;;;;;
-
-
-;;;;;;;;;;;
-;; UNIQUE
-;;;;;;;;;;;
-
-
-;;;;;;;;;;;;
-;; MISSING
-;;;;;;;;;;;;
-
-
-;;;;;;;;;;;;;;;
-;; JOIN/SPLIT
-;;;;;;;;;;;;;;;
-
-
-;;;;;;;;;;;;
-;; RESHAPE
-;;;;;;;;;;;;
-
-(defn- regroup-cols-from-template
-  [ds cols target-cols value-name column-split-fn]
-  (let [template? (some nil? target-cols)
-        pre-groups (->> cols
-                        (map (fn [col-name]
-                               (let [col (ds col-name)
-                                     split (column-split-fn col-name)
-                                     buff (if template? {} {value-name col})]
-                                 (into buff (mapv (fn [k v] (if k [k v] [v col]))
-                                                  target-cols split))))))
-        groups (-> (->> target-cols
-                        (remove nil?)
-                        (map #(fn [n] (get n %)))
-                        (apply juxt))
-                   (clojure.core/group-by pre-groups)
-                   (vals))]
-    (map #(reduce merge %) groups)))
-
-(defn- cols->pre-longer
-  ([ds cols names value-name column-splitter]
-   (let [column-split-fn (cond (instance? java.util.regex.Pattern column-splitter) (comp rest #(re-find column-splitter (str %)))
-                               (fn? column-splitter) column-splitter
-                               :else vector)]
-     (regroup-cols-from-template ds cols names value-name column-split-fn))))
-
-(defn- pre-longer->target-cols
-  [ds cnt m]
-  (let [new-cols (map (fn [[col-name maybe-column]]
-                        (if (col/is-column? maybe-column)
-                          (col/set-name maybe-column col-name)
-                          (col/new-column col-name (dtype/const-reader maybe-column cnt {:datatype :object})))) m)]
-    (ds/append-columns ds new-cols)))
-
-(defn pivot->longer
-  "`tidyr` pivot_longer api"
-  ([ds columns-selector] (pivot->longer ds columns-selector nil))
-  ([ds columns-selector {:keys [target-cols value-column-name splitter drop-missing? meta-field datatypes]
-                         :or {target-cols :$column
-                              value-column-name :$value
-                              drop-missing? true}}]
-   (let [cols (column-names ds columns-selector meta-field)
-         target-cols (if (iterable-sequence? target-cols) target-cols [target-cols])
-         groups (cols->pre-longer ds cols target-cols value-column-name splitter)
-         cols-to-add (keys (clojure.core/first groups))
-         ds-template (drop-columns ds cols)
-         cnt (ds/row-count ds-template)]
-     (as-> (ds/set-metadata (->> groups                                        
-                                 (map (partial pre-longer->target-cols ds-template cnt))
-                                 (apply ds/concat))
-                            (ds/metadata ds)) final-ds
-       (if drop-missing? (drop-missing final-ds cols-to-add) final-ds)
-       (if datatypes (convert-column-type final-ds datatypes) final-ds)
-       (reorder-columns final-ds (ds/column-names ds-template) (remove nil? target-cols))))))
-
-(defn- drop-join-leftovers
-  [data join-name]
-  (drop-columns data (-> (meta data)
-                         :right-column-names
-                         (get join-name))))
-
-(defn- perform-join
-  [join-ds curr-ds join-name]
-  (ds/left-join join-name curr-ds join-ds))
-
-(defn- make-apply-join-fn
-  "Perform left-join on groups and create new columns"
-  [group-name->names single-value? value-names join-name starting-ds-count fold-fn rename-map]
-  (fn [curr-ds {:keys [name group-id data]}]
-    (let [col-name (str/join "_" (->> name
-                                      group-name->names
-                                      (remove nil?))) ;; source names
-          col-name (get rename-map col-name col-name)
-          target-names (if single-value?
-                         [col-name]
-                         (map #(str % "-" col-name) value-names)) ;; traget column names
-          rename-map (zipmap value-names target-names) ;; renaming map
-          data (-> data
-                   (rename-columns rename-map) ;; rename value column
-                   (select-columns (conj target-names join-name)) ;; select rhs for join
-                   (perform-join curr-ds join-name) ;; perform left join
-                   (drop-join-leftovers join-name))] ;; drop unnecessary leftovers
-      (if (> (ds/row-count data) starting-ds-count) ;; in case when there were multiple values, create vectors
-        (if fold-fn
-          (strategy-fold data (column-names data (complement (set target-names))) fold-fn {:add-group-as-column true})
-          (do (println "WARNING: multiple values in result detected, data should be rolled in.")
-              data))
-        data))))
-
-(defn pivot->wider
-  ([ds columns-selector value-columns] (pivot->wider ds columns-selector value-columns nil))
-  ([ds columns-selector value-columns {:keys [fold-fn rename-map]}]
-   (let [col-names (column-names ds columns-selector) ;; columns to be unrolled
-         value-names (column-names ds value-columns) ;; columns to be used as values
-         single-value? (= (count value-names) 1) ;; maybe this is one column? (different name creation rely on this)
-         rest-cols (->> (clojure.core/concat col-names value-names)
-                        (set)
-                        (complement)
-                        (column-names ds)) ;; the columns used in join
-         join-on-single? (= (count rest-cols) 1) ;; mayve this is one column? (different join column creation)
-         join-name (if join-on-single?
-                     (clojure.core/first rest-cols)
-                     (gensym (apply str "^____" rest-cols))) ;; generate join column name
-         ;; col-to-drop (col-to-drop-name join-name) ;; what to drop after join
-         pre-ds (if join-on-single?
-                  ds
-                  (join-columns ds join-name rest-cols {:result-type :seq
-                                                        :drop-columns? true})) ;; t.m.ds doesn't have join on multiple columns, so we need to create single column to be used fo join
-         starting-ds (unique-by (select-columns pre-ds join-name)) ;; left join source dataset
-         starting-ds-count (ds/row-count starting-ds) ;; how much records to expect
-         grouped-ds (group-by pre-ds col-names) ;; group by columns which values will create new columns
-         group-name->names (->> col-names
-                                (map #(fn [m] (get m %)))
-                                (apply juxt)) ;; create function which extract new column name
-         result (reduce (make-apply-join-fn group-name->names single-value? value-names
-                                            join-name starting-ds-count fold-fn rename-map)
-                        starting-ds
-                        (ds/mapseq-reader grouped-ds))] ;; perform join on groups and create new columns
-     (-> (if join-on-single? ;; finalize, recreate original columns from join column, and reorder stuff
-           result
-           (-> (separate-column result join-name rest-cols identity {:drop-column? true})
-               (reorder-columns rest-cols)))
-         (ds/set-dataset-name (ds/dataset-name ds))))))
-
-
-
-;;;;;;;;;;;;;;
-;; USE CASES
-;;;;;;;;;;;;;;
-
-
-;; unroll
-
-(unroll (dataset [{:a 1 :b [1 2 3]} {:a 2 :b [3 4]}]) :b)
-(unroll (dataset [{:a 1 :b [1 2 3]} {:a 2 :b [3 4]}]) [:b])
-(unroll (dataset [{:a 1 :b [1 2 3]} {:a 2 :b [3 4]}]) {:b :float32})
-
-
-;; https://archive.ics.uci.edu/ml/machine-learning-databases/kddcup98-mld/epsilon_mirror/
-;; (time (def ds (dataset "cup98LRN.txt.gz")))
-(def DS (dataset {:V1 (take 9 (cycle [1 2]))
-                  :V2 (range 1 10)
-                  :V3 (take 9 (cycle [0.5 1.0 1.5]))
-                  :V4 (take 9 (cycle [\A \B \C]))}))
-
-(def DSm (dataset {:V1 (take 9 (cycle [1 2 nil]))
-                   :V2 (range 1 10)
-                   :V3 (take 9 (cycle [0.5 1.0 nil 1.5]))
-                   :V4 (take 9 (cycle [\A \B \C]))}))
-
-(def DSm2 (dataset {:a [nil nil nil 1 2 nil 3 4 nil nil nil 11 nil]
-                    :b [nil 2   2   2 2 3   nil 3 nil   3   nil   4  nil]}))
-
-
-(ungroup (group-by DS :V1) {:dataset-name "ungrouped"})
-(ungroup (group-by DS [:V1 :V3]) {:add-group-id-as-column true})
-(ungroup (group-by DS (juxt :V1 :V4)) {:add-group-as-column "my group"})
-(ungroup (group-by DS #(< (:V2 %) 4)) {:add-group-as-column true})
-(ungroup (group-by DS (comp #{\B \C} :V4)) {:add-group-as-column true})
-
-
-(select-columns DS :V1)
-(select-columns DS [:V1 :V2])
-(select-columns DS {:V1 "v1"
-                    :V2 "v2"})
-(select-columns DS #(= :int64 %) :datatype)
-
-(drop-columns DS :V1)
-(drop-columns DS [:V1 :V2])
-(drop-columns DS #(= :int64 %) :datatype)
-
-(rename-columns DS {:V1 "v1"
-                    :V2 "v2"})
-
-(ungroup (select-columns (group-by DS :V1) {:V1 "v1"}))
-(ungroup (drop-columns (group-by DS [:V4]) (comp #{:int64} :datatype)))
-
-(add-or-update-column DS :abc [1 2] :na)
-(add-or-update-column DS :abc [1 2] :cycle)
-(add-or-update-column DS :abc "X")
-(add-or-update-columns DS {:abc "X"
-                           :xyz [1 2 3]})
-(add-or-update-column DS :abc (fn [ds] (dfn/+ (ds :V1) (ds :V2))))
-
-(add-or-update-columns DS {:abc "X"
-                           :xyz [1 2 3]} :na)
-
-(ungroup (add-or-update-column (group-by DS :V4) :abc #(let [mean (dfn/mean (% :V2))
-                                                             stddev (dfn/standard-deviation (% :V2))]
-                                                         (dfn// (dfn/- (% :V2) mean)
-                                                                stddev))))
-
-
-(ungroup (add-or-update-columns (group-by DS :V4) {:abc "X"
-                                                   :xyz [-1]} :na))
-
-(convert-column-type DS :V1 :float64)
-
-(select-rows DS 3)
-(drop-rows DS 3)
-
-
-(select-rows DS [3 4 7])
-(drop-rows DS [3 4 7])
-
-(select-rows DS (comp #(< 1 %) :V1))
-(drop-rows DS (comp #(< 1 %) :V1))
-
-(select-rows DS [true nil nil true])
-(drop-rows DS [true nil nil true])
-
-(ungroup (select-rows (group-by DS :V1) 0))
-(ungroup (drop-rows (group-by DS :V1) 0))
-
-;; select rows where :V2 values are lower than column mean
-(let [mean (dfn/mean (DS :V2))]
-  (select-rows DS (fn [row] (< (:V2 row) mean))))
-
-;; select rows of grouped (by :V4) where :V2 values are lower than :V2 mean.
-;; pre option adds temporary columns according to provided map before row selecting 
-(ungroup (select-rows (group-by DS :V4)
-                      (fn [row] (< (:V2 row) (:mean row)))
-                      {:pre {:mean #(dfn/mean (% :V2))}}))
-
-(aggregate DS [#(dfn/mean (% :V3)) (fn [ds] {:mean-v1 (dfn/mean (ds :V1))
-                                            :mean-v2 (dfn/mean (ds :V2))})])
-
-(aggregate (group-by DS :V4) [#(dfn/mean (% :V3)) (fn [ds] {:mean-v1 (dfn/mean (ds :V1))
-                                                           :mean-v2 (dfn/mean (ds :V2))})])
-
-(order-by DS :V1)
-(order-by DS :V1 :desc)
-
-(order-by DS [:V1 :V2])
-(order-by DS [:V1 :V2] [:asc :desc])
-(order-by DS [:V1 :V2] [:desc :desc])
-(order-by DS [:V3 :V1] [:desc :asc])
-
-(order-by DS [:V4 (fn [row] (* (:V1 row)
-                              (:V2 row)
-                              (:V3 row)))] [:desc :asc])
-
-(ungroup (order-by (group-by DS :V4) [:V1 :V2] [:desc :desc]))
-
-(unique-by DS)
-
-(unique-by DS :V1)
-(unique-by DS :V1 {:strategy :last})
-(unique-by DS :V1 {:strategy :random})
-(unique-by DS :V1 {:strategy :fold})
-
-(unique-by DS :V4 {:strategy vec})
-
-(unique-by DS :V4 {:strategy (partial reduce +)})
-
-
-(unique-by DS (fn [m] (mod (:V2 m) 3)) {:strategy vec})
-
-
-(unique-by DS [:V1 :V4])
-(unique-by DS [:V1 :V4] {:strategy :last})
-
-(unique-by DS (fn [m] (mod (:V2 m) 3)))
-(unique-by DS (fn [m] (mod (:V2 m) 3)) {:strategy :last :limit-columns [:V2]})
-
-(ungroup (unique-by (group-by DS :V4) [:V1 :V3]))
-
-(select-missing DSm)
-(drop-missing DSm)
-
-(select-missing DSm :V1)
-(drop-missing DSm :V1)
-
-(ungroup (select-missing (group-by DSm :V4)))
-(ungroup (drop-missing (group-by DSm :V4)))
-
-(replace-missing DSm2 :a 222)
-(replace-missing DSm2 [:a :b] 222)
-
-(replace-missing DSm2 :a nil {:strategy :up})
-(replace-missing DSm2 :a nil {:strategy :down})
-(replace-missing DSm2 :a 999 {:strategy :up})
-(replace-missing DSm2 :a 999 {:strategy :down})
-(replace-missing DSm2 [:a :b] 999 {:strategy :down})
-
-(replace-missing DSm2 [:a :b] dfn/median)
-
-(ungroup (replace-missing (group-by DSm2 :b) [:a] 11 {:strategy :up}))
-
-(join-columns DSm :joined [:V1 :V2 :V4])
-(join-columns DSm :joined [:V1 :V2 :V4] {:drop-columns? false})
-(join-columns DSm :joined [:V1 :V2 :V4] {:separator "!" :missing-subst "NA"})
-(join-columns DSm :joined :all {:separator ["|" "-"] :missing-subst "NA"})
-(ungroup (join-columns (group-by DSm :V4) :joined [:V1 :V2 :V4]))
-(ungroup (join-columns (group-by DSm :V4) :joined [:V1 :V2 :V4] {:drop-columns? false}))
-(ungroup (join-columns (group-by DSm :V2) :joined [:V1 :V2 :V4] {:separator "!" :missing-subst "NA"}))
-
-(join-columns DSm :joined [:V1 :V2 :V4] {:result-type :map})
-(join-columns DSm :joined [:V1 :V2 :V4] {:result-type :seq})
-
-
-(separate-column DS :V3 [:int-part :frac-part] (fn [^double v]
-                                                 [(int (quot v 1.0))
-                                                  (mod v 1.0)]))
-
-(separate-column DS :V3 [:int-part :frac-part] (fn [^double v]
-                                                 [(int (quot v 1.0))
-                                                  (mod v 1.0)]) {:drop-column? false})
-
-(separate-column DS :V3 [:int-part :frac-part] (fn [^double v]
-                                                 [(int (quot v 1.0))
-                                                  (mod v 1.0)]) {:missing-subst #{0 0.0}})
-
-(separate-column (join-columns DSm :joined [:V1 :V2 :V4] {:result-type :map})
-                 :joined [:v1 :v2 :v4] (juxt :V1 :V2 :V4))
-
-(separate-column (join-columns DSm :joined [:V1 :V2 :V4] {:result-type :seq})
-                 :joined [:v1 :v2 :v4] identity)
 
 
 ;;;;

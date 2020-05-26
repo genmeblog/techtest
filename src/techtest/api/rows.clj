@@ -1,11 +1,11 @@
 (ns techtest.api.rows
+  (:refer-clojure :exclude [shuffle rand-nth first last])
   (:require [tech.ml.dataset :as ds]
 
             [techtest.api.utils :refer [iterable-sequence?]]
             [techtest.api.columns :refer [add-or-update-columns]]
             [techtest.api.group-by :refer [grouped? process-group-data]]
-            [tech.v2.datatype.functional :as dfn])
-  (:refer-clojure :exclude [shuffle rand-nth first last]))
+            [tech.v2.datatype.functional :as dfn]))
 
 (defn- find-indexes-from-seq
   "Find row indexes based on true/false values or indexes"

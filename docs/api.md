@@ -588,7 +588,7 @@ Rows as sequence of sequences
 (take 2 (api/rows ds))
 ```
 
-    ([#object[java.time.LocalDate 0x13184030 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x47018323 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+    ([#object[java.time.LocalDate 0x5b4df88c "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x2af89d36 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 
 ------------------------------------------------------------------------
 
@@ -598,13 +598,13 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
-    ({"date" #object[java.time.LocalDate 0x55266f34 "2012-01-01"],
+    ({"date" #object[java.time.LocalDate 0x2c2b67a2 "2012-01-01"],
       "precipitation" 0.0,
       "temp_min" 5.0,
       "weather" "drizzle",
       "temp_max" 12.8,
       "wind" 4.7}
-     {"date" #object[java.time.LocalDate 0x642889a2 "2012-01-02"],
+     {"date" #object[java.time.LocalDate 0x6a281f74 "2012-01-02"],
       "precipitation" 10.9,
       "temp_min" 2.8,
       "weather" "rain",
@@ -1700,7 +1700,7 @@ If you want to rename colums use `rename-columns` and pass map where keys are ol
 
 \_unnamed \[9 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@14c234d3> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@100fc172> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 2   | 2   | 1.000     | B                           |
@@ -1728,7 +1728,7 @@ Function works on grouped dataset
 
 {1 Group: 1 \[5 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@742e9d55> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@6a359be7> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 1   | 3   | 1.500     | C                           |
@@ -1738,7 +1738,7 @@ Function works on grouped dataset
 
 , 2 Group: 2 \[4 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@742e9d55> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@6a359be7> |
 |-----|-----|-----------|-----------------------------|
 | 2   | 2   | 1.000     | B                           |
 | 2   | 4   | 0.5000    | A                           |
@@ -1794,15 +1794,15 @@ Replace one column (column is trimmed)
 
 | :V1     | :V2 | :V3    | :V4 |
 |---------|-----|--------|-----|
-| 0.8707  | 1   | 0.5000 | A   |
-| 0.03354 | 2   | 1.000  | B   |
-| 0.2123  | 3   | 1.500  | C   |
-| 0.3767  | 4   | 0.5000 | A   |
-| 0.4065  | 5   | 1.000  | B   |
-| 0.8876  | 6   | 1.500  | C   |
-| 0.1387  | 7   | 0.5000 | A   |
-| 0.4397  | 8   | 1.000  | B   |
-| 0.9100  | 9   | 1.500  | C   |
+| 0.05439 | 1   | 0.5000 | A   |
+| 0.2244  | 2   | 1.000  | B   |
+| 0.01317 | 3   | 1.500  | C   |
+| 0.2552  | 4   | 0.5000 | A   |
+| 0.9822  | 5   | 1.000  | B   |
+| 0.8805  | 6   | 1.500  | C   |
+| 0.5465  | 7   | 0.5000 | A   |
+| 0.3808  | 8   | 1.000  | B   |
+| 0.2649  | 9   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -2203,7 +2203,7 @@ Double array conversion.
 (api/->array DS :V1)
 ```
 
-    #object["[J" 0xe56bb15 "[J@e56bb15"]
+    #object["[J" 0x293b62f0 "[J@293b62f0"]
 
 ------------------------------------------------------------------------
 
@@ -2215,7 +2215,7 @@ Function also works on grouped dataset
     (api/->array :V2))
 ```
 
-    (#object["[J" 0x28b9158d "[J@28b9158d"] #object["[J" 0x5066f294 "[J@5066f294"] #object["[J" 0x4e3af7a7 "[J@4e3af7a7"])
+    (#object["[J" 0x7ff7e523 "[J@7ff7e523"] #object["[J" 0x314c1d81 "[J@314c1d81"] #object["[J" 0x58e0b5f "[J@58e0b5f"])
 
 ------------------------------------------------------------------------
 
@@ -2226,8 +2226,8 @@ You can also cast the type to the other one (if casting is possible):
 (api/->array DS :V1 :float32)
 ```
 
-    #object["[Ljava.lang.String;" 0x1cee5f57 "[Ljava.lang.String;@1cee5f57"]
-    #object["[F" 0x7ea136e "[F@7ea136e"]
+    #object["[Ljava.lang.String;" 0x661063fe "[Ljava.lang.String;@661063fe"]
+    #object["[F" 0x7d144fb0 "[F@7d144fb0"]
 
 ### Rows
 
@@ -2411,7 +2411,7 @@ Random row (single)
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
-| 2   | 8   | 1.000 | B   |
+| 2   | 6   | 1.500 | C   |
 
 ------------------------------------------------------------------------
 
@@ -2426,14 +2426,14 @@ Random `n` (default: row count) rows with repetition.
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
 | 2   | 2   | 1.000  | B   |
-| 2   | 4   | 0.5000 | A   |
-| 1   | 7   | 0.5000 | A   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
 | 1   | 3   | 1.500  | C   |
-| 1   | 1   | 0.5000 | A   |
-| 1   | 5   | 1.000  | B   |
 | 2   | 4   | 0.5000 | A   |
-| 1   | 7   | 0.5000 | A   |
-| 1   | 1   | 0.5000 | A   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2445,13 +2445,13 @@ Five random rows with repetition
 
 \_unnamed \[5 4\]:
 
-| :V1 | :V2 | :V3   | :V4 |
-|-----|-----|-------|-----|
-| 1   | 5   | 1.000 | B   |
-| 2   | 6   | 1.500 | C   |
-| 1   | 5   | 1.000 | B   |
-| 1   | 5   | 1.000 | B   |
-| 1   | 3   | 1.500 | C   |
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 2   | 8   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 8   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 6   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -2465,10 +2465,10 @@ Five random, non-repeating rows
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
 | 1   | 7   | 0.5000 | A   |
 | 1   | 3   | 1.500  | C   |
-| 1   | 1   | 0.5000 | A   |
-| 1   | 5   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
 | 2   | 4   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
@@ -2484,14 +2484,14 @@ Shuffle dataset
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
 | 2   | 8   | 1.000  | B   |
-| 1   | 5   | 1.000  | B   |
-| 2   | 4   | 0.5000 | A   |
-| 2   | 2   | 1.000  | B   |
-| 2   | 6   | 1.500  | C   |
-| 1   | 1   | 0.5000 | A   |
 | 1   | 3   | 1.500  | C   |
-| 1   | 7   | 0.5000 | A   |
 | 1   | 9   | 1.500  | C   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 1   | 0.5000 | A   |
+| 2   | 6   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
 
 ------------------------------------------------------------------------
 
@@ -2544,18 +2544,18 @@ Select 5 random rows from each group
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 1   | 0.5000 | A   |
 | 1   | 7   | 0.5000 | A   |
-| 1   | 1   | 0.5000 | A   |
-| 1   | 1   | 0.5000 | A   |
-| 1   | 1   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
 | 1   | 5   | 1.000  | B   |
-| 2   | 8   | 1.000  | B   |
-| 2   | 8   | 1.000  | B   |
 | 2   | 2   | 1.000  | B   |
 | 2   | 8   | 1.000  | B   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 2   | 1.000  | B   |
 | 1   | 9   | 1.500  | C   |
-| 1   | 9   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
 | 1   | 3   | 1.500  | C   |
 | 1   | 9   | 1.500  | C   |
 | 1   | 9   | 1.500  | C   |
@@ -3020,7 +3020,7 @@ Random
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 1   | 0.5000 | A   |
+| 1   | 3   | 1.500  | C   |
 | 2   | 4   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
@@ -4226,6 +4226,28 @@ or
 | C   | \#{1 2} | \#{6 3 9} | \#{1.5} |
 | A   | \#{1 2} | \#{7 1 4} | \#{0.5} |
 
+------------------------------------------------------------------------
+
+This works also on grouped dataset
+
+``` clojure
+(-> DS
+    (api/group-by :V1)
+    (api/fold-by :V4)
+    (api/ungroup))
+```
+
+\_unnamed \[6 4\]:
+
+| :V4 | :V1     | :V2     | :V3         |
+|-----|---------|---------|-------------|
+| B   | \[1\]   | \[5\]   | \[1.0\]     |
+| C   | \[1 1\] | \[3 9\] | \[1.5 1.5\] |
+| A   | \[1 1\] | \[1 7\] | \[0.5 0.5\] |
+| B   | \[2 2\] | \[2 8\] | \[1.0 1.0\] |
+| C   | \[2\]   | \[6\]   | \[1.5\]     |
+| A   | \[2\]   | \[4\]   | \[0.5\]     |
+
 #### Unroll
 
 `unroll` unfolds sequences stored in data, multiplying other ones when necessary. You can unroll more than one column at once (folded data should have the same size!).
@@ -4372,9 +4394,295 @@ You can also force datatypes
 | :V3   | 9     | :float32  |               |
 | :V4   | 9     | :string   | true          |
 
+------------------------------------------------------------------------
+
+This works also on grouped dataset
+
+``` clojure
+(-> DS
+    (api/group-by :V1)
+    (api/fold-by [:V1 :V4])
+    (api/unroll :V3 {:indexes? true})
+    (api/ungroup))
+```
+
+\_unnamed \[9 5\]:
+
+| :V4 | :V1 | :V2     | :indexes | :V3    |
+|-----|-----|---------|----------|--------|
+| A   | 1   | \[1 7\] | 0        | 0.5000 |
+| A   | 1   | \[1 7\] | 1        | 0.5000 |
+| B   | 1   | \[5\]   | 0        | 1.000  |
+| C   | 1   | \[3 9\] | 0        | 1.500  |
+| C   | 1   | \[3 9\] | 1        | 1.500  |
+| C   | 2   | \[6\]   | 0        | 1.500  |
+| A   | 2   | \[4\]   | 0        | 0.5000 |
+| B   | 2   | \[2 8\] | 0        | 1.000  |
+| B   | 2   | \[2 8\] | 1        | 1.000  |
+
 ### Reshape
 
+Reshaping data provides two types of operations:
+
+-   `pivot->longer` - converting columns to rows
+-   `pivot->wider` - converting rows to columns
+
+Both functions are inspired on [tidyr](https://tidyr.tidyverse.org/articles/pivot.html) R package and provide almost the same functionality.
+
+All examples are taken from mentioned above documentation.
+
+Both functions work only on regular dataset.
+
 #### Longer
+
+Create rows from all columns but `"religion"`.
+
+``` clojure
+(def relig-income (api/dataset "data/relig_income.csv"))
+```
+
+``` clojure
+(api/head relig-income)
+```
+
+data/relig\_income.csv \[5 11\]:
+
+<table>
+<colgroup>
+<col width="16%" />
+<col width="6%" />
+<col width="7%" />
+<col width="7%" />
+<col width="7%" />
+<col width="7%" />
+<col width="7%" />
+<col width="8%" />
+<col width="9%" />
+<col width="6%" />
+<col width="16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>religion</th>
+<th>&lt;$10k</th>
+<th>$10-20k</th>
+<th>$20-30k</th>
+<th>$30-40k</th>
+<th>$40-50k</th>
+<th>$50-75k</th>
+<th>$75-100k</th>
+<th>$100-150k</th>
+<th>&gt;150k</th>
+<th>Don't know/refused</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Agnostic</td>
+<td>27</td>
+<td>34</td>
+<td>60</td>
+<td>81</td>
+<td>76</td>
+<td>137</td>
+<td>122</td>
+<td>109</td>
+<td>84</td>
+<td>96</td>
+</tr>
+<tr class="even">
+<td>Atheist</td>
+<td>12</td>
+<td>27</td>
+<td>37</td>
+<td>52</td>
+<td>35</td>
+<td>70</td>
+<td>73</td>
+<td>59</td>
+<td>74</td>
+<td>76</td>
+</tr>
+<tr class="odd">
+<td>Buddhist</td>
+<td>27</td>
+<td>21</td>
+<td>30</td>
+<td>34</td>
+<td>33</td>
+<td>58</td>
+<td>62</td>
+<td>39</td>
+<td>53</td>
+<td>54</td>
+</tr>
+<tr class="even">
+<td>Catholic</td>
+<td>418</td>
+<td>617</td>
+<td>732</td>
+<td>670</td>
+<td>638</td>
+<td>1116</td>
+<td>949</td>
+<td>792</td>
+<td>633</td>
+<td>1489</td>
+</tr>
+<tr class="odd">
+<td>Don’t know/refused</td>
+<td>15</td>
+<td>14</td>
+<td>15</td>
+<td>11</td>
+<td>10</td>
+<td>35</td>
+<td>21</td>
+<td>17</td>
+<td>18</td>
+<td>116</td>
+</tr>
+</tbody>
+</table>
+
+``` clojure
+(api/pivot->longer relig-income (complement #{"religion"}))
+```
+
+data/relig\_income.csv \[180 3\]:
+
+| religion                | :$column           | :$value |
+|-------------------------|--------------------|---------|
+| Agnostic                | &lt;$10k           | 27      |
+| Atheist                 | &lt;$10k           | 12      |
+| Buddhist                | &lt;$10k           | 27      |
+| Catholic                | &lt;$10k           | 418     |
+| Don’t know/refused      | &lt;$10k           | 15      |
+| Evangelical Prot        | &lt;$10k           | 575     |
+| Hindu                   | &lt;$10k           | 1       |
+| Historically Black Prot | &lt;$10k           | 228     |
+| Jehovah's Witness       | &lt;$10k           | 20      |
+| Jewish                  | &lt;$10k           | 19      |
+| Mainline Prot           | &lt;$10k           | 289     |
+| Mormon                  | &lt;$10k           | 29      |
+| Muslim                  | &lt;$10k           | 6       |
+| Orthodox                | &lt;$10k           | 13      |
+| Other Christian         | &lt;$10k           | 9       |
+| Other Faiths            | &lt;$10k           | 20      |
+| Other World Religions   | &lt;$10k           | 5       |
+| Unaffiliated            | &lt;$10k           | 217     |
+| Agnostic                | Don't know/refused | 96      |
+| Atheist                 | Don't know/refused | 76      |
+| Buddhist                | Don't know/refused | 54      |
+| Catholic                | Don't know/refused | 1489    |
+| Don’t know/refused      | Don't know/refused | 116     |
+| Evangelical Prot        | Don't know/refused | 1529    |
+| Hindu                   | Don't know/refused | 37      |
+
+------------------------------------------------------------------------
+
+Convert only columns starting with `"wk"` and pack them into `:week` column, values go to `:rank` column
+
+``` clojure
+(def bilboard (-> (api/dataset "data/billboard.csv.gz")
+                  (api/drop-columns #(= :boolean %) :datatype))) ;; drop some boolean columns, tidyr just skips them
+```
+
+``` clojure
+(->> bilboard
+     (api/column-names)
+     (take 11)
+     (api/select-columns bilboard)
+     (api/head))
+```
+
+data/billboard.csv.gz \[5 11\]:
+
+| artist       | track                   | date.entered | wk1 | wk2 | wk3 | wk4 | wk5 | wk6 | wk7 | wk8 |
+|--------------|-------------------------|--------------|-----|-----|-----|-----|-----|-----|-----|-----|
+| 2 Pac        | Baby Don't Cry (Keep... | 2000-02-26   | 87  | 82  | 72  | 77  | 87  | 94  | 99  |     |
+| 2Ge+her      | The Hardest Part Of ... | 2000-09-02   | 91  | 87  | 92  |     |     |     |     |     |
+| 3 Doors Down | Kryptonite              | 2000-04-08   | 81  | 70  | 68  | 67  | 66  | 57  | 54  | 53  |
+| 3 Doors Down | Loser                   | 2000-10-21   | 76  | 76  | 72  | 69  | 67  | 65  | 55  | 59  |
+| 504 Boyz     | Wobble Wobble           | 2000-04-15   | 57  | 34  | 25  | 17  | 17  | 31  | 36  | 49  |
+
+``` clojure
+(api/pivot->longer bilboard #(clojure.string/starts-with? % "wk") {:target-cols :week
+                                                                   :value-column-name :rank})
+```
+
+data/billboard.csv.gz \[5307 5\]:
+
+| artist              | track                   | date.entered | :week | :rank |
+|---------------------|-------------------------|--------------|-------|-------|
+| 3 Doors Down        | Kryptonite              | 2000-04-08   | wk35  | 4     |
+| Braxton, Toni       | He Wasn't Man Enough    | 2000-03-18   | wk35  | 34    |
+| Creed               | Higher                  | 1999-09-11   | wk35  | 22    |
+| Creed               | With Arms Wide Open     | 2000-05-13   | wk35  | 5     |
+| Hill, Faith         | Breathe                 | 1999-11-06   | wk35  | 8     |
+| Joe                 | I Wanna Know            | 2000-01-01   | wk35  | 5     |
+| Lonestar            | Amazed                  | 1999-06-05   | wk35  | 14    |
+| Vertical Horizon    | Everything You Want     | 2000-01-22   | wk35  | 27    |
+| matchbox twenty     | Bent                    | 2000-04-29   | wk35  | 33    |
+| Creed               | Higher                  | 1999-09-11   | wk55  | 21    |
+| Lonestar            | Amazed                  | 1999-06-05   | wk55  | 22    |
+| 3 Doors Down        | Kryptonite              | 2000-04-08   | wk19  | 18    |
+| 3 Doors Down        | Loser                   | 2000-10-21   | wk19  | 73    |
+| 98^0                | Give Me Just One Nig... | 2000-08-19   | wk19  | 93    |
+| Aaliyah             | I Don't Wanna           | 2000-01-29   | wk19  | 83    |
+| Aaliyah             | Try Again               | 2000-03-18   | wk19  | 3     |
+| Adams, Yolanda      | Open My Heart           | 2000-08-26   | wk19  | 79    |
+| Aguilera, Christina | Come On Over Baby (A... | 2000-08-05   | wk19  | 23    |
+| Aguilera, Christina | I Turn To You           | 2000-04-15   | wk19  | 29    |
+| Aguilera, Christina | What A Girl Wants       | 1999-11-27   | wk19  | 18    |
+| Alice Deejay        | Better Off Alone        | 2000-04-08   | wk19  | 79    |
+| Amber               | Sexual                  | 1999-07-17   | wk19  | 95    |
+| Anthony, Marc       | My Baby You             | 2000-09-16   | wk19  | 91    |
+| Anthony, Marc       | You Sang To Me          | 2000-02-26   | wk19  | 9     |
+| Avant               | My First Love           | 2000-11-04   | wk19  | 81    |
+
+------------------------------------------------------------------------
+
+We can create numerical column out of column names
+
+``` clojure
+(api/pivot->longer bilboard #(clojure.string/starts-with? % "wk") {:target-cols :week
+                                                                   :value-column-name :rank
+                                                                   :splitter #"wk(.*)"
+                                                                   :datatypes {:week :int16}})
+```
+
+data/billboard.csv.gz \[5307 5\]:
+
+| artist              | track                   | date.entered | :week | :rank |
+|---------------------|-------------------------|--------------|-------|-------|
+| 3 Doors Down        | Kryptonite              | 2000-04-08   | 46    | 21    |
+| Creed               | Higher                  | 1999-09-11   | 46    | 7     |
+| Creed               | With Arms Wide Open     | 2000-05-13   | 46    | 37    |
+| Hill, Faith         | Breathe                 | 1999-11-06   | 46    | 31    |
+| Lonestar            | Amazed                  | 1999-06-05   | 46    | 5     |
+| 3 Doors Down        | Kryptonite              | 2000-04-08   | 51    | 42    |
+| Creed               | Higher                  | 1999-09-11   | 51    | 14    |
+| Hill, Faith         | Breathe                 | 1999-11-06   | 51    | 49    |
+| Lonestar            | Amazed                  | 1999-06-05   | 51    | 12    |
+| 2 Pac               | Baby Don't Cry (Keep... | 2000-02-26   | 6     | 94    |
+| 3 Doors Down        | Kryptonite              | 2000-04-08   | 6     | 57    |
+| 3 Doors Down        | Loser                   | 2000-10-21   | 6     | 65    |
+| 504 Boyz            | Wobble Wobble           | 2000-04-15   | 6     | 31    |
+| 98^0                | Give Me Just One Nig... | 2000-08-19   | 6     | 19    |
+| Aaliyah             | I Don't Wanna           | 2000-01-29   | 6     | 35    |
+| Aaliyah             | Try Again               | 2000-03-18   | 6     | 18    |
+| Adams, Yolanda      | Open My Heart           | 2000-08-26   | 6     | 67    |
+| Adkins, Trace       | More                    | 2000-04-29   | 6     | 69    |
+| Aguilera, Christina | Come On Over Baby (A... | 2000-08-05   | 6     | 18    |
+| Aguilera, Christina | I Turn To You           | 2000-04-15   | 6     | 19    |
+| Aguilera, Christina | What A Girl Wants       | 1999-11-27   | 6     | 13    |
+| Alice Deejay        | Better Off Alone        | 2000-04-08   | 6     | 36    |
+| Amber               | Sexual                  | 1999-07-17   | 6     | 93    |
+| Anthony, Marc       | My Baby You             | 2000-09-16   | 6     | 81    |
+| Anthony, Marc       | You Sang To Me          | 2000-02-26   | 6     | 27    |
+
+------------------------------------------------------------------------
 
 #### Wider
 

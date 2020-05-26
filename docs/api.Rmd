@@ -2057,6 +2057,17 @@ or
 (api/fold-by DS [:V4] set)
 ```
 
+---
+
+This works also on grouped dataset
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V1)
+    (api/fold-by :V4)
+    (api/ungroup))
+```
+
 #### Unroll
 
 `unroll` unfolds sequences stored in data, multiplying other ones when necessary. You can unroll more than one column at once (folded data should have the same size!).
@@ -2118,9 +2129,84 @@ You can also force datatypes
     (api/info :columns))
 ```
 
+---
+
+This works also on grouped dataset
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V1)
+    (api/fold-by [:V1 :V4])
+    (api/unroll :V3 {:indexes? true})
+    (api/ungroup))
+```
+
 ### Reshape
 
+Reshaping data provides two types of operations:
+
+* `pivot->longer` - converting columns to rows
+* `pivot->wider` - converting rows to columns
+
+Both functions are inspired on [tidyr](https://tidyr.tidyverse.org/articles/pivot.html) R package and provide almost the same functionality.
+
+All examples are taken from mentioned above documentation.
+
+Both functions work only on regular dataset.
+
 #### Longer
+
+Create rows from all columns but `"religion"`.
+
+```{clojure results="hide"}
+(def relig-income (api/dataset "data/relig_income.csv"))
+```
+
+```{clojure results="asis"}
+(api/head relig-income)
+```
+
+```{clojure results="asis"}
+(api/pivot->longer relig-income (complement #{"religion"}))
+```
+
+---
+
+Convert only columns starting with `"wk"` and pack them into `:week` column, values go to `:rank` column
+
+```{clojure results="hide"}
+(def bilboard (-> (api/dataset "data/billboard.csv.gz")
+                  (api/drop-columns #(= :boolean %) :datatype))) ;; drop some boolean columns, tidyr just skips them
+```
+
+```{clojure results="asis"}
+(->> bilboard
+     (api/column-names)
+     (take 11)
+     (api/select-columns bilboard)
+     (api/head))
+```
+
+```{clojure results="asis"}
+(api/pivot->longer bilboard #(clojure.string/starts-with? % "wk") {:target-cols :week
+                                                                   :value-column-name :rank})
+```
+
+---
+
+We can create numerical column out of column names
+
+```{clojure results="asis"}
+(api/pivot->longer bilboard #(clojure.string/starts-with? % "wk") {:target-cols :week
+                                                                   :value-column-name :rank
+                                                                   :splitter #"wk(.*)"
+                                                                   :datatypes {:week :int16}})
+
+```
+
+---
+
+
 
 #### Wider
 

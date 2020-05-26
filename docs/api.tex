@@ -995,7 +995,7 @@ Rows as sequence of sequences
 \end{Shaded}
 
 \begin{verbatim}
-([#object[java.time.LocalDate 0xfbb430e "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x2bf21945 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+([#object[java.time.LocalDate 0x31715e29 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x6a75cfe0 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -1009,13 +1009,13 @@ Rows as sequence of maps
 \end{Shaded}
 
 \begin{verbatim}
-({"date" #object[java.time.LocalDate 0x7ea89b4a "2012-01-01"],
+({"date" #object[java.time.LocalDate 0x32d4287b "2012-01-01"],
   "precipitation" 0.0,
   "temp_min" 5.0,
   "weather" "drizzle",
   "temp_max" 12.8,
   "wind" 4.7}
- {"date" #object[java.time.LocalDate 0x2682ae81 "2012-01-02"],
+ {"date" #object[java.time.LocalDate 0x1d158ebc "2012-01-02"],
   "precipitation" 10.9,
   "temp_min" 2.8,
   "weather" "rain",
@@ -2619,7 +2619,7 @@ where keys are old names, values new ones.
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@d2c3416}{\nolinkurl{java.lang.Object@d2c3416}}\tabularnewline
+\href{mailto:java.lang.Object@3049b1fe}{\nolinkurl{java.lang.Object@3049b1fe}}\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2655,7 +2655,7 @@ Function works on grouped dataset
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@4165c5f9}{\nolinkurl{java.lang.Object@4165c5f9}}\tabularnewline
+\href{mailto:java.lang.Object@241e9555}{\nolinkurl{java.lang.Object@241e9555}}\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2671,7 +2671,7 @@ v1 & v2 & {[}1 2 3{]} &
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@4165c5f9}{\nolinkurl{java.lang.Object@4165c5f9}}\tabularnewline
+\href{mailto:java.lang.Object@241e9555}{\nolinkurl{java.lang.Object@241e9555}}\tabularnewline
 \midrule
 \endhead
 2 & 2 & 1.000 & B\tabularnewline
@@ -2761,15 +2761,15 @@ Replace one column (column is trimmed)
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-0.4241 & 1 & 0.5000 & A\tabularnewline
-0.8455 & 2 & 1.000 & B\tabularnewline
-0.4797 & 3 & 1.500 & C\tabularnewline
-0.8634 & 4 & 0.5000 & A\tabularnewline
-0.2812 & 5 & 1.000 & B\tabularnewline
-0.5213 & 6 & 1.500 & C\tabularnewline
-0.6539 & 7 & 0.5000 & A\tabularnewline
-0.2455 & 8 & 1.000 & B\tabularnewline
-0.5489 & 9 & 1.500 & C\tabularnewline
+0.1151 & 1 & 0.5000 & A\tabularnewline
+0.7605 & 2 & 1.000 & B\tabularnewline
+0.02764 & 3 & 1.500 & C\tabularnewline
+0.06691 & 4 & 0.5000 & A\tabularnewline
+0.8581 & 5 & 1.000 & B\tabularnewline
+0.6666 & 6 & 1.500 & C\tabularnewline
+0.9442 & 7 & 0.5000 & A\tabularnewline
+0.4027 & 8 & 1.000 & B\tabularnewline
+0.8871 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3334,7 +3334,7 @@ Double array conversion.
 \end{Shaded}
 
 \begin{verbatim}
-#object["[J" 0x7627907 "[J@7627907"]
+#object["[J" 0x2d1f3596 "[J@2d1f3596"]
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3350,7 +3350,7 @@ Function also works on grouped dataset
 \end{Shaded}
 
 \begin{verbatim}
-(#object["[J" 0x64359c08 "[J@64359c08"] #object["[J" 0x719f6ea5 "[J@719f6ea5"] #object["[J" 0x4d031458 "[J@4d031458"])
+(#object["[J" 0x23e21d06 "[J@23e21d06"] #object["[J" 0x40b79a85 "[J@40b79a85"] #object["[J" 0xf38c6c7 "[J@f38c6c7"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3365,8 +3365,8 @@ You can also cast the type to the other one (if casting is possible):
 \end{Shaded}
 
 \begin{verbatim}
-#object["[Ljava.lang.String;" 0x4050cf1 "[Ljava.lang.String;@4050cf1"]
-#object["[F" 0x1f01a0a3 "[F@1f01a0a3"]
+#object["[Ljava.lang.String;" 0x5c8c0d2f "[Ljava.lang.String;@5c8c0d2f"]
+#object["[F" 0x4788c116 "[F@4788c116"]
 \end{verbatim}
 
 \subsubsection{Rows}\label{rows}
@@ -3636,7 +3636,7 @@ Random row (single)
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 6 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3657,15 +3657,15 @@ Random \texttt{n} (default: row count) rows with repetition.
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 6 & 1.500 & C\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3688,9 +3688,9 @@ Five random rows with repetition
 \endhead
 1 & 5 & 1.000 & B\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3711,11 +3711,11 @@ Five random, non-repeating rows
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 9 & 1.500 & C\tabularnewline
 1 & 7 & 0.5000 & A\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
 2 & 8 & 1.000 & B\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3737,13 +3737,13 @@ Shuffle dataset
 \midrule
 \endhead
 2 & 8 & 1.000 & B\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
@@ -3818,21 +3818,21 @@ Select 5 random rows from each group
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0.5000 & A\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
 1 & 7 & 0.5000 & A\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
 2 & 8 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -4486,8 +4486,8 @@ Random
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 6 & 1.500 & C\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -6179,6 +6179,35 @@ A & \#\{1 2\} & \#\{7 1 4\} & \#\{0.5\}\tabularnewline
 \bottomrule
 \end{longtable}
 
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+This works also on grouped dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V1}\NormalTok{)}
+\NormalTok{    (api/fold-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}6 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V4 & :V1 & :V2 & :V3\tabularnewline
+\midrule
+\endhead
+B & {[}1{]} & {[}5{]} & {[}1.0{]}\tabularnewline
+C & {[}1 1{]} & {[}3 9{]} & {[}1.5 1.5{]}\tabularnewline
+A & {[}1 1{]} & {[}1 7{]} & {[}0.5 0.5{]}\tabularnewline
+B & {[}2 2{]} & {[}2 8{]} & {[}1.0 1.0{]}\tabularnewline
+C & {[}2{]} & {[}6{]} & {[}1.5{]}\tabularnewline
+A & {[}2{]} & {[}4{]} & {[}0.5{]}\tabularnewline
+\bottomrule
+\end{longtable}
+
 \paragraph{Unroll}\label{unroll}
 
 \texttt{unroll} unfolds sequences stored in data, multiplying other ones
@@ -6376,9 +6405,407 @@ You can also force datatypes
 \bottomrule
 \end{longtable}
 
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+This works also on grouped dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V1}\NormalTok{)}
+\NormalTok{    (api/fold-by [}\AttributeTok{:V1} \AttributeTok{:V4}\NormalTok{])}
+\NormalTok{    (api/unroll }\AttributeTok{:V3}\NormalTok{ \{}\AttributeTok{:indexes}\NormalTok{? }\VariableTok{true}\NormalTok{\})}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:V4 & :V1 & :V2 & :indexes & :V3\tabularnewline
+\midrule
+\endhead
+A & 1 & {[}1 7{]} & 0 & 0.5000\tabularnewline
+A & 1 & {[}1 7{]} & 1 & 0.5000\tabularnewline
+B & 1 & {[}5{]} & 0 & 1.000\tabularnewline
+C & 1 & {[}3 9{]} & 0 & 1.500\tabularnewline
+C & 1 & {[}3 9{]} & 1 & 1.500\tabularnewline
+C & 2 & {[}6{]} & 0 & 1.500\tabularnewline
+A & 2 & {[}4{]} & 0 & 0.5000\tabularnewline
+B & 2 & {[}2 8{]} & 0 & 1.000\tabularnewline
+B & 2 & {[}2 8{]} & 1 & 1.000\tabularnewline
+\bottomrule
+\end{longtable}
+
 \subsubsection{Reshape}\label{reshape}
 
+Reshaping data provides two types of operations:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{pivot-\textgreater{}longer} - converting columns to rows
+\item
+  \texttt{pivot-\textgreater{}wider} - converting rows to columns
+\end{itemize}
+
+Both functions are inspired on
+\href{https://tidyr.tidyverse.org/articles/pivot.html}{tidyr} R package
+and provide almost the same functionality.
+
+All examples are taken from mentioned above documentation.
+
+Both functions work only on regular dataset.
+
 \paragraph{Longer}\label{longer}
+
+Create rows from all columns but \texttt{"religion"}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ relig-income }\NormalTok{(api/dataset }\StringTok{"data/relig_income.csv"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/head relig-income)}
+\end{Highlighting}
+\end{Shaded}
+
+data/relig\_income.csv {[}5 11{]}:
+
+\begin{longtable}[]{@{}lllllllllll@{}}
+\toprule
+\begin{minipage}[b]{0.11\columnwidth}\raggedright\strut
+religion\strut
+\end{minipage} & \begin{minipage}[b]{0.04\columnwidth}\raggedright\strut
+\textless{}\$10k\strut
+\end{minipage} & \begin{minipage}[b]{0.05\columnwidth}\raggedright\strut
+\$10-20k\strut
+\end{minipage} & \begin{minipage}[b]{0.05\columnwidth}\raggedright\strut
+\$20-30k\strut
+\end{minipage} & \begin{minipage}[b]{0.05\columnwidth}\raggedright\strut
+\$30-40k\strut
+\end{minipage} & \begin{minipage}[b]{0.05\columnwidth}\raggedright\strut
+\$40-50k\strut
+\end{minipage} & \begin{minipage}[b]{0.05\columnwidth}\raggedright\strut
+\$50-75k\strut
+\end{minipage} & \begin{minipage}[b]{0.06\columnwidth}\raggedright\strut
+\$75-100k\strut
+\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright\strut
+\$100-150k\strut
+\end{minipage} & \begin{minipage}[b]{0.04\columnwidth}\raggedright\strut
+\textgreater{}150k\strut
+\end{minipage} & \begin{minipage}[b]{0.11\columnwidth}\raggedright\strut
+Don't know/refused\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+Agnostic\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+27\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+34\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+60\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+81\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+76\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+137\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+122\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+109\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+84\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+96\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+Atheist\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+12\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+27\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+37\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+52\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+35\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+70\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+73\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+59\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+74\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+76\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+Buddhist\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+27\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+21\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+30\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+34\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+33\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+58\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+62\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+39\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+53\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+54\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+Catholic\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+418\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+617\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+732\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+670\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+638\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+1116\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+949\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+792\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+633\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+1489\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+Don't know/refused\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+15\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+14\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+15\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+11\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+10\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+35\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+21\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+17\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+18\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+116\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/pivot->longer relig-income (}\KeywordTok{complement}\NormalTok{ #\{}\StringTok{"religion"}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+data/relig\_income.csv {[}180 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+religion & :\$column & :\$value\tabularnewline
+\midrule
+\endhead
+Agnostic & \textless{}\$10k & 27\tabularnewline
+Atheist & \textless{}\$10k & 12\tabularnewline
+Buddhist & \textless{}\$10k & 27\tabularnewline
+Catholic & \textless{}\$10k & 418\tabularnewline
+Don't know/refused & \textless{}\$10k & 15\tabularnewline
+Evangelical Prot & \textless{}\$10k & 575\tabularnewline
+Hindu & \textless{}\$10k & 1\tabularnewline
+Historically Black Prot & \textless{}\$10k & 228\tabularnewline
+Jehovah's Witness & \textless{}\$10k & 20\tabularnewline
+Jewish & \textless{}\$10k & 19\tabularnewline
+Mainline Prot & \textless{}\$10k & 289\tabularnewline
+Mormon & \textless{}\$10k & 29\tabularnewline
+Muslim & \textless{}\$10k & 6\tabularnewline
+Orthodox & \textless{}\$10k & 13\tabularnewline
+Other Christian & \textless{}\$10k & 9\tabularnewline
+Other Faiths & \textless{}\$10k & 20\tabularnewline
+Other World Religions & \textless{}\$10k & 5\tabularnewline
+Unaffiliated & \textless{}\$10k & 217\tabularnewline
+Agnostic & Don't know/refused & 96\tabularnewline
+Atheist & Don't know/refused & 76\tabularnewline
+Buddhist & Don't know/refused & 54\tabularnewline
+Catholic & Don't know/refused & 1489\tabularnewline
+Don't know/refused & Don't know/refused & 116\tabularnewline
+Evangelical Prot & Don't know/refused & 1529\tabularnewline
+Hindu & Don't know/refused & 37\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Convert only columns starting with \texttt{"wk"} and pack them into
+\texttt{:week} column, values go to \texttt{:rank} column
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ bilboard }\NormalTok{(}\KeywordTok{->}\NormalTok{ (api/dataset }\StringTok{"data/billboard.csv.gz"}\NormalTok{)}
+\NormalTok{                  (api/drop-columns #(}\KeywordTok{=} \AttributeTok{:boolean} \VariableTok{%}\NormalTok{) }\AttributeTok{:datatype}\NormalTok{))) }\CommentTok{;; drop some boolean columns, tidyr just skips them}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->>}\NormalTok{ bilboard}
+\NormalTok{     (api/column-names)}
+\NormalTok{     (}\KeywordTok{take} \DecValTok{11}\NormalTok{)}
+\NormalTok{     (api/select-columns bilboard)}
+\NormalTok{     (api/head))}
+\end{Highlighting}
+\end{Shaded}
+
+data/billboard.csv.gz {[}5 11{]}:
+
+\begin{longtable}[]{@{}lllllllllll@{}}
+\toprule
+artist & track & date.entered & wk1 & wk2 & wk3 & wk4 & wk5 & wk6 & wk7
+& wk8\tabularnewline
+\midrule
+\endhead
+2 Pac & Baby Don't Cry (Keep\ldots{} & 2000-02-26 & 87 & 82 & 72 & 77 &
+87 & 94 & 99 &\tabularnewline
+2Ge+her & The Hardest Part Of \ldots{} & 2000-09-02 & 91 & 87 & 92 & & &
+& &\tabularnewline
+3 Doors Down & Kryptonite & 2000-04-08 & 81 & 70 & 68 & 67 & 66 & 57 &
+54 & 53\tabularnewline
+3 Doors Down & Loser & 2000-10-21 & 76 & 76 & 72 & 69 & 67 & 65 & 55 &
+59\tabularnewline
+504 Boyz & Wobble Wobble & 2000-04-15 & 57 & 34 & 25 & 17 & 17 & 31 & 36
+& 49\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/pivot->longer bilboard #(clojure.string/starts-with? }\VariableTok{%} \StringTok{"wk"}\NormalTok{) \{}\AttributeTok{:target-cols} \AttributeTok{:week}
+                                                                   \AttributeTok{:value-column-name} \AttributeTok{:rank}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+data/billboard.csv.gz {[}5307 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+artist & track & date.entered & :week & :rank\tabularnewline
+\midrule
+\endhead
+3 Doors Down & Kryptonite & 2000-04-08 & wk35 & 4\tabularnewline
+Braxton, Toni & He Wasn't Man Enough & 2000-03-18 & wk35 &
+34\tabularnewline
+Creed & Higher & 1999-09-11 & wk35 & 22\tabularnewline
+Creed & With Arms Wide Open & 2000-05-13 & wk35 & 5\tabularnewline
+Hill, Faith & Breathe & 1999-11-06 & wk35 & 8\tabularnewline
+Joe & I Wanna Know & 2000-01-01 & wk35 & 5\tabularnewline
+Lonestar & Amazed & 1999-06-05 & wk35 & 14\tabularnewline
+Vertical Horizon & Everything You Want & 2000-01-22 & wk35 &
+27\tabularnewline
+matchbox twenty & Bent & 2000-04-29 & wk35 & 33\tabularnewline
+Creed & Higher & 1999-09-11 & wk55 & 21\tabularnewline
+Lonestar & Amazed & 1999-06-05 & wk55 & 22\tabularnewline
+3 Doors Down & Kryptonite & 2000-04-08 & wk19 & 18\tabularnewline
+3 Doors Down & Loser & 2000-10-21 & wk19 & 73\tabularnewline
+98\^{}0 & Give Me Just One Nig\ldots{} & 2000-08-19 & wk19 &
+93\tabularnewline
+Aaliyah & I Don't Wanna & 2000-01-29 & wk19 & 83\tabularnewline
+Aaliyah & Try Again & 2000-03-18 & wk19 & 3\tabularnewline
+Adams, Yolanda & Open My Heart & 2000-08-26 & wk19 & 79\tabularnewline
+Aguilera, Christina & Come On Over Baby (A\ldots{} & 2000-08-05 & wk19 &
+23\tabularnewline
+Aguilera, Christina & I Turn To You & 2000-04-15 & wk19 &
+29\tabularnewline
+Aguilera, Christina & What A Girl Wants & 1999-11-27 & wk19 &
+18\tabularnewline
+Alice Deejay & Better Off Alone & 2000-04-08 & wk19 & 79\tabularnewline
+Amber & Sexual & 1999-07-17 & wk19 & 95\tabularnewline
+Anthony, Marc & My Baby You & 2000-09-16 & wk19 & 91\tabularnewline
+Anthony, Marc & You Sang To Me & 2000-02-26 & wk19 & 9\tabularnewline
+Avant & My First Love & 2000-11-04 & wk19 & 81\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+We can create numerical column out of column names
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/pivot->longer bilboard #(clojure.string/starts-with? }\VariableTok{%} \StringTok{"wk"}\NormalTok{) \{}\AttributeTok{:target-cols} \AttributeTok{:week}
+                                                                   \AttributeTok{:value-column-name} \AttributeTok{:rank}
+                                                                   \AttributeTok{:splitter} \SpecialStringTok{#"wk(.*)"}
+                                                                   \AttributeTok{:datatypes}\NormalTok{ \{}\AttributeTok{:week} \AttributeTok{:int16}\NormalTok{\}\})}
+\end{Highlighting}
+\end{Shaded}
+
+data/billboard.csv.gz {[}5307 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+artist & track & date.entered & :week & :rank\tabularnewline
+\midrule
+\endhead
+3 Doors Down & Kryptonite & 2000-04-08 & 46 & 21\tabularnewline
+Creed & Higher & 1999-09-11 & 46 & 7\tabularnewline
+Creed & With Arms Wide Open & 2000-05-13 & 46 & 37\tabularnewline
+Hill, Faith & Breathe & 1999-11-06 & 46 & 31\tabularnewline
+Lonestar & Amazed & 1999-06-05 & 46 & 5\tabularnewline
+3 Doors Down & Kryptonite & 2000-04-08 & 51 & 42\tabularnewline
+Creed & Higher & 1999-09-11 & 51 & 14\tabularnewline
+Hill, Faith & Breathe & 1999-11-06 & 51 & 49\tabularnewline
+Lonestar & Amazed & 1999-06-05 & 51 & 12\tabularnewline
+2 Pac & Baby Don't Cry (Keep\ldots{} & 2000-02-26 & 6 &
+94\tabularnewline
+3 Doors Down & Kryptonite & 2000-04-08 & 6 & 57\tabularnewline
+3 Doors Down & Loser & 2000-10-21 & 6 & 65\tabularnewline
+504 Boyz & Wobble Wobble & 2000-04-15 & 6 & 31\tabularnewline
+98\^{}0 & Give Me Just One Nig\ldots{} & 2000-08-19 & 6 &
+19\tabularnewline
+Aaliyah & I Don't Wanna & 2000-01-29 & 6 & 35\tabularnewline
+Aaliyah & Try Again & 2000-03-18 & 6 & 18\tabularnewline
+Adams, Yolanda & Open My Heart & 2000-08-26 & 6 & 67\tabularnewline
+Adkins, Trace & More & 2000-04-29 & 6 & 69\tabularnewline
+Aguilera, Christina & Come On Over Baby (A\ldots{} & 2000-08-05 & 6 &
+18\tabularnewline
+Aguilera, Christina & I Turn To You & 2000-04-15 & 6 & 19\tabularnewline
+Aguilera, Christina & What A Girl Wants & 1999-11-27 & 6 &
+13\tabularnewline
+Alice Deejay & Better Off Alone & 2000-04-08 & 6 & 36\tabularnewline
+Amber & Sexual & 1999-07-17 & 6 & 93\tabularnewline
+Anthony, Marc & My Baby You & 2000-09-16 & 6 & 81\tabularnewline
+Anthony, Marc & You Sang To Me & 2000-02-26 & 6 & 27\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 \paragraph{Wider}\label{wider}
 

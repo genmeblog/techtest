@@ -1,13 +1,12 @@
 (ns techtest.api.columns
+  (:refer-clojure :exclude [group-by])
   (:require [tech.ml.dataset :as ds]
             [tech.ml.dataset.column :as col]
             [tech.v2.datatype :as dtype]
 
             [techtest.api.utils :refer [iterable-sequence?]]
             [techtest.api.dataset :refer [dataset]]
-            [techtest.api.group-by :refer [grouped? process-group-data]])
-  (:refer-clojure :exclude [group-by]))
-
+            [techtest.api.group-by :refer [grouped? process-group-data]]))
 
 (defn- filter-column-names
   "Filter column names"
