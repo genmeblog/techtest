@@ -96,6 +96,7 @@
                          separate-column)
 
 (exporter/export-symbols techtest.api.fold-unroll
+                         fold-by
                          unroll)
 
 ;; concat

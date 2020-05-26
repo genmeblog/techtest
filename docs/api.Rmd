@@ -2023,11 +2023,100 @@ Only `a,b,c,d` strings
 
 ### Fold/Unroll Rows
 
-Rows 
+To pack or unpack the data into single value you can use `fold-by` and `unroll` functions.
 
-#### Fold
+`fold-by` groups dataset and packs columns data from each group separately into desired datastructure (like vector or sequence). `unroll` does the opposite.
+
+#### Fold-by
+
+Group-by and pack columns into vector
+
+```{clojure results="asis"}
+(api/fold-by DS [:V3 :V4 :V1])
+```
+
+---
+
+You can pack several columns at once.
+
+```{clojure results="asis"}
+(api/fold-by DS [:V4])
+```
+
+---
+
+You can use custom packing function
+
+```{clojure results="asis"}
+(api/fold-by DS [:V4] seq)
+```
+
+or
+
+```{clojure results="asis"}
+(api/fold-by DS [:V4] set)
+```
 
 #### Unroll
+
+`unroll` unfolds sequences stored in data, multiplying other ones when necessary. You can unroll more than one column at once (folded data should have the same size!).
+
+Options:
+
+* `:indexes?` if true (or column name), information about index of unrolled sequence is added.
+* `:datatypes` list of datatypes which should be applied to restored columns, a map
+
+---
+
+Unroll one column
+
+```{clojure results="asis"}
+(api/unroll (api/fold-by DS [:V4]) [:V1])
+```
+
+---
+
+Unroll all folded columns
+
+```{clojure results="asis"}
+(api/unroll (api/fold-by DS [:V4]) [:V1 :V2 :V3])
+```
+
+---
+
+Unroll one by one leads to cartesian product
+
+```{clojure results="asis"}
+(-> DS
+    (api/fold-by [:V4 :V1])
+    (api/unroll [:V2])
+    (api/unroll [:V3]))
+```
+
+--- 
+
+You can add indexes
+
+```{clojure results="asis"}
+(api/unroll (api/fold-by DS [:V1]) [:V4 :V2 :V3] {:indexes? true})
+```
+
+```{clojure results="asis"}
+(api/unroll (api/fold-by DS [:V1]) [:V4 :V2 :V3] {:indexes? "vector idx"})
+```
+
+---
+
+You can also force datatypes
+
+```{clojure results="asis"}
+(-> DS
+    (api/fold-by [:V1])
+    (api/unroll [:V4 :V2 :V3] {:datatypes {:V4 :string
+                                           :V2 :int16
+                                           :V3 :float32}})
+    (api/info :columns))
+```
 
 ### Reshape
 

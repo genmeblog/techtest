@@ -32,10 +32,10 @@
          (ungroup ungroup-options)))))
 
 (defn- unique-by-fn
-  [strategy columns-selector limit-columns]
+  [strategy columns-selector limit-columns options]
   (if (fn? strategy)
 
-    (fn [ds] (strategy-fold ds columns-selector strategy))
+    (fn [ds] (strategy-fold ds columns-selector strategy options))
     
     (let [local-options {:keep-fn (get strategies strategy strategy-first)}]
       (cond
@@ -63,7 +63,7 @@
                          :or {strategy :first}
                          :as options}]
 
-   (let [ufn (unique-by-fn strategy columns-selector limit-columns)]
+   (let [ufn (unique-by-fn strategy columns-selector limit-columns options)]
 
      (if (grouped? ds)
        (process-group-data ds #(maybe-skip-unique % ufn))
