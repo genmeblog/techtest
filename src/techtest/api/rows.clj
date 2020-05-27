@@ -35,8 +35,7 @@
 (defn- select-or-drop-rows
   "Select or drop rows."
   ([f ds rows-selector] (select-or-drop-rows f ds rows-selector nil))
-  ([f ds rows-selector {:keys [limit-columns pre]
-                        :as options}]
+  ([f ds rows-selector {:keys [limit-columns pre]}]
    (if (grouped? ds)
      (let [pre-ds (map #(add-or-update-columns % pre) (ds :data))
            indices (map #(find-indexes % rows-selector limit-columns) pre-ds)]       

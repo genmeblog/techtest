@@ -6,9 +6,9 @@
             [techtest.api.columns :refer [select-columns column-names]]
             [techtest.api.group-by :refer [grouped? process-group-data ungroup]]))
 
-(defn- strategy-first [k idxs] (clojure.core/first idxs))
-(defn- strategy-last [k idxs] (clojure.core/last idxs))
-(defn- strategy-random [k idxs] (clojure.core/rand-nth idxs))
+(defn- strategy-first [_ idxs] (clojure.core/first idxs))
+(defn- strategy-last [_ idxs] (clojure.core/last idxs))
+(defn- strategy-random [_ idxs] (clojure.core/rand-nth idxs))
 
 (def ^:private strategies
   {:first strategy-first

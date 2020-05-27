@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [concat])
   (:require [tech.ml.dataset :as ds]
 
-            [techtest.api.join-separate :refer [join-columns separate-column]]
+            [techtest.api.join-separate :refer [join-columns]]
             [techtest.api.columns :refer [column-names]]))
 
 ;; joins
@@ -14,7 +14,7 @@
                                                          :drop-columns? false})
         dsr (join-columns ds-right join-column-name cols {:result-type hash
                                                           :drop-columns? false})
-        joined-ds (join-fn join-column-name dsl dsr)]
+        joined-ds (join-fn join-column-name dsl dsr options)]
     (-> joined-ds
         (ds/drop-columns [join-column-name (-> joined-ds
                                                (meta)

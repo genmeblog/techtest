@@ -1,7 +1,6 @@
 (ns techtest.api.fold-unroll
   (:require [tech.ml.dataset :as ds]
 
-            [techtest.api.utils :refer [iterable-sequence?]]
             [techtest.api.unique-by :refer [unique-by]]
             [techtest.api.columns :refer [column-names select-columns reorder-columns]]
             [techtest.api.group-by :refer [grouped? process-group-data]]))

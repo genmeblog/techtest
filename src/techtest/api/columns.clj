@@ -71,14 +71,14 @@
   [column col-cnt cnt]
   (let [q (quot cnt col-cnt)
         r (rem cnt col-cnt)
-        col-name (col/column-name column)]
-    (let [tmp-ds (->> (dataset [column])
-                      (repeat q)
-                      (apply ds/concat))]
-      (if (zero? r)
-        (tmp-ds col-name)
-        ((-> (ds/concat tmp-ds
-                        (dataset [(dtype/sub-buffer column 0 r)]))) col-name)))))
+        col-name (col/column-name column)
+        tmp-ds (->> (dataset [column])
+                    (repeat q)
+                    (apply ds/concat))]
+    (if (zero? r)
+      (tmp-ds col-name)
+      ((-> (ds/concat tmp-ds
+                      (dataset [(dtype/sub-buffer column 0 r)]))) col-name))))
 
 (defn- fix-column-size-column
   [column strategy cnt]

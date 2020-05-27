@@ -2,9 +2,8 @@
   (:require [tech.ml.dataset :as ds]
             [tech.ml.dataset.column :as col]
             [tech.ml.protocols.dataset :as prot]
-            [tech.v2.datatype :as dtype]
 
-            [techtest.api.utils :refer [map-v iterable-sequence?]]))
+            [techtest.api.utils :refer [iterable-sequence?]]))
 
 ;;;;;;;;;;;;;;;;;;;;;
 ;; DATASET CREATION

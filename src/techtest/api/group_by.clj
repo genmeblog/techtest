@@ -4,7 +4,7 @@
             [tech.v2.datatype :as dtype]
             
 
-            [techtest.api.utils :refer [map-v iterable-sequence? ->str]]
+            [techtest.api.utils :refer [iterable-sequence? ->str]]
             [techtest.api.dataset :refer [dataset]])
   (:refer-clojure :exclude [group-by]))
 
@@ -140,16 +140,16 @@
 (defn- group-as-column->seq
   "Convert group name to a seq of columns"
   [add-group-as-column separate? name count]
-  (if add-group-as-column
+  (when add-group-as-column
     (cond
       (and separate? (map? name)) (group-name-map->cols name count)
       (and separate? (iterable-sequence? name)) (group-name-seq->cols name add-group-as-column count)
-      :esle [(col/new-column (maybe-name add-group-as-column :$group-name) (repeat count name))])))
+      :else [(col/new-column (maybe-name add-group-as-column :$group-name) (repeat count name))])))
 
 (defn- group-id-as-column->seq
   "Convert group id to as seq of columns"
   [add-group-id-as-column count group-id]
-  (if add-group-id-as-column
+  (when add-group-id-as-column
     [(col/new-column (maybe-name add-group-id-as-column :$group-id) (dtype/const-reader group-id count {:datatype :int64}))]))
 
 (defn- prepare-ds-for-ungrouping

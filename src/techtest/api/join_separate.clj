@@ -1,6 +1,5 @@
 (ns techtest.api.join-separate
   (:require [tech.ml.dataset :as ds]
-            [tech.ml.dataset.column :as col]
             [clojure.string :as str]
 
             [techtest.api.utils :refer [iterable-sequence?]]
