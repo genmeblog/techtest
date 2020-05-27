@@ -118,7 +118,7 @@
          ;; col-to-drop (col-to-drop-name join-name) ;; what to drop after join
          pre-ds (if join-on-single?
                   ds
-                  (join-columns ds join-name rest-cols {:result-type hash
+                  (join-columns ds join-name rest-cols {:result-type :seq
                                                         :drop-columns? true})) ;; t.m.ds doesn't have join on multiple columns, so we need to create single column to be used fo join
          starting-ds (unique-by (select-columns pre-ds join-name)) ;; left join source dataset
          starting-ds-count (ds/row-count starting-ds) ;; how much records to expect

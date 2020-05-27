@@ -16,7 +16,6 @@ output:
         smart: false
     pdf_document:
         highlight: tango
-        latex_engine: xelatex
     md_document:
         variant: markdown_github
 ---
@@ -2718,7 +2717,7 @@ This API doesn't provide any statistical, numerical or date/time functions. Use 
 
 ### Other examples
 
-Flights
+#### Flights
 
 ```{clojure results="hide"}
 (defonce flights (api/dataset "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv"))
@@ -2739,9 +2738,7 @@ flights
     )
 ```
 
----
-
-Stocks
+#### Stocks
 
 ```{clojure results="hide"}
 (defonce stocks (api/dataset "https://raw.githubusercontent.com/techascent/tech.ml.dataset/master/test/data/stocks.csv" {:key-fn keyword}))
@@ -2767,3 +2764,18 @@ stocks
     (api/rename-columns {:$group-name-0 :symbol
                          :$group-name-1 :year}))
 ```
+
+#### data.table
+
+Snippets taken from [Introduction to data.table](https://rdatatable.gitlab.io/data.table/articles/datatable-intro.html)
+
+```{r}
+library(data.table)
+library(knitr)
+
+flights <- fread("https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv")
+
+kable(head(flights))
+```
+
+TBC
