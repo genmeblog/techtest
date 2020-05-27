@@ -995,7 +995,7 @@ Rows as sequence of sequences
 \end{Shaded}
 
 \begin{verbatim}
-([#object[java.time.LocalDate 0x359867fa "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x36b549d9 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+([#object[java.time.LocalDate 0xf627548 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x5cb21c8e "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -1009,13 +1009,13 @@ Rows as sequence of maps
 \end{Shaded}
 
 \begin{verbatim}
-({"date" #object[java.time.LocalDate 0x798121af "2012-01-01"],
+({"date" #object[java.time.LocalDate 0x384d6c6a "2012-01-01"],
   "precipitation" 0.0,
   "temp_min" 5.0,
   "weather" "drizzle",
   "temp_max" 12.8,
   "wind" 4.7}
- {"date" #object[java.time.LocalDate 0x3eec2d30 "2012-01-02"],
+ {"date" #object[java.time.LocalDate 0x71945e4f "2012-01-02"],
   "precipitation" 10.9,
   "temp_min" 2.8,
   "weather" "rain",
@@ -2619,7 +2619,7 @@ where keys are old names, values new ones.
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@1dc5451b}{\nolinkurl{java.lang.Object@1dc5451b}}\tabularnewline
+\href{mailto:java.lang.Object@1a024aa2}{\nolinkurl{java.lang.Object@1a024aa2}}\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2655,7 +2655,7 @@ Function works on grouped dataset
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@3d83ea0b}{\nolinkurl{java.lang.Object@3d83ea0b}}\tabularnewline
+\href{mailto:java.lang.Object@472da677}{\nolinkurl{java.lang.Object@472da677}}\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2671,7 +2671,7 @@ v1 & v2 & {[}1 2 3{]} &
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@3d83ea0b}{\nolinkurl{java.lang.Object@3d83ea0b}}\tabularnewline
+\href{mailto:java.lang.Object@472da677}{\nolinkurl{java.lang.Object@472da677}}\tabularnewline
 \midrule
 \endhead
 2 & 2 & 1.000 & B\tabularnewline
@@ -2761,15 +2761,15 @@ Replace one column (column is trimmed)
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-0.2565 & 1 & 0.5000 & A\tabularnewline
-0.7238 & 2 & 1.000 & B\tabularnewline
-0.7878 & 3 & 1.500 & C\tabularnewline
-0.1993 & 4 & 0.5000 & A\tabularnewline
-0.8512 & 5 & 1.000 & B\tabularnewline
-0.5382 & 6 & 1.500 & C\tabularnewline
-0.4285 & 7 & 0.5000 & A\tabularnewline
-0.4484 & 8 & 1.000 & B\tabularnewline
-0.1991 & 9 & 1.500 & C\tabularnewline
+0.3741 & 1 & 0.5000 & A\tabularnewline
+0.2879 & 2 & 1.000 & B\tabularnewline
+0.6001 & 3 & 1.500 & C\tabularnewline
+0.4689 & 4 & 0.5000 & A\tabularnewline
+0.6258 & 5 & 1.000 & B\tabularnewline
+0.7511 & 6 & 1.500 & C\tabularnewline
+0.6976 & 7 & 0.5000 & A\tabularnewline
+0.5225 & 8 & 1.000 & B\tabularnewline
+0.4395 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3332,7 +3332,7 @@ Double array conversion.
 \end{Shaded}
 
 \begin{verbatim}
-#object["[J" 0x44222d1 "[J@44222d1"]
+#object["[J" 0x58098b7f "[J@58098b7f"]
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3348,7 +3348,7 @@ Function also works on grouped dataset
 \end{Shaded}
 
 \begin{verbatim}
-(#object["[J" 0x15a01a22 "[J@15a01a22"] #object["[J" 0x53e15661 "[J@53e15661"] #object["[J" 0x2412fe45 "[J@2412fe45"])
+(#object["[J" 0x1c6332d4 "[J@1c6332d4"] #object["[J" 0x2990607e "[J@2990607e"] #object["[J" 0x1a83c80e "[J@1a83c80e"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3363,8 +3363,8 @@ You can also cast the type to the other one (if casting is possible):
 \end{Shaded}
 
 \begin{verbatim}
-#object["[Ljava.lang.String;" 0x4a851c75 "[Ljava.lang.String;@4a851c75"]
-#object["[F" 0x5181d68e "[F@5181d68e"]
+#object["[Ljava.lang.String;" 0x5e4ad9da "[Ljava.lang.String;@5e4ad9da"]
+#object["[F" 0x454e756b "[F@454e756b"]
 \end{verbatim}
 
 \subsubsection{Rows}\label{rows}
@@ -3655,15 +3655,15 @@ Random \texttt{n} (default: row count) rows with repetition.
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 4 & 0.5000 & A\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
 1 & 1 & 0.5000 & A\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3684,11 +3684,11 @@ Five random rows with repetition
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 4 & 0.5000 & A\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3709,11 +3709,11 @@ Five random, non-repeating rows
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 2 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
 2 & 8 & 1.000 & B\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3734,15 +3734,15 @@ Shuffle dataset
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 4 & 0.5000 & A\tabularnewline
 1 & 7 & 0.5000 & A\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3817,20 +3817,20 @@ Select 5 random rows from each group
 \midrule
 \endhead
 2 & 4 & 0.5000 & A\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
 1 & 1 & 0.5000 & A\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -4484,7 +4484,7 @@ Random
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 8 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
@@ -6519,15 +6519,15 @@ Create rows from all columns but \texttt{"religion"}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{(api/head relig-income)}
+\NormalTok{relig-income}
 \end{Highlighting}
 \end{Shaded}
 
-data/relig\_income.csv {[}5 11{]}:
+data/relig\_income.csv {[}18 11{]}:
 
 \begin{longtable}[]{@{}lllllllllll@{}}
 \toprule
-\begin{minipage}[b]{0.11\columnwidth}\raggedright\strut
+\begin{minipage}[b]{0.14\columnwidth}\raggedright\strut
 religion\strut
 \end{minipage} & \begin{minipage}[b]{0.04\columnwidth}\raggedright\strut
 \textless{}\$10k\strut
@@ -6543,7 +6543,7 @@ religion\strut
 \$50-75k\strut
 \end{minipage} & \begin{minipage}[b]{0.06\columnwidth}\raggedright\strut
 \$75-100k\strut
-\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright\strut
+\end{minipage} & \begin{minipage}[b]{0.06\columnwidth}\raggedright\strut
 \$100-150k\strut
 \end{minipage} & \begin{minipage}[b]{0.04\columnwidth}\raggedright\strut
 \textgreater{}150k\strut
@@ -6552,7 +6552,7 @@ Don't know/refused\strut
 \end{minipage}\tabularnewline
 \midrule
 \endhead
-\begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
 Agnostic\strut
 \end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
 27\strut
@@ -6568,14 +6568,14 @@ Agnostic\strut
 137\strut
 \end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
 122\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
 109\strut
 \end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
 84\strut
 \end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
 96\strut
 \end{minipage}\tabularnewline
-\begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
 Atheist\strut
 \end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
 12\strut
@@ -6591,14 +6591,14 @@ Atheist\strut
 70\strut
 \end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
 73\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
 59\strut
 \end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
 74\strut
 \end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
 76\strut
 \end{minipage}\tabularnewline
-\begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
 Buddhist\strut
 \end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
 27\strut
@@ -6614,14 +6614,14 @@ Buddhist\strut
 58\strut
 \end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
 62\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
 39\strut
 \end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
 53\strut
 \end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
 54\strut
 \end{minipage}\tabularnewline
-\begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
 Catholic\strut
 \end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
 418\strut
@@ -6637,14 +6637,14 @@ Catholic\strut
 1116\strut
 \end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
 949\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
 792\strut
 \end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
 633\strut
 \end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
 1489\strut
 \end{minipage}\tabularnewline
-\begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
 Don't know/refused\strut
 \end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
 15\strut
@@ -6660,12 +6660,311 @@ Don't know/refused\strut
 35\strut
 \end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
 21\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
 17\strut
 \end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
 18\strut
 \end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
 116\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Evangelical Prot\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+575\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+869\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+1064\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+982\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+881\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+1486\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+949\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+723\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+414\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+1529\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Hindu\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+9\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+7\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+9\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+11\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+34\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+47\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+48\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+54\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+37\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Historically Black Prot\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+228\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+244\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+236\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+238\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+197\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+223\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+131\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+81\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+78\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+339\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Jehovah's Witness\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+20\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+27\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+24\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+24\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+21\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+30\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+15\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+11\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+6\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+37\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Jewish\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+19\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+19\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+25\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+25\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+30\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+95\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+69\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+87\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+151\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+162\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Mainline Prot\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+289\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+495\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+619\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+655\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+651\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+1107\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+939\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+753\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+634\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+1328\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Mormon\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+29\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+40\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+48\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+51\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+56\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+112\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+85\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+49\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+42\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+69\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Muslim\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+6\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+7\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+9\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+10\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+9\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+23\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+16\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+8\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+6\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+22\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Orthodox\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+13\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+17\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+23\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+32\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+32\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+47\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+38\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+42\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+46\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+73\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Other Christian\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+9\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+7\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+11\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+13\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+13\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+14\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+18\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+14\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+12\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+18\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Other Faiths\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+20\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+33\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+40\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+46\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+49\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+63\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+46\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+40\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+41\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+71\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Other World Religions\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+5\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+3\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+7\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+3\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+8\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Unaffiliated\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+217\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+299\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+374\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+365\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+341\strut
+\end{minipage} & \begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+528\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+407\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+321\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+258\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+597\strut
 \end{minipage}\tabularnewline
 \bottomrule
 \end{longtable}
@@ -6728,12 +7027,11 @@ Convert only columns starting with \texttt{"wk"} and pack them into
 \NormalTok{(}\KeywordTok{->>}\NormalTok{ bilboard}
 \NormalTok{     (api/column-names)}
 \NormalTok{     (}\KeywordTok{take} \DecValTok{13}\NormalTok{)}
-\NormalTok{     (api/select-columns bilboard)}
-\NormalTok{     (api/head))}
+\NormalTok{     (api/select-columns bilboard))}
 \end{Highlighting}
 \end{Shaded}
 
-data/billboard.csv.gz {[}5 13{]}:
+data/billboard.csv.gz {[}317 13{]}:
 
 \begin{longtable}[]{@{}lllllllllllll@{}}
 \toprule
@@ -6751,6 +7049,46 @@ artist & track & date.entered & wk1 & wk2 & wk3 & wk4 & wk5 & wk6 & wk7
 59 & 62 & 61\tabularnewline
 504 Boyz & Wobble Wobble & 2000-04-15 & 57 & 34 & 25 & 17 & 17 & 31 & 36
 & 49 & 53 & 57\tabularnewline
+98\^{}0 & Give Me Just One Nig\ldots{} & 2000-08-19 & 51 & 39 & 34 & 26
+& 26 & 19 & 2 & 2 & 3 & 6\tabularnewline
+A*Teens & Dancing Queen & 2000-07-08 & 97 & 97 & 96 & 95 & 100 & & & &
+&\tabularnewline
+Aaliyah & I Don't Wanna & 2000-01-29 & 84 & 62 & 51 & 41 & 38 & 35 & 35
+& 38 & 38 & 36\tabularnewline
+Aaliyah & Try Again & 2000-03-18 & 59 & 53 & 38 & 28 & 21 & 18 & 16 & 14
+& 12 & 10\tabularnewline
+Adams, Yolanda & Open My Heart & 2000-08-26 & 76 & 76 & 74 & 69 & 68 &
+67 & 61 & 58 & 57 & 59\tabularnewline
+Adkins, Trace & More & 2000-04-29 & 84 & 84 & 75 & 73 & 73 & 69 & 68 &
+65 & 73 & 83\tabularnewline
+Aguilera, Christina & Come On Over Baby (A\ldots{} & 2000-08-05 & 57 &
+47 & 45 & 29 & 23 & 18 & 11 & 9 & 9 & 11\tabularnewline
+Aguilera, Christina & I Turn To You & 2000-04-15 & 50 & 39 & 30 & 28 &
+21 & 19 & 20 & 17 & 17 & 17\tabularnewline
+Aguilera, Christina & What A Girl Wants & 1999-11-27 & 71 & 51 & 28 & 18
+& 13 & 13 & 11 & 1 & 1 & 2\tabularnewline
+Alice Deejay & Better Off Alone & 2000-04-08 & 79 & 65 & 53 & 48 & 45 &
+36 & 34 & 29 & 27 & 30\tabularnewline
+Allan, Gary & Smoke Rings In The D\ldots{} & 2000-01-22 & 80 & 78 & 76 &
+77 & 92 & & & & &\tabularnewline
+Amber & Sexual & 1999-07-17 & 99 & 99 & 96 & 96 & 100 & 93 & 93 & 96 &
+&\tabularnewline
+Anastacia & I'm Outta Love & 2000-04-01 & 92 & & & 95 & & & & &
+&\tabularnewline
+Anthony, Marc & My Baby You & 2000-09-16 & 82 & 76 & 76 & 70 & 82 & 81 &
+74 & 80 & 76 & 76\tabularnewline
+Anthony, Marc & You Sang To Me & 2000-02-26 & 77 & 54 & 50 & 43 & 30 &
+27 & 21 & 18 & 15 & 13\tabularnewline
+Avant & My First Love & 2000-11-04 & 70 & 62 & 56 & 43 & 39 & 33 & 26 &
+26 & 26 & 31\tabularnewline
+Avant & Separated & 2000-04-29 & 62 & 32 & 30 & 23 & 26 & 30 & 35 & 32 &
+32 & 25\tabularnewline
+BBMak & Back Here & 2000-04-29 & 99 & 86 & 60 & 52 & 38 & 34 & 28 & 21 &
+18 & 18\tabularnewline
+Backstreet Boys, The & Shape Of My Heart & 2000-10-14 & 39 & 25 & 24 &
+15 & 12 & 12 & 10 & 9 & 10 & 12\tabularnewline
+Backstreet Boys, The & Show Me The Meaning \ldots{} & 2000-01-01 & 74 &
+62 & 55 & 25 & 16 & 14 & 12 & 10 & 12 & 9\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -6870,12 +7208,11 @@ splitted and data can be restored into separate columns.
 \NormalTok{(}\KeywordTok{->>}\NormalTok{ who}
 \NormalTok{     (api/column-names)}
 \NormalTok{     (}\KeywordTok{take} \DecValTok{10}\NormalTok{)}
-\NormalTok{     (api/select-columns who)}
-\NormalTok{     (api/head))}
+\NormalTok{     (api/select-columns who))}
 \end{Highlighting}
 \end{Shaded}
 
-data/who.csv.gz {[}5 10{]}:
+data/who.csv.gz {[}7240 10{]}:
 
 \begin{longtable}[]{@{}llllllllll@{}}
 \toprule
@@ -7006,6 +7343,426 @@ AFG\strut
 \strut
 \end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
 \strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1985\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1986\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1987\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1988\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1989\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1990\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1991\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1992\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1993\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1994\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1995\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1996\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1997\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+0\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+10\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+6\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+3\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+5\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+2\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1998\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+30\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+129\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+128\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+90\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+89\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+64\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1999\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+8\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+55\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+55\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+47\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+34\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+21\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+2000\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+52\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+228\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+183\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+149\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+129\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+94\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+2001\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+129\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+379\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+349\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+274\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+204\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+139\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+2002\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+90\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+476\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+481\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+368\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+246\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+241\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+2003\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+127\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+511\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+436\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+284\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+256\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+288\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+2004\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+139\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+537\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+568\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+360\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+358\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+386\strut
 \end{minipage}\tabularnewline
 \bottomrule
 \end{longtable}
@@ -7228,10 +7985,10 @@ data/anscombe.csv {[}44 3{]}:
 :x & :a & :b & :y1 & :y2 & :z1 & :z2\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0 & 0.3789 & 0.9831 & 3 & -2\tabularnewline
-2 & 1 & 1 & 0.3252 & 0.9221 & 3 & -2\tabularnewline
-3 & 0 & 1 & 0.3689 & 0.6474 & 3 & -2\tabularnewline
-4 & 0 & 1 & 0.7811 & 0.8229 & 3 & -2\tabularnewline
+1 & 1 & 0 & 0.7818 & 0.1303 & 3 & -2\tabularnewline
+2 & 1 & 1 & 0.8713 & 0.4563 & 3 & -2\tabularnewline
+3 & 0 & 1 & 0.3143 & 0.7664 & 3 & -2\tabularnewline
+4 & 0 & 1 & 0.08568 & 0.08408 & 3 & -2\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7249,14 +8006,14 @@ data/anscombe.csv {[}44 3{]}:
 :x & :a & :b & :times & y & z\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0 & 1 & 0.3789 & 3\tabularnewline
-2 & 1 & 1 & 1 & 0.3252 & 3\tabularnewline
-3 & 0 & 1 & 1 & 0.3689 & 3\tabularnewline
-4 & 0 & 1 & 1 & 0.7811 & 3\tabularnewline
-1 & 1 & 0 & 2 & 0.9831 & -2\tabularnewline
-2 & 1 & 1 & 2 & 0.9221 & -2\tabularnewline
-3 & 0 & 1 & 2 & 0.6474 & -2\tabularnewline
-4 & 0 & 1 & 2 & 0.8229 & -2\tabularnewline
+1 & 1 & 0 & 1 & 0.7818 & 3\tabularnewline
+2 & 1 & 1 & 1 & 0.8713 & 3\tabularnewline
+3 & 0 & 1 & 1 & 0.3143 & 3\tabularnewline
+4 & 0 & 1 & 1 & 0.08568 & 3\tabularnewline
+1 & 1 & 0 & 2 & 0.1303 & -2\tabularnewline
+2 & 1 & 1 & 2 & 0.4563 & -2\tabularnewline
+3 & 0 & 1 & 2 & 0.7664 & -2\tabularnewline
+4 & 0 & 1 & 2 & 0.08408 & -2\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -7749,12 +8506,11 @@ bank}
 \NormalTok{(}\KeywordTok{->>}\NormalTok{ world-bank-pop}
 \NormalTok{     (api/column-names)}
 \NormalTok{     (}\KeywordTok{take} \DecValTok{8}\NormalTok{)}
-\NormalTok{     (api/select-columns world-bank-pop)}
-\NormalTok{     (api/head))}
+\NormalTok{     (api/select-columns world-bank-pop))}
 \end{Highlighting}
 \end{Shaded}
 
-data/world\_bank\_pop.csv.gz {[}5 8{]}:
+data/world\_bank\_pop.csv.gz {[}1056 8{]}:
 
 \begin{longtable}[]{@{}llllllll@{}}
 \toprule
@@ -7772,6 +8528,46 @@ ABW & SP.POP.GROW & 2.055 & 2.226 & 2.229 & 2.109 & 1.757 &
 1.302\tabularnewline
 AFG & SP.URB.TOTL & 4.436E+06 & 4.648E+06 & 4.893E+06 & 5.156E+06 &
 5.427E+06 & 5.692E+06\tabularnewline
+AFG & SP.URB.GROW & 3.912 & 4.663 & 5.135 & 5.230 & 5.124 &
+4.769\tabularnewline
+AFG & SP.POP.TOTL & 2.009E+07 & 2.097E+07 & 2.198E+07 & 2.306E+07 &
+2.412E+07 & 2.507E+07\tabularnewline
+AFG & SP.POP.GROW & 3.495 & 4.252 & 4.721 & 4.818 & 4.469 &
+3.870\tabularnewline
+AGO & SP.URB.TOTL & 8.235E+06 & 8.708E+06 & 9.219E+06 & 9.765E+06 &
+1.034E+07 & 1.095E+07\tabularnewline
+AGO & SP.URB.GROW & 5.437 & 5.588 & 5.700 & 5.758 & 5.753 &
+5.693\tabularnewline
+AGO & SP.POP.TOTL & 1.644E+07 & 1.698E+07 & 1.757E+07 & 1.820E+07 &
+1.887E+07 & 1.955E+07\tabularnewline
+AGO & SP.POP.GROW & 3.033 & 3.245 & 3.412 & 3.526 & 3.574 &
+3.576\tabularnewline
+ALB & SP.URB.TOTL & 1.289E+06 & 1.299E+06 & 1.327E+06 & 1.355E+06 &
+1.382E+06 & 1.407E+06\tabularnewline
+ALB & SP.URB.GROW & 0.7425 & 0.7104 & 2.181 & 2.060 & 1.972 &
+1.826\tabularnewline
+ALB & SP.POP.TOTL & 3.089E+06 & 3.060E+06 & 3.051E+06 & 3.040E+06 &
+3.027E+06 & 3.011E+06\tabularnewline
+ALB & SP.POP.GROW & -0.6374 & -0.9385 & -0.2999 & -0.3741 & -0.4179 &
+-0.5118\tabularnewline
+AND & SP.URB.TOTL & 6.042E+04 & 6.199E+04 & 6.419E+04 & 6.675E+04 &
+6.919E+04 & 7.121E+04\tabularnewline
+AND & SP.URB.GROW & 1.279 & 2.572 & 3.492 & 3.900 & 3.598 &
+2.868\tabularnewline
+AND & SP.POP.TOTL & 6.539E+04 & 6.734E+04 & 7.005E+04 & 7.318E+04 &
+7.624E+04 & 7.887E+04\tabularnewline
+AND & SP.POP.GROW & 1.572 & 2.940 & 3.943 & 4.375 & 4.099 &
+3.382\tabularnewline
+ARB & SP.URB.TOTL & 1.500E+08 & 1.539E+08 & 1.580E+08 & 1.623E+08 &
+1.668E+08 & 1.718E+08\tabularnewline
+ARB & SP.URB.GROW & 2.600 & 2.629 & 2.639 & 2.710 & 2.806 &
+2.993\tabularnewline
+ARB & SP.POP.TOTL & 2.838E+08 & 2.899E+08 & 2.960E+08 & 3.024E+08 &
+3.092E+08 & 3.163E+08\tabularnewline
+ARB & SP.POP.GROW & 2.111 & 2.120 & 2.131 & 2.165 & 2.224 &
+2.297\tabularnewline
+ARE & SP.URB.TOTL & 2.531E+06 & 2.683E+06 & 2.843E+06 & 3.049E+06 &
+3.347E+06 & 3.767E+06\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -8288,18 +9084,764 @@ Y & & -2.168 & & -1.036 &\tabularnewline
 \bottomrule
 \end{longtable}
 
-\subsubsection{Join/Concat}\label{joinconcat}
+\subsubsection{Join/Concat Datasets}\label{joinconcat-datasets}
+
+Dataset joins and concatenations functions.
+
+Joins accept left-side and right-side datasets and columns selector.
+Options are the same as in \texttt{tech.ml.dataset} functions.
+
+The difference between \texttt{tech.ml.dataset} join functions are:
+arguments order (first datasets) and possibility to join on multiple
+columns.
+
+Datasets used as examples
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ ds1 }\NormalTok{(api/dataset \{}\AttributeTok{:a}\NormalTok{ [}\DecValTok{1} \DecValTok{2} \DecValTok{1} \DecValTok{2} \DecValTok{3} \DecValTok{4} \VariableTok{nil} \VariableTok{nil} \DecValTok{4}\NormalTok{]}
+                       \AttributeTok{:b}\NormalTok{ (}\KeywordTok{range} \DecValTok{101} \DecValTok{110}\NormalTok{)}
+                       \AttributeTok{:c}\NormalTok{ (}\KeywordTok{map} \KeywordTok{str} \StringTok{"abs tract"}\NormalTok{)\}))}
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ ds2 }\NormalTok{(api/dataset \{}\AttributeTok{:a}\NormalTok{ [}\VariableTok{nil} \DecValTok{1} \DecValTok{2} \DecValTok{5} \DecValTok{4} \DecValTok{3} \DecValTok{2} \DecValTok{1} \VariableTok{nil}\NormalTok{]}
+                       \AttributeTok{:b}\NormalTok{ (}\KeywordTok{range} \DecValTok{110} \DecValTok{101} \DecValTok{-1}\NormalTok{)}
+                       \AttributeTok{:c}\NormalTok{ (}\KeywordTok{map} \KeywordTok{str} \StringTok{"datatable"}\NormalTok{)}
+                       \AttributeTok{:d}\NormalTok{ (}\KeywordTok{symbol} \StringTok{"X"}\NormalTok{)\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ds1}
+\NormalTok{ds2}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:a & :b & :c\tabularnewline
+\midrule
+\endhead
+1 & 101 & a\tabularnewline
+2 & 102 & b\tabularnewline
+1 & 103 & s\tabularnewline
+2 & 104 &\tabularnewline
+3 & 105 & t\tabularnewline
+4 & 106 & r\tabularnewline
+& 107 & a\tabularnewline
+& 108 & c\tabularnewline
+4 & 109 & t\tabularnewline
+\bottomrule
+\end{longtable}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:a & :b & :c & :d\tabularnewline
+\midrule
+\endhead
+& 110 & d & X\tabularnewline
+1 & 109 & a & X\tabularnewline
+2 & 108 & t & X\tabularnewline
+5 & 107 & a & X\tabularnewline
+4 & 106 & t & X\tabularnewline
+3 & 105 & a & X\tabularnewline
+2 & 104 & b & X\tabularnewline
+1 & 103 & l & X\tabularnewline
+& 102 & e & X\tabularnewline
+\bottomrule
+\end{longtable}
 
 \paragraph{Left}\label{left}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/left-join ds1 ds2 }\AttributeTok{:b}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+left-outer-join {[}9 7{]}:
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule
+:b & :a & :c & :right.b & :right.a & :right.c & :d\tabularnewline
+\midrule
+\endhead
+109 & 4 & t & 109 & 1 & a & X\tabularnewline
+108 & & c & 108 & 2 & t & X\tabularnewline
+107 & & a & 107 & 5 & a & X\tabularnewline
+106 & 4 & r & 106 & 4 & t & X\tabularnewline
+105 & 3 & t & 105 & 3 & a & X\tabularnewline
+104 & 2 & & 104 & 2 & b & X\tabularnewline
+103 & 1 & s & 103 & 1 & l & X\tabularnewline
+102 & 2 & b & 102 & & e & X\tabularnewline
+101 & 1 & a & & & &\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/left-join ds2 ds1 }\AttributeTok{:b}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+left-outer-join {[}9 7{]}:
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule
+:b & :a & :c & :d & :right.b & :right.a & :right.c\tabularnewline
+\midrule
+\endhead
+102 & & e & X & 102 & 2 & b\tabularnewline
+103 & 1 & l & X & 103 & 1 & s\tabularnewline
+104 & 2 & b & X & 104 & 2 &\tabularnewline
+105 & 3 & a & X & 105 & 3 & t\tabularnewline
+106 & 4 & t & X & 106 & 4 & r\tabularnewline
+107 & 5 & a & X & 107 & & a\tabularnewline
+108 & 2 & t & X & 108 & & c\tabularnewline
+109 & 1 & a & X & 109 & 4 & t\tabularnewline
+110 & & d & X & & &\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/left-join ds1 ds2 [}\AttributeTok{:a} \AttributeTok{:b}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+left-outer-join {[}9 7{]}:
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule
+:a & :b & :c & :right.a & :right.b & :right.c & :d\tabularnewline
+\midrule
+\endhead
+4 & 106 & r & 4 & 106 & t & X\tabularnewline
+3 & 105 & t & 3 & 105 & a & X\tabularnewline
+2 & 104 & & 2 & 104 & b & X\tabularnewline
+1 & 103 & s & 1 & 103 & l & X\tabularnewline
+2 & 102 & b & & & &\tabularnewline
+& 108 & c & & & &\tabularnewline
+& 107 & a & & & &\tabularnewline
+1 & 101 & a & & & &\tabularnewline
+4 & 109 & t & & & &\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/left-join ds2 ds1 [}\AttributeTok{:a} \AttributeTok{:b}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+left-outer-join {[}9 7{]}:
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule
+:a & :b & :c & :d & :right.a & :right.b & :right.c\tabularnewline
+\midrule
+\endhead
+1 & 103 & l & X & 1 & 103 & s\tabularnewline
+2 & 104 & b & X & 2 & 104 &\tabularnewline
+3 & 105 & a & X & 3 & 105 & t\tabularnewline
+4 & 106 & t & X & 4 & 106 & r\tabularnewline
+2 & 108 & t & X & & &\tabularnewline
+1 & 109 & a & X & & &\tabularnewline
+5 & 107 & a & X & & &\tabularnewline
+& 110 & d & X & & &\tabularnewline
+& 102 & e & X & & &\tabularnewline
+\bottomrule
+\end{longtable}
+
 \paragraph{Right}\label{right}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/right-join ds1 ds2 }\AttributeTok{:b}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+right-outer-join {[}9 7{]}:
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule
+:b & :a & :c & :right.b & :right.a & :right.c & :d\tabularnewline
+\midrule
+\endhead
+109 & 4 & t & 109 & 1 & a & X\tabularnewline
+108 & & c & 108 & 2 & t & X\tabularnewline
+107 & & a & 107 & 5 & a & X\tabularnewline
+106 & 4 & r & 106 & 4 & t & X\tabularnewline
+105 & 3 & t & 105 & 3 & a & X\tabularnewline
+104 & 2 & & 104 & 2 & b & X\tabularnewline
+103 & 1 & s & 103 & 1 & l & X\tabularnewline
+102 & 2 & b & 102 & & e & X\tabularnewline
+& & & 110 & & d & X\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/right-join ds2 ds1 }\AttributeTok{:b}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+right-outer-join {[}9 7{]}:
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule
+:b & :a & :c & :d & :right.b & :right.a & :right.c\tabularnewline
+\midrule
+\endhead
+102 & & e & X & 102 & 2 & b\tabularnewline
+103 & 1 & l & X & 103 & 1 & s\tabularnewline
+104 & 2 & b & X & 104 & 2 &\tabularnewline
+105 & 3 & a & X & 105 & 3 & t\tabularnewline
+106 & 4 & t & X & 106 & 4 & r\tabularnewline
+107 & 5 & a & X & 107 & & a\tabularnewline
+108 & 2 & t & X & 108 & & c\tabularnewline
+109 & 1 & a & X & 109 & 4 & t\tabularnewline
+& & & & 101 & 1 & a\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/right-join ds1 ds2 [}\AttributeTok{:a} \AttributeTok{:b}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+right-outer-join {[}9 7{]}:
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule
+:a & :b & :c & :right.a & :right.b & :right.c & :d\tabularnewline
+\midrule
+\endhead
+4 & 106 & r & 4 & 106 & t & X\tabularnewline
+3 & 105 & t & 3 & 105 & a & X\tabularnewline
+2 & 104 & & 2 & 104 & b & X\tabularnewline
+1 & 103 & s & 1 & 103 & l & X\tabularnewline
+& & & & 110 & d & X\tabularnewline
+& & & 1 & 109 & a & X\tabularnewline
+& & & 2 & 108 & t & X\tabularnewline
+& & & 5 & 107 & a & X\tabularnewline
+& & & & 102 & e & X\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/right-join ds2 ds1 [}\AttributeTok{:a} \AttributeTok{:b}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+right-outer-join {[}9 7{]}:
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule
+:a & :b & :c & :d & :right.a & :right.b & :right.c\tabularnewline
+\midrule
+\endhead
+1 & 103 & l & X & 1 & 103 & s\tabularnewline
+2 & 104 & b & X & 2 & 104 &\tabularnewline
+3 & 105 & a & X & 3 & 105 & t\tabularnewline
+4 & 106 & t & X & 4 & 106 & r\tabularnewline
+& & & & 1 & 101 & a\tabularnewline
+& & & & 2 & 102 & b\tabularnewline
+& & & & & 107 & a\tabularnewline
+& & & & & 108 & c\tabularnewline
+& & & & 4 & 109 & t\tabularnewline
+\bottomrule
+\end{longtable}
 
 \paragraph{Inner}\label{inner}
 
-\paragraph{Hash}\label{hash}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/inner-join ds1 ds2 }\AttributeTok{:b}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+inner-join {[}8 6{]}:
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+:b & :a & :c & :right.a & :right.c & :d\tabularnewline
+\midrule
+\endhead
+109 & 4 & t & 1 & a & X\tabularnewline
+108 & & c & 2 & t & X\tabularnewline
+107 & & a & 5 & a & X\tabularnewline
+106 & 4 & r & 4 & t & X\tabularnewline
+105 & 3 & t & 3 & a & X\tabularnewline
+104 & 2 & & 2 & b & X\tabularnewline
+103 & 1 & s & 1 & l & X\tabularnewline
+102 & 2 & b & & e & X\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/inner-join ds2 ds1 }\AttributeTok{:b}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+inner-join {[}8 6{]}:
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+:b & :a & :c & :d & :right.a & :right.c\tabularnewline
+\midrule
+\endhead
+102 & & e & X & 2 & b\tabularnewline
+103 & 1 & l & X & 1 & s\tabularnewline
+104 & 2 & b & X & 2 &\tabularnewline
+105 & 3 & a & X & 3 & t\tabularnewline
+106 & 4 & t & X & 4 & r\tabularnewline
+107 & 5 & a & X & & a\tabularnewline
+108 & 2 & t & X & & c\tabularnewline
+109 & 1 & a & X & 4 & t\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/inner-join ds1 ds2 [}\AttributeTok{:a} \AttributeTok{:b}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+inner-join {[}4 7{]}:
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule
+:a & :b & :c & :right.a & :right.b & :right.c & :d\tabularnewline
+\midrule
+\endhead
+4 & 106 & r & 4 & 106 & t & X\tabularnewline
+3 & 105 & t & 3 & 105 & a & X\tabularnewline
+2 & 104 & & 2 & 104 & b & X\tabularnewline
+1 & 103 & s & 1 & 103 & l & X\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/inner-join ds2 ds1 [}\AttributeTok{:a} \AttributeTok{:b}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+inner-join {[}4 7{]}:
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule
+:a & :b & :c & :d & :right.a & :right.b & :right.c\tabularnewline
+\midrule
+\endhead
+1 & 103 & l & X & 1 & 103 & s\tabularnewline
+2 & 104 & b & X & 2 & 104 &\tabularnewline
+3 & 105 & a & X & 3 & 105 & t\tabularnewline
+4 & 106 & t & X & 4 & 106 & r\tabularnewline
+\bottomrule
+\end{longtable}
 
 \paragraph{Concat}\label{concat}
 
+\texttt{contact} joins rows from other datasets
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/concat ds1)}
+\end{Highlighting}
+\end{Shaded}
+
+null {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:a & :b & :c\tabularnewline
+\midrule
+\endhead
+1 & 101 & a\tabularnewline
+2 & 102 & b\tabularnewline
+1 & 103 & s\tabularnewline
+2 & 104 &\tabularnewline
+3 & 105 & t\tabularnewline
+4 & 106 & r\tabularnewline
+& 107 & a\tabularnewline
+& 108 & c\tabularnewline
+4 & 109 & t\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/concat ds1 (api/drop-columns ds2 }\AttributeTok{:d}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+null {[}18 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:a & :b & :c\tabularnewline
+\midrule
+\endhead
+1 & 101 & a\tabularnewline
+2 & 102 & b\tabularnewline
+1 & 103 & s\tabularnewline
+2 & 104 &\tabularnewline
+3 & 105 & t\tabularnewline
+4 & 106 & r\tabularnewline
+& 107 & a\tabularnewline
+& 108 & c\tabularnewline
+4 & 109 & t\tabularnewline
+& 110 & d\tabularnewline
+1 & 109 & a\tabularnewline
+2 & 108 & t\tabularnewline
+5 & 107 & a\tabularnewline
+4 & 106 & t\tabularnewline
+3 & 105 & a\tabularnewline
+2 & 104 & b\tabularnewline
+1 & 103 & l\tabularnewline
+& 102 & e\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{apply}\NormalTok{ api/concat (}\KeywordTok{repeatedly} \DecValTok{3}\NormalTok{ #(api/random DS)))}
+\end{Highlighting}
+\end{Shaded}
+
+null {[}27 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+\bottomrule
+\end{longtable}
+
 \subsubsection{Functions}\label{functions}
+
+This API doesn't provide any statistical, numerical or date/time
+functions. Use below namespaces:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+Namespace & functions\tabularnewline
+\midrule
+\endhead
+\texttt{tech.v2.datatype.functional} & primitive oprations, reducers,
+statistics\tabularnewline
+\texttt{tech.v2.datatype.datatime} & date/time converters\tabularnewline
+\texttt{tech.v2.datatype.datetime.operations} & date/time
+functions\tabularnewline
+\texttt{tech.ml.dataset.pipeline} & pipeline operations\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsubsection{Other examples}\label{other-examples}
+
+Flights
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{defonce}\FunctionTok{ flights }\NormalTok{(api/dataset }\StringTok{"https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{flights}
+\end{Highlighting}
+\end{Shaded}
+
+\url{https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv}
+{[}253316 11{]}:
+
+\begin{longtable}[]{@{}lllllllllll@{}}
+\toprule
+year & month & day & dep\_delay & arr\_delay & carrier & origin & dest &
+air\_time & distance & hour\tabularnewline
+\midrule
+\endhead
+2014 & 1 & 1 & 14 & 13 & AA & JFK & LAX & 359 & 2475 & 9\tabularnewline
+2014 & 1 & 1 & -3 & 13 & AA & JFK & LAX & 363 & 2475 & 11\tabularnewline
+2014 & 1 & 1 & 2 & 9 & AA & JFK & LAX & 351 & 2475 & 19\tabularnewline
+2014 & 1 & 1 & -8 & -26 & AA & LGA & PBI & 157 & 1035 & 7\tabularnewline
+2014 & 1 & 1 & 2 & 1 & AA & JFK & LAX & 350 & 2475 & 13\tabularnewline
+2014 & 1 & 1 & 4 & 0 & AA & EWR & LAX & 339 & 2454 & 18\tabularnewline
+2014 & 1 & 1 & -2 & -18 & AA & JFK & LAX & 338 & 2475 &
+21\tabularnewline
+2014 & 1 & 1 & -3 & -14 & AA & JFK & LAX & 356 & 2475 &
+15\tabularnewline
+2014 & 1 & 1 & -1 & -17 & AA & JFK & MIA & 161 & 1089 &
+15\tabularnewline
+2014 & 1 & 1 & -2 & -14 & AA & JFK & SEA & 349 & 2422 &
+18\tabularnewline
+2014 & 1 & 1 & -5 & -17 & AA & EWR & MIA & 161 & 1085 &
+16\tabularnewline
+2014 & 1 & 1 & 7 & -5 & AA & JFK & SFO & 365 & 2586 & 17\tabularnewline
+2014 & 1 & 1 & 3 & 1 & AA & JFK & BOS & 39 & 187 & 12\tabularnewline
+2014 & 1 & 1 & 142 & 133 & AA & JFK & LAX & 345 & 2475 &
+19\tabularnewline
+2014 & 1 & 1 & -5 & -26 & AA & JFK & BOS & 35 & 187 & 17\tabularnewline
+2014 & 1 & 1 & 18 & 69 & AA & JFK & ORD & 155 & 740 & 17\tabularnewline
+2014 & 1 & 1 & 25 & 36 & AA & JFK & IAH & 234 & 1417 & 16\tabularnewline
+2014 & 1 & 1 & -1 & 1 & AA & JFK & AUS & 232 & 1521 & 17\tabularnewline
+2014 & 1 & 1 & 191 & 185 & AA & EWR & DFW & 214 & 1372 &
+16\tabularnewline
+2014 & 1 & 1 & -7 & -6 & AA & LGA & ORD & 142 & 733 & 5\tabularnewline
+2014 & 1 & 1 & -7 & 0 & AA & LGA & ORD & 143 & 733 & 6\tabularnewline
+2014 & 1 & 1 & -8 & -17 & AA & LGA & ORD & 139 & 733 & 6\tabularnewline
+2014 & 1 & 1 & -2 & 15 & AA & LGA & ORD & 145 & 733 & 7\tabularnewline
+2014 & 1 & 1 & -3 & 1 & AA & LGA & ORD & 139 & 733 & 8\tabularnewline
+2014 & 1 & 1 & 44 & 42 & AA & LGA & ORD & 141 & 733 & 10\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ flights }\CommentTok{;; take dataset (loaded from the net}
+\NormalTok{    (api/drop-missing) }\CommentTok{;; remove rows with missing values}
+\NormalTok{    (api/select-rows #(}\KeywordTok{=} \StringTok{"AA"}\NormalTok{ (}\KeywordTok{get} \VariableTok{%} \StringTok{"carrier"}\NormalTok{))) }\CommentTok{;; filter rows by carrier="AA"}
+\NormalTok{    (api/group-by [}\StringTok{"origin"} \StringTok{"dest"} \StringTok{"month"}\NormalTok{]) }\CommentTok{;; group by several columns}
+\NormalTok{    (api/aggregate \{}\AttributeTok{:arr-delay-mean}\NormalTok{ #(tech.v2.datatype.functional/mean (}\VariableTok{%} \StringTok{"arr_delay"}\NormalTok{)) }\CommentTok{;; calculate mean of arr_delay...}
+                    \AttributeTok{:dep-delay-mean}\NormalTok{ #(tech.v2.datatype.functional/mean (}\VariableTok{%} \StringTok{"dep_delay"}\NormalTok{))\}) }\CommentTok{;; ...and dep_delay}
+\NormalTok{    (api/order-by [}\StringTok{"origin"} \StringTok{"dest"} \StringTok{"month"}\NormalTok{]) }\CommentTok{;; order by some columns}
+\NormalTok{    )}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}200 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+month & origin & dest & :arr-delay-mean & :dep-delay-mean\tabularnewline
+\midrule
+\endhead
+1 & EWR & DFW & 6.428 & 10.01\tabularnewline
+2 & EWR & DFW & 10.54 & 11.35\tabularnewline
+3 & EWR & DFW & 12.87 & 8.080\tabularnewline
+4 & EWR & DFW & 17.79 & 12.92\tabularnewline
+5 & EWR & DFW & 18.49 & 18.68\tabularnewline
+6 & EWR & DFW & 37.01 & 38.74\tabularnewline
+7 & EWR & DFW & 20.25 & 21.15\tabularnewline
+8 & EWR & DFW & 16.94 & 22.07\tabularnewline
+9 & EWR & DFW & 5.865 & 13.06\tabularnewline
+10 & EWR & DFW & 18.81 & 18.89\tabularnewline
+1 & EWR & LAX & 1.367 & 7.500\tabularnewline
+2 & EWR & LAX & 10.33 & 4.111\tabularnewline
+3 & EWR & LAX & -4.400 & -6.800\tabularnewline
+1 & EWR & MIA & 11.01 & 12.12\tabularnewline
+2 & EWR & MIA & 1.564 & 4.756\tabularnewline
+3 & EWR & MIA & -4.111 & 0.4444\tabularnewline
+4 & EWR & MIA & 3.189 & 6.433\tabularnewline
+5 & EWR & MIA & -2.538 & 6.344\tabularnewline
+6 & EWR & MIA & 7.307 & 16.20\tabularnewline
+7 & EWR & MIA & 25.22 & 26.35\tabularnewline
+8 & EWR & MIA & -6.125 & 0.8462\tabularnewline
+9 & EWR & MIA & -0.9063 & 0.3594\tabularnewline
+10 & EWR & MIA & -4.475 & -3.787\tabularnewline
+7 & EWR & PHX & -5.103 & 0.2759\tabularnewline
+8 & EWR & PHX & 3.548 & 6.226\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Stocks
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{defonce}\FunctionTok{ stocks }\NormalTok{(api/dataset }\StringTok{"https://raw.githubusercontent.com/techascent/tech.ml.dataset/master/test/data/stocks.csv"}\NormalTok{ \{}\AttributeTok{:key-fn} \KeywordTok{keyword}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{stocks}
+\end{Highlighting}
+\end{Shaded}
+
+\url{https://raw.githubusercontent.com/techascent/tech.ml.dataset/master/test/data/stocks.csv}
+{[}560 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:symbol & :date & :price\tabularnewline
+\midrule
+\endhead
+MSFT & 2000-01-01 & 39.81\tabularnewline
+MSFT & 2000-02-01 & 36.35\tabularnewline
+MSFT & 2000-03-01 & 43.22\tabularnewline
+MSFT & 2000-04-01 & 28.37\tabularnewline
+MSFT & 2000-05-01 & 25.45\tabularnewline
+MSFT & 2000-06-01 & 32.54\tabularnewline
+MSFT & 2000-07-01 & 28.40\tabularnewline
+MSFT & 2000-08-01 & 28.40\tabularnewline
+MSFT & 2000-09-01 & 24.53\tabularnewline
+MSFT & 2000-10-01 & 28.02\tabularnewline
+MSFT & 2000-11-01 & 23.34\tabularnewline
+MSFT & 2000-12-01 & 17.65\tabularnewline
+MSFT & 2001-01-01 & 24.84\tabularnewline
+MSFT & 2001-02-01 & 24.00\tabularnewline
+MSFT & 2001-03-01 & 22.25\tabularnewline
+MSFT & 2001-04-01 & 27.56\tabularnewline
+MSFT & 2001-05-01 & 28.14\tabularnewline
+MSFT & 2001-06-01 & 29.70\tabularnewline
+MSFT & 2001-07-01 & 26.93\tabularnewline
+MSFT & 2001-08-01 & 23.21\tabularnewline
+MSFT & 2001-09-01 & 20.82\tabularnewline
+MSFT & 2001-10-01 & 23.65\tabularnewline
+MSFT & 2001-11-01 & 26.12\tabularnewline
+MSFT & 2001-12-01 & 26.95\tabularnewline
+MSFT & 2002-01-01 & 25.92\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ stocks}
+\NormalTok{    (api/group-by (}\KeywordTok{fn}\NormalTok{ [row]}
+\NormalTok{                    \{}\AttributeTok{:symbol}\NormalTok{ (}\AttributeTok{:symbol}\NormalTok{ row)}
+                     \AttributeTok{:year}\NormalTok{ (tech.v2.datatype.datetime.operations/get-years (}\AttributeTok{:date}\NormalTok{ row))\}))}
+\NormalTok{    (api/aggregate #(tech.v2.datatype.functional/mean (}\VariableTok{%} \AttributeTok{:price}\NormalTok{)))}
+\NormalTok{    (api/order-by [}\AttributeTok{:symbol} \AttributeTok{:year}\NormalTok{]))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}51 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:symbol & :year & :summary\tabularnewline
+\midrule
+\endhead
+AAPL & 2000 & 21.75\tabularnewline
+AAPL & 2001 & 10.18\tabularnewline
+AAPL & 2002 & 9.408\tabularnewline
+AAPL & 2003 & 9.347\tabularnewline
+AAPL & 2004 & 18.72\tabularnewline
+AAPL & 2005 & 48.17\tabularnewline
+AAPL & 2006 & 72.04\tabularnewline
+AAPL & 2007 & 133.4\tabularnewline
+AAPL & 2008 & 138.5\tabularnewline
+AAPL & 2009 & 150.4\tabularnewline
+AAPL & 2010 & 206.6\tabularnewline
+AMZN & 2000 & 43.93\tabularnewline
+AMZN & 2001 & 11.74\tabularnewline
+AMZN & 2002 & 16.72\tabularnewline
+AMZN & 2003 & 39.02\tabularnewline
+AMZN & 2004 & 43.27\tabularnewline
+AMZN & 2005 & 40.19\tabularnewline
+AMZN & 2006 & 36.25\tabularnewline
+AMZN & 2007 & 69.95\tabularnewline
+AMZN & 2008 & 69.02\tabularnewline
+AMZN & 2009 & 90.73\tabularnewline
+AMZN & 2010 & 124.2\tabularnewline
+GOOG & 2004 & 159.5\tabularnewline
+GOOG & 2005 & 286.5\tabularnewline
+GOOG & 2006 & 415.3\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ stocks}
+\NormalTok{    (api/group-by (}\KeywordTok{juxt} \AttributeTok{:symbol}\NormalTok{ #(tech.v2.datatype.datetime.operations/get-years (}\VariableTok{%} \AttributeTok{:date}\NormalTok{))))}
+\NormalTok{    (api/aggregate #(tech.v2.datatype.functional/mean (}\VariableTok{%} \AttributeTok{:price}\NormalTok{)))}
+\NormalTok{    (api/rename-columns \{:$group-name}\DecValTok{-0} \AttributeTok{:symbol}
+\NormalTok{                         :$group-name}\DecValTok{-1} \AttributeTok{:year}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}51 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:symbol & :year & :summary\tabularnewline
+\midrule
+\endhead
+AMZN & 2007 & 69.95\tabularnewline
+AMZN & 2008 & 69.02\tabularnewline
+AMZN & 2009 & 90.73\tabularnewline
+AMZN & 2010 & 124.2\tabularnewline
+AMZN & 2000 & 43.93\tabularnewline
+AMZN & 2001 & 11.74\tabularnewline
+AMZN & 2002 & 16.72\tabularnewline
+AMZN & 2003 & 39.02\tabularnewline
+AMZN & 2004 & 43.27\tabularnewline
+AMZN & 2005 & 40.19\tabularnewline
+AMZN & 2006 & 36.25\tabularnewline
+IBM & 2001 & 96.97\tabularnewline
+IBM & 2002 & 75.13\tabularnewline
+IBM & 2000 & 96.91\tabularnewline
+MSFT & 2006 & 24.76\tabularnewline
+MSFT & 2005 & 23.85\tabularnewline
+MSFT & 2004 & 22.67\tabularnewline
+MSFT & 2003 & 20.93\tabularnewline
+AAPL & 2001 & 10.18\tabularnewline
+MSFT & 2010 & 28.51\tabularnewline
+AAPL & 2002 & 9.408\tabularnewline
+MSFT & 2009 & 22.87\tabularnewline
+MSFT & 2008 & 25.21\tabularnewline
+AAPL & 2000 & 21.75\tabularnewline
+MSFT & 2007 & 29.28\tabularnewline
+\bottomrule
+\end{longtable}
 
 \end{document}

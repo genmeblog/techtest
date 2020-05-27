@@ -1238,17 +1238,17 @@ precipitation
 <hr />
 <p>Rows as sequence of sequences</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">take</span> <span class="dv">2</span> (api/rows ds))</code></pre></div>
-<pre><code>([#object[java.time.LocalDate 0x6c255e7e &quot;2012-01-01&quot;] 0.0 12.8 5.0 4.7 &quot;drizzle&quot;] [#object[java.time.LocalDate 0x4b8e7ae9 &quot;2012-01-02&quot;] 10.9 10.6 2.8 4.5 &quot;rain&quot;])</code></pre>
+<pre><code>([#object[java.time.LocalDate 0x2ff7b2f4 &quot;2012-01-01&quot;] 0.0 12.8 5.0 4.7 &quot;drizzle&quot;] [#object[java.time.LocalDate 0x1e260278 &quot;2012-01-02&quot;] 10.9 10.6 2.8 4.5 &quot;rain&quot;])</code></pre>
 <hr />
 <p>Rows as sequence of maps</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(clojure.pprint/pprint (<span class="kw">take</span> <span class="dv">2</span> (api/rows ds <span class="at">:as-maps</span>)))</code></pre></div>
-<pre><code>({&quot;date&quot; #object[java.time.LocalDate 0x604e5fb8 &quot;2012-01-01&quot;],
+<pre><code>({&quot;date&quot; #object[java.time.LocalDate 0x4ad1a10d &quot;2012-01-01&quot;],
   &quot;precipitation&quot; 0.0,
   &quot;temp_min&quot; 5.0,
   &quot;weather&quot; &quot;drizzle&quot;,
   &quot;temp_max&quot; 12.8,
   &quot;wind&quot; 4.7}
- {&quot;date&quot; #object[java.time.LocalDate 0x3011f383 &quot;2012-01-02&quot;],
+ {&quot;date&quot; #object[java.time.LocalDate 0xd7bd3ed &quot;2012-01-02&quot;],
   &quot;precipitation&quot; 10.9,
   &quot;temp_min&quot; 2.8,
   &quot;weather&quot; &quot;rain&quot;,
@@ -3521,7 +3521,7 @@ precipitation
 <th>v1</th>
 <th>v2</th>
 <th>[1 2 3]</th>
-<th><a href="mailto:java.lang.Object@76fad58e">java.lang.Object@76fad58e</a></th>
+<th><a href="mailto:java.lang.Object@5db891ef">java.lang.Object@5db891ef</a></th>
 </tr>
 </thead>
 <tbody>
@@ -3597,7 +3597,7 @@ precipitation
 <th>v1</th>
 <th>v2</th>
 <th>[1 2 3]</th>
-<th><a href="mailto:java.lang.Object@731ccd9c">java.lang.Object@731ccd9c</a></th>
+<th><a href="mailto:java.lang.Object@6875a1dc">java.lang.Object@6875a1dc</a></th>
 </tr>
 </thead>
 <tbody>
@@ -3640,7 +3640,7 @@ precipitation
 <th>v1</th>
 <th>v2</th>
 <th>[1 2 3]</th>
-<th><a href="mailto:java.lang.Object@731ccd9c">java.lang.Object@731ccd9c</a></th>
+<th><a href="mailto:java.lang.Object@6875a1dc">java.lang.Object@6875a1dc</a></th>
 </tr>
 </thead>
 <tbody>
@@ -3781,55 +3781,55 @@ precipitation
 </thead>
 <tbody>
 <tr class="odd">
-<td>0.1976</td>
+<td>0.08589</td>
 <td>1</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
-<td>0.1525</td>
+<td>0.7985</td>
 <td>2</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="odd">
-<td>0.8060</td>
+<td>0.4402</td>
 <td>3</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="even">
-<td>0.4807</td>
+<td>0.3398</td>
 <td>4</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="odd">
-<td>0.6834</td>
+<td>0.9579</td>
 <td>5</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="even">
-<td>0.2024</td>
+<td>0.4655</td>
 <td>6</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="odd">
-<td>0.9422</td>
+<td>0.3738</td>
 <td>7</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
-<td>0.9447</td>
+<td>0.4389</td>
 <td>8</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="odd">
-<td>0.9019</td>
+<td>0.8515</td>
 <td>9</td>
 <td>1.500</td>
 <td>C</td>
@@ -5062,19 +5062,19 @@ precipitation
 <hr />
 <p>Double array conversion.</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/-&gt;array DS <span class="at">:V1</span>)</code></pre></div>
-<pre><code>#object[&quot;[J&quot; 0x134cbce3 &quot;[J@134cbce3&quot;]</code></pre>
+<pre><code>#object[&quot;[J&quot; 0x482c86c0 &quot;[J@482c86c0&quot;]</code></pre>
 <hr />
 <p>Function also works on grouped dataset</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
     (api/group-by <span class="at">:V3</span>)
     (api/-&gt;array <span class="at">:V2</span>))</code></pre></div>
-<pre><code>(#object[&quot;[J&quot; 0x24c32f31 &quot;[J@24c32f31&quot;] #object[&quot;[J&quot; 0x3c6761c0 &quot;[J@3c6761c0&quot;] #object[&quot;[J&quot; 0x18aef1fa &quot;[J@18aef1fa&quot;])</code></pre>
+<pre><code>(#object[&quot;[J&quot; 0x6bdfc38c &quot;[J@6bdfc38c&quot;] #object[&quot;[J&quot; 0x5b0e8757 &quot;[J@5b0e8757&quot;] #object[&quot;[J&quot; 0x6f7d0b80 &quot;[J@6f7d0b80&quot;])</code></pre>
 <hr />
 <p>You can also cast the type to the other one (if casting is possible):</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/-&gt;array DS <span class="at">:V4</span> <span class="at">:string</span>)
 (api/-&gt;array DS <span class="at">:V1</span> <span class="at">:float32</span>)</code></pre></div>
-<pre><code>#object[&quot;[Ljava.lang.String;&quot; 0x443e85a9 &quot;[Ljava.lang.String;@443e85a9&quot;]
-#object[&quot;[F&quot; 0x5f3a2b5b &quot;[F@5f3a2b5b&quot;]</code></pre>
+<pre><code>#object[&quot;[Ljava.lang.String;&quot; 0x6fbac78a &quot;[Ljava.lang.String;@6fbac78a&quot;]
+#object[&quot;[F&quot; 0x74be0c4d &quot;[F@74be0c4d&quot;]</code></pre>
 </div>
 </div>
 <div id="rows" class="section level3">
@@ -5399,9 +5399,9 @@ precipitation
 <tbody>
 <tr class="odd">
 <td>1</td>
-<td>7</td>
-<td>0.5000</td>
-<td>A</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 </tbody>
 </table>
@@ -5420,28 +5420,16 @@ precipitation
 </thead>
 <tbody>
 <tr class="odd">
-<td>2</td>
-<td>4</td>
+<td>1</td>
+<td>1</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
-<td>2</td>
-<td>6</td>
+<td>1</td>
+<td>3</td>
 <td>1.500</td>
 <td>C</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>5</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
 </tr>
 <tr class="odd">
 <td>1</td>
@@ -5450,18 +5438,6 @@ precipitation
 <td>A</td>
 </tr>
 <tr class="even">
-<td>1</td>
-<td>9</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>9</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="even">
 <td>2</td>
 <td>2</td>
 <td>1.000</td>
@@ -5469,7 +5445,31 @@ precipitation
 </tr>
 <tr class="odd">
 <td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
 <td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
@@ -5491,19 +5491,7 @@ precipitation
 <tbody>
 <tr class="odd">
 <td>1</td>
-<td>9</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="even">
 <td>1</td>
-<td>3</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>7</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
@@ -5512,6 +5500,18 @@ precipitation
 <td>2</td>
 <td>1.000</td>
 <td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 <tr class="odd">
 <td>1</td>
@@ -5536,34 +5536,34 @@ precipitation
 </thead>
 <tbody>
 <tr class="odd">
-<td>1</td>
-<td>1</td>
+<td>2</td>
+<td>4</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
 <td>1</td>
-<td>9</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="odd">
-<td>1</td>
 <td>5</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
-<tr class="even">
-<td>1</td>
-<td>3</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
 <tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
 <td>2</td>
 <td>2</td>
 <td>1.000</td>
 <td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 </tbody>
 </table>
@@ -5594,46 +5594,46 @@ precipitation
 <td>C</td>
 </tr>
 <tr class="odd">
-<td>2</td>
-<td>6</td>
+<td>1</td>
+<td>3</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="even">
 <td>1</td>
-<td>3</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
 <td>1.500</td>
 <td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
 </tr>
 <tr class="odd">
 <td>2</td>
 <td>8</td>
 <td>1.000</td>
 <td>B</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>2</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>7</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>5</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
 </tr>
 </tbody>
 </table>
@@ -5754,13 +5754,13 @@ precipitation
 </tr>
 <tr class="even">
 <td>1</td>
-<td>7</td>
+<td>1</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="odd">
-<td>2</td>
-<td>4</td>
+<td>1</td>
+<td>7</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
@@ -5772,7 +5772,7 @@ precipitation
 </tr>
 <tr class="odd">
 <td>1</td>
-<td>1</td>
+<td>7</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
@@ -5783,14 +5783,14 @@ precipitation
 <td>B</td>
 </tr>
 <tr class="odd">
-<td>2</td>
-<td>8</td>
+<td>1</td>
+<td>5</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="even">
 <td>2</td>
-<td>2</td>
+<td>8</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
@@ -5801,20 +5801,20 @@ precipitation
 <td>B</td>
 </tr>
 <tr class="even">
-<td>2</td>
-<td>8</td>
+<td>1</td>
+<td>5</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="odd">
 <td>1</td>
-<td>9</td>
+<td>3</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="even">
-<td>1</td>
-<td>9</td>
+<td>2</td>
+<td>6</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
@@ -5825,8 +5825,8 @@ precipitation
 <td>C</td>
 </tr>
 <tr class="even">
-<td>1</td>
-<td>3</td>
+<td>2</td>
+<td>6</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
@@ -6922,14 +6922,14 @@ precipitation
 </thead>
 <tbody>
 <tr class="odd">
-<td>2</td>
-<td>2</td>
+<td>1</td>
+<td>5</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="even">
-<td>1</td>
-<td>3</td>
+<td>2</td>
+<td>6</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
@@ -10250,21 +10250,21 @@ precipitation
 <hr />
 <p>Create rows from all columns but <code>&quot;religion&quot;</code>.</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">def</span><span class="fu"> relig-income </span>(api/dataset <span class="st">&quot;data/relig_income.csv&quot;</span>))</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/head relig-income)</code></pre></div>
-<p>data/relig_income.csv [5 11]:</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">relig-income</code></pre></div>
+<p>data/relig_income.csv [18 11]:</p>
 <table>
 <colgroup>
-<col width="16%"></col>
-<col width="6%"></col>
+<col width="19%"></col>
+<col width="5%"></col>
 <col width="7%"></col>
 <col width="7%"></col>
 <col width="7%"></col>
 <col width="7%"></col>
 <col width="7%"></col>
 <col width="8%"></col>
-<col width="9%"></col>
-<col width="6%"></col>
-<col width="16%"></col>
+<col width="8%"></col>
+<col width="5%"></col>
+<col width="15%"></col>
 </colgroup>
 <thead>
 <tr class="header">
@@ -10346,6 +10346,175 @@ precipitation
 <td>17</td>
 <td>18</td>
 <td>116</td>
+</tr>
+<tr class="even">
+<td>Evangelical Prot</td>
+<td>575</td>
+<td>869</td>
+<td>1064</td>
+<td>982</td>
+<td>881</td>
+<td>1486</td>
+<td>949</td>
+<td>723</td>
+<td>414</td>
+<td>1529</td>
+</tr>
+<tr class="odd">
+<td>Hindu</td>
+<td>1</td>
+<td>9</td>
+<td>7</td>
+<td>9</td>
+<td>11</td>
+<td>34</td>
+<td>47</td>
+<td>48</td>
+<td>54</td>
+<td>37</td>
+</tr>
+<tr class="even">
+<td>Historically Black Prot</td>
+<td>228</td>
+<td>244</td>
+<td>236</td>
+<td>238</td>
+<td>197</td>
+<td>223</td>
+<td>131</td>
+<td>81</td>
+<td>78</td>
+<td>339</td>
+</tr>
+<tr class="odd">
+<td>Jehovah's Witness</td>
+<td>20</td>
+<td>27</td>
+<td>24</td>
+<td>24</td>
+<td>21</td>
+<td>30</td>
+<td>15</td>
+<td>11</td>
+<td>6</td>
+<td>37</td>
+</tr>
+<tr class="even">
+<td>Jewish</td>
+<td>19</td>
+<td>19</td>
+<td>25</td>
+<td>25</td>
+<td>30</td>
+<td>95</td>
+<td>69</td>
+<td>87</td>
+<td>151</td>
+<td>162</td>
+</tr>
+<tr class="odd">
+<td>Mainline Prot</td>
+<td>289</td>
+<td>495</td>
+<td>619</td>
+<td>655</td>
+<td>651</td>
+<td>1107</td>
+<td>939</td>
+<td>753</td>
+<td>634</td>
+<td>1328</td>
+</tr>
+<tr class="even">
+<td>Mormon</td>
+<td>29</td>
+<td>40</td>
+<td>48</td>
+<td>51</td>
+<td>56</td>
+<td>112</td>
+<td>85</td>
+<td>49</td>
+<td>42</td>
+<td>69</td>
+</tr>
+<tr class="odd">
+<td>Muslim</td>
+<td>6</td>
+<td>7</td>
+<td>9</td>
+<td>10</td>
+<td>9</td>
+<td>23</td>
+<td>16</td>
+<td>8</td>
+<td>6</td>
+<td>22</td>
+</tr>
+<tr class="even">
+<td>Orthodox</td>
+<td>13</td>
+<td>17</td>
+<td>23</td>
+<td>32</td>
+<td>32</td>
+<td>47</td>
+<td>38</td>
+<td>42</td>
+<td>46</td>
+<td>73</td>
+</tr>
+<tr class="odd">
+<td>Other Christian</td>
+<td>9</td>
+<td>7</td>
+<td>11</td>
+<td>13</td>
+<td>13</td>
+<td>14</td>
+<td>18</td>
+<td>14</td>
+<td>12</td>
+<td>18</td>
+</tr>
+<tr class="even">
+<td>Other Faiths</td>
+<td>20</td>
+<td>33</td>
+<td>40</td>
+<td>46</td>
+<td>49</td>
+<td>63</td>
+<td>46</td>
+<td>40</td>
+<td>41</td>
+<td>71</td>
+</tr>
+<tr class="odd">
+<td>Other World Religions</td>
+<td>5</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>2</td>
+<td>7</td>
+<td>3</td>
+<td>4</td>
+<td>4</td>
+<td>8</td>
+</tr>
+<tr class="even">
+<td>Unaffiliated</td>
+<td>217</td>
+<td>299</td>
+<td>374</td>
+<td>365</td>
+<td>341</td>
+<td>528</td>
+<td>407</td>
+<td>321</td>
+<td>258</td>
+<td>597</td>
 </tr>
 </tbody>
 </table>
@@ -10494,9 +10663,8 @@ precipitation
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;&gt;</span> bilboard
      (api/column-names)
      (<span class="kw">take</span> <span class="dv">13</span>)
-     (api/select-columns bilboard)
-     (api/head))</code></pre></div>
-<p>data/billboard.csv.gz [5 13]:</p>
+     (api/select-columns bilboard))</code></pre></div>
+<p>data/billboard.csv.gz [317 13]:</p>
 <table>
 <thead>
 <tr class="header">
@@ -10590,6 +10758,306 @@ precipitation
 <td>49</td>
 <td>53</td>
 <td>57</td>
+</tr>
+<tr class="even">
+<td>98^0</td>
+<td>Give Me Just One Nig...</td>
+<td>2000-08-19</td>
+<td>51</td>
+<td>39</td>
+<td>34</td>
+<td>26</td>
+<td>26</td>
+<td>19</td>
+<td>2</td>
+<td>2</td>
+<td>3</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<td>A*Teens</td>
+<td>Dancing Queen</td>
+<td>2000-07-08</td>
+<td>97</td>
+<td>97</td>
+<td>96</td>
+<td>95</td>
+<td>100</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Aaliyah</td>
+<td>I Don't Wanna</td>
+<td>2000-01-29</td>
+<td>84</td>
+<td>62</td>
+<td>51</td>
+<td>41</td>
+<td>38</td>
+<td>35</td>
+<td>35</td>
+<td>38</td>
+<td>38</td>
+<td>36</td>
+</tr>
+<tr class="odd">
+<td>Aaliyah</td>
+<td>Try Again</td>
+<td>2000-03-18</td>
+<td>59</td>
+<td>53</td>
+<td>38</td>
+<td>28</td>
+<td>21</td>
+<td>18</td>
+<td>16</td>
+<td>14</td>
+<td>12</td>
+<td>10</td>
+</tr>
+<tr class="even">
+<td>Adams, Yolanda</td>
+<td>Open My Heart</td>
+<td>2000-08-26</td>
+<td>76</td>
+<td>76</td>
+<td>74</td>
+<td>69</td>
+<td>68</td>
+<td>67</td>
+<td>61</td>
+<td>58</td>
+<td>57</td>
+<td>59</td>
+</tr>
+<tr class="odd">
+<td>Adkins, Trace</td>
+<td>More</td>
+<td>2000-04-29</td>
+<td>84</td>
+<td>84</td>
+<td>75</td>
+<td>73</td>
+<td>73</td>
+<td>69</td>
+<td>68</td>
+<td>65</td>
+<td>73</td>
+<td>83</td>
+</tr>
+<tr class="even">
+<td>Aguilera, Christina</td>
+<td>Come On Over Baby (A...</td>
+<td>2000-08-05</td>
+<td>57</td>
+<td>47</td>
+<td>45</td>
+<td>29</td>
+<td>23</td>
+<td>18</td>
+<td>11</td>
+<td>9</td>
+<td>9</td>
+<td>11</td>
+</tr>
+<tr class="odd">
+<td>Aguilera, Christina</td>
+<td>I Turn To You</td>
+<td>2000-04-15</td>
+<td>50</td>
+<td>39</td>
+<td>30</td>
+<td>28</td>
+<td>21</td>
+<td>19</td>
+<td>20</td>
+<td>17</td>
+<td>17</td>
+<td>17</td>
+</tr>
+<tr class="even">
+<td>Aguilera, Christina</td>
+<td>What A Girl Wants</td>
+<td>1999-11-27</td>
+<td>71</td>
+<td>51</td>
+<td>28</td>
+<td>18</td>
+<td>13</td>
+<td>13</td>
+<td>11</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>Alice Deejay</td>
+<td>Better Off Alone</td>
+<td>2000-04-08</td>
+<td>79</td>
+<td>65</td>
+<td>53</td>
+<td>48</td>
+<td>45</td>
+<td>36</td>
+<td>34</td>
+<td>29</td>
+<td>27</td>
+<td>30</td>
+</tr>
+<tr class="even">
+<td>Allan, Gary</td>
+<td>Smoke Rings In The D...</td>
+<td>2000-01-22</td>
+<td>80</td>
+<td>78</td>
+<td>76</td>
+<td>77</td>
+<td>92</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Amber</td>
+<td>Sexual</td>
+<td>1999-07-17</td>
+<td>99</td>
+<td>99</td>
+<td>96</td>
+<td>96</td>
+<td>100</td>
+<td>93</td>
+<td>93</td>
+<td>96</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Anastacia</td>
+<td>I'm Outta Love</td>
+<td>2000-04-01</td>
+<td>92</td>
+<td></td>
+<td></td>
+<td>95</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Anthony, Marc</td>
+<td>My Baby You</td>
+<td>2000-09-16</td>
+<td>82</td>
+<td>76</td>
+<td>76</td>
+<td>70</td>
+<td>82</td>
+<td>81</td>
+<td>74</td>
+<td>80</td>
+<td>76</td>
+<td>76</td>
+</tr>
+<tr class="even">
+<td>Anthony, Marc</td>
+<td>You Sang To Me</td>
+<td>2000-02-26</td>
+<td>77</td>
+<td>54</td>
+<td>50</td>
+<td>43</td>
+<td>30</td>
+<td>27</td>
+<td>21</td>
+<td>18</td>
+<td>15</td>
+<td>13</td>
+</tr>
+<tr class="odd">
+<td>Avant</td>
+<td>My First Love</td>
+<td>2000-11-04</td>
+<td>70</td>
+<td>62</td>
+<td>56</td>
+<td>43</td>
+<td>39</td>
+<td>33</td>
+<td>26</td>
+<td>26</td>
+<td>26</td>
+<td>31</td>
+</tr>
+<tr class="even">
+<td>Avant</td>
+<td>Separated</td>
+<td>2000-04-29</td>
+<td>62</td>
+<td>32</td>
+<td>30</td>
+<td>23</td>
+<td>26</td>
+<td>30</td>
+<td>35</td>
+<td>32</td>
+<td>32</td>
+<td>25</td>
+</tr>
+<tr class="odd">
+<td>BBMak</td>
+<td>Back Here</td>
+<td>2000-04-29</td>
+<td>99</td>
+<td>86</td>
+<td>60</td>
+<td>52</td>
+<td>38</td>
+<td>34</td>
+<td>28</td>
+<td>21</td>
+<td>18</td>
+<td>18</td>
+</tr>
+<tr class="even">
+<td>Backstreet Boys, The</td>
+<td>Shape Of My Heart</td>
+<td>2000-10-14</td>
+<td>39</td>
+<td>25</td>
+<td>24</td>
+<td>15</td>
+<td>12</td>
+<td>12</td>
+<td>10</td>
+<td>9</td>
+<td>10</td>
+<td>12</td>
+</tr>
+<tr class="odd">
+<td>Backstreet Boys, The</td>
+<td>Show Me The Meaning ...</td>
+<td>2000-01-01</td>
+<td>74</td>
+<td>62</td>
+<td>55</td>
+<td>25</td>
+<td>16</td>
+<td>14</td>
+<td>12</td>
+<td>10</td>
+<td>12</td>
+<td>9</td>
 </tr>
 </tbody>
 </table>
@@ -10985,9 +11453,8 @@ precipitation
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;&gt;</span> who
      (api/column-names)
      (<span class="kw">take</span> <span class="dv">10</span>)
-     (api/select-columns who)
-     (api/head))</code></pre></div>
-<p>data/who.csv.gz [5 10]:</p>
+     (api/select-columns who))</code></pre></div>
+<p>data/who.csv.gz [7240 10]:</p>
 <table style="width:100%;">
 <colgroup>
 <col width="11%"></col>
@@ -11075,6 +11542,246 @@ precipitation
 <td></td>
 <td></td>
 <td></td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1985</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1986</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1987</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1988</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1989</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1990</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1991</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1992</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1993</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1994</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1995</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1996</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1997</td>
+<td>0</td>
+<td>10</td>
+<td>6</td>
+<td>3</td>
+<td>5</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1998</td>
+<td>30</td>
+<td>129</td>
+<td>128</td>
+<td>90</td>
+<td>89</td>
+<td>64</td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1999</td>
+<td>8</td>
+<td>55</td>
+<td>55</td>
+<td>47</td>
+<td>34</td>
+<td>21</td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>2000</td>
+<td>52</td>
+<td>228</td>
+<td>183</td>
+<td>149</td>
+<td>129</td>
+<td>94</td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>2001</td>
+<td>129</td>
+<td>379</td>
+<td>349</td>
+<td>274</td>
+<td>204</td>
+<td>139</td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>2002</td>
+<td>90</td>
+<td>476</td>
+<td>481</td>
+<td>368</td>
+<td>246</td>
+<td>241</td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>2003</td>
+<td>127</td>
+<td>511</td>
+<td>436</td>
+<td>284</td>
+<td>256</td>
+<td>288</td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>2004</td>
+<td>139</td>
+<td>537</td>
+<td>568</td>
+<td>360</td>
+<td>358</td>
+<td>386</td>
 </tr>
 </tbody>
 </table>
@@ -11768,8 +12475,8 @@ precipitation
 <td>1</td>
 <td>1</td>
 <td>0</td>
-<td>0.8647</td>
-<td>0.5142</td>
+<td>0.04593</td>
+<td>0.003130</td>
 <td>3</td>
 <td>-2</td>
 </tr>
@@ -11777,8 +12484,8 @@ precipitation
 <td>2</td>
 <td>1</td>
 <td>1</td>
-<td>0.5035</td>
-<td>0.02892</td>
+<td>0.5084</td>
+<td>0.02834</td>
 <td>3</td>
 <td>-2</td>
 </tr>
@@ -11786,8 +12493,8 @@ precipitation
 <td>3</td>
 <td>0</td>
 <td>1</td>
-<td>0.3690</td>
-<td>0.6544</td>
+<td>0.6936</td>
+<td>0.5350</td>
 <td>3</td>
 <td>-2</td>
 </tr>
@@ -11795,8 +12502,8 @@ precipitation
 <td>4</td>
 <td>0</td>
 <td>1</td>
-<td>0.3418</td>
-<td>0.03925</td>
+<td>0.9493</td>
+<td>0.4574</td>
 <td>3</td>
 <td>-2</td>
 </tr>
@@ -11822,7 +12529,7 @@ precipitation
 <td>1</td>
 <td>0</td>
 <td>1</td>
-<td>0.8647</td>
+<td>0.04593</td>
 <td>3</td>
 </tr>
 <tr class="even">
@@ -11830,7 +12537,7 @@ precipitation
 <td>1</td>
 <td>1</td>
 <td>1</td>
-<td>0.5035</td>
+<td>0.5084</td>
 <td>3</td>
 </tr>
 <tr class="odd">
@@ -11838,7 +12545,7 @@ precipitation
 <td>0</td>
 <td>1</td>
 <td>1</td>
-<td>0.3690</td>
+<td>0.6936</td>
 <td>3</td>
 </tr>
 <tr class="even">
@@ -11846,7 +12553,7 @@ precipitation
 <td>0</td>
 <td>1</td>
 <td>1</td>
-<td>0.3418</td>
+<td>0.9493</td>
 <td>3</td>
 </tr>
 <tr class="odd">
@@ -11854,7 +12561,7 @@ precipitation
 <td>1</td>
 <td>0</td>
 <td>2</td>
-<td>0.5142</td>
+<td>0.003130</td>
 <td>-2</td>
 </tr>
 <tr class="even">
@@ -11862,7 +12569,7 @@ precipitation
 <td>1</td>
 <td>1</td>
 <td>2</td>
-<td>0.02892</td>
+<td>0.02834</td>
 <td>-2</td>
 </tr>
 <tr class="odd">
@@ -11870,7 +12577,7 @@ precipitation
 <td>0</td>
 <td>1</td>
 <td>2</td>
-<td>0.6544</td>
+<td>0.5350</td>
 <td>-2</td>
 </tr>
 <tr class="even">
@@ -11878,7 +12585,7 @@ precipitation
 <td>0</td>
 <td>1</td>
 <td>2</td>
-<td>0.03925</td>
+<td>0.4574</td>
 <td>-2</td>
 </tr>
 </tbody>
@@ -13341,9 +14048,8 @@ precipitation
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;&gt;</span> world-bank-pop
      (api/column-names)
      (<span class="kw">take</span> <span class="dv">8</span>)
-     (api/select-columns world-bank-pop)
-     (api/head))</code></pre></div>
-<p>data/world_bank_pop.csv.gz [5 8]:</p>
+     (api/select-columns world-bank-pop))</code></pre></div>
+<p>data/world_bank_pop.csv.gz [1056 8]:</p>
 <table>
 <thead>
 <tr class="header">
@@ -13407,6 +14113,206 @@ precipitation
 <td>5.156E+06</td>
 <td>5.427E+06</td>
 <td>5.692E+06</td>
+</tr>
+<tr class="even">
+<td>AFG</td>
+<td>SP.URB.GROW</td>
+<td>3.912</td>
+<td>4.663</td>
+<td>5.135</td>
+<td>5.230</td>
+<td>5.124</td>
+<td>4.769</td>
+</tr>
+<tr class="odd">
+<td>AFG</td>
+<td>SP.POP.TOTL</td>
+<td>2.009E+07</td>
+<td>2.097E+07</td>
+<td>2.198E+07</td>
+<td>2.306E+07</td>
+<td>2.412E+07</td>
+<td>2.507E+07</td>
+</tr>
+<tr class="even">
+<td>AFG</td>
+<td>SP.POP.GROW</td>
+<td>3.495</td>
+<td>4.252</td>
+<td>4.721</td>
+<td>4.818</td>
+<td>4.469</td>
+<td>3.870</td>
+</tr>
+<tr class="odd">
+<td>AGO</td>
+<td>SP.URB.TOTL</td>
+<td>8.235E+06</td>
+<td>8.708E+06</td>
+<td>9.219E+06</td>
+<td>9.765E+06</td>
+<td>1.034E+07</td>
+<td>1.095E+07</td>
+</tr>
+<tr class="even">
+<td>AGO</td>
+<td>SP.URB.GROW</td>
+<td>5.437</td>
+<td>5.588</td>
+<td>5.700</td>
+<td>5.758</td>
+<td>5.753</td>
+<td>5.693</td>
+</tr>
+<tr class="odd">
+<td>AGO</td>
+<td>SP.POP.TOTL</td>
+<td>1.644E+07</td>
+<td>1.698E+07</td>
+<td>1.757E+07</td>
+<td>1.820E+07</td>
+<td>1.887E+07</td>
+<td>1.955E+07</td>
+</tr>
+<tr class="even">
+<td>AGO</td>
+<td>SP.POP.GROW</td>
+<td>3.033</td>
+<td>3.245</td>
+<td>3.412</td>
+<td>3.526</td>
+<td>3.574</td>
+<td>3.576</td>
+</tr>
+<tr class="odd">
+<td>ALB</td>
+<td>SP.URB.TOTL</td>
+<td>1.289E+06</td>
+<td>1.299E+06</td>
+<td>1.327E+06</td>
+<td>1.355E+06</td>
+<td>1.382E+06</td>
+<td>1.407E+06</td>
+</tr>
+<tr class="even">
+<td>ALB</td>
+<td>SP.URB.GROW</td>
+<td>0.7425</td>
+<td>0.7104</td>
+<td>2.181</td>
+<td>2.060</td>
+<td>1.972</td>
+<td>1.826</td>
+</tr>
+<tr class="odd">
+<td>ALB</td>
+<td>SP.POP.TOTL</td>
+<td>3.089E+06</td>
+<td>3.060E+06</td>
+<td>3.051E+06</td>
+<td>3.040E+06</td>
+<td>3.027E+06</td>
+<td>3.011E+06</td>
+</tr>
+<tr class="even">
+<td>ALB</td>
+<td>SP.POP.GROW</td>
+<td>-0.6374</td>
+<td>-0.9385</td>
+<td>-0.2999</td>
+<td>-0.3741</td>
+<td>-0.4179</td>
+<td>-0.5118</td>
+</tr>
+<tr class="odd">
+<td>AND</td>
+<td>SP.URB.TOTL</td>
+<td>6.042E+04</td>
+<td>6.199E+04</td>
+<td>6.419E+04</td>
+<td>6.675E+04</td>
+<td>6.919E+04</td>
+<td>7.121E+04</td>
+</tr>
+<tr class="even">
+<td>AND</td>
+<td>SP.URB.GROW</td>
+<td>1.279</td>
+<td>2.572</td>
+<td>3.492</td>
+<td>3.900</td>
+<td>3.598</td>
+<td>2.868</td>
+</tr>
+<tr class="odd">
+<td>AND</td>
+<td>SP.POP.TOTL</td>
+<td>6.539E+04</td>
+<td>6.734E+04</td>
+<td>7.005E+04</td>
+<td>7.318E+04</td>
+<td>7.624E+04</td>
+<td>7.887E+04</td>
+</tr>
+<tr class="even">
+<td>AND</td>
+<td>SP.POP.GROW</td>
+<td>1.572</td>
+<td>2.940</td>
+<td>3.943</td>
+<td>4.375</td>
+<td>4.099</td>
+<td>3.382</td>
+</tr>
+<tr class="odd">
+<td>ARB</td>
+<td>SP.URB.TOTL</td>
+<td>1.500E+08</td>
+<td>1.539E+08</td>
+<td>1.580E+08</td>
+<td>1.623E+08</td>
+<td>1.668E+08</td>
+<td>1.718E+08</td>
+</tr>
+<tr class="even">
+<td>ARB</td>
+<td>SP.URB.GROW</td>
+<td>2.600</td>
+<td>2.629</td>
+<td>2.639</td>
+<td>2.710</td>
+<td>2.806</td>
+<td>2.993</td>
+</tr>
+<tr class="odd">
+<td>ARB</td>
+<td>SP.POP.TOTL</td>
+<td>2.838E+08</td>
+<td>2.899E+08</td>
+<td>2.960E+08</td>
+<td>3.024E+08</td>
+<td>3.092E+08</td>
+<td>3.163E+08</td>
+</tr>
+<tr class="even">
+<td>ARB</td>
+<td>SP.POP.GROW</td>
+<td>2.111</td>
+<td>2.120</td>
+<td>2.131</td>
+<td>2.165</td>
+<td>2.224</td>
+<td>2.297</td>
+</tr>
+<tr class="odd">
+<td>ARE</td>
+<td>SP.URB.TOTL</td>
+<td>2.531E+06</td>
+<td>2.683E+06</td>
+<td>2.843E+06</td>
+<td>3.049E+06</td>
+<td>3.347E+06</td>
+<td>3.767E+06</td>
 </tr>
 </tbody>
 </table>
@@ -14912,26 +15818,2548 @@ precipitation
 </table>
 </div>
 </div>
-<div id="joinconcat" class="section level3">
-<h3>Join/Concat</h3>
+<div id="joinconcat-datasets" class="section level3">
+<h3>Join/Concat Datasets</h3>
+<p>Dataset joins and concatenations functions.</p>
+<p>Joins accept left-side and right-side datasets and columns selector. Options are the same as in <code>tech.ml.dataset</code> functions.</p>
+<p>The difference between <code>tech.ml.dataset</code> join functions are: arguments order (first datasets) and possibility to join on multiple columns.</p>
+<p>Datasets used as examples</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">def</span><span class="fu"> ds1 </span>(api/dataset {<span class="at">:a</span> [<span class="dv">1</span> <span class="dv">2</span> <span class="dv">1</span> <span class="dv">2</span> <span class="dv">3</span> <span class="dv">4</span> <span class="va">nil</span> <span class="va">nil</span> <span class="dv">4</span>]
+                       <span class="at">:b</span> (<span class="kw">range</span> <span class="dv">101</span> <span class="dv">110</span>)
+                       <span class="at">:c</span> (<span class="kw">map</span> <span class="kw">str</span> <span class="st">&quot;abs tract&quot;</span>)}))
+(<span class="bu">def</span><span class="fu"> ds2 </span>(api/dataset {<span class="at">:a</span> [<span class="va">nil</span> <span class="dv">1</span> <span class="dv">2</span> <span class="dv">5</span> <span class="dv">4</span> <span class="dv">3</span> <span class="dv">2</span> <span class="dv">1</span> <span class="va">nil</span>]
+                       <span class="at">:b</span> (<span class="kw">range</span> <span class="dv">110</span> <span class="dv">101</span> <span class="dv">-1</span>)
+                       <span class="at">:c</span> (<span class="kw">map</span> <span class="kw">str</span> <span class="st">&quot;datatable&quot;</span>)
+                       <span class="at">:d</span> (<span class="kw">symbol</span> <span class="st">&quot;X&quot;</span>)}))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">ds1
+ds2</code></pre></div>
+<p>_unnamed [9 3]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>101</td>
+<td>a</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>102</td>
+<td>b</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>103</td>
+<td>s</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>104</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>105</td>
+<td>t</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>106</td>
+<td>r</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>107</td>
+<td>a</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>108</td>
+<td>c</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>109</td>
+<td>t</td>
+</tr>
+</tbody>
+</table>
+<p>_unnamed [9 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+<th>:d</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>110</td>
+<td>d</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>109</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>108</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>107</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>106</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>105</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>104</td>
+<td>b</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>103</td>
+<td>l</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>102</td>
+<td>e</td>
+<td>X</td>
+</tr>
+</tbody>
+</table>
 <div id="left" class="section level4">
 <h4>Left</h4>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/left-join ds1 ds2 <span class="at">:b</span>)</code></pre></div>
+<p>left-outer-join [9 7]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:b</th>
+<th>:a</th>
+<th>:c</th>
+<th>:right.b</th>
+<th>:right.a</th>
+<th>:right.c</th>
+<th>:d</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>109</td>
+<td>4</td>
+<td>t</td>
+<td>109</td>
+<td>1</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>108</td>
+<td></td>
+<td>c</td>
+<td>108</td>
+<td>2</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>107</td>
+<td></td>
+<td>a</td>
+<td>107</td>
+<td>5</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>106</td>
+<td>4</td>
+<td>r</td>
+<td>106</td>
+<td>4</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>105</td>
+<td>3</td>
+<td>t</td>
+<td>105</td>
+<td>3</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>104</td>
+<td>2</td>
+<td></td>
+<td>104</td>
+<td>2</td>
+<td>b</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>103</td>
+<td>1</td>
+<td>s</td>
+<td>103</td>
+<td>1</td>
+<td>l</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>102</td>
+<td>2</td>
+<td>b</td>
+<td>102</td>
+<td></td>
+<td>e</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>101</td>
+<td>1</td>
+<td>a</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/left-join ds2 ds1 <span class="at">:b</span>)</code></pre></div>
+<p>left-outer-join [9 7]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:b</th>
+<th>:a</th>
+<th>:c</th>
+<th>:d</th>
+<th>:right.b</th>
+<th>:right.a</th>
+<th>:right.c</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>102</td>
+<td></td>
+<td>e</td>
+<td>X</td>
+<td>102</td>
+<td>2</td>
+<td>b</td>
+</tr>
+<tr class="even">
+<td>103</td>
+<td>1</td>
+<td>l</td>
+<td>X</td>
+<td>103</td>
+<td>1</td>
+<td>s</td>
+</tr>
+<tr class="odd">
+<td>104</td>
+<td>2</td>
+<td>b</td>
+<td>X</td>
+<td>104</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>105</td>
+<td>3</td>
+<td>a</td>
+<td>X</td>
+<td>105</td>
+<td>3</td>
+<td>t</td>
+</tr>
+<tr class="odd">
+<td>106</td>
+<td>4</td>
+<td>t</td>
+<td>X</td>
+<td>106</td>
+<td>4</td>
+<td>r</td>
+</tr>
+<tr class="even">
+<td>107</td>
+<td>5</td>
+<td>a</td>
+<td>X</td>
+<td>107</td>
+<td></td>
+<td>a</td>
+</tr>
+<tr class="odd">
+<td>108</td>
+<td>2</td>
+<td>t</td>
+<td>X</td>
+<td>108</td>
+<td></td>
+<td>c</td>
+</tr>
+<tr class="even">
+<td>109</td>
+<td>1</td>
+<td>a</td>
+<td>X</td>
+<td>109</td>
+<td>4</td>
+<td>t</td>
+</tr>
+<tr class="odd">
+<td>110</td>
+<td></td>
+<td>d</td>
+<td>X</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/left-join ds1 ds2 [<span class="at">:a</span> <span class="at">:b</span>])</code></pre></div>
+<p>left-outer-join [9 7]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+<th>:right.a</th>
+<th>:right.b</th>
+<th>:right.c</th>
+<th>:d</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>4</td>
+<td>106</td>
+<td>r</td>
+<td>4</td>
+<td>106</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>105</td>
+<td>t</td>
+<td>3</td>
+<td>105</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>104</td>
+<td></td>
+<td>2</td>
+<td>104</td>
+<td>b</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>103</td>
+<td>s</td>
+<td>1</td>
+<td>103</td>
+<td>l</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>102</td>
+<td>b</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td></td>
+<td>108</td>
+<td>c</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>107</td>
+<td>a</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>101</td>
+<td>a</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>109</td>
+<td>t</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/left-join ds2 ds1 [<span class="at">:a</span> <span class="at">:b</span>])</code></pre></div>
+<p>left-outer-join [9 7]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+<th>:d</th>
+<th>:right.a</th>
+<th>:right.b</th>
+<th>:right.c</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>103</td>
+<td>l</td>
+<td>X</td>
+<td>1</td>
+<td>103</td>
+<td>s</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>104</td>
+<td>b</td>
+<td>X</td>
+<td>2</td>
+<td>104</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>105</td>
+<td>a</td>
+<td>X</td>
+<td>3</td>
+<td>105</td>
+<td>t</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>106</td>
+<td>t</td>
+<td>X</td>
+<td>4</td>
+<td>106</td>
+<td>r</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>108</td>
+<td>t</td>
+<td>X</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>109</td>
+<td>a</td>
+<td>X</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>107</td>
+<td>a</td>
+<td>X</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td></td>
+<td>110</td>
+<td>d</td>
+<td>X</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>102</td>
+<td>e</td>
+<td>X</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="right" class="section level4">
 <h4>Right</h4>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/right-join ds1 ds2 <span class="at">:b</span>)</code></pre></div>
+<p>right-outer-join [9 7]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:b</th>
+<th>:a</th>
+<th>:c</th>
+<th>:right.b</th>
+<th>:right.a</th>
+<th>:right.c</th>
+<th>:d</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>109</td>
+<td>4</td>
+<td>t</td>
+<td>109</td>
+<td>1</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>108</td>
+<td></td>
+<td>c</td>
+<td>108</td>
+<td>2</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>107</td>
+<td></td>
+<td>a</td>
+<td>107</td>
+<td>5</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>106</td>
+<td>4</td>
+<td>r</td>
+<td>106</td>
+<td>4</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>105</td>
+<td>3</td>
+<td>t</td>
+<td>105</td>
+<td>3</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>104</td>
+<td>2</td>
+<td></td>
+<td>104</td>
+<td>2</td>
+<td>b</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>103</td>
+<td>1</td>
+<td>s</td>
+<td>103</td>
+<td>1</td>
+<td>l</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>102</td>
+<td>2</td>
+<td>b</td>
+<td>102</td>
+<td></td>
+<td>e</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td></td>
+<td>110</td>
+<td></td>
+<td>d</td>
+<td>X</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/right-join ds2 ds1 <span class="at">:b</span>)</code></pre></div>
+<p>right-outer-join [9 7]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:b</th>
+<th>:a</th>
+<th>:c</th>
+<th>:d</th>
+<th>:right.b</th>
+<th>:right.a</th>
+<th>:right.c</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>102</td>
+<td></td>
+<td>e</td>
+<td>X</td>
+<td>102</td>
+<td>2</td>
+<td>b</td>
+</tr>
+<tr class="even">
+<td>103</td>
+<td>1</td>
+<td>l</td>
+<td>X</td>
+<td>103</td>
+<td>1</td>
+<td>s</td>
+</tr>
+<tr class="odd">
+<td>104</td>
+<td>2</td>
+<td>b</td>
+<td>X</td>
+<td>104</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>105</td>
+<td>3</td>
+<td>a</td>
+<td>X</td>
+<td>105</td>
+<td>3</td>
+<td>t</td>
+</tr>
+<tr class="odd">
+<td>106</td>
+<td>4</td>
+<td>t</td>
+<td>X</td>
+<td>106</td>
+<td>4</td>
+<td>r</td>
+</tr>
+<tr class="even">
+<td>107</td>
+<td>5</td>
+<td>a</td>
+<td>X</td>
+<td>107</td>
+<td></td>
+<td>a</td>
+</tr>
+<tr class="odd">
+<td>108</td>
+<td>2</td>
+<td>t</td>
+<td>X</td>
+<td>108</td>
+<td></td>
+<td>c</td>
+</tr>
+<tr class="even">
+<td>109</td>
+<td>1</td>
+<td>a</td>
+<td>X</td>
+<td>109</td>
+<td>4</td>
+<td>t</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>101</td>
+<td>1</td>
+<td>a</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/right-join ds1 ds2 [<span class="at">:a</span> <span class="at">:b</span>])</code></pre></div>
+<p>right-outer-join [9 7]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+<th>:right.a</th>
+<th>:right.b</th>
+<th>:right.c</th>
+<th>:d</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>4</td>
+<td>106</td>
+<td>r</td>
+<td>4</td>
+<td>106</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>105</td>
+<td>t</td>
+<td>3</td>
+<td>105</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>104</td>
+<td></td>
+<td>2</td>
+<td>104</td>
+<td>b</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>103</td>
+<td>s</td>
+<td>1</td>
+<td>103</td>
+<td>l</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>110</td>
+<td>d</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td></td>
+<td>1</td>
+<td>109</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td></td>
+<td>2</td>
+<td>108</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td></td>
+<td>5</td>
+<td>107</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>102</td>
+<td>e</td>
+<td>X</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/right-join ds2 ds1 [<span class="at">:a</span> <span class="at">:b</span>])</code></pre></div>
+<p>right-outer-join [9 7]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+<th>:d</th>
+<th>:right.a</th>
+<th>:right.b</th>
+<th>:right.c</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>103</td>
+<td>l</td>
+<td>X</td>
+<td>1</td>
+<td>103</td>
+<td>s</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>104</td>
+<td>b</td>
+<td>X</td>
+<td>2</td>
+<td>104</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>105</td>
+<td>a</td>
+<td>X</td>
+<td>3</td>
+<td>105</td>
+<td>t</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>106</td>
+<td>t</td>
+<td>X</td>
+<td>4</td>
+<td>106</td>
+<td>r</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>1</td>
+<td>101</td>
+<td>a</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>2</td>
+<td>102</td>
+<td>b</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>107</td>
+<td>a</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>108</td>
+<td>c</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>4</td>
+<td>109</td>
+<td>t</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="inner" class="section level4">
 <h4>Inner</h4>
-</div>
-<div id="hash" class="section level4">
-<h4>Hash</h4>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/inner-join ds1 ds2 <span class="at">:b</span>)</code></pre></div>
+<p>inner-join [8 6]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:b</th>
+<th>:a</th>
+<th>:c</th>
+<th>:right.a</th>
+<th>:right.c</th>
+<th>:d</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>109</td>
+<td>4</td>
+<td>t</td>
+<td>1</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>108</td>
+<td></td>
+<td>c</td>
+<td>2</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>107</td>
+<td></td>
+<td>a</td>
+<td>5</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>106</td>
+<td>4</td>
+<td>r</td>
+<td>4</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>105</td>
+<td>3</td>
+<td>t</td>
+<td>3</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>104</td>
+<td>2</td>
+<td></td>
+<td>2</td>
+<td>b</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>103</td>
+<td>1</td>
+<td>s</td>
+<td>1</td>
+<td>l</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>102</td>
+<td>2</td>
+<td>b</td>
+<td></td>
+<td>e</td>
+<td>X</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/inner-join ds2 ds1 <span class="at">:b</span>)</code></pre></div>
+<p>inner-join [8 6]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:b</th>
+<th>:a</th>
+<th>:c</th>
+<th>:d</th>
+<th>:right.a</th>
+<th>:right.c</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>102</td>
+<td></td>
+<td>e</td>
+<td>X</td>
+<td>2</td>
+<td>b</td>
+</tr>
+<tr class="even">
+<td>103</td>
+<td>1</td>
+<td>l</td>
+<td>X</td>
+<td>1</td>
+<td>s</td>
+</tr>
+<tr class="odd">
+<td>104</td>
+<td>2</td>
+<td>b</td>
+<td>X</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>105</td>
+<td>3</td>
+<td>a</td>
+<td>X</td>
+<td>3</td>
+<td>t</td>
+</tr>
+<tr class="odd">
+<td>106</td>
+<td>4</td>
+<td>t</td>
+<td>X</td>
+<td>4</td>
+<td>r</td>
+</tr>
+<tr class="even">
+<td>107</td>
+<td>5</td>
+<td>a</td>
+<td>X</td>
+<td></td>
+<td>a</td>
+</tr>
+<tr class="odd">
+<td>108</td>
+<td>2</td>
+<td>t</td>
+<td>X</td>
+<td></td>
+<td>c</td>
+</tr>
+<tr class="even">
+<td>109</td>
+<td>1</td>
+<td>a</td>
+<td>X</td>
+<td>4</td>
+<td>t</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/inner-join ds1 ds2 [<span class="at">:a</span> <span class="at">:b</span>])</code></pre></div>
+<p>inner-join [4 7]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+<th>:right.a</th>
+<th>:right.b</th>
+<th>:right.c</th>
+<th>:d</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>4</td>
+<td>106</td>
+<td>r</td>
+<td>4</td>
+<td>106</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>105</td>
+<td>t</td>
+<td>3</td>
+<td>105</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>104</td>
+<td></td>
+<td>2</td>
+<td>104</td>
+<td>b</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>103</td>
+<td>s</td>
+<td>1</td>
+<td>103</td>
+<td>l</td>
+<td>X</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/inner-join ds2 ds1 [<span class="at">:a</span> <span class="at">:b</span>])</code></pre></div>
+<p>inner-join [4 7]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+<th>:d</th>
+<th>:right.a</th>
+<th>:right.b</th>
+<th>:right.c</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>103</td>
+<td>l</td>
+<td>X</td>
+<td>1</td>
+<td>103</td>
+<td>s</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>104</td>
+<td>b</td>
+<td>X</td>
+<td>2</td>
+<td>104</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>105</td>
+<td>a</td>
+<td>X</td>
+<td>3</td>
+<td>105</td>
+<td>t</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>106</td>
+<td>t</td>
+<td>X</td>
+<td>4</td>
+<td>106</td>
+<td>r</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="concat" class="section level4">
 <h4>Concat</h4>
+<p><code>contact</code> joins rows from other datasets</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/concat ds1)</code></pre></div>
+<p>null [9 3]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>101</td>
+<td>a</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>102</td>
+<td>b</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>103</td>
+<td>s</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>104</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>105</td>
+<td>t</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>106</td>
+<td>r</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>107</td>
+<td>a</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>108</td>
+<td>c</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>109</td>
+<td>t</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/concat ds1 (api/drop-columns ds2 <span class="at">:d</span>))</code></pre></div>
+<p>null [18 3]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>101</td>
+<td>a</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>102</td>
+<td>b</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>103</td>
+<td>s</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>104</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>105</td>
+<td>t</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>106</td>
+<td>r</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>107</td>
+<td>a</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>108</td>
+<td>c</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>109</td>
+<td>t</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>110</td>
+<td>d</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>109</td>
+<td>a</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>108</td>
+<td>t</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>107</td>
+<td>a</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>106</td>
+<td>t</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>105</td>
+<td>a</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>104</td>
+<td>b</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>103</td>
+<td>l</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>102</td>
+<td>e</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">apply</span> api/concat (<span class="kw">repeatedly</span> <span class="dv">3</span> #(api/random DS)))</code></pre></div>
+<p>null [27 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div id="functions" class="section level3">
 <h3>Functions</h3>
+<p>This API doesn't provide any statistical, numerical or date/time functions. Use below namespaces:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Namespace</th>
+<th>functions</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>tech.v2.datatype.functional</code></td>
+<td>primitive oprations, reducers, statistics</td>
+</tr>
+<tr class="even">
+<td><code>tech.v2.datatype.datatime</code></td>
+<td>date/time converters</td>
+</tr>
+<tr class="odd">
+<td><code>tech.v2.datatype.datetime.operations</code></td>
+<td>date/time functions</td>
+</tr>
+<tr class="even">
+<td><code>tech.ml.dataset.pipeline</code></td>
+<td>pipeline operations</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="other-examples" class="section level3">
+<h3>Other examples</h3>
+<p>Flights</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">defonce</span><span class="fu"> flights </span>(api/dataset <span class="st">&quot;https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv&quot;</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">flights</code></pre></div>
+<p><a href="https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv" class="uri">https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv</a> [253316 11]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>year</th>
+<th>month</th>
+<th>day</th>
+<th>dep_delay</th>
+<th>arr_delay</th>
+<th>carrier</th>
+<th>origin</th>
+<th>dest</th>
+<th>air_time</th>
+<th>distance</th>
+<th>hour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>14</td>
+<td>13</td>
+<td>AA</td>
+<td>JFK</td>
+<td>LAX</td>
+<td>359</td>
+<td>2475</td>
+<td>9</td>
+</tr>
+<tr class="even">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>-3</td>
+<td>13</td>
+<td>AA</td>
+<td>JFK</td>
+<td>LAX</td>
+<td>363</td>
+<td>2475</td>
+<td>11</td>
+</tr>
+<tr class="odd">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>9</td>
+<td>AA</td>
+<td>JFK</td>
+<td>LAX</td>
+<td>351</td>
+<td>2475</td>
+<td>19</td>
+</tr>
+<tr class="even">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>-8</td>
+<td>-26</td>
+<td>AA</td>
+<td>LGA</td>
+<td>PBI</td>
+<td>157</td>
+<td>1035</td>
+<td>7</td>
+</tr>
+<tr class="odd">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>AA</td>
+<td>JFK</td>
+<td>LAX</td>
+<td>350</td>
+<td>2475</td>
+<td>13</td>
+</tr>
+<tr class="even">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>4</td>
+<td>0</td>
+<td>AA</td>
+<td>EWR</td>
+<td>LAX</td>
+<td>339</td>
+<td>2454</td>
+<td>18</td>
+</tr>
+<tr class="odd">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>-2</td>
+<td>-18</td>
+<td>AA</td>
+<td>JFK</td>
+<td>LAX</td>
+<td>338</td>
+<td>2475</td>
+<td>21</td>
+</tr>
+<tr class="even">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>-3</td>
+<td>-14</td>
+<td>AA</td>
+<td>JFK</td>
+<td>LAX</td>
+<td>356</td>
+<td>2475</td>
+<td>15</td>
+</tr>
+<tr class="odd">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>-1</td>
+<td>-17</td>
+<td>AA</td>
+<td>JFK</td>
+<td>MIA</td>
+<td>161</td>
+<td>1089</td>
+<td>15</td>
+</tr>
+<tr class="even">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>-2</td>
+<td>-14</td>
+<td>AA</td>
+<td>JFK</td>
+<td>SEA</td>
+<td>349</td>
+<td>2422</td>
+<td>18</td>
+</tr>
+<tr class="odd">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>-5</td>
+<td>-17</td>
+<td>AA</td>
+<td>EWR</td>
+<td>MIA</td>
+<td>161</td>
+<td>1085</td>
+<td>16</td>
+</tr>
+<tr class="even">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>7</td>
+<td>-5</td>
+<td>AA</td>
+<td>JFK</td>
+<td>SFO</td>
+<td>365</td>
+<td>2586</td>
+<td>17</td>
+</tr>
+<tr class="odd">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>3</td>
+<td>1</td>
+<td>AA</td>
+<td>JFK</td>
+<td>BOS</td>
+<td>39</td>
+<td>187</td>
+<td>12</td>
+</tr>
+<tr class="even">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>142</td>
+<td>133</td>
+<td>AA</td>
+<td>JFK</td>
+<td>LAX</td>
+<td>345</td>
+<td>2475</td>
+<td>19</td>
+</tr>
+<tr class="odd">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>-5</td>
+<td>-26</td>
+<td>AA</td>
+<td>JFK</td>
+<td>BOS</td>
+<td>35</td>
+<td>187</td>
+<td>17</td>
+</tr>
+<tr class="even">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>18</td>
+<td>69</td>
+<td>AA</td>
+<td>JFK</td>
+<td>ORD</td>
+<td>155</td>
+<td>740</td>
+<td>17</td>
+</tr>
+<tr class="odd">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>25</td>
+<td>36</td>
+<td>AA</td>
+<td>JFK</td>
+<td>IAH</td>
+<td>234</td>
+<td>1417</td>
+<td>16</td>
+</tr>
+<tr class="even">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>-1</td>
+<td>1</td>
+<td>AA</td>
+<td>JFK</td>
+<td>AUS</td>
+<td>232</td>
+<td>1521</td>
+<td>17</td>
+</tr>
+<tr class="odd">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>191</td>
+<td>185</td>
+<td>AA</td>
+<td>EWR</td>
+<td>DFW</td>
+<td>214</td>
+<td>1372</td>
+<td>16</td>
+</tr>
+<tr class="even">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>-7</td>
+<td>-6</td>
+<td>AA</td>
+<td>LGA</td>
+<td>ORD</td>
+<td>142</td>
+<td>733</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>-7</td>
+<td>0</td>
+<td>AA</td>
+<td>LGA</td>
+<td>ORD</td>
+<td>143</td>
+<td>733</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>-8</td>
+<td>-17</td>
+<td>AA</td>
+<td>LGA</td>
+<td>ORD</td>
+<td>139</td>
+<td>733</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>-2</td>
+<td>15</td>
+<td>AA</td>
+<td>LGA</td>
+<td>ORD</td>
+<td>145</td>
+<td>733</td>
+<td>7</td>
+</tr>
+<tr class="even">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>-3</td>
+<td>1</td>
+<td>AA</td>
+<td>LGA</td>
+<td>ORD</td>
+<td>139</td>
+<td>733</td>
+<td>8</td>
+</tr>
+<tr class="odd">
+<td>2014</td>
+<td>1</td>
+<td>1</td>
+<td>44</td>
+<td>42</td>
+<td>AA</td>
+<td>LGA</td>
+<td>ORD</td>
+<td>141</td>
+<td>733</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> flights <span class="co">;; take dataset (loaded from the net</span>
+    (api/drop-missing) <span class="co">;; remove rows with missing values</span>
+    (api/select-rows #(<span class="kw">=</span> <span class="st">&quot;AA&quot;</span> (<span class="kw">get</span> <span class="va">%</span> <span class="st">&quot;carrier&quot;</span>))) <span class="co">;; filter rows by carrier=&quot;AA&quot;</span>
+    (api/group-by [<span class="st">&quot;origin&quot;</span> <span class="st">&quot;dest&quot;</span> <span class="st">&quot;month&quot;</span>]) <span class="co">;; group by several columns</span>
+    (api/aggregate {<span class="at">:arr-delay-mean</span> #(tech.v2.datatype.functional/mean (<span class="va">%</span> <span class="st">&quot;arr_delay&quot;</span>)) <span class="co">;; calculate mean of arr_delay...</span>
+                    <span class="at">:dep-delay-mean</span> #(tech.v2.datatype.functional/mean (<span class="va">%</span> <span class="st">&quot;dep_delay&quot;</span>))}) <span class="co">;; ...and dep_delay</span>
+    (api/order-by [<span class="st">&quot;origin&quot;</span> <span class="st">&quot;dest&quot;</span> <span class="st">&quot;month&quot;</span>]) <span class="co">;; order by some columns</span>
+    )</code></pre></div>
+<p>_unnamed [200 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>month</th>
+<th>origin</th>
+<th>dest</th>
+<th>:arr-delay-mean</th>
+<th>:dep-delay-mean</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>EWR</td>
+<td>DFW</td>
+<td>6.428</td>
+<td>10.01</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>EWR</td>
+<td>DFW</td>
+<td>10.54</td>
+<td>11.35</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>EWR</td>
+<td>DFW</td>
+<td>12.87</td>
+<td>8.080</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>EWR</td>
+<td>DFW</td>
+<td>17.79</td>
+<td>12.92</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>EWR</td>
+<td>DFW</td>
+<td>18.49</td>
+<td>18.68</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>EWR</td>
+<td>DFW</td>
+<td>37.01</td>
+<td>38.74</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>EWR</td>
+<td>DFW</td>
+<td>20.25</td>
+<td>21.15</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>EWR</td>
+<td>DFW</td>
+<td>16.94</td>
+<td>22.07</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>EWR</td>
+<td>DFW</td>
+<td>5.865</td>
+<td>13.06</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>EWR</td>
+<td>DFW</td>
+<td>18.81</td>
+<td>18.89</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>EWR</td>
+<td>LAX</td>
+<td>1.367</td>
+<td>7.500</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>EWR</td>
+<td>LAX</td>
+<td>10.33</td>
+<td>4.111</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>EWR</td>
+<td>LAX</td>
+<td>-4.400</td>
+<td>-6.800</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>EWR</td>
+<td>MIA</td>
+<td>11.01</td>
+<td>12.12</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>EWR</td>
+<td>MIA</td>
+<td>1.564</td>
+<td>4.756</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>EWR</td>
+<td>MIA</td>
+<td>-4.111</td>
+<td>0.4444</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>EWR</td>
+<td>MIA</td>
+<td>3.189</td>
+<td>6.433</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>EWR</td>
+<td>MIA</td>
+<td>-2.538</td>
+<td>6.344</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>EWR</td>
+<td>MIA</td>
+<td>7.307</td>
+<td>16.20</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>EWR</td>
+<td>MIA</td>
+<td>25.22</td>
+<td>26.35</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>EWR</td>
+<td>MIA</td>
+<td>-6.125</td>
+<td>0.8462</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>EWR</td>
+<td>MIA</td>
+<td>-0.9063</td>
+<td>0.3594</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>EWR</td>
+<td>MIA</td>
+<td>-4.475</td>
+<td>-3.787</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>EWR</td>
+<td>PHX</td>
+<td>-5.103</td>
+<td>0.2759</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>EWR</td>
+<td>PHX</td>
+<td>3.548</td>
+<td>6.226</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Stocks</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">defonce</span><span class="fu"> stocks </span>(api/dataset <span class="st">&quot;https://raw.githubusercontent.com/techascent/tech.ml.dataset/master/test/data/stocks.csv&quot;</span> {<span class="at">:key-fn</span> <span class="kw">keyword</span>}))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">stocks</code></pre></div>
+<p><a href="https://raw.githubusercontent.com/techascent/tech.ml.dataset/master/test/data/stocks.csv" class="uri">https://raw.githubusercontent.com/techascent/tech.ml.dataset/master/test/data/stocks.csv</a> [560 3]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:symbol</th>
+<th>:date</th>
+<th>:price</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>MSFT</td>
+<td>2000-01-01</td>
+<td>39.81</td>
+</tr>
+<tr class="even">
+<td>MSFT</td>
+<td>2000-02-01</td>
+<td>36.35</td>
+</tr>
+<tr class="odd">
+<td>MSFT</td>
+<td>2000-03-01</td>
+<td>43.22</td>
+</tr>
+<tr class="even">
+<td>MSFT</td>
+<td>2000-04-01</td>
+<td>28.37</td>
+</tr>
+<tr class="odd">
+<td>MSFT</td>
+<td>2000-05-01</td>
+<td>25.45</td>
+</tr>
+<tr class="even">
+<td>MSFT</td>
+<td>2000-06-01</td>
+<td>32.54</td>
+</tr>
+<tr class="odd">
+<td>MSFT</td>
+<td>2000-07-01</td>
+<td>28.40</td>
+</tr>
+<tr class="even">
+<td>MSFT</td>
+<td>2000-08-01</td>
+<td>28.40</td>
+</tr>
+<tr class="odd">
+<td>MSFT</td>
+<td>2000-09-01</td>
+<td>24.53</td>
+</tr>
+<tr class="even">
+<td>MSFT</td>
+<td>2000-10-01</td>
+<td>28.02</td>
+</tr>
+<tr class="odd">
+<td>MSFT</td>
+<td>2000-11-01</td>
+<td>23.34</td>
+</tr>
+<tr class="even">
+<td>MSFT</td>
+<td>2000-12-01</td>
+<td>17.65</td>
+</tr>
+<tr class="odd">
+<td>MSFT</td>
+<td>2001-01-01</td>
+<td>24.84</td>
+</tr>
+<tr class="even">
+<td>MSFT</td>
+<td>2001-02-01</td>
+<td>24.00</td>
+</tr>
+<tr class="odd">
+<td>MSFT</td>
+<td>2001-03-01</td>
+<td>22.25</td>
+</tr>
+<tr class="even">
+<td>MSFT</td>
+<td>2001-04-01</td>
+<td>27.56</td>
+</tr>
+<tr class="odd">
+<td>MSFT</td>
+<td>2001-05-01</td>
+<td>28.14</td>
+</tr>
+<tr class="even">
+<td>MSFT</td>
+<td>2001-06-01</td>
+<td>29.70</td>
+</tr>
+<tr class="odd">
+<td>MSFT</td>
+<td>2001-07-01</td>
+<td>26.93</td>
+</tr>
+<tr class="even">
+<td>MSFT</td>
+<td>2001-08-01</td>
+<td>23.21</td>
+</tr>
+<tr class="odd">
+<td>MSFT</td>
+<td>2001-09-01</td>
+<td>20.82</td>
+</tr>
+<tr class="even">
+<td>MSFT</td>
+<td>2001-10-01</td>
+<td>23.65</td>
+</tr>
+<tr class="odd">
+<td>MSFT</td>
+<td>2001-11-01</td>
+<td>26.12</td>
+</tr>
+<tr class="even">
+<td>MSFT</td>
+<td>2001-12-01</td>
+<td>26.95</td>
+</tr>
+<tr class="odd">
+<td>MSFT</td>
+<td>2002-01-01</td>
+<td>25.92</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> stocks
+    (api/group-by (<span class="kw">fn</span> [row]
+                    {<span class="at">:symbol</span> (<span class="at">:symbol</span> row)
+                     <span class="at">:year</span> (tech.v2.datatype.datetime.operations/get-years (<span class="at">:date</span> row))}))
+    (api/aggregate #(tech.v2.datatype.functional/mean (<span class="va">%</span> <span class="at">:price</span>)))
+    (api/order-by [<span class="at">:symbol</span> <span class="at">:year</span>]))</code></pre></div>
+<p>_unnamed [51 3]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:symbol</th>
+<th>:year</th>
+<th>:summary</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>AAPL</td>
+<td>2000</td>
+<td>21.75</td>
+</tr>
+<tr class="even">
+<td>AAPL</td>
+<td>2001</td>
+<td>10.18</td>
+</tr>
+<tr class="odd">
+<td>AAPL</td>
+<td>2002</td>
+<td>9.408</td>
+</tr>
+<tr class="even">
+<td>AAPL</td>
+<td>2003</td>
+<td>9.347</td>
+</tr>
+<tr class="odd">
+<td>AAPL</td>
+<td>2004</td>
+<td>18.72</td>
+</tr>
+<tr class="even">
+<td>AAPL</td>
+<td>2005</td>
+<td>48.17</td>
+</tr>
+<tr class="odd">
+<td>AAPL</td>
+<td>2006</td>
+<td>72.04</td>
+</tr>
+<tr class="even">
+<td>AAPL</td>
+<td>2007</td>
+<td>133.4</td>
+</tr>
+<tr class="odd">
+<td>AAPL</td>
+<td>2008</td>
+<td>138.5</td>
+</tr>
+<tr class="even">
+<td>AAPL</td>
+<td>2009</td>
+<td>150.4</td>
+</tr>
+<tr class="odd">
+<td>AAPL</td>
+<td>2010</td>
+<td>206.6</td>
+</tr>
+<tr class="even">
+<td>AMZN</td>
+<td>2000</td>
+<td>43.93</td>
+</tr>
+<tr class="odd">
+<td>AMZN</td>
+<td>2001</td>
+<td>11.74</td>
+</tr>
+<tr class="even">
+<td>AMZN</td>
+<td>2002</td>
+<td>16.72</td>
+</tr>
+<tr class="odd">
+<td>AMZN</td>
+<td>2003</td>
+<td>39.02</td>
+</tr>
+<tr class="even">
+<td>AMZN</td>
+<td>2004</td>
+<td>43.27</td>
+</tr>
+<tr class="odd">
+<td>AMZN</td>
+<td>2005</td>
+<td>40.19</td>
+</tr>
+<tr class="even">
+<td>AMZN</td>
+<td>2006</td>
+<td>36.25</td>
+</tr>
+<tr class="odd">
+<td>AMZN</td>
+<td>2007</td>
+<td>69.95</td>
+</tr>
+<tr class="even">
+<td>AMZN</td>
+<td>2008</td>
+<td>69.02</td>
+</tr>
+<tr class="odd">
+<td>AMZN</td>
+<td>2009</td>
+<td>90.73</td>
+</tr>
+<tr class="even">
+<td>AMZN</td>
+<td>2010</td>
+<td>124.2</td>
+</tr>
+<tr class="odd">
+<td>GOOG</td>
+<td>2004</td>
+<td>159.5</td>
+</tr>
+<tr class="even">
+<td>GOOG</td>
+<td>2005</td>
+<td>286.5</td>
+</tr>
+<tr class="odd">
+<td>GOOG</td>
+<td>2006</td>
+<td>415.3</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> stocks
+    (api/group-by (<span class="kw">juxt</span> <span class="at">:symbol</span> #(tech.v2.datatype.datetime.operations/get-years (<span class="va">%</span> <span class="at">:date</span>))))
+    (api/aggregate #(tech.v2.datatype.functional/mean (<span class="va">%</span> <span class="at">:price</span>)))
+    (api/rename-columns {:$group-name<span class="dv">-0</span> <span class="at">:symbol</span>
+                         :$group-name<span class="dv">-1</span> <span class="at">:year</span>}))</code></pre></div>
+<p>_unnamed [51 3]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:symbol</th>
+<th>:year</th>
+<th>:summary</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>AMZN</td>
+<td>2007</td>
+<td>69.95</td>
+</tr>
+<tr class="even">
+<td>AMZN</td>
+<td>2008</td>
+<td>69.02</td>
+</tr>
+<tr class="odd">
+<td>AMZN</td>
+<td>2009</td>
+<td>90.73</td>
+</tr>
+<tr class="even">
+<td>AMZN</td>
+<td>2010</td>
+<td>124.2</td>
+</tr>
+<tr class="odd">
+<td>AMZN</td>
+<td>2000</td>
+<td>43.93</td>
+</tr>
+<tr class="even">
+<td>AMZN</td>
+<td>2001</td>
+<td>11.74</td>
+</tr>
+<tr class="odd">
+<td>AMZN</td>
+<td>2002</td>
+<td>16.72</td>
+</tr>
+<tr class="even">
+<td>AMZN</td>
+<td>2003</td>
+<td>39.02</td>
+</tr>
+<tr class="odd">
+<td>AMZN</td>
+<td>2004</td>
+<td>43.27</td>
+</tr>
+<tr class="even">
+<td>AMZN</td>
+<td>2005</td>
+<td>40.19</td>
+</tr>
+<tr class="odd">
+<td>AMZN</td>
+<td>2006</td>
+<td>36.25</td>
+</tr>
+<tr class="even">
+<td>IBM</td>
+<td>2001</td>
+<td>96.97</td>
+</tr>
+<tr class="odd">
+<td>IBM</td>
+<td>2002</td>
+<td>75.13</td>
+</tr>
+<tr class="even">
+<td>IBM</td>
+<td>2000</td>
+<td>96.91</td>
+</tr>
+<tr class="odd">
+<td>MSFT</td>
+<td>2006</td>
+<td>24.76</td>
+</tr>
+<tr class="even">
+<td>MSFT</td>
+<td>2005</td>
+<td>23.85</td>
+</tr>
+<tr class="odd">
+<td>MSFT</td>
+<td>2004</td>
+<td>22.67</td>
+</tr>
+<tr class="even">
+<td>MSFT</td>
+<td>2003</td>
+<td>20.93</td>
+</tr>
+<tr class="odd">
+<td>AAPL</td>
+<td>2001</td>
+<td>10.18</td>
+</tr>
+<tr class="even">
+<td>MSFT</td>
+<td>2010</td>
+<td>28.51</td>
+</tr>
+<tr class="odd">
+<td>AAPL</td>
+<td>2002</td>
+<td>9.408</td>
+</tr>
+<tr class="even">
+<td>MSFT</td>
+<td>2009</td>
+<td>22.87</td>
+</tr>
+<tr class="odd">
+<td>MSFT</td>
+<td>2008</td>
+<td>25.21</td>
+</tr>
+<tr class="even">
+<td>AAPL</td>
+<td>2000</td>
+<td>21.75</td>
+</tr>
+<tr class="odd">
+<td>MSFT</td>
+<td>2007</td>
+<td>29.28</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 

@@ -588,7 +588,7 @@ Rows as sequence of sequences
 (take 2 (api/rows ds))
 ```
 
-    ([#object[java.time.LocalDate 0x1f21346f "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x36600ba9 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+    ([#object[java.time.LocalDate 0x3691554a "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x7675208e "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 
 ------------------------------------------------------------------------
 
@@ -598,13 +598,13 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
-    ({"date" #object[java.time.LocalDate 0x5f712317 "2012-01-01"],
+    ({"date" #object[java.time.LocalDate 0x2f673dbf "2012-01-01"],
       "precipitation" 0.0,
       "temp_min" 5.0,
       "weather" "drizzle",
       "temp_max" 12.8,
       "wind" 4.7}
-     {"date" #object[java.time.LocalDate 0x47665f3e "2012-01-02"],
+     {"date" #object[java.time.LocalDate 0x68302648 "2012-01-02"],
       "precipitation" 10.9,
       "temp_min" 2.8,
       "weather" "rain",
@@ -1700,7 +1700,7 @@ If you want to rename colums use `rename-columns` and pass map where keys are ol
 
 \_unnamed \[9 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@463a0509> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@2d24048d> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 2   | 2   | 1.000     | B                           |
@@ -1728,7 +1728,7 @@ Function works on grouped dataset
 
 {1 Group: 1 \[5 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@66ce64f6> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@69177695> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 1   | 3   | 1.500     | C                           |
@@ -1738,7 +1738,7 @@ Function works on grouped dataset
 
 , 2 Group: 2 \[4 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@66ce64f6> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@69177695> |
 |-----|-----|-----------|-----------------------------|
 | 2   | 2   | 1.000     | B                           |
 | 2   | 4   | 0.5000    | A                           |
@@ -1794,15 +1794,15 @@ Replace one column (column is trimmed)
 
 | :V1     | :V2 | :V3    | :V4 |
 |---------|-----|--------|-----|
-| 0.4689  | 1   | 0.5000 | A   |
-| 0.6207  | 2   | 1.000  | B   |
-| 0.4110  | 3   | 1.500  | C   |
-| 0.04923 | 4   | 0.5000 | A   |
-| 0.1620  | 5   | 1.000  | B   |
-| 0.04168 | 6   | 1.500  | C   |
-| 0.5098  | 7   | 0.5000 | A   |
-| 0.5358  | 8   | 1.000  | B   |
-| 0.4423  | 9   | 1.500  | C   |
+| 0.4767  | 1   | 0.5000 | A   |
+| 0.3188  | 2   | 1.000  | B   |
+| 0.4749  | 3   | 1.500  | C   |
+| 0.7564  | 4   | 0.5000 | A   |
+| 0.9327  | 5   | 1.000  | B   |
+| 0.5593  | 6   | 1.500  | C   |
+| 0.03408 | 7   | 0.5000 | A   |
+| 0.9514  | 8   | 1.000  | B   |
+| 0.4665  | 9   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -2202,7 +2202,7 @@ Double array conversion.
 (api/->array DS :V1)
 ```
 
-    #object["[J" 0x30c7b716 "[J@30c7b716"]
+    #object["[J" 0x29b72291 "[J@29b72291"]
 
 ------------------------------------------------------------------------
 
@@ -2214,7 +2214,7 @@ Function also works on grouped dataset
     (api/->array :V2))
 ```
 
-    (#object["[J" 0x284d4596 "[J@284d4596"] #object["[J" 0x4cc6ef97 "[J@4cc6ef97"] #object["[J" 0x1550b84a "[J@1550b84a"])
+    (#object["[J" 0x23aaeaa0 "[J@23aaeaa0"] #object["[J" 0x37c79d70 "[J@37c79d70"] #object["[J" 0x38a0e75 "[J@38a0e75"])
 
 ------------------------------------------------------------------------
 
@@ -2225,8 +2225,8 @@ You can also cast the type to the other one (if casting is possible):
 (api/->array DS :V1 :float32)
 ```
 
-    #object["[Ljava.lang.String;" 0x3b8ee9a "[Ljava.lang.String;@3b8ee9a"]
-    #object["[F" 0x18bc82b0 "[F@18bc82b0"]
+    #object["[Ljava.lang.String;" 0x29a243df "[Ljava.lang.String;@29a243df"]
+    #object["[F" 0x32a6eaf0 "[F@32a6eaf0"]
 
 ### Rows
 
@@ -2408,9 +2408,9 @@ Random row (single)
 
 \_unnamed \[1 4\]:
 
-| :V1 | :V2 | :V3   | :V4 |
-|-----|-----|-------|-----|
-| 1   | 5   | 1.000 | B   |
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 7   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2424,15 +2424,15 @@ Random `n` (default: row count) rows with repetition.
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 5   | 1.000  | B   |
-| 2   | 4   | 0.5000 | A   |
-| 2   | 6   | 1.500  | C   |
-| 1   | 7   | 0.5000 | A   |
-| 1   | 7   | 0.5000 | A   |
-| 2   | 2   | 1.000  | B   |
-| 1   | 9   | 1.500  | C   |
-| 1   | 3   | 1.500  | C   |
 | 1   | 1   | 0.5000 | A   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 8   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 3   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -2446,10 +2446,10 @@ Five random rows with repetition
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 1   | 0.5000 | A   |
 | 1   | 7   | 0.5000 | A   |
-| 2   | 2   | 1.000  | B   |
-| 1   | 3   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
 | 1   | 1   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
@@ -2462,13 +2462,13 @@ Five random, non-repeating rows
 
 \_unnamed \[5 4\]:
 
-| :V1 | :V2 | :V3   | :V4 |
-|-----|-----|-------|-----|
-| 2   | 6   | 1.500 | C   |
-| 1   | 3   | 1.500 | C   |
-| 2   | 8   | 1.000 | B   |
-| 2   | 2   | 1.000 | B   |
-| 1   | 5   | 1.000 | B   |
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 2   | 4   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 1   | 0.5000 | A   |
+| 1   | 9   | 1.500  | C   |
+| 2   | 8   | 1.000  | B   |
 
 ------------------------------------------------------------------------
 
@@ -2482,15 +2482,15 @@ Shuffle dataset
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 1   | 0.5000 | A   |
+| 1   | 9   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
 | 2   | 8   | 1.000  | B   |
-| 2   | 6   | 1.500  | C   |
+| 2   | 2   | 1.000  | B   |
 | 1   | 7   | 0.5000 | A   |
+| 2   | 6   | 1.500  | C   |
 | 1   | 3   | 1.500  | C   |
 | 1   | 5   | 1.000  | B   |
-| 2   | 2   | 1.000  | B   |
-| 2   | 4   | 0.5000 | A   |
-| 1   | 9   | 1.500  | C   |
+| 1   | 1   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2543,19 +2543,19 @@ Select 5 random rows from each group
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 2   | 4   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
 | 1   | 1   | 0.5000 | A   |
 | 1   | 1   | 0.5000 | A   |
-| 1   | 1   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 5   | 1.000  | B   |
 | 2   | 2   | 1.000  | B   |
-| 2   | 2   | 1.000  | B   |
+| 1   | 5   | 1.000  | B   |
 | 2   | 8   | 1.000  | B   |
-| 2   | 8   | 1.000  | B   |
-| 2   | 8   | 1.000  | B   |
-| 2   | 6   | 1.500  | C   |
-| 1   | 3   | 1.500  | C   |
-| 2   | 6   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
 | 1   | 3   | 1.500  | C   |
 | 2   | 6   | 1.500  | C   |
 
@@ -3017,10 +3017,10 @@ Random
 
 \_unnamed \[2 4\]:
 
-| :V1 | :V2 | :V3    | :V4 |
-|-----|-----|--------|-----|
-| 1   | 1   | 0.5000 | A   |
-| 2   | 6   | 1.500  | C   |
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 2   | 8   | 1.000 | B   |
+| 1   | 9   | 1.500 | C   |
 
 ------------------------------------------------------------------------
 
@@ -4462,24 +4462,24 @@ Create rows from all columns but `"religion"`.
 ```
 
 ``` clojure
-(api/head relig-income)
+relig-income
 ```
 
-data/relig\_income.csv \[5 11\]:
+data/relig\_income.csv \[18 11\]:
 
 <table>
 <colgroup>
-<col width="16%" />
-<col width="6%" />
+<col width="19%" />
+<col width="5%" />
 <col width="7%" />
 <col width="7%" />
 <col width="7%" />
 <col width="7%" />
 <col width="7%" />
 <col width="8%" />
-<col width="9%" />
-<col width="6%" />
-<col width="16%" />
+<col width="8%" />
+<col width="5%" />
+<col width="15%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -4562,6 +4562,175 @@ data/relig\_income.csv \[5 11\]:
 <td>18</td>
 <td>116</td>
 </tr>
+<tr class="even">
+<td>Evangelical Prot</td>
+<td>575</td>
+<td>869</td>
+<td>1064</td>
+<td>982</td>
+<td>881</td>
+<td>1486</td>
+<td>949</td>
+<td>723</td>
+<td>414</td>
+<td>1529</td>
+</tr>
+<tr class="odd">
+<td>Hindu</td>
+<td>1</td>
+<td>9</td>
+<td>7</td>
+<td>9</td>
+<td>11</td>
+<td>34</td>
+<td>47</td>
+<td>48</td>
+<td>54</td>
+<td>37</td>
+</tr>
+<tr class="even">
+<td>Historically Black Prot</td>
+<td>228</td>
+<td>244</td>
+<td>236</td>
+<td>238</td>
+<td>197</td>
+<td>223</td>
+<td>131</td>
+<td>81</td>
+<td>78</td>
+<td>339</td>
+</tr>
+<tr class="odd">
+<td>Jehovah's Witness</td>
+<td>20</td>
+<td>27</td>
+<td>24</td>
+<td>24</td>
+<td>21</td>
+<td>30</td>
+<td>15</td>
+<td>11</td>
+<td>6</td>
+<td>37</td>
+</tr>
+<tr class="even">
+<td>Jewish</td>
+<td>19</td>
+<td>19</td>
+<td>25</td>
+<td>25</td>
+<td>30</td>
+<td>95</td>
+<td>69</td>
+<td>87</td>
+<td>151</td>
+<td>162</td>
+</tr>
+<tr class="odd">
+<td>Mainline Prot</td>
+<td>289</td>
+<td>495</td>
+<td>619</td>
+<td>655</td>
+<td>651</td>
+<td>1107</td>
+<td>939</td>
+<td>753</td>
+<td>634</td>
+<td>1328</td>
+</tr>
+<tr class="even">
+<td>Mormon</td>
+<td>29</td>
+<td>40</td>
+<td>48</td>
+<td>51</td>
+<td>56</td>
+<td>112</td>
+<td>85</td>
+<td>49</td>
+<td>42</td>
+<td>69</td>
+</tr>
+<tr class="odd">
+<td>Muslim</td>
+<td>6</td>
+<td>7</td>
+<td>9</td>
+<td>10</td>
+<td>9</td>
+<td>23</td>
+<td>16</td>
+<td>8</td>
+<td>6</td>
+<td>22</td>
+</tr>
+<tr class="even">
+<td>Orthodox</td>
+<td>13</td>
+<td>17</td>
+<td>23</td>
+<td>32</td>
+<td>32</td>
+<td>47</td>
+<td>38</td>
+<td>42</td>
+<td>46</td>
+<td>73</td>
+</tr>
+<tr class="odd">
+<td>Other Christian</td>
+<td>9</td>
+<td>7</td>
+<td>11</td>
+<td>13</td>
+<td>13</td>
+<td>14</td>
+<td>18</td>
+<td>14</td>
+<td>12</td>
+<td>18</td>
+</tr>
+<tr class="even">
+<td>Other Faiths</td>
+<td>20</td>
+<td>33</td>
+<td>40</td>
+<td>46</td>
+<td>49</td>
+<td>63</td>
+<td>46</td>
+<td>40</td>
+<td>41</td>
+<td>71</td>
+</tr>
+<tr class="odd">
+<td>Other World Religions</td>
+<td>5</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>2</td>
+<td>7</td>
+<td>3</td>
+<td>4</td>
+<td>4</td>
+<td>8</td>
+</tr>
+<tr class="even">
+<td>Unaffiliated</td>
+<td>217</td>
+<td>299</td>
+<td>374</td>
+<td>365</td>
+<td>341</td>
+<td>528</td>
+<td>407</td>
+<td>321</td>
+<td>258</td>
+<td>597</td>
+</tr>
 </tbody>
 </table>
 
@@ -4612,19 +4781,38 @@ Convert only columns starting with `"wk"` and pack them into `:week` column, val
 (->> bilboard
      (api/column-names)
      (take 13)
-     (api/select-columns bilboard)
-     (api/head))
+     (api/select-columns bilboard))
 ```
 
-data/billboard.csv.gz \[5 13\]:
+data/billboard.csv.gz \[317 13\]:
 
-| artist       | track                   | date.entered | wk1 | wk2 | wk3 | wk4 | wk5 | wk6 | wk7 | wk8 | wk9 | wk10 |
-|--------------|-------------------------|--------------|-----|-----|-----|-----|-----|-----|-----|-----|-----|------|
-| 2 Pac        | Baby Don't Cry (Keep... | 2000-02-26   | 87  | 82  | 72  | 77  | 87  | 94  | 99  |     |     |      |
-| 2Ge+her      | The Hardest Part Of ... | 2000-09-02   | 91  | 87  | 92  |     |     |     |     |     |     |      |
-| 3 Doors Down | Kryptonite              | 2000-04-08   | 81  | 70  | 68  | 67  | 66  | 57  | 54  | 53  | 51  | 51   |
-| 3 Doors Down | Loser                   | 2000-10-21   | 76  | 76  | 72  | 69  | 67  | 65  | 55  | 59  | 62  | 61   |
-| 504 Boyz     | Wobble Wobble           | 2000-04-15   | 57  | 34  | 25  | 17  | 17  | 31  | 36  | 49  | 53  | 57   |
+| artist               | track                   | date.entered | wk1 | wk2 | wk3 | wk4 | wk5 | wk6 | wk7 | wk8 | wk9 | wk10 |
+|----------------------|-------------------------|--------------|-----|-----|-----|-----|-----|-----|-----|-----|-----|------|
+| 2 Pac                | Baby Don't Cry (Keep... | 2000-02-26   | 87  | 82  | 72  | 77  | 87  | 94  | 99  |     |     |      |
+| 2Ge+her              | The Hardest Part Of ... | 2000-09-02   | 91  | 87  | 92  |     |     |     |     |     |     |      |
+| 3 Doors Down         | Kryptonite              | 2000-04-08   | 81  | 70  | 68  | 67  | 66  | 57  | 54  | 53  | 51  | 51   |
+| 3 Doors Down         | Loser                   | 2000-10-21   | 76  | 76  | 72  | 69  | 67  | 65  | 55  | 59  | 62  | 61   |
+| 504 Boyz             | Wobble Wobble           | 2000-04-15   | 57  | 34  | 25  | 17  | 17  | 31  | 36  | 49  | 53  | 57   |
+| 98^0                 | Give Me Just One Nig... | 2000-08-19   | 51  | 39  | 34  | 26  | 26  | 19  | 2   | 2   | 3   | 6    |
+| A\*Teens             | Dancing Queen           | 2000-07-08   | 97  | 97  | 96  | 95  | 100 |     |     |     |     |      |
+| Aaliyah              | I Don't Wanna           | 2000-01-29   | 84  | 62  | 51  | 41  | 38  | 35  | 35  | 38  | 38  | 36   |
+| Aaliyah              | Try Again               | 2000-03-18   | 59  | 53  | 38  | 28  | 21  | 18  | 16  | 14  | 12  | 10   |
+| Adams, Yolanda       | Open My Heart           | 2000-08-26   | 76  | 76  | 74  | 69  | 68  | 67  | 61  | 58  | 57  | 59   |
+| Adkins, Trace        | More                    | 2000-04-29   | 84  | 84  | 75  | 73  | 73  | 69  | 68  | 65  | 73  | 83   |
+| Aguilera, Christina  | Come On Over Baby (A... | 2000-08-05   | 57  | 47  | 45  | 29  | 23  | 18  | 11  | 9   | 9   | 11   |
+| Aguilera, Christina  | I Turn To You           | 2000-04-15   | 50  | 39  | 30  | 28  | 21  | 19  | 20  | 17  | 17  | 17   |
+| Aguilera, Christina  | What A Girl Wants       | 1999-11-27   | 71  | 51  | 28  | 18  | 13  | 13  | 11  | 1   | 1   | 2    |
+| Alice Deejay         | Better Off Alone        | 2000-04-08   | 79  | 65  | 53  | 48  | 45  | 36  | 34  | 29  | 27  | 30   |
+| Allan, Gary          | Smoke Rings In The D... | 2000-01-22   | 80  | 78  | 76  | 77  | 92  |     |     |     |     |      |
+| Amber                | Sexual                  | 1999-07-17   | 99  | 99  | 96  | 96  | 100 | 93  | 93  | 96  |     |      |
+| Anastacia            | I'm Outta Love          | 2000-04-01   | 92  |     |     | 95  |     |     |     |     |     |      |
+| Anthony, Marc        | My Baby You             | 2000-09-16   | 82  | 76  | 76  | 70  | 82  | 81  | 74  | 80  | 76  | 76   |
+| Anthony, Marc        | You Sang To Me          | 2000-02-26   | 77  | 54  | 50  | 43  | 30  | 27  | 21  | 18  | 15  | 13   |
+| Avant                | My First Love           | 2000-11-04   | 70  | 62  | 56  | 43  | 39  | 33  | 26  | 26  | 26  | 31   |
+| Avant                | Separated               | 2000-04-29   | 62  | 32  | 30  | 23  | 26  | 30  | 35  | 32  | 32  | 25   |
+| BBMak                | Back Here               | 2000-04-29   | 99  | 86  | 60  | 52  | 38  | 34  | 28  | 21  | 18  | 18   |
+| Backstreet Boys, The | Shape Of My Heart       | 2000-10-14   | 39  | 25  | 24  | 15  | 12  | 12  | 10  | 9   | 10  | 12   |
+| Backstreet Boys, The | Show Me The Meaning ... | 2000-01-01   | 74  | 62  | 55  | 25  | 16  | 14  | 12  | 10  | 12  | 9    |
 
 ``` clojure
 (api/pivot->longer bilboard #(clojure.string/starts-with? % "wk") {:target-columns :week
@@ -4714,11 +4902,10 @@ When column names contain observation data, such column names can be splitted an
 (->> who
      (api/column-names)
      (take 10)
-     (api/select-columns who)
-     (api/head))
+     (api/select-columns who))
 ```
 
-data/who.csv.gz \[5 10\]:
+data/who.csv.gz \[7240 10\]:
 
 <table style="width:100%;">
 <colgroup>
@@ -4807,6 +4994,246 @@ data/who.csv.gz \[5 10\]:
 <td></td>
 <td></td>
 <td></td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1985</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1986</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1987</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1988</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1989</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1990</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1991</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1992</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1993</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1994</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1995</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1996</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1997</td>
+<td>0</td>
+<td>10</td>
+<td>6</td>
+<td>3</td>
+<td>5</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1998</td>
+<td>30</td>
+<td>129</td>
+<td>128</td>
+<td>90</td>
+<td>89</td>
+<td>64</td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1999</td>
+<td>8</td>
+<td>55</td>
+<td>55</td>
+<td>47</td>
+<td>34</td>
+<td>21</td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>2000</td>
+<td>52</td>
+<td>228</td>
+<td>183</td>
+<td>149</td>
+<td>129</td>
+<td>94</td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>2001</td>
+<td>129</td>
+<td>379</td>
+<td>349</td>
+<td>274</td>
+<td>204</td>
+<td>139</td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>2002</td>
+<td>90</td>
+<td>476</td>
+<td>481</td>
+<td>368</td>
+<td>246</td>
+<td>241</td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>2003</td>
+<td>127</td>
+<td>511</td>
+<td>436</td>
+<td>284</td>
+<td>256</td>
+<td>288</td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>2004</td>
+<td>139</td>
+<td>537</td>
+<td>568</td>
+<td>360</td>
+<td>358</td>
+<td>386</td>
 </tr>
 </tbody>
 </table>
@@ -4970,12 +5397,12 @@ pnl
 
 \_unnamed \[4 7\]:
 
-| :x  | :a  | :b  | :y1     | :y2    | :z1 | :z2 |
-|-----|-----|-----|---------|--------|-----|-----|
-| 1   | 1   | 0   | 0.03628 | 0.4275 | 3   | -2  |
-| 2   | 1   | 1   | 0.9835  | 0.2564 | 3   | -2  |
-| 3   | 0   | 1   | 0.6579  | 0.6758 | 3   | -2  |
-| 4   | 0   | 1   | 0.4779  | 0.6619 | 3   | -2  |
+| :x  | :a  | :b  | :y1     | :y2     | :z1 | :z2 |
+|-----|-----|-----|---------|---------|-----|-----|
+| 1   | 1   | 0   | 0.2951  | 0.1168  | 3   | -2  |
+| 2   | 1   | 1   | 0.5273  | 0.02846 | 3   | -2  |
+| 3   | 0   | 1   | 0.03933 | 0.5647  | 3   | -2  |
+| 4   | 0   | 1   | 0.7732  | 0.7824  | 3   | -2  |
 
 ``` clojure
 (api/pivot->longer pnl [:y1 :y2 :z1 :z2] {:target-columns [nil :times]
@@ -4986,14 +5413,14 @@ pnl
 
 | :x  | :a  | :b  | :times | y       | z   |
 |-----|-----|-----|--------|---------|-----|
-| 1   | 1   | 0   | 1      | 0.03628 | 3   |
-| 2   | 1   | 1   | 1      | 0.9835  | 3   |
-| 3   | 0   | 1   | 1      | 0.6579  | 3   |
-| 4   | 0   | 1   | 1      | 0.4779  | 3   |
-| 1   | 1   | 0   | 2      | 0.4275  | -2  |
-| 2   | 1   | 1   | 2      | 0.2564  | -2  |
-| 3   | 0   | 1   | 2      | 0.6758  | -2  |
-| 4   | 0   | 1   | 2      | 0.6619  | -2  |
+| 1   | 1   | 0   | 1      | 0.2951  | 3   |
+| 2   | 1   | 1   | 1      | 0.5273  | 3   |
+| 3   | 0   | 1   | 1      | 0.03933 | 3   |
+| 4   | 0   | 1   | 1      | 0.7732  | 3   |
+| 1   | 1   | 0   | 2      | 0.1168  | -2  |
+| 2   | 1   | 1   | 2      | 0.02846 | -2  |
+| 3   | 0   | 1   | 2      | 0.5647  | -2  |
+| 4   | 0   | 1   | 2      | 0.7824  | -2  |
 
 #### Wider
 
@@ -5365,11 +5792,10 @@ A couple of `tidyr` examples of more complex reshaping.
 (->> world-bank-pop
      (api/column-names)
      (take 8)
-     (api/select-columns world-bank-pop)
-     (api/head))
+     (api/select-columns world-bank-pop))
 ```
 
-data/world\_bank\_pop.csv.gz \[5 8\]:
+data/world\_bank\_pop.csv.gz \[1056 8\]:
 
 | country | indicator   | 2000      | 2001      | 2002      | 2003      | 2004      | 2005      |
 |---------|-------------|-----------|-----------|-----------|-----------|-----------|-----------|
@@ -5378,6 +5804,26 @@ data/world\_bank\_pop.csv.gz \[5 8\]:
 | ABW     | SP.POP.TOTL | 9.085E+04 | 9.290E+04 | 9.499E+04 | 9.702E+04 | 9.874E+04 | 1.000E+05 |
 | ABW     | SP.POP.GROW | 2.055     | 2.226     | 2.229     | 2.109     | 1.757     | 1.302     |
 | AFG     | SP.URB.TOTL | 4.436E+06 | 4.648E+06 | 4.893E+06 | 5.156E+06 | 5.427E+06 | 5.692E+06 |
+| AFG     | SP.URB.GROW | 3.912     | 4.663     | 5.135     | 5.230     | 5.124     | 4.769     |
+| AFG     | SP.POP.TOTL | 2.009E+07 | 2.097E+07 | 2.198E+07 | 2.306E+07 | 2.412E+07 | 2.507E+07 |
+| AFG     | SP.POP.GROW | 3.495     | 4.252     | 4.721     | 4.818     | 4.469     | 3.870     |
+| AGO     | SP.URB.TOTL | 8.235E+06 | 8.708E+06 | 9.219E+06 | 9.765E+06 | 1.034E+07 | 1.095E+07 |
+| AGO     | SP.URB.GROW | 5.437     | 5.588     | 5.700     | 5.758     | 5.753     | 5.693     |
+| AGO     | SP.POP.TOTL | 1.644E+07 | 1.698E+07 | 1.757E+07 | 1.820E+07 | 1.887E+07 | 1.955E+07 |
+| AGO     | SP.POP.GROW | 3.033     | 3.245     | 3.412     | 3.526     | 3.574     | 3.576     |
+| ALB     | SP.URB.TOTL | 1.289E+06 | 1.299E+06 | 1.327E+06 | 1.355E+06 | 1.382E+06 | 1.407E+06 |
+| ALB     | SP.URB.GROW | 0.7425    | 0.7104    | 2.181     | 2.060     | 1.972     | 1.826     |
+| ALB     | SP.POP.TOTL | 3.089E+06 | 3.060E+06 | 3.051E+06 | 3.040E+06 | 3.027E+06 | 3.011E+06 |
+| ALB     | SP.POP.GROW | -0.6374   | -0.9385   | -0.2999   | -0.3741   | -0.4179   | -0.5118   |
+| AND     | SP.URB.TOTL | 6.042E+04 | 6.199E+04 | 6.419E+04 | 6.675E+04 | 6.919E+04 | 7.121E+04 |
+| AND     | SP.URB.GROW | 1.279     | 2.572     | 3.492     | 3.900     | 3.598     | 2.868     |
+| AND     | SP.POP.TOTL | 6.539E+04 | 6.734E+04 | 7.005E+04 | 7.318E+04 | 7.624E+04 | 7.887E+04 |
+| AND     | SP.POP.GROW | 1.572     | 2.940     | 3.943     | 4.375     | 4.099     | 3.382     |
+| ARB     | SP.URB.TOTL | 1.500E+08 | 1.539E+08 | 1.580E+08 | 1.623E+08 | 1.668E+08 | 1.718E+08 |
+| ARB     | SP.URB.GROW | 2.600     | 2.629     | 2.639     | 2.710     | 2.806     | 2.993     |
+| ARB     | SP.POP.TOTL | 2.838E+08 | 2.899E+08 | 2.960E+08 | 3.024E+08 | 3.092E+08 | 3.163E+08 |
+| ARB     | SP.POP.GROW | 2.111     | 2.120     | 2.131     | 2.165     | 2.224     | 2.297     |
+| ARE     | SP.URB.TOTL | 2.531E+06 | 2.683E+06 | 2.843E+06 | 3.049E+06 | 3.347E+06 | 3.767E+06 |
 
 Step 1 - convert years column into values
 
@@ -5779,16 +6225,583 @@ data/stockstidyr.csv \[3 6\]:
 | Z       | 1.437      |            | -1.779     |            | -6.809     |
 | Y       |            | -2.168     |            | -1.036     |            |
 
-### Join/Concat
+### Join/Concat Datasets
+
+Dataset joins and concatenations functions.
+
+Joins accept left-side and right-side datasets and columns selector. Options are the same as in `tech.ml.dataset` functions.
+
+The difference between `tech.ml.dataset` join functions are: arguments order (first datasets) and possibility to join on multiple columns.
+
+Datasets used as examples
+
+``` clojure
+(def ds1 (api/dataset {:a [1 2 1 2 3 4 nil nil 4]
+                       :b (range 101 110)
+                       :c (map str "abs tract")}))
+(def ds2 (api/dataset {:a [nil 1 2 5 4 3 2 1 nil]
+                       :b (range 110 101 -1)
+                       :c (map str "datatable")
+                       :d (symbol "X")}))
+```
+
+``` clojure
+ds1
+ds2
+```
+
+\_unnamed \[9 3\]:
+
+| :a  | :b  | :c  |
+|-----|-----|-----|
+| 1   | 101 | a   |
+| 2   | 102 | b   |
+| 1   | 103 | s   |
+| 2   | 104 |     |
+| 3   | 105 | t   |
+| 4   | 106 | r   |
+|     | 107 | a   |
+|     | 108 | c   |
+| 4   | 109 | t   |
+
+\_unnamed \[9 4\]:
+
+| :a  | :b  | :c  | :d  |
+|-----|-----|-----|-----|
+|     | 110 | d   | X   |
+| 1   | 109 | a   | X   |
+| 2   | 108 | t   | X   |
+| 5   | 107 | a   | X   |
+| 4   | 106 | t   | X   |
+| 3   | 105 | a   | X   |
+| 2   | 104 | b   | X   |
+| 1   | 103 | l   | X   |
+|     | 102 | e   | X   |
 
 #### Left
 
+``` clojure
+(api/left-join ds1 ds2 :b)
+```
+
+left-outer-join \[9 7\]:
+
+| :b  | :a  | :c  | :right.b | :right.a | :right.c | :d  |
+|-----|-----|-----|----------|----------|----------|-----|
+| 109 | 4   | t   | 109      | 1        | a        | X   |
+| 108 |     | c   | 108      | 2        | t        | X   |
+| 107 |     | a   | 107      | 5        | a        | X   |
+| 106 | 4   | r   | 106      | 4        | t        | X   |
+| 105 | 3   | t   | 105      | 3        | a        | X   |
+| 104 | 2   |     | 104      | 2        | b        | X   |
+| 103 | 1   | s   | 103      | 1        | l        | X   |
+| 102 | 2   | b   | 102      |          | e        | X   |
+| 101 | 1   | a   |          |          |          |     |
+
+------------------------------------------------------------------------
+
+``` clojure
+(api/left-join ds2 ds1 :b)
+```
+
+left-outer-join \[9 7\]:
+
+| :b  | :a  | :c  | :d  | :right.b | :right.a | :right.c |
+|-----|-----|-----|-----|----------|----------|----------|
+| 102 |     | e   | X   | 102      | 2        | b        |
+| 103 | 1   | l   | X   | 103      | 1        | s        |
+| 104 | 2   | b   | X   | 104      | 2        |          |
+| 105 | 3   | a   | X   | 105      | 3        | t        |
+| 106 | 4   | t   | X   | 106      | 4        | r        |
+| 107 | 5   | a   | X   | 107      |          | a        |
+| 108 | 2   | t   | X   | 108      |          | c        |
+| 109 | 1   | a   | X   | 109      | 4        | t        |
+| 110 |     | d   | X   |          |          |          |
+
+------------------------------------------------------------------------
+
+``` clojure
+(api/left-join ds1 ds2 [:a :b])
+```
+
+left-outer-join \[9 7\]:
+
+| :a  | :b  | :c  | :right.a | :right.b | :right.c | :d  |
+|-----|-----|-----|----------|----------|----------|-----|
+| 4   | 106 | r   | 4        | 106      | t        | X   |
+| 3   | 105 | t   | 3        | 105      | a        | X   |
+| 2   | 104 |     | 2        | 104      | b        | X   |
+| 1   | 103 | s   | 1        | 103      | l        | X   |
+| 2   | 102 | b   |          |          |          |     |
+|     | 108 | c   |          |          |          |     |
+|     | 107 | a   |          |          |          |     |
+| 1   | 101 | a   |          |          |          |     |
+| 4   | 109 | t   |          |          |          |     |
+
+------------------------------------------------------------------------
+
+``` clojure
+(api/left-join ds2 ds1 [:a :b])
+```
+
+left-outer-join \[9 7\]:
+
+| :a  | :b  | :c  | :d  | :right.a | :right.b | :right.c |
+|-----|-----|-----|-----|----------|----------|----------|
+| 1   | 103 | l   | X   | 1        | 103      | s        |
+| 2   | 104 | b   | X   | 2        | 104      |          |
+| 3   | 105 | a   | X   | 3        | 105      | t        |
+| 4   | 106 | t   | X   | 4        | 106      | r        |
+| 2   | 108 | t   | X   |          |          |          |
+| 1   | 109 | a   | X   |          |          |          |
+| 5   | 107 | a   | X   |          |          |          |
+|     | 110 | d   | X   |          |          |          |
+|     | 102 | e   | X   |          |          |          |
+
 #### Right
+
+``` clojure
+(api/right-join ds1 ds2 :b)
+```
+
+right-outer-join \[9 7\]:
+
+| :b  | :a  | :c  | :right.b | :right.a | :right.c | :d  |
+|-----|-----|-----|----------|----------|----------|-----|
+| 109 | 4   | t   | 109      | 1        | a        | X   |
+| 108 |     | c   | 108      | 2        | t        | X   |
+| 107 |     | a   | 107      | 5        | a        | X   |
+| 106 | 4   | r   | 106      | 4        | t        | X   |
+| 105 | 3   | t   | 105      | 3        | a        | X   |
+| 104 | 2   |     | 104      | 2        | b        | X   |
+| 103 | 1   | s   | 103      | 1        | l        | X   |
+| 102 | 2   | b   | 102      |          | e        | X   |
+|     |     |     | 110      |          | d        | X   |
+
+------------------------------------------------------------------------
+
+``` clojure
+(api/right-join ds2 ds1 :b)
+```
+
+right-outer-join \[9 7\]:
+
+| :b  | :a  | :c  | :d  | :right.b | :right.a | :right.c |
+|-----|-----|-----|-----|----------|----------|----------|
+| 102 |     | e   | X   | 102      | 2        | b        |
+| 103 | 1   | l   | X   | 103      | 1        | s        |
+| 104 | 2   | b   | X   | 104      | 2        |          |
+| 105 | 3   | a   | X   | 105      | 3        | t        |
+| 106 | 4   | t   | X   | 106      | 4        | r        |
+| 107 | 5   | a   | X   | 107      |          | a        |
+| 108 | 2   | t   | X   | 108      |          | c        |
+| 109 | 1   | a   | X   | 109      | 4        | t        |
+|     |     |     |     | 101      | 1        | a        |
+
+------------------------------------------------------------------------
+
+``` clojure
+(api/right-join ds1 ds2 [:a :b])
+```
+
+right-outer-join \[9 7\]:
+
+| :a  | :b  | :c  | :right.a | :right.b | :right.c | :d  |
+|-----|-----|-----|----------|----------|----------|-----|
+| 4   | 106 | r   | 4        | 106      | t        | X   |
+| 3   | 105 | t   | 3        | 105      | a        | X   |
+| 2   | 104 |     | 2        | 104      | b        | X   |
+| 1   | 103 | s   | 1        | 103      | l        | X   |
+|     |     |     |          | 110      | d        | X   |
+|     |     |     | 1        | 109      | a        | X   |
+|     |     |     | 2        | 108      | t        | X   |
+|     |     |     | 5        | 107      | a        | X   |
+|     |     |     |          | 102      | e        | X   |
+
+------------------------------------------------------------------------
+
+``` clojure
+(api/right-join ds2 ds1 [:a :b])
+```
+
+right-outer-join \[9 7\]:
+
+| :a  | :b  | :c  | :d  | :right.a | :right.b | :right.c |
+|-----|-----|-----|-----|----------|----------|----------|
+| 1   | 103 | l   | X   | 1        | 103      | s        |
+| 2   | 104 | b   | X   | 2        | 104      |          |
+| 3   | 105 | a   | X   | 3        | 105      | t        |
+| 4   | 106 | t   | X   | 4        | 106      | r        |
+|     |     |     |     | 1        | 101      | a        |
+|     |     |     |     | 2        | 102      | b        |
+|     |     |     |     |          | 107      | a        |
+|     |     |     |     |          | 108      | c        |
+|     |     |     |     | 4        | 109      | t        |
 
 #### Inner
 
-#### Hash
+``` clojure
+(api/inner-join ds1 ds2 :b)
+```
+
+inner-join \[8 6\]:
+
+| :b  | :a  | :c  | :right.a | :right.c | :d  |
+|-----|-----|-----|----------|----------|-----|
+| 109 | 4   | t   | 1        | a        | X   |
+| 108 |     | c   | 2        | t        | X   |
+| 107 |     | a   | 5        | a        | X   |
+| 106 | 4   | r   | 4        | t        | X   |
+| 105 | 3   | t   | 3        | a        | X   |
+| 104 | 2   |     | 2        | b        | X   |
+| 103 | 1   | s   | 1        | l        | X   |
+| 102 | 2   | b   |          | e        | X   |
+
+------------------------------------------------------------------------
+
+``` clojure
+(api/inner-join ds2 ds1 :b)
+```
+
+inner-join \[8 6\]:
+
+| :b  | :a  | :c  | :d  | :right.a | :right.c |
+|-----|-----|-----|-----|----------|----------|
+| 102 |     | e   | X   | 2        | b        |
+| 103 | 1   | l   | X   | 1        | s        |
+| 104 | 2   | b   | X   | 2        |          |
+| 105 | 3   | a   | X   | 3        | t        |
+| 106 | 4   | t   | X   | 4        | r        |
+| 107 | 5   | a   | X   |          | a        |
+| 108 | 2   | t   | X   |          | c        |
+| 109 | 1   | a   | X   | 4        | t        |
+
+------------------------------------------------------------------------
+
+``` clojure
+(api/inner-join ds1 ds2 [:a :b])
+```
+
+inner-join \[4 7\]:
+
+| :a  | :b  | :c  | :right.a | :right.b | :right.c | :d  |
+|-----|-----|-----|----------|----------|----------|-----|
+| 4   | 106 | r   | 4        | 106      | t        | X   |
+| 3   | 105 | t   | 3        | 105      | a        | X   |
+| 2   | 104 |     | 2        | 104      | b        | X   |
+| 1   | 103 | s   | 1        | 103      | l        | X   |
+
+------------------------------------------------------------------------
+
+``` clojure
+(api/inner-join ds2 ds1 [:a :b])
+```
+
+inner-join \[4 7\]:
+
+| :a  | :b  | :c  | :d  | :right.a | :right.b | :right.c |
+|-----|-----|-----|-----|----------|----------|----------|
+| 1   | 103 | l   | X   | 1        | 103      | s        |
+| 2   | 104 | b   | X   | 2        | 104      |          |
+| 3   | 105 | a   | X   | 3        | 105      | t        |
+| 4   | 106 | t   | X   | 4        | 106      | r        |
 
 #### Concat
 
+`contact` joins rows from other datasets
+
+``` clojure
+(api/concat ds1)
+```
+
+null \[9 3\]:
+
+| :a  | :b  | :c  |
+|-----|-----|-----|
+| 1   | 101 | a   |
+| 2   | 102 | b   |
+| 1   | 103 | s   |
+| 2   | 104 |     |
+| 3   | 105 | t   |
+| 4   | 106 | r   |
+|     | 107 | a   |
+|     | 108 | c   |
+| 4   | 109 | t   |
+
+------------------------------------------------------------------------
+
+``` clojure
+(api/concat ds1 (api/drop-columns ds2 :d))
+```
+
+null \[18 3\]:
+
+| :a  | :b  | :c  |
+|-----|-----|-----|
+| 1   | 101 | a   |
+| 2   | 102 | b   |
+| 1   | 103 | s   |
+| 2   | 104 |     |
+| 3   | 105 | t   |
+| 4   | 106 | r   |
+|     | 107 | a   |
+|     | 108 | c   |
+| 4   | 109 | t   |
+|     | 110 | d   |
+| 1   | 109 | a   |
+| 2   | 108 | t   |
+| 5   | 107 | a   |
+| 4   | 106 | t   |
+| 3   | 105 | a   |
+| 2   | 104 | b   |
+| 1   | 103 | l   |
+|     | 102 | e   |
+
+------------------------------------------------------------------------
+
+``` clojure
+(apply api/concat (repeatedly 3 #(api/random DS)))
+```
+
+null \[27 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 3   | 1.500  | C   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 1   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 1   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 1   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 1   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+
 ### Functions
+
+This API doesn't provide any statistical, numerical or date/time functions. Use below namespaces:
+
+| Namespace                              | functions                                 |
+|----------------------------------------|-------------------------------------------|
+| `tech.v2.datatype.functional`          | primitive oprations, reducers, statistics |
+| `tech.v2.datatype.datatime`            | date/time converters                      |
+| `tech.v2.datatype.datetime.operations` | date/time functions                       |
+| `tech.ml.dataset.pipeline`             | pipeline operations                       |
+
+### Other examples
+
+Flights
+
+``` clojure
+(defonce flights (api/dataset "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv"))
+```
+
+``` clojure
+flights
+```
+
+<https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv> \[253316 11\]:
+
+| year | month | day | dep\_delay | arr\_delay | carrier | origin | dest | air\_time | distance | hour |
+|------|-------|-----|------------|------------|---------|--------|------|-----------|----------|------|
+| 2014 | 1     | 1   | 14         | 13         | AA      | JFK    | LAX  | 359       | 2475     | 9    |
+| 2014 | 1     | 1   | -3         | 13         | AA      | JFK    | LAX  | 363       | 2475     | 11   |
+| 2014 | 1     | 1   | 2          | 9          | AA      | JFK    | LAX  | 351       | 2475     | 19   |
+| 2014 | 1     | 1   | -8         | -26        | AA      | LGA    | PBI  | 157       | 1035     | 7    |
+| 2014 | 1     | 1   | 2          | 1          | AA      | JFK    | LAX  | 350       | 2475     | 13   |
+| 2014 | 1     | 1   | 4          | 0          | AA      | EWR    | LAX  | 339       | 2454     | 18   |
+| 2014 | 1     | 1   | -2         | -18        | AA      | JFK    | LAX  | 338       | 2475     | 21   |
+| 2014 | 1     | 1   | -3         | -14        | AA      | JFK    | LAX  | 356       | 2475     | 15   |
+| 2014 | 1     | 1   | -1         | -17        | AA      | JFK    | MIA  | 161       | 1089     | 15   |
+| 2014 | 1     | 1   | -2         | -14        | AA      | JFK    | SEA  | 349       | 2422     | 18   |
+| 2014 | 1     | 1   | -5         | -17        | AA      | EWR    | MIA  | 161       | 1085     | 16   |
+| 2014 | 1     | 1   | 7          | -5         | AA      | JFK    | SFO  | 365       | 2586     | 17   |
+| 2014 | 1     | 1   | 3          | 1          | AA      | JFK    | BOS  | 39        | 187      | 12   |
+| 2014 | 1     | 1   | 142        | 133        | AA      | JFK    | LAX  | 345       | 2475     | 19   |
+| 2014 | 1     | 1   | -5         | -26        | AA      | JFK    | BOS  | 35        | 187      | 17   |
+| 2014 | 1     | 1   | 18         | 69         | AA      | JFK    | ORD  | 155       | 740      | 17   |
+| 2014 | 1     | 1   | 25         | 36         | AA      | JFK    | IAH  | 234       | 1417     | 16   |
+| 2014 | 1     | 1   | -1         | 1          | AA      | JFK    | AUS  | 232       | 1521     | 17   |
+| 2014 | 1     | 1   | 191        | 185        | AA      | EWR    | DFW  | 214       | 1372     | 16   |
+| 2014 | 1     | 1   | -7         | -6         | AA      | LGA    | ORD  | 142       | 733      | 5    |
+| 2014 | 1     | 1   | -7         | 0          | AA      | LGA    | ORD  | 143       | 733      | 6    |
+| 2014 | 1     | 1   | -8         | -17        | AA      | LGA    | ORD  | 139       | 733      | 6    |
+| 2014 | 1     | 1   | -2         | 15         | AA      | LGA    | ORD  | 145       | 733      | 7    |
+| 2014 | 1     | 1   | -3         | 1          | AA      | LGA    | ORD  | 139       | 733      | 8    |
+| 2014 | 1     | 1   | 44         | 42         | AA      | LGA    | ORD  | 141       | 733      | 10   |
+
+``` clojure
+(-> flights ;; take dataset (loaded from the net
+    (api/drop-missing) ;; remove rows with missing values
+    (api/select-rows #(= "AA" (get % "carrier"))) ;; filter rows by carrier="AA"
+    (api/group-by ["origin" "dest" "month"]) ;; group by several columns
+    (api/aggregate {:arr-delay-mean #(tech.v2.datatype.functional/mean (% "arr_delay")) ;; calculate mean of arr_delay...
+                    :dep-delay-mean #(tech.v2.datatype.functional/mean (% "dep_delay"))}) ;; ...and dep_delay
+    (api/order-by ["origin" "dest" "month"]) ;; order by some columns
+    )
+```
+
+\_unnamed \[200 5\]:
+
+| month | origin | dest | :arr-delay-mean | :dep-delay-mean |
+|-------|--------|------|-----------------|-----------------|
+| 1     | EWR    | DFW  | 6.428           | 10.01           |
+| 2     | EWR    | DFW  | 10.54           | 11.35           |
+| 3     | EWR    | DFW  | 12.87           | 8.080           |
+| 4     | EWR    | DFW  | 17.79           | 12.92           |
+| 5     | EWR    | DFW  | 18.49           | 18.68           |
+| 6     | EWR    | DFW  | 37.01           | 38.74           |
+| 7     | EWR    | DFW  | 20.25           | 21.15           |
+| 8     | EWR    | DFW  | 16.94           | 22.07           |
+| 9     | EWR    | DFW  | 5.865           | 13.06           |
+| 10    | EWR    | DFW  | 18.81           | 18.89           |
+| 1     | EWR    | LAX  | 1.367           | 7.500           |
+| 2     | EWR    | LAX  | 10.33           | 4.111           |
+| 3     | EWR    | LAX  | -4.400          | -6.800          |
+| 1     | EWR    | MIA  | 11.01           | 12.12           |
+| 2     | EWR    | MIA  | 1.564           | 4.756           |
+| 3     | EWR    | MIA  | -4.111          | 0.4444          |
+| 4     | EWR    | MIA  | 3.189           | 6.433           |
+| 5     | EWR    | MIA  | -2.538          | 6.344           |
+| 6     | EWR    | MIA  | 7.307           | 16.20           |
+| 7     | EWR    | MIA  | 25.22           | 26.35           |
+| 8     | EWR    | MIA  | -6.125          | 0.8462          |
+| 9     | EWR    | MIA  | -0.9063         | 0.3594          |
+| 10    | EWR    | MIA  | -4.475          | -3.787          |
+| 7     | EWR    | PHX  | -5.103          | 0.2759          |
+| 8     | EWR    | PHX  | 3.548           | 6.226           |
+
+------------------------------------------------------------------------
+
+Stocks
+
+``` clojure
+(defonce stocks (api/dataset "https://raw.githubusercontent.com/techascent/tech.ml.dataset/master/test/data/stocks.csv" {:key-fn keyword}))
+```
+
+``` clojure
+stocks
+```
+
+<https://raw.githubusercontent.com/techascent/tech.ml.dataset/master/test/data/stocks.csv> \[560 3\]:
+
+| :symbol | :date      | :price |
+|---------|------------|--------|
+| MSFT    | 2000-01-01 | 39.81  |
+| MSFT    | 2000-02-01 | 36.35  |
+| MSFT    | 2000-03-01 | 43.22  |
+| MSFT    | 2000-04-01 | 28.37  |
+| MSFT    | 2000-05-01 | 25.45  |
+| MSFT    | 2000-06-01 | 32.54  |
+| MSFT    | 2000-07-01 | 28.40  |
+| MSFT    | 2000-08-01 | 28.40  |
+| MSFT    | 2000-09-01 | 24.53  |
+| MSFT    | 2000-10-01 | 28.02  |
+| MSFT    | 2000-11-01 | 23.34  |
+| MSFT    | 2000-12-01 | 17.65  |
+| MSFT    | 2001-01-01 | 24.84  |
+| MSFT    | 2001-02-01 | 24.00  |
+| MSFT    | 2001-03-01 | 22.25  |
+| MSFT    | 2001-04-01 | 27.56  |
+| MSFT    | 2001-05-01 | 28.14  |
+| MSFT    | 2001-06-01 | 29.70  |
+| MSFT    | 2001-07-01 | 26.93  |
+| MSFT    | 2001-08-01 | 23.21  |
+| MSFT    | 2001-09-01 | 20.82  |
+| MSFT    | 2001-10-01 | 23.65  |
+| MSFT    | 2001-11-01 | 26.12  |
+| MSFT    | 2001-12-01 | 26.95  |
+| MSFT    | 2002-01-01 | 25.92  |
+
+``` clojure
+(-> stocks
+    (api/group-by (fn [row]
+                    {:symbol (:symbol row)
+                     :year (tech.v2.datatype.datetime.operations/get-years (:date row))}))
+    (api/aggregate #(tech.v2.datatype.functional/mean (% :price)))
+    (api/order-by [:symbol :year]))
+```
+
+\_unnamed \[51 3\]:
+
+| :symbol | :year | :summary |
+|---------|-------|----------|
+| AAPL    | 2000  | 21.75    |
+| AAPL    | 2001  | 10.18    |
+| AAPL    | 2002  | 9.408    |
+| AAPL    | 2003  | 9.347    |
+| AAPL    | 2004  | 18.72    |
+| AAPL    | 2005  | 48.17    |
+| AAPL    | 2006  | 72.04    |
+| AAPL    | 2007  | 133.4    |
+| AAPL    | 2008  | 138.5    |
+| AAPL    | 2009  | 150.4    |
+| AAPL    | 2010  | 206.6    |
+| AMZN    | 2000  | 43.93    |
+| AMZN    | 2001  | 11.74    |
+| AMZN    | 2002  | 16.72    |
+| AMZN    | 2003  | 39.02    |
+| AMZN    | 2004  | 43.27    |
+| AMZN    | 2005  | 40.19    |
+| AMZN    | 2006  | 36.25    |
+| AMZN    | 2007  | 69.95    |
+| AMZN    | 2008  | 69.02    |
+| AMZN    | 2009  | 90.73    |
+| AMZN    | 2010  | 124.2    |
+| GOOG    | 2004  | 159.5    |
+| GOOG    | 2005  | 286.5    |
+| GOOG    | 2006  | 415.3    |
+
+``` clojure
+(-> stocks
+    (api/group-by (juxt :symbol #(tech.v2.datatype.datetime.operations/get-years (% :date))))
+    (api/aggregate #(tech.v2.datatype.functional/mean (% :price)))
+    (api/rename-columns {:$group-name-0 :symbol
+                         :$group-name-1 :year}))
+```
+
+\_unnamed \[51 3\]:
+
+| :symbol | :year | :summary |
+|---------|-------|----------|
+| AMZN    | 2007  | 69.95    |
+| AMZN    | 2008  | 69.02    |
+| AMZN    | 2009  | 90.73    |
+| AMZN    | 2010  | 124.2    |
+| AMZN    | 2000  | 43.93    |
+| AMZN    | 2001  | 11.74    |
+| AMZN    | 2002  | 16.72    |
+| AMZN    | 2003  | 39.02    |
+| AMZN    | 2004  | 43.27    |
+| AMZN    | 2005  | 40.19    |
+| AMZN    | 2006  | 36.25    |
+| IBM     | 2001  | 96.97    |
+| IBM     | 2002  | 75.13    |
+| IBM     | 2000  | 96.91    |
+| MSFT    | 2006  | 24.76    |
+| MSFT    | 2005  | 23.85    |
+| MSFT    | 2004  | 22.67    |
+| MSFT    | 2003  | 20.93    |
+| AAPL    | 2001  | 10.18    |
+| MSFT    | 2010  | 28.51    |
+| AAPL    | 2002  | 9.408    |
+| MSFT    | 2009  | 22.87    |
+| MSFT    | 2008  | 25.21    |
+| AAPL    | 2000  | 21.75    |
+| MSFT    | 2007  | 29.28    |

@@ -2183,7 +2183,7 @@ Create rows from all columns but `"religion"`.
 ```
 
 ```{clojure results="asis"}
-(api/head relig-income)
+relig-income
 ```
 
 ```{clojure results="asis"}
@@ -2203,8 +2203,7 @@ Convert only columns starting with `"wk"` and pack them into `:week` column, val
 (->> bilboard
      (api/column-names)
      (take 13)
-     (api/select-columns bilboard)
-     (api/head))
+     (api/select-columns bilboard))
 ```
 
 ```{clojure results="asis"}
@@ -2236,8 +2235,7 @@ When column names contain observation data, such column names can be splitted an
 (->> who
      (api/column-names)
      (take 10)
-     (api/select-columns who)
-     (api/head))
+     (api/select-columns who))
 ```
 
 ```{clojure results="asis"}
@@ -2433,8 +2431,7 @@ A couple of `tidyr` examples of more complex reshaping.
 (->> world-bank-pop
      (api/column-names)
      (take 8)
-     (api/select-columns world-bank-pop)
-     (api/head))
+     (api/select-columns world-bank-pop))
 ```
 
 Step 1 - convert years column into values
@@ -2591,17 +2588,182 @@ Convert to wide form on time column (let's limit values to a couple of rows)
     (api/pivot->wider "time" :price))
 ```
 
-### Join/Concat
+### Join/Concat Datasets
+
+Dataset joins and concatenations functions.
+
+Joins accept left-side and right-side datasets and columns selector. Options are the same as in `tech.ml.dataset` functions.
+
+The difference between `tech.ml.dataset` join functions are: arguments order (first datasets) and possibility to join on multiple columns.
+
+Datasets used as examples
+
+```{clojure results="hide"}
+(def ds1 (api/dataset {:a [1 2 1 2 3 4 nil nil 4]
+                       :b (range 101 110)
+                       :c (map str "abs tract")}))
+(def ds2 (api/dataset {:a [nil 1 2 5 4 3 2 1 nil]
+                       :b (range 110 101 -1)
+                       :c (map str "datatable")
+                       :d (symbol "X")}))
+```
+
+```{clojure results="asis"}
+ds1
+ds2
+```
 
 #### Left
 
+```{clojure results="asis"}
+(api/left-join ds1 ds2 :b)
+```
+
+---
+
+```{clojure results="asis"}
+(api/left-join ds2 ds1 :b)
+```
+
+---
+
+```{clojure results="asis"}
+(api/left-join ds1 ds2 [:a :b])
+```
+
+---
+
+```{clojure results="asis"}
+(api/left-join ds2 ds1 [:a :b])
+```
+
 #### Right
+
+```{clojure results="asis"}
+(api/right-join ds1 ds2 :b)
+```
+
+---
+
+```{clojure results="asis"}
+(api/right-join ds2 ds1 :b)
+```
+
+---
+
+```{clojure results="asis"}
+(api/right-join ds1 ds2 [:a :b])
+```
+
+---
+
+```{clojure results="asis"}
+(api/right-join ds2 ds1 [:a :b])
+```
 
 #### Inner
 
-#### Hash
+```{clojure results="asis"}
+(api/inner-join ds1 ds2 :b)
+```
+
+---
+
+```{clojure results="asis"}
+(api/inner-join ds2 ds1 :b)
+```
+
+---
+
+```{clojure results="asis"}
+(api/inner-join ds1 ds2 [:a :b])
+```
+
+---
+
+```{clojure results="asis"}
+(api/inner-join ds2 ds1 [:a :b])
+```
 
 #### Concat
 
+`contact` joins rows from other datasets
+
+```{clojure results="asis"}
+(api/concat ds1)
+```
+
+---
+
+```{clojure results="asis"}
+(api/concat ds1 (api/drop-columns ds2 :d))
+```
+
+---
+
+```{clojure results="asis"}
+(apply api/concat (repeatedly 3 #(api/random DS)))
+```
+
 ### Functions
 
+This API doesn't provide any statistical, numerical or date/time functions. Use below namespaces:
+
+| Namespace | functions |
+|-----------|-----------|
+| `tech.v2.datatype.functional` | primitive oprations, reducers, statistics |
+| `tech.v2.datatype.datatime` | date/time converters |
+| `tech.v2.datatype.datetime.operations` | date/time functions |
+| `tech.ml.dataset.pipeline` | pipeline operations |
+
+### Other examples
+
+Flights
+
+```{clojure results="hide"}
+(defonce flights (api/dataset "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv"))
+```
+
+```{clojure results="asis"}
+flights
+```
+
+```{clojure results="asis"}
+(-> flights ;; take dataset (loaded from the net
+    (api/drop-missing) ;; remove rows with missing values
+    (api/select-rows #(= "AA" (get % "carrier"))) ;; filter rows by carrier="AA"
+    (api/group-by ["origin" "dest" "month"]) ;; group by several columns
+    (api/aggregate {:arr-delay-mean #(tech.v2.datatype.functional/mean (% "arr_delay")) ;; calculate mean of arr_delay...
+                    :dep-delay-mean #(tech.v2.datatype.functional/mean (% "dep_delay"))}) ;; ...and dep_delay
+    (api/order-by ["origin" "dest" "month"]) ;; order by some columns
+    )
+```
+
+---
+
+Stocks
+
+```{clojure results="hide"}
+(defonce stocks (api/dataset "https://raw.githubusercontent.com/techascent/tech.ml.dataset/master/test/data/stocks.csv" {:key-fn keyword}))
+```
+
+```{clojure results="asis"}
+stocks
+```
+
+```{clojure results="asis"}
+(-> stocks
+    (api/group-by (fn [row]
+                    {:symbol (:symbol row)
+                     :year (tech.v2.datatype.datetime.operations/get-years (:date row))}))
+    (api/aggregate #(tech.v2.datatype.functional/mean (% :price)))
+    (api/order-by [:symbol :year]))
+```
+
+```{clojure results="asis"}
+(-> stocks
+    (api/group-by (juxt :symbol #(tech.v2.datatype.datetime.operations/get-years (% :date))))
+    (api/aggregate #(tech.v2.datatype.functional/mean (% :price)))
+    (api/rename-columns {:$group-name-0 :symbol
+                         :$group-name-1 :year}))
+```
