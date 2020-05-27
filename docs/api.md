@@ -588,7 +588,7 @@ Rows as sequence of sequences
 (take 2 (api/rows ds))
 ```
 
-    ([#object[java.time.LocalDate 0x5b4df88c "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x2af89d36 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+    ([#object[java.time.LocalDate 0x1f21346f "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x36600ba9 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 
 ------------------------------------------------------------------------
 
@@ -598,13 +598,13 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
-    ({"date" #object[java.time.LocalDate 0x2c2b67a2 "2012-01-01"],
+    ({"date" #object[java.time.LocalDate 0x5f712317 "2012-01-01"],
       "precipitation" 0.0,
       "temp_min" 5.0,
       "weather" "drizzle",
       "temp_max" 12.8,
       "wind" 4.7}
-     {"date" #object[java.time.LocalDate 0x6a281f74 "2012-01-02"],
+     {"date" #object[java.time.LocalDate 0x47665f3e "2012-01-02"],
       "precipitation" 10.9,
       "temp_min" 2.8,
       "weather" "rain",
@@ -1419,7 +1419,7 @@ To select dataset columns or column names `columns-selector` is used. `columns-s
 
 Column name can be anything.
 
-`column-names` function returns names according to `columns-selector` and optional `meta-filed`. `meta-field` is one of the following:
+`column-names` function returns names according to `columns-selector` and optional `meta-field`. `meta-field` is one of the following:
 
 -   `:name` (default) - to operate on column names
 -   `:datatype` - to operated on column types
@@ -1700,7 +1700,7 @@ If you want to rename colums use `rename-columns` and pass map where keys are ol
 
 \_unnamed \[9 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@100fc172> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@463a0509> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 2   | 2   | 1.000     | B                           |
@@ -1728,7 +1728,7 @@ Function works on grouped dataset
 
 {1 Group: 1 \[5 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@6a359be7> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@66ce64f6> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 1   | 3   | 1.500     | C                           |
@@ -1738,7 +1738,7 @@ Function works on grouped dataset
 
 , 2 Group: 2 \[4 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@6a359be7> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@66ce64f6> |
 |-----|-----|-----------|-----------------------------|
 | 2   | 2   | 1.000     | B                           |
 | 2   | 4   | 0.5000    | A                           |
@@ -1794,15 +1794,15 @@ Replace one column (column is trimmed)
 
 | :V1     | :V2 | :V3    | :V4 |
 |---------|-----|--------|-----|
-| 0.05439 | 1   | 0.5000 | A   |
-| 0.2244  | 2   | 1.000  | B   |
-| 0.01317 | 3   | 1.500  | C   |
-| 0.2552  | 4   | 0.5000 | A   |
-| 0.9822  | 5   | 1.000  | B   |
-| 0.8805  | 6   | 1.500  | C   |
-| 0.5465  | 7   | 0.5000 | A   |
-| 0.3808  | 8   | 1.000  | B   |
-| 0.2649  | 9   | 1.500  | C   |
+| 0.4689  | 1   | 0.5000 | A   |
+| 0.6207  | 2   | 1.000  | B   |
+| 0.4110  | 3   | 1.500  | C   |
+| 0.04923 | 4   | 0.5000 | A   |
+| 0.1620  | 5   | 1.000  | B   |
+| 0.04168 | 6   | 1.500  | C   |
+| 0.5098  | 7   | 0.5000 | A   |
+| 0.5358  | 8   | 1.000  | B   |
+| 0.4423  | 9   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -1997,7 +1997,6 @@ Arguments:
 -   `column-name` - target column name
 -   `map-fn` - mapping function
 -   `columns-selector` - columns selected
--   `meta-field` (optional) - column selector option
 
 ------------------------------------------------------------------------
 
@@ -2005,7 +2004,7 @@ Let's add numerical columns together
 
 ``` clojure
 (api/map-columns DS :sum-of-numbers (fn [& rows]
-                                      (reduce + rows)) #{:int64 :float64} :datatype)
+                                      (reduce + rows)) (api/column-names DS  #{:int64 :float64} :datatype))
 ```
 
 \_unnamed \[9 5\]:
@@ -2028,7 +2027,7 @@ The same works on grouped dataset
 (-> DS
     (api/group-by :V4)
     (api/map-columns :sum-of-numbers (fn [& rows]
-                                       (reduce + rows)) #{:int64 :float64} :datatype)
+                                       (reduce + rows)) (api/column-names DS  #{:int64 :float64} :datatype))
     (api/ungroup))
 ```
 
@@ -2203,7 +2202,7 @@ Double array conversion.
 (api/->array DS :V1)
 ```
 
-    #object["[J" 0x293b62f0 "[J@293b62f0"]
+    #object["[J" 0x30c7b716 "[J@30c7b716"]
 
 ------------------------------------------------------------------------
 
@@ -2215,7 +2214,7 @@ Function also works on grouped dataset
     (api/->array :V2))
 ```
 
-    (#object["[J" 0x7ff7e523 "[J@7ff7e523"] #object["[J" 0x314c1d81 "[J@314c1d81"] #object["[J" 0x58e0b5f "[J@58e0b5f"])
+    (#object["[J" 0x284d4596 "[J@284d4596"] #object["[J" 0x4cc6ef97 "[J@4cc6ef97"] #object["[J" 0x1550b84a "[J@1550b84a"])
 
 ------------------------------------------------------------------------
 
@@ -2226,8 +2225,8 @@ You can also cast the type to the other one (if casting is possible):
 (api/->array DS :V1 :float32)
 ```
 
-    #object["[Ljava.lang.String;" 0x661063fe "[Ljava.lang.String;@661063fe"]
-    #object["[F" 0x7d144fb0 "[F@7d144fb0"]
+    #object["[Ljava.lang.String;" 0x3b8ee9a "[Ljava.lang.String;@3b8ee9a"]
+    #object["[F" 0x18bc82b0 "[F@18bc82b0"]
 
 ### Rows
 
@@ -2411,7 +2410,7 @@ Random row (single)
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
-| 2   | 6   | 1.500 | C   |
+| 1   | 5   | 1.000 | B   |
 
 ------------------------------------------------------------------------
 
@@ -2425,15 +2424,15 @@ Random `n` (default: row count) rows with repetition.
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
+| 1   | 5   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
 | 2   | 2   | 1.000  | B   |
 | 1   | 9   | 1.500  | C   |
-| 1   | 9   | 1.500  | C   |
 | 1   | 3   | 1.500  | C   |
-| 2   | 4   | 0.5000 | A   |
-| 2   | 8   | 1.000  | B   |
-| 1   | 3   | 1.500  | C   |
-| 2   | 4   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2447,11 +2446,11 @@ Five random rows with repetition
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 2   | 8   | 1.000  | B   |
+| 1   | 1   | 0.5000 | A   |
 | 1   | 7   | 0.5000 | A   |
-| 2   | 8   | 1.000  | B   |
-| 2   | 4   | 0.5000 | A   |
-| 2   | 6   | 1.500  | C   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 1   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2463,13 +2462,13 @@ Five random, non-repeating rows
 
 \_unnamed \[5 4\]:
 
-| :V1 | :V2 | :V3    | :V4 |
-|-----|-----|--------|-----|
-| 1   | 1   | 0.5000 | A   |
-| 1   | 7   | 0.5000 | A   |
-| 1   | 3   | 1.500  | C   |
-| 2   | 6   | 1.500  | C   |
-| 2   | 4   | 0.5000 | A   |
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 2   | 6   | 1.500 | C   |
+| 1   | 3   | 1.500 | C   |
+| 2   | 8   | 1.000 | B   |
+| 2   | 2   | 1.000 | B   |
+| 1   | 5   | 1.000 | B   |
 
 ------------------------------------------------------------------------
 
@@ -2483,15 +2482,15 @@ Shuffle dataset
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 2   | 8   | 1.000  | B   |
-| 1   | 3   | 1.500  | C   |
-| 1   | 9   | 1.500  | C   |
-| 2   | 2   | 1.000  | B   |
 | 1   | 1   | 0.5000 | A   |
+| 2   | 8   | 1.000  | B   |
 | 2   | 6   | 1.500  | C   |
-| 2   | 4   | 0.5000 | A   |
 | 1   | 7   | 0.5000 | A   |
+| 1   | 3   | 1.500  | C   |
 | 1   | 5   | 1.000  | B   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 9   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -2544,21 +2543,21 @@ Select 5 random rows from each group
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 7   | 0.5000 | A   |
-| 1   | 7   | 0.5000 | A   |
 | 2   | 4   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
 | 2   | 4   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
-| 1   | 5   | 1.000  | B   |
+| 2   | 2   | 1.000  | B   |
 | 2   | 2   | 1.000  | B   |
 | 2   | 8   | 1.000  | B   |
-| 2   | 2   | 1.000  | B   |
-| 2   | 2   | 1.000  | B   |
-| 1   | 9   | 1.500  | C   |
+| 2   | 8   | 1.000  | B   |
+| 2   | 8   | 1.000  | B   |
 | 2   | 6   | 1.500  | C   |
 | 1   | 3   | 1.500  | C   |
-| 1   | 9   | 1.500  | C   |
-| 1   | 9   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
 
 ### Aggregate
 
@@ -3020,8 +3019,8 @@ Random
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 3   | 1.500  | C   |
-| 2   | 4   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
+| 2   | 6   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -4435,6 +4434,27 @@ Both functions work only on regular dataset.
 
 #### Longer
 
+`pivot->longer` converts columns to rows. Column names are treated as data.
+
+Arguments:
+
+-   dataset
+-   columns selector
+-   options:
+    -   `:target-columns` - column name(s) where source column names are stored, or columns pattern (see below) (default: `:$column`)
+    -   `:value-column-name` - name of the column for values (default: `:$value`)
+    -   `:splitter` - regular expression or function which splits source column names into data
+    -   `:drop-missing?` - remove rows with missing? (default: `:true`)
+    -   `:datatypes` - map of target columns data types
+
+`:target-columns` - can be:
+
+-   column name - source columns names are put there as a data
+-   column names as seqence - source columns names after split are put separately into `:target-columns` as data
+-   pattern - is a sequence of names, where some of the names are `nil`. `nil` is replaced by a name taken from splitter and such column is used for values.
+
+------------------------------------------------------------------------
+
 Create rows from all columns but `"religion"`.
 
 ``` clojure
@@ -4591,23 +4611,23 @@ Convert only columns starting with `"wk"` and pack them into `:week` column, val
 ``` clojure
 (->> bilboard
      (api/column-names)
-     (take 11)
+     (take 13)
      (api/select-columns bilboard)
      (api/head))
 ```
 
-data/billboard.csv.gz \[5 11\]:
+data/billboard.csv.gz \[5 13\]:
 
-| artist       | track                   | date.entered | wk1 | wk2 | wk3 | wk4 | wk5 | wk6 | wk7 | wk8 |
-|--------------|-------------------------|--------------|-----|-----|-----|-----|-----|-----|-----|-----|
-| 2 Pac        | Baby Don't Cry (Keep... | 2000-02-26   | 87  | 82  | 72  | 77  | 87  | 94  | 99  |     |
-| 2Ge+her      | The Hardest Part Of ... | 2000-09-02   | 91  | 87  | 92  |     |     |     |     |     |
-| 3 Doors Down | Kryptonite              | 2000-04-08   | 81  | 70  | 68  | 67  | 66  | 57  | 54  | 53  |
-| 3 Doors Down | Loser                   | 2000-10-21   | 76  | 76  | 72  | 69  | 67  | 65  | 55  | 59  |
-| 504 Boyz     | Wobble Wobble           | 2000-04-15   | 57  | 34  | 25  | 17  | 17  | 31  | 36  | 49  |
+| artist       | track                   | date.entered | wk1 | wk2 | wk3 | wk4 | wk5 | wk6 | wk7 | wk8 | wk9 | wk10 |
+|--------------|-------------------------|--------------|-----|-----|-----|-----|-----|-----|-----|-----|-----|------|
+| 2 Pac        | Baby Don't Cry (Keep... | 2000-02-26   | 87  | 82  | 72  | 77  | 87  | 94  | 99  |     |     |      |
+| 2Ge+her      | The Hardest Part Of ... | 2000-09-02   | 91  | 87  | 92  |     |     |     |     |     |     |      |
+| 3 Doors Down | Kryptonite              | 2000-04-08   | 81  | 70  | 68  | 67  | 66  | 57  | 54  | 53  | 51  | 51   |
+| 3 Doors Down | Loser                   | 2000-10-21   | 76  | 76  | 72  | 69  | 67  | 65  | 55  | 59  | 62  | 61   |
+| 504 Boyz     | Wobble Wobble           | 2000-04-15   | 57  | 34  | 25  | 17  | 17  | 31  | 36  | 49  | 53  | 57   |
 
 ``` clojure
-(api/pivot->longer bilboard #(clojure.string/starts-with? % "wk") {:target-cols :week
+(api/pivot->longer bilboard #(clojure.string/starts-with? % "wk") {:target-columns :week
                                                                    :value-column-name :rank})
 ```
 
@@ -4646,7 +4666,7 @@ data/billboard.csv.gz \[5307 5\]:
 We can create numerical column out of column names
 
 ``` clojure
-(api/pivot->longer bilboard #(clojure.string/starts-with? % "wk") {:target-cols :week
+(api/pivot->longer bilboard #(clojure.string/starts-with? % "wk") {:target-columns :week
                                                                    :value-column-name :rank
                                                                    :splitter #"wk(.*)"
                                                                    :datatypes {:week :int16}})
@@ -4684,7 +4704,1080 @@ data/billboard.csv.gz \[5307 5\]:
 
 ------------------------------------------------------------------------
 
+When column names contain observation data, such column names can be splitted and data can be restored into separate columns.
+
+``` clojure
+(def who (api/dataset "data/who.csv.gz"))
+```
+
+``` clojure
+(->> who
+     (api/column-names)
+     (take 10)
+     (api/select-columns who)
+     (api/head))
+```
+
+data/who.csv.gz \[5 10\]:
+
+<table style="width:100%;">
+<colgroup>
+<col width="11%" />
+<col width="5%" />
+<col width="5%" />
+<col width="5%" />
+<col width="11%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>country</th>
+<th>iso2</th>
+<th>iso3</th>
+<th>year</th>
+<th>new_sp_m014</th>
+<th>new_sp_m1524</th>
+<th>new_sp_m2534</th>
+<th>new_sp_m3544</th>
+<th>new_sp_m4554</th>
+<th>new_sp_m5564</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1980</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1981</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1982</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1983</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Afghanistan</td>
+<td>AF</td>
+<td>AFG</td>
+<td>1984</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+``` clojure
+(api/pivot->longer who #(clojure.string/starts-with? % "new") {:target-columns [:diagnosis :gender :age]
+                                                               :splitter #"new_?(.*)_(.)(.*)"
+                                                               :value-column-name :count})
+```
+
+data/who.csv.gz \[76046 8\]:
+
+| country                           | iso2 | iso3 | year | :diagnosis | :gender | :age | :count |
+|-----------------------------------|------|------|------|------------|---------|------|--------|
+| Albania                           | AL   | ALB  | 2013 | rel        | m       | 1524 | 60     |
+| Algeria                           | DZ   | DZA  | 2013 | rel        | m       | 1524 | 1021   |
+| Andorra                           | AD   | AND  | 2013 | rel        | m       | 1524 | 0      |
+| Angola                            | AO   | AGO  | 2013 | rel        | m       | 1524 | 2992   |
+| Anguilla                          | AI   | AIA  | 2013 | rel        | m       | 1524 | 0      |
+| Antigua and Barbuda               | AG   | ATG  | 2013 | rel        | m       | 1524 | 1      |
+| Argentina                         | AR   | ARG  | 2013 | rel        | m       | 1524 | 1124   |
+| Armenia                           | AM   | ARM  | 2013 | rel        | m       | 1524 | 116    |
+| Australia                         | AU   | AUS  | 2013 | rel        | m       | 1524 | 105    |
+| Austria                           | AT   | AUT  | 2013 | rel        | m       | 1524 | 44     |
+| Azerbaijan                        | AZ   | AZE  | 2013 | rel        | m       | 1524 | 958    |
+| Bahamas                           | BS   | BHS  | 2013 | rel        | m       | 1524 | 2      |
+| Bahrain                           | BH   | BHR  | 2013 | rel        | m       | 1524 | 13     |
+| Bangladesh                        | BD   | BGD  | 2013 | rel        | m       | 1524 | 14705  |
+| Barbados                          | BB   | BRB  | 2013 | rel        | m       | 1524 | 0      |
+| Belarus                           | BY   | BLR  | 2013 | rel        | m       | 1524 | 162    |
+| Belgium                           | BE   | BEL  | 2013 | rel        | m       | 1524 | 63     |
+| Belize                            | BZ   | BLZ  | 2013 | rel        | m       | 1524 | 8      |
+| Benin                             | BJ   | BEN  | 2013 | rel        | m       | 1524 | 301    |
+| Bermuda                           | BM   | BMU  | 2013 | rel        | m       | 1524 | 0      |
+| Bhutan                            | BT   | BTN  | 2013 | rel        | m       | 1524 | 180    |
+| Bolivia (Plurinational State of)  | BO   | BOL  | 2013 | rel        | m       | 1524 | 1470   |
+| Bonaire, Saint Eustatius and Saba | BQ   | BES  | 2013 | rel        | m       | 1524 | 0      |
+| Bosnia and Herzegovina            | BA   | BIH  | 2013 | rel        | m       | 1524 | 57     |
+| Botswana                          | BW   | BWA  | 2013 | rel        | m       | 1524 | 423    |
+
+------------------------------------------------------------------------
+
+When data contains multiple observations per row, we can use splitter and pattern for target columns to create new columns and put values there. In following dataset we have two obseravations `dob` and `gender` for two childs. We want to put child infomation into the column and leave dob and gender for values.
+
+``` clojure
+(def family (api/dataset "data/family.csv"))
+```
+
+``` clojure
+family
+```
+
+data/family.csv \[5 5\]:
+
+| family | dob\_child1 | dob\_child2 | gender\_child1 | gender\_child2 |
+|--------|-------------|-------------|----------------|----------------|
+| 1      | 1998-11-26  | 2000-01-29  | 1              | 2              |
+| 2      | 1996-06-22  |             | 2              |                |
+| 3      | 2002-07-11  | 2004-04-05  | 2              | 2              |
+| 4      | 2004-10-10  | 2009-08-27  | 1              | 1              |
+| 5      | 2000-12-05  | 2005-02-28  | 2              | 1              |
+
+``` clojure
+(api/pivot->longer family (complement #{"family"}) {:target-columns [nil :child]
+                                                    :splitter #(clojure.string/split % #"_")
+                                                    :datatypes {"gender" :int16}})
+```
+
+data/family.csv \[9 4\]:
+
+| family | :child | dob        | gender |
+|--------|--------|------------|--------|
+| 1      | child1 | 1998-11-26 | 1      |
+| 2      | child1 | 1996-06-22 | 2      |
+| 3      | child1 | 2002-07-11 | 2      |
+| 4      | child1 | 2004-10-10 | 1      |
+| 5      | child1 | 2000-12-05 | 2      |
+| 1      | child2 | 2000-01-29 | 2      |
+| 3      | child2 | 2004-04-05 | 2      |
+| 4      | child2 | 2009-08-27 | 1      |
+| 5      | child2 | 2005-02-28 | 1      |
+
+------------------------------------------------------------------------
+
+Similar here, we have two observations: `x` and `y` in four groups.
+
+``` clojure
+(def anscombe (api/dataset "data/anscombe.csv"))
+```
+
+``` clojure
+anscombe
+```
+
+data/anscombe.csv \[11 8\]:
+
+| x1  | x2  | x3  | x4  | y1    | y2    | y3    | y4    |
+|-----|-----|-----|-----|-------|-------|-------|-------|
+| 10  | 10  | 10  | 8   | 8.040 | 9.140 | 7.460 | 6.580 |
+| 8   | 8   | 8   | 8   | 6.950 | 8.140 | 6.770 | 5.760 |
+| 13  | 13  | 13  | 8   | 7.580 | 8.740 | 12.74 | 7.710 |
+| 9   | 9   | 9   | 8   | 8.810 | 8.770 | 7.110 | 8.840 |
+| 11  | 11  | 11  | 8   | 8.330 | 9.260 | 7.810 | 8.470 |
+| 14  | 14  | 14  | 8   | 9.960 | 8.100 | 8.840 | 7.040 |
+| 6   | 6   | 6   | 8   | 7.240 | 6.130 | 6.080 | 5.250 |
+| 4   | 4   | 4   | 19  | 4.260 | 3.100 | 5.390 | 12.50 |
+| 12  | 12  | 12  | 8   | 10.84 | 9.130 | 8.150 | 5.560 |
+| 7   | 7   | 7   | 8   | 4.820 | 7.260 | 6.420 | 7.910 |
+| 5   | 5   | 5   | 8   | 5.680 | 4.740 | 5.730 | 6.890 |
+
+``` clojure
+(api/pivot->longer anscombe :all {:splitter #"(.)(.)"
+                                  :target-columns [nil :set]})
+```
+
+data/anscombe.csv \[44 3\]:
+
+| :set | x   | y     |
+|------|-----|-------|
+| 1    | 10  | 8.040 |
+| 1    | 8   | 6.950 |
+| 1    | 13  | 7.580 |
+| 1    | 9   | 8.810 |
+| 1    | 11  | 8.330 |
+| 1    | 14  | 9.960 |
+| 1    | 6   | 7.240 |
+| 1    | 4   | 4.260 |
+| 1    | 12  | 10.84 |
+| 1    | 7   | 4.820 |
+| 1    | 5   | 5.680 |
+| 2    | 10  | 9.140 |
+| 2    | 8   | 8.140 |
+| 2    | 13  | 8.740 |
+| 2    | 9   | 8.770 |
+| 2    | 11  | 9.260 |
+| 2    | 14  | 8.100 |
+| 2    | 6   | 6.130 |
+| 2    | 4   | 3.100 |
+| 2    | 12  | 9.130 |
+| 2    | 7   | 7.260 |
+| 2    | 5   | 4.740 |
+| 3    | 10  | 7.460 |
+| 3    | 8   | 6.770 |
+| 3    | 13  | 12.74 |
+
+------------------------------------------------------------------------
+
+``` clojure
+(def pnl (api/dataset {:x [1 2 3 4]
+                       :a [1 1 0 0]
+                       :b [0 1 1 1]
+                       :y1 (repeatedly 4 rand)
+                       :y2 (repeatedly 4 rand)
+                       :z1 [3 3 3 3]
+                       :z2 [-2 -2 -2 -2]}))
+```
+
+``` clojure
+pnl
+```
+
+\_unnamed \[4 7\]:
+
+| :x  | :a  | :b  | :y1     | :y2    | :z1 | :z2 |
+|-----|-----|-----|---------|--------|-----|-----|
+| 1   | 1   | 0   | 0.03628 | 0.4275 | 3   | -2  |
+| 2   | 1   | 1   | 0.9835  | 0.2564 | 3   | -2  |
+| 3   | 0   | 1   | 0.6579  | 0.6758 | 3   | -2  |
+| 4   | 0   | 1   | 0.4779  | 0.6619 | 3   | -2  |
+
+``` clojure
+(api/pivot->longer pnl [:y1 :y2 :z1 :z2] {:target-columns [nil :times]
+                                          :splitter #":(.)(.)"})
+```
+
+\_unnamed \[8 6\]:
+
+| :x  | :a  | :b  | :times | y       | z   |
+|-----|-----|-----|--------|---------|-----|
+| 1   | 1   | 0   | 1      | 0.03628 | 3   |
+| 2   | 1   | 1   | 1      | 0.9835  | 3   |
+| 3   | 0   | 1   | 1      | 0.6579  | 3   |
+| 4   | 0   | 1   | 1      | 0.4779  | 3   |
+| 1   | 1   | 0   | 2      | 0.4275  | -2  |
+| 2   | 1   | 1   | 2      | 0.2564  | -2  |
+| 3   | 0   | 1   | 2      | 0.6758  | -2  |
+| 4   | 0   | 1   | 2      | 0.6619  | -2  |
+
 #### Wider
+
+`pivot->wider` converts rows to columns.
+
+Arguments:
+
+-   dataset
+-   columns selector - values from selected columns are converted to new columns
+-   value columns - what are values
+
+When multiple columns are used as columns selector, names are joined using `:separator` (default: "\_") option.
+
+When columns selector creates non unique set of values, they are folded using `:fold-fn` (default: `vec`) option.
+
+When value columns are a sequence, multiple observations as columns are created appending value column names into new columns. Column names are joined using `:value-separator` (default: "-") option.
+
+------------------------------------------------------------------------
+
+Use `station` as a name source for columns and `seen` for values
+
+``` clojure
+(def fish (api/dataset "data/fish_encounters.csv"))
+```
+
+``` clojure
+fish
+```
+
+data/fish\_encounters.csv \[114 3\]:
+
+| fish | station  | seen |
+|------|----------|------|
+| 4842 | Release  | 1    |
+| 4842 | I80\_1   | 1    |
+| 4842 | Lisbon   | 1    |
+| 4842 | Rstr     | 1    |
+| 4842 | Base\_TD | 1    |
+| 4842 | BCE      | 1    |
+| 4842 | BCW      | 1    |
+| 4842 | BCE2     | 1    |
+| 4842 | BCW2     | 1    |
+| 4842 | MAE      | 1    |
+| 4842 | MAW      | 1    |
+| 4843 | Release  | 1    |
+| 4843 | I80\_1   | 1    |
+| 4843 | Lisbon   | 1    |
+| 4843 | Rstr     | 1    |
+| 4843 | Base\_TD | 1    |
+| 4843 | BCE      | 1    |
+| 4843 | BCW      | 1    |
+| 4843 | BCE2     | 1    |
+| 4843 | BCW2     | 1    |
+| 4843 | MAE      | 1    |
+| 4843 | MAW      | 1    |
+| 4844 | Release  | 1    |
+| 4844 | I80\_1   | 1    |
+| 4844 | Lisbon   | 1    |
+
+``` clojure
+(api/pivot->wider fish "station" "seen")
+```
+
+data/fish\_encounters.csv \[19 12\]:
+
+| fish | Rstr | Base\_TD | I80\_1 | Release | MAE | BCE2 | MAW | BCW2 | BCE | Lisbon | BCW |
+|------|------|----------|--------|---------|-----|------|-----|------|-----|--------|-----|
+| 4842 | 1    | 1        | 1      | 1       | 1   | 1    | 1   | 1    | 1   | 1      | 1   |
+| 4843 | 1    | 1        | 1      | 1       | 1   | 1    | 1   | 1    | 1   | 1      | 1   |
+| 4844 | 1    | 1        | 1      | 1       | 1   | 1    | 1   | 1    | 1   | 1      | 1   |
+| 4850 | 1    | 1        | 1      | 1       |     |      |     |      | 1   |        | 1   |
+| 4857 | 1    | 1        | 1      | 1       |     | 1    |     | 1    | 1   | 1      | 1   |
+| 4858 | 1    | 1        | 1      | 1       | 1   | 1    | 1   | 1    | 1   | 1      | 1   |
+| 4861 | 1    | 1        | 1      | 1       | 1   | 1    | 1   | 1    | 1   | 1      | 1   |
+| 4862 | 1    | 1        | 1      | 1       |     | 1    |     | 1    | 1   | 1      | 1   |
+| 4864 |      |          | 1      | 1       |     |      |     |      |     |        |     |
+| 4865 |      |          | 1      | 1       |     |      |     |      |     | 1      |     |
+| 4845 | 1    | 1        | 1      | 1       |     |      |     |      |     | 1      |     |
+| 4847 |      |          | 1      | 1       |     |      |     |      |     | 1      |     |
+| 4848 | 1    |          | 1      | 1       |     |      |     |      |     | 1      |     |
+| 4849 |      |          | 1      | 1       |     |      |     |      |     |        |     |
+| 4851 |      |          | 1      | 1       |     |      |     |      |     |        |     |
+| 4854 |      |          | 1      | 1       |     |      |     |      |     |        |     |
+| 4855 | 1    | 1        | 1      | 1       |     |      |     |      |     | 1      |     |
+| 4859 | 1    | 1        | 1      | 1       |     |      |     |      |     | 1      |     |
+| 4863 |      |          | 1      | 1       |     |      |     |      |     |        |     |
+
+------------------------------------------------------------------------
+
+If selected columns contain multiple values, such values should be folded.
+
+``` clojure
+(def warpbreaks (api/dataset "data/warpbreaks.csv"))
+```
+
+``` clojure
+warpbreaks
+```
+
+data/warpbreaks.csv \[54 3\]:
+
+| breaks | wool | tension |
+|--------|------|---------|
+| 26     | A    | L       |
+| 30     | A    | L       |
+| 54     | A    | L       |
+| 25     | A    | L       |
+| 70     | A    | L       |
+| 52     | A    | L       |
+| 51     | A    | L       |
+| 26     | A    | L       |
+| 67     | A    | L       |
+| 18     | A    | M       |
+| 21     | A    | M       |
+| 29     | A    | M       |
+| 17     | A    | M       |
+| 12     | A    | M       |
+| 18     | A    | M       |
+| 35     | A    | M       |
+| 30     | A    | M       |
+| 36     | A    | M       |
+| 36     | A    | H       |
+| 21     | A    | H       |
+| 24     | A    | H       |
+| 18     | A    | H       |
+| 10     | A    | H       |
+| 43     | A    | H       |
+| 28     | A    | H       |
+
+Let's see how many values are for each type of `wool` and `tension` groups
+
+``` clojure
+(-> warpbreaks
+    (api/group-by ["wool" "tension"])
+    (api/aggregate {:n api/row-count}))
+```
+
+\_unnamed \[6 3\]:
+
+| wool | tension | :n  |
+|------|---------|-----|
+| A    | H       | 9   |
+| B    | H       | 9   |
+| A    | L       | 9   |
+| A    | M       | 9   |
+| B    | L       | 9   |
+| B    | M       | 9   |
+
+``` clojure
+(-> warpbreaks
+    (api/reorder-columns ["wool" "tension" "breaks"])
+    (api/pivot->wider "wool" "breaks" {:fold-fn vec}))
+```
+
+data/warpbreaks.csv \[3 3\]:
+
+| tension | B                              | A                              |
+|---------|--------------------------------|--------------------------------|
+| M       | \[42 26 19 16 39 28 21 39 29\] | \[18 21 29 17 12 18 35 30 36\] |
+| H       | \[20 21 24 17 13 15 15 16 28\] | \[36 21 24 18 10 43 28 15 26\] |
+| L       | \[27 14 29 19 29 31 41 20 44\] | \[26 30 54 25 70 52 51 26 67\] |
+
+We can also calculate mean (aggreate values)
+
+``` clojure
+(-> warpbreaks
+    (api/reorder-columns ["wool" "tension" "breaks"])
+    (api/pivot->wider "wool" "breaks" {:fold-fn tech.v2.datatype.functional/mean}))
+```
+
+data/warpbreaks.csv \[3 3\]:
+
+| tension | B     | A     |
+|---------|-------|-------|
+| H       | 18.78 | 24.56 |
+| M       | 28.78 | 24.00 |
+| L       | 28.22 | 44.56 |
+
+------------------------------------------------------------------------
+
+Multiple source columns, joined with default separator.
+
+``` clojure
+(def production (api/dataset "data/production.csv"))
+```
+
+``` clojure
+production
+```
+
+data/production.csv \[45 4\]:
+
+| product | country | year | production |
+|---------|---------|------|------------|
+| A       | AI      | 2000 | 1.637      |
+| A       | AI      | 2001 | 0.1587     |
+| A       | AI      | 2002 | -1.568     |
+| A       | AI      | 2003 | -0.4446    |
+| A       | AI      | 2004 | -0.07134   |
+| A       | AI      | 2005 | 1.612      |
+| A       | AI      | 2006 | -0.7043    |
+| A       | AI      | 2007 | -1.536     |
+| A       | AI      | 2008 | 0.8391     |
+| A       | AI      | 2009 | -0.3742    |
+| A       | AI      | 2010 | -0.7116    |
+| A       | AI      | 2011 | 1.128      |
+| A       | AI      | 2012 | 1.457      |
+| A       | AI      | 2013 | -1.559     |
+| A       | AI      | 2014 | -0.1170    |
+| B       | AI      | 2000 | -0.02618   |
+| B       | AI      | 2001 | -0.6886    |
+| B       | AI      | 2002 | 0.06249    |
+| B       | AI      | 2003 | -0.7234    |
+| B       | AI      | 2004 | 0.4725     |
+| B       | AI      | 2005 | -0.9417    |
+| B       | AI      | 2006 | -0.3478    |
+| B       | AI      | 2007 | 0.5243     |
+| B       | AI      | 2008 | 1.832      |
+| B       | AI      | 2009 | 0.1071     |
+
+``` clojure
+(api/pivot->wider production ["product" "country"] "production")
+```
+
+data/production.csv \[15 4\]:
+
+| year | A\_AI    | B\_EI   | B\_AI    |
+|------|----------|---------|----------|
+| 2000 | 1.637    | 1.405   | -0.02618 |
+| 2001 | 0.1587   | -0.5962 | -0.6886  |
+| 2002 | -1.568   | -0.2657 | 0.06249  |
+| 2003 | -0.4446  | 0.6526  | -0.7234  |
+| 2004 | -0.07134 | 0.6256  | 0.4725   |
+| 2005 | 1.612    | -1.345  | -0.9417  |
+| 2006 | -0.7043  | -0.9718 | -0.3478  |
+| 2007 | -1.536   | -1.697  | 0.5243   |
+| 2008 | 0.8391   | 0.04556 | 1.832    |
+| 2009 | -0.3742  | 1.193   | 0.1071   |
+| 2010 | -0.7116  | -1.606  | -0.3290  |
+| 2011 | 1.128    | -0.7724 | -1.783   |
+| 2012 | 1.457    | -2.503  | 0.6113   |
+| 2013 | -1.559   | -1.628  | -0.7853  |
+| 2014 | -0.1170  | 0.03330 | 0.9784   |
+
+------------------------------------------------------------------------
+
+Multiple value columns
+
+``` clojure
+(def income (api/dataset "data/us_rent_income.csv"))
+```
+
+``` clojure
+income
+```
+
+data/us\_rent\_income.csv \[104 5\]:
+
+| GEOID | NAME                 | variable | estimate | moe |
+|-------|----------------------|----------|----------|-----|
+| 1     | Alabama              | income   | 24476    | 136 |
+| 1     | Alabama              | rent     | 747      | 3   |
+| 2     | Alaska               | income   | 32940    | 508 |
+| 2     | Alaska               | rent     | 1200     | 13  |
+| 4     | Arizona              | income   | 27517    | 148 |
+| 4     | Arizona              | rent     | 972      | 4   |
+| 5     | Arkansas             | income   | 23789    | 165 |
+| 5     | Arkansas             | rent     | 709      | 5   |
+| 6     | California           | income   | 29454    | 109 |
+| 6     | California           | rent     | 1358     | 3   |
+| 8     | Colorado             | income   | 32401    | 109 |
+| 8     | Colorado             | rent     | 1125     | 5   |
+| 9     | Connecticut          | income   | 35326    | 195 |
+| 9     | Connecticut          | rent     | 1123     | 5   |
+| 10    | Delaware             | income   | 31560    | 247 |
+| 10    | Delaware             | rent     | 1076     | 10  |
+| 11    | District of Columbia | income   | 43198    | 681 |
+| 11    | District of Columbia | rent     | 1424     | 17  |
+| 12    | Florida              | income   | 25952    | 70  |
+| 12    | Florida              | rent     | 1077     | 3   |
+| 13    | Georgia              | income   | 27024    | 106 |
+| 13    | Georgia              | rent     | 927      | 3   |
+| 15    | Hawaii               | income   | 32453    | 218 |
+| 15    | Hawaii               | rent     | 1507     | 18  |
+| 16    | Idaho                | income   | 25298    | 208 |
+
+``` clojure
+(api/pivot->wider income "variable" ["estimate" "moe"])
+```
+
+data/us\_rent\_income.csv \[52 6\]:
+
+| GEOID | NAME                 | estimate-rent | moe-rent | estimate-income | moe-income |
+|-------|----------------------|---------------|----------|-----------------|------------|
+| 1     | Alabama              | 747           | 3        | 24476           | 136        |
+| 2     | Alaska               | 1200          | 13       | 32940           | 508        |
+| 4     | Arizona              | 972           | 4        | 27517           | 148        |
+| 5     | Arkansas             | 709           | 5        | 23789           | 165        |
+| 6     | California           | 1358          | 3        | 29454           | 109        |
+| 8     | Colorado             | 1125          | 5        | 32401           | 109        |
+| 9     | Connecticut          | 1123          | 5        | 35326           | 195        |
+| 10    | Delaware             | 1076          | 10       | 31560           | 247        |
+| 11    | District of Columbia | 1424          | 17       | 43198           | 681        |
+| 12    | Florida              | 1077          | 3        | 25952           | 70         |
+| 13    | Georgia              | 927           | 3        | 27024           | 106        |
+| 15    | Hawaii               | 1507          | 18       | 32453           | 218        |
+| 16    | Idaho                | 792           | 7        | 25298           | 208        |
+| 17    | Illinois             | 952           | 3        | 30684           | 83         |
+| 18    | Indiana              | 782           | 3        | 27247           | 117        |
+| 19    | Iowa                 | 740           | 4        | 30002           | 143        |
+| 20    | Kansas               | 801           | 5        | 29126           | 208        |
+| 21    | Kentucky             | 713           | 4        | 24702           | 159        |
+| 22    | Louisiana            | 825           | 4        | 25086           | 155        |
+| 23    | Maine                | 808           | 7        | 26841           | 187        |
+| 24    | Maryland             | 1311          | 5        | 37147           | 152        |
+| 25    | Massachusetts        | 1173          | 5        | 34498           | 199        |
+| 26    | Michigan             | 824           | 3        | 26987           | 82         |
+| 27    | Minnesota            | 906           | 4        | 32734           | 189        |
+| 28    | Mississippi          | 740           | 5        | 22766           | 194        |
+
+------------------------------------------------------------------------
+
+Reshape contact data
+
+``` clojure
+(def contacts (api/dataset "data/contacts.csv"))
+```
+
+``` clojure
+contacts
+```
+
+data/contacts.csv \[6 3\]:
+
+| field   | value             | person\_id |
+|---------|-------------------|------------|
+| name    | Jiena McLellan    | 1          |
+| company | Toyota            | 1          |
+| name    | John Smith        | 2          |
+| company | google            | 2          |
+| email   | <john@google.com> | 2          |
+| name    | Huxley Ratcliffe  | 3          |
+
+``` clojure
+(api/pivot->wider contacts "field" "value")
+```
+
+data/contacts.csv \[3 4\]:
+
+| person\_id | email             | name             | company |
+|------------|-------------------|------------------|---------|
+| 1          |                   | Jiena McLellan   | Toyota  |
+| 2          | <john@google.com> | John Smith       | google  |
+| 3          |                   | Huxley Ratcliffe |         |
+
+#### Reshaping
+
+A couple of `tidyr` examples of more complex reshaping.
+
+------------------------------------------------------------------------
+
+[World bank](https://tidyr.tidyverse.org/articles/pivot.html#world-bank)
+
+``` clojure
+(def world-bank-pop (api/dataset "data/world_bank_pop.csv.gz"))
+```
+
+``` clojure
+(->> world-bank-pop
+     (api/column-names)
+     (take 8)
+     (api/select-columns world-bank-pop)
+     (api/head))
+```
+
+data/world\_bank\_pop.csv.gz \[5 8\]:
+
+| country | indicator   | 2000      | 2001      | 2002      | 2003      | 2004      | 2005      |
+|---------|-------------|-----------|-----------|-----------|-----------|-----------|-----------|
+| ABW     | SP.URB.TOTL | 4.244E+04 | 4.305E+04 | 4.367E+04 | 4.425E+04 | 4.467E+04 | 4.489E+04 |
+| ABW     | SP.URB.GROW | 1.183     | 1.413     | 1.435     | 1.310     | 0.9515    | 0.4913    |
+| ABW     | SP.POP.TOTL | 9.085E+04 | 9.290E+04 | 9.499E+04 | 9.702E+04 | 9.874E+04 | 1.000E+05 |
+| ABW     | SP.POP.GROW | 2.055     | 2.226     | 2.229     | 2.109     | 1.757     | 1.302     |
+| AFG     | SP.URB.TOTL | 4.436E+06 | 4.648E+06 | 4.893E+06 | 5.156E+06 | 5.427E+06 | 5.692E+06 |
+
+Step 1 - convert years column into values
+
+``` clojure
+(def pop2 (api/pivot->longer world-bank-pop (map str (range 2000 2018)) {:drop-missing? false
+                                                                         :target-columns ["year"]
+                                                                         :value-column-name "value"}))
+```
+
+``` clojure
+pop2
+```
+
+data/world\_bank\_pop.csv.gz \[19008 4\]:
+
+| country | indicator   | year | value     |
+|---------|-------------|------|-----------|
+| ABW     | SP.URB.TOTL | 2013 | 4.436E+04 |
+| ABW     | SP.URB.GROW | 2013 | 0.6695    |
+| ABW     | SP.POP.TOTL | 2013 | 1.032E+05 |
+| ABW     | SP.POP.GROW | 2013 | 0.5929    |
+| AFG     | SP.URB.TOTL | 2013 | 7.734E+06 |
+| AFG     | SP.URB.GROW | 2013 | 4.193     |
+| AFG     | SP.POP.TOTL | 2013 | 3.173E+07 |
+| AFG     | SP.POP.GROW | 2013 | 3.315     |
+| AGO     | SP.URB.TOTL | 2013 | 1.612E+07 |
+| AGO     | SP.URB.GROW | 2013 | 4.723     |
+| AGO     | SP.POP.TOTL | 2013 | 2.600E+07 |
+| AGO     | SP.POP.GROW | 2013 | 3.532     |
+| ALB     | SP.URB.TOTL | 2013 | 1.604E+06 |
+| ALB     | SP.URB.GROW | 2013 | 1.744     |
+| ALB     | SP.POP.TOTL | 2013 | 2.895E+06 |
+| ALB     | SP.POP.GROW | 2013 | -0.1832   |
+| AND     | SP.URB.TOTL | 2013 | 7.153E+04 |
+| AND     | SP.URB.GROW | 2013 | -2.119    |
+| AND     | SP.POP.TOTL | 2013 | 8.079E+04 |
+| AND     | SP.POP.GROW | 2013 | -2.013    |
+| ARB     | SP.URB.TOTL | 2013 | 2.186E+08 |
+| ARB     | SP.URB.GROW | 2013 | 2.783     |
+| ARB     | SP.POP.TOTL | 2013 | 3.817E+08 |
+| ARB     | SP.POP.GROW | 2013 | 2.249     |
+| ARE     | SP.URB.TOTL | 2013 | 7.661E+06 |
+
+Step 2 - separate `"indicate"` column
+
+``` clojure
+(def pop3 (api/separate-column pop2
+                               "indicator" ["area" "variable"]
+                               #(rest (clojure.string/split % #"\."))))
+```
+
+``` clojure
+pop3
+```
+
+data/world\_bank\_pop.csv.gz \[19008 5\]:
+
+| country | area | variable | year | value     |
+|---------|------|----------|------|-----------|
+| ABW     | URB  | TOTL     | 2013 | 4.436E+04 |
+| ABW     | URB  | GROW     | 2013 | 0.6695    |
+| ABW     | POP  | TOTL     | 2013 | 1.032E+05 |
+| ABW     | POP  | GROW     | 2013 | 0.5929    |
+| AFG     | URB  | TOTL     | 2013 | 7.734E+06 |
+| AFG     | URB  | GROW     | 2013 | 4.193     |
+| AFG     | POP  | TOTL     | 2013 | 3.173E+07 |
+| AFG     | POP  | GROW     | 2013 | 3.315     |
+| AGO     | URB  | TOTL     | 2013 | 1.612E+07 |
+| AGO     | URB  | GROW     | 2013 | 4.723     |
+| AGO     | POP  | TOTL     | 2013 | 2.600E+07 |
+| AGO     | POP  | GROW     | 2013 | 3.532     |
+| ALB     | URB  | TOTL     | 2013 | 1.604E+06 |
+| ALB     | URB  | GROW     | 2013 | 1.744     |
+| ALB     | POP  | TOTL     | 2013 | 2.895E+06 |
+| ALB     | POP  | GROW     | 2013 | -0.1832   |
+| AND     | URB  | TOTL     | 2013 | 7.153E+04 |
+| AND     | URB  | GROW     | 2013 | -2.119    |
+| AND     | POP  | TOTL     | 2013 | 8.079E+04 |
+| AND     | POP  | GROW     | 2013 | -2.013    |
+| ARB     | URB  | TOTL     | 2013 | 2.186E+08 |
+| ARB     | URB  | GROW     | 2013 | 2.783     |
+| ARB     | POP  | TOTL     | 2013 | 3.817E+08 |
+| ARB     | POP  | GROW     | 2013 | 2.249     |
+| ARE     | URB  | TOTL     | 2013 | 7.661E+06 |
+
+Step 3 - Make columns based on `"variable"` values.
+
+``` clojure
+(api/pivot->wider pop3 "variable" "value")
+```
+
+data/world\_bank\_pop.csv.gz \[9504 5\]:
+
+| country | area | year | GROW    | TOTL      |
+|---------|------|------|---------|-----------|
+| ABW     | URB  | 2013 | 0.6695  | 4.436E+04 |
+| ABW     | POP  | 2013 | 0.5929  | 1.032E+05 |
+| AFG     | URB  | 2013 | 4.193   | 7.734E+06 |
+| AFG     | POP  | 2013 | 3.315   | 3.173E+07 |
+| AGO     | URB  | 2013 | 4.723   | 1.612E+07 |
+| AGO     | POP  | 2013 | 3.532   | 2.600E+07 |
+| ALB     | URB  | 2013 | 1.744   | 1.604E+06 |
+| ALB     | POP  | 2013 | -0.1832 | 2.895E+06 |
+| AND     | URB  | 2013 | -2.119  | 7.153E+04 |
+| AND     | POP  | 2013 | -2.013  | 8.079E+04 |
+| ARB     | URB  | 2013 | 2.783   | 2.186E+08 |
+| ARB     | POP  | 2013 | 2.249   | 3.817E+08 |
+| ARE     | URB  | 2013 | 1.555   | 7.661E+06 |
+| ARE     | POP  | 2013 | 1.182   | 9.006E+06 |
+| ARG     | URB  | 2013 | 1.188   | 3.882E+07 |
+| ARG     | POP  | 2013 | 1.047   | 4.254E+07 |
+| ARM     | URB  | 2013 | 0.2810  | 1.828E+06 |
+| ARM     | POP  | 2013 | 0.4013  | 2.894E+06 |
+| ASM     | URB  | 2013 | 0.05798 | 4.831E+04 |
+| ASM     | POP  | 2013 | 0.1393  | 5.531E+04 |
+| ATG     | URB  | 2013 | 0.3838  | 2.480E+04 |
+| ATG     | POP  | 2013 | 1.076   | 9.782E+04 |
+| AUS     | URB  | 2013 | 1.875   | 1.979E+07 |
+| AUS     | POP  | 2013 | 1.758   | 2.315E+07 |
+| AUT     | URB  | 2013 | 0.9196  | 4.862E+06 |
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+[Multi-choice](https://tidyr.tidyverse.org/articles/pivot.html#multi-choice)
+
+``` clojure
+(def multi (api/dataset {:id [1 2 3 4]
+                         :choice1 ["A" "C" "D" "B"]
+                         :choice2 ["B" "B" nil "D"]
+                         :choice3 ["C" nil nil nil]}))
+```
+
+``` clojure
+multi
+```
+
+\_unnamed \[4 4\]:
+
+| :id | :choice1 | :choice2 | :choice3 |
+|-----|----------|----------|----------|
+| 1   | A        | B        | C        |
+| 2   | C        | B        |          |
+| 3   | D        |          |          |
+| 4   | B        | D        |          |
+
+Step 1 - convert all choices into rows and add artificial column to all values which are not missing.
+
+``` clojure
+(def multi2 (-> multi
+                (api/pivot->longer (complement #{:id}))
+                (api/add-or-update-column :checked true)))
+```
+
+``` clojure
+multi2
+```
+
+\_unnamed \[8 4\]:
+
+| :id | :$column | :$value | :checked |
+|-----|----------|---------|----------|
+| 1   | :choice1 | A       | true     |
+| 2   | :choice1 | C       | true     |
+| 3   | :choice1 | D       | true     |
+| 4   | :choice1 | B       | true     |
+| 1   | :choice2 | B       | true     |
+| 2   | :choice2 | B       | true     |
+| 4   | :choice2 | D       | true     |
+| 1   | :choice3 | C       | true     |
+
+Step 2 - Convert back to wide form with actual choices as columns
+
+``` clojure
+(-> multi2
+    (api/drop-columns :$column)
+    (api/pivot->wider :$value :checked {:drop-missing? false})
+    (api/order-by :id))
+```
+
+\_unnamed \[4 5\]:
+
+| :id | A    | B    | C    | D    |
+|-----|------|------|------|------|
+| 1   | true | true | true |      |
+| 2   |      | true | true |      |
+| 3   |      |      |      | true |
+| 4   |      | true |      | true |
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+[Construction](https://tidyr.tidyverse.org/articles/pivot.html#by-hand)
+
+``` clojure
+(def construction (api/dataset "data/construction.csv"))
+(def construction-unit-map {"1 unit" "1"
+                            "2 to 4 units" "2-4"
+                            "5 units or more" "5+"})
+```
+
+``` clojure
+construction
+```
+
+data/construction.csv \[9 9\]:
+
+| Year | Month     | 1 unit | 2 to 4 units | 5 units or more | Northeast | Midwest | South | West |
+|------|-----------|--------|--------------|-----------------|-----------|---------|-------|------|
+| 2018 | January   | 859    |              | 348             | 114       | 169     | 596   | 339  |
+| 2018 | February  | 882    |              | 400             | 138       | 160     | 655   | 336  |
+| 2018 | March     | 862    |              | 356             | 150       | 154     | 595   | 330  |
+| 2018 | April     | 797    |              | 447             | 144       | 196     | 613   | 304  |
+| 2018 | May       | 875    |              | 364             | 90        | 169     | 673   | 319  |
+| 2018 | June      | 867    |              | 342             | 76        | 170     | 610   | 360  |
+| 2018 | July      | 829    |              | 360             | 108       | 183     | 594   | 310  |
+| 2018 | August    | 939    |              | 286             | 90        | 205     | 649   | 286  |
+| 2018 | September | 835    |              | 304             | 117       | 175     | 560   | 296  |
+
+Conversion 1 - Group two column types
+
+``` clojure
+(-> construction
+    (api/pivot->longer #"^[125NWS].*|Midwest" {:target-columns [:units :region]
+                                               :splitter (fn [col-name]
+                                                           (if (re-matches #"^[125].*" col-name)
+                                                             [(construction-unit-map col-name) nil]
+                                                             [nil col-name]))
+                                               :value-column-name :n
+                                               :drop-missing? false}))
+```
+
+data/construction.csv \[63 5\]:
+
+| Year | Month     | :units | :region | :n  |
+|------|-----------|--------|---------|-----|
+| 2018 | January   | 1      |         | 859 |
+| 2018 | February  | 1      |         | 882 |
+| 2018 | March     | 1      |         | 862 |
+| 2018 | April     | 1      |         | 797 |
+| 2018 | May       | 1      |         | 875 |
+| 2018 | June      | 1      |         | 867 |
+| 2018 | July      | 1      |         | 829 |
+| 2018 | August    | 1      |         | 939 |
+| 2018 | September | 1      |         | 835 |
+| 2018 | January   | 2-4    |         |     |
+| 2018 | February  | 2-4    |         |     |
+| 2018 | March     | 2-4    |         |     |
+| 2018 | April     | 2-4    |         |     |
+| 2018 | May       | 2-4    |         |     |
+| 2018 | June      | 2-4    |         |     |
+| 2018 | July      | 2-4    |         |     |
+| 2018 | August    | 2-4    |         |     |
+| 2018 | September | 2-4    |         |     |
+| 2018 | January   | 5+     |         | 348 |
+| 2018 | February  | 5+     |         | 400 |
+| 2018 | March     | 5+     |         | 356 |
+| 2018 | April     | 5+     |         | 447 |
+| 2018 | May       | 5+     |         | 364 |
+| 2018 | June      | 5+     |         | 342 |
+| 2018 | July      | 5+     |         | 360 |
+
+Conversion 2 - Convert to longer form and back and rename columns
+
+``` clojure
+(-> construction
+    (api/pivot->longer #"^[125NWS].*|Midwest" {:target-columns [:units :region]
+                                               :splitter (fn [col-name]
+                                                           (if (re-matches #"^[125].*" col-name)
+                                                             [(construction-unit-map col-name) nil]
+                                                             [nil col-name]))
+                                               :value-column-name :n
+                                               :drop-missing? false})
+    (api/pivot->wider [:units :region] :n)
+    (api/rename-columns (zipmap (vals construction-unit-map)
+                                (keys construction-unit-map))))
+```
+
+data/construction.csv \[9 9\]:
+
+| Year | Month     | Midwest | 5 units or more | 2 to 4 units | Northeast | South | 1 unit | West |
+|------|-----------|---------|-----------------|--------------|-----------|-------|--------|------|
+| 2018 | January   | 169     | 348             |              | 114       | 596   | 859    | 339  |
+| 2018 | February  | 160     | 400             |              | 138       | 655   | 882    | 336  |
+| 2018 | March     | 154     | 356             |              | 150       | 595   | 862    | 330  |
+| 2018 | April     | 196     | 447             |              | 144       | 613   | 797    | 304  |
+| 2018 | May       | 169     | 364             |              | 90        | 673   | 875    | 319  |
+| 2018 | June      | 170     | 342             |              | 76        | 610   | 867    | 360  |
+| 2018 | July      | 183     | 360             |              | 108       | 594   | 829    | 310  |
+| 2018 | August    | 205     | 286             |              | 90        | 649   | 939    | 286  |
+| 2018 | September | 175     | 304             |              | 117       | 560   | 835    | 296  |
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+Various operations on stocks, examples taken from [gather](https://tidyr.tidyverse.org/reference/gather.html) and [spread](https://tidyr.tidyverse.org/reference/spread.html) manuals.
+
+``` clojure
+(def stocks-tidyr (api/dataset "data/stockstidyr.csv"))
+```
+
+``` clojure
+stocks-tidyr
+```
+
+data/stockstidyr.csv \[10 4\]:
+
+| time       | X       | Y       | Z      |
+|------------|---------|---------|--------|
+| 2009-01-01 | 1.310   | -1.890  | -1.779 |
+| 2009-01-02 | -0.2999 | -1.825  | 2.399  |
+| 2009-01-03 | 0.5365  | -1.036  | -3.987 |
+| 2009-01-04 | -1.884  | -0.5218 | -2.831 |
+| 2009-01-05 | -0.9605 | -2.217  | 1.437  |
+| 2009-01-06 | -1.185  | -2.894  | 3.398  |
+| 2009-01-07 | -0.8521 | -2.168  | -1.201 |
+| 2009-01-08 | 0.2523  | -0.3285 | -1.532 |
+| 2009-01-09 | 0.4026  | 1.964   | -6.809 |
+| 2009-01-10 | -0.6438 | 2.686   | -2.559 |
+
+Convert to longer form
+
+``` clojure
+(def stocks-long (api/pivot->longer stocks-tidyr ["X" "Y" "Z"] {:value-column-name :price
+                                                                :target-columns :stocks}))
+```
+
+``` clojure
+stocks-long
+```
+
+data/stockstidyr.csv \[30 3\]:
+
+| time       | :stocks | :price  |
+|------------|---------|---------|
+| 2009-01-01 | X       | 1.310   |
+| 2009-01-02 | X       | -0.2999 |
+| 2009-01-03 | X       | 0.5365  |
+| 2009-01-04 | X       | -1.884  |
+| 2009-01-05 | X       | -0.9605 |
+| 2009-01-06 | X       | -1.185  |
+| 2009-01-07 | X       | -0.8521 |
+| 2009-01-08 | X       | 0.2523  |
+| 2009-01-09 | X       | 0.4026  |
+| 2009-01-10 | X       | -0.6438 |
+| 2009-01-01 | Y       | -1.890  |
+| 2009-01-02 | Y       | -1.825  |
+| 2009-01-03 | Y       | -1.036  |
+| 2009-01-04 | Y       | -0.5218 |
+| 2009-01-05 | Y       | -2.217  |
+| 2009-01-06 | Y       | -2.894  |
+| 2009-01-07 | Y       | -2.168  |
+| 2009-01-08 | Y       | -0.3285 |
+| 2009-01-09 | Y       | 1.964   |
+| 2009-01-10 | Y       | 2.686   |
+| 2009-01-01 | Z       | -1.779  |
+| 2009-01-02 | Z       | 2.399   |
+| 2009-01-03 | Z       | -3.987  |
+| 2009-01-04 | Z       | -2.831  |
+| 2009-01-05 | Z       | 1.437   |
+
+Convert back to wide form
+
+``` clojure
+(api/pivot->wider stocks-long :stocks :price)
+```
+
+data/stockstidyr.csv \[10 4\]:
+
+| time       | Z      | X       | Y       |
+|------------|--------|---------|---------|
+| 2009-01-01 | -1.779 | 1.310   | -1.890  |
+| 2009-01-02 | 2.399  | -0.2999 | -1.825  |
+| 2009-01-03 | -3.987 | 0.5365  | -1.036  |
+| 2009-01-04 | -2.831 | -1.884  | -0.5218 |
+| 2009-01-05 | 1.437  | -0.9605 | -2.217  |
+| 2009-01-06 | 3.398  | -1.185  | -2.894  |
+| 2009-01-07 | -1.201 | -0.8521 | -2.168  |
+| 2009-01-08 | -1.532 | 0.2523  | -0.3285 |
+| 2009-01-09 | -6.809 | 0.4026  | 1.964   |
+| 2009-01-10 | -2.559 | -0.6438 | 2.686   |
+
+Convert to wide form on time column (let's limit values to a couple of rows)
+
+``` clojure
+(-> stocks-long
+    (api/select-rows (range 0 30 4))
+    (api/pivot->wider "time" :price))
+```
+
+data/stockstidyr.csv \[3 6\]:
+
+| :stocks | 2009-01-05 | 2009-01-07 | 2009-01-01 | 2009-01-03 | 2009-01-09 |
+|---------|------------|------------|------------|------------|------------|
+| X       | -0.9605    |            | 1.310      |            | 0.4026     |
+| Z       | 1.437      |            | -1.779     |            | -6.809     |
+| Y       |            | -2.168     |            | -1.036     |            |
 
 ### Join/Concat
 

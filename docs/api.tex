@@ -110,7 +110,7 @@
 
 \title{Proposed API for tech.ml.dataset}
 \author{GenerateMe}
-\date{2020-05-26}
+\date{2020-05-27}
 
 \begin{document}
 \maketitle
@@ -995,7 +995,7 @@ Rows as sequence of sequences
 \end{Shaded}
 
 \begin{verbatim}
-([#object[java.time.LocalDate 0x31715e29 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x6a75cfe0 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+([#object[java.time.LocalDate 0x359867fa "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x36b549d9 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -1009,13 +1009,13 @@ Rows as sequence of maps
 \end{Shaded}
 
 \begin{verbatim}
-({"date" #object[java.time.LocalDate 0x32d4287b "2012-01-01"],
+({"date" #object[java.time.LocalDate 0x798121af "2012-01-01"],
   "precipitation" 0.0,
   "temp_min" 5.0,
   "weather" "drizzle",
   "temp_max" 12.8,
   "wind" 4.7}
- {"date" #object[java.time.LocalDate 0x1d158ebc "2012-01-02"],
+ {"date" #object[java.time.LocalDate 0x3eec2d30 "2012-01-02"],
   "precipitation" 10.9,
   "temp_min" 2.8,
   "weather" "rain",
@@ -2221,7 +2221,7 @@ used. \texttt{columns-selector} can be one of the following:
 Column name can be anything.
 
 \texttt{column-names} function returns names according to
-\texttt{columns-selector} and optional \texttt{meta-filed}.
+\texttt{columns-selector} and optional \texttt{meta-field}.
 \texttt{meta-field} is one of the following:
 
 \begin{itemize}
@@ -2619,7 +2619,7 @@ where keys are old names, values new ones.
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@3049b1fe}{\nolinkurl{java.lang.Object@3049b1fe}}\tabularnewline
+\href{mailto:java.lang.Object@1dc5451b}{\nolinkurl{java.lang.Object@1dc5451b}}\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2655,7 +2655,7 @@ Function works on grouped dataset
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@241e9555}{\nolinkurl{java.lang.Object@241e9555}}\tabularnewline
+\href{mailto:java.lang.Object@3d83ea0b}{\nolinkurl{java.lang.Object@3d83ea0b}}\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2671,7 +2671,7 @@ v1 & v2 & {[}1 2 3{]} &
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@241e9555}{\nolinkurl{java.lang.Object@241e9555}}\tabularnewline
+\href{mailto:java.lang.Object@3d83ea0b}{\nolinkurl{java.lang.Object@3d83ea0b}}\tabularnewline
 \midrule
 \endhead
 2 & 2 & 1.000 & B\tabularnewline
@@ -2761,15 +2761,15 @@ Replace one column (column is trimmed)
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-0.1151 & 1 & 0.5000 & A\tabularnewline
-0.7605 & 2 & 1.000 & B\tabularnewline
-0.02764 & 3 & 1.500 & C\tabularnewline
-0.06691 & 4 & 0.5000 & A\tabularnewline
-0.8581 & 5 & 1.000 & B\tabularnewline
-0.6666 & 6 & 1.500 & C\tabularnewline
-0.9442 & 7 & 0.5000 & A\tabularnewline
-0.4027 & 8 & 1.000 & B\tabularnewline
-0.8871 & 9 & 1.500 & C\tabularnewline
+0.2565 & 1 & 0.5000 & A\tabularnewline
+0.7238 & 2 & 1.000 & B\tabularnewline
+0.7878 & 3 & 1.500 & C\tabularnewline
+0.1993 & 4 & 0.5000 & A\tabularnewline
+0.8512 & 5 & 1.000 & B\tabularnewline
+0.5382 & 6 & 1.500 & C\tabularnewline
+0.4285 & 7 & 0.5000 & A\tabularnewline
+0.4484 & 8 & 1.000 & B\tabularnewline
+0.1991 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3036,8 +3036,6 @@ Arguments:
   \texttt{map-fn} - mapping function
 \item
   \texttt{columns-selector} - columns selected
-\item
-  \texttt{meta-field} (optional) - column selector option
 \end{itemize}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3047,7 +3045,7 @@ Let's add numerical columns together
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{(api/map-columns DS }\AttributeTok{:sum-of-numbers}\NormalTok{ (}\KeywordTok{fn}\NormalTok{ [& rows]}
-\NormalTok{                                      (}\KeywordTok{reduce} \KeywordTok{+}\NormalTok{ rows)) #\{}\AttributeTok{:int64} \AttributeTok{:float64}\NormalTok{\} }\AttributeTok{:datatype}\NormalTok{)}
+\NormalTok{                                      (}\KeywordTok{reduce} \KeywordTok{+}\NormalTok{ rows)) (api/column-names DS  #\{}\AttributeTok{:int64} \AttributeTok{:float64}\NormalTok{\} }\AttributeTok{:datatype}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -3077,7 +3075,7 @@ The same works on grouped dataset
 \NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
 \NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
 \NormalTok{    (api/map-columns }\AttributeTok{:sum-of-numbers}\NormalTok{ (}\KeywordTok{fn}\NormalTok{ [& rows]}
-\NormalTok{                                       (}\KeywordTok{reduce} \KeywordTok{+}\NormalTok{ rows)) #\{}\AttributeTok{:int64} \AttributeTok{:float64}\NormalTok{\} }\AttributeTok{:datatype}\NormalTok{)}
+\NormalTok{                                       (}\KeywordTok{reduce} \KeywordTok{+}\NormalTok{ rows)) (api/column-names DS  #\{}\AttributeTok{:int64} \AttributeTok{:float64}\NormalTok{\} }\AttributeTok{:datatype}\NormalTok{))}
 \NormalTok{    (api/ungroup))}
 \end{Highlighting}
 \end{Shaded}
@@ -3334,7 +3332,7 @@ Double array conversion.
 \end{Shaded}
 
 \begin{verbatim}
-#object["[J" 0x2d1f3596 "[J@2d1f3596"]
+#object["[J" 0x44222d1 "[J@44222d1"]
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3350,7 +3348,7 @@ Function also works on grouped dataset
 \end{Shaded}
 
 \begin{verbatim}
-(#object["[J" 0x23e21d06 "[J@23e21d06"] #object["[J" 0x40b79a85 "[J@40b79a85"] #object["[J" 0xf38c6c7 "[J@f38c6c7"])
+(#object["[J" 0x15a01a22 "[J@15a01a22"] #object["[J" 0x53e15661 "[J@53e15661"] #object["[J" 0x2412fe45 "[J@2412fe45"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3365,8 +3363,8 @@ You can also cast the type to the other one (if casting is possible):
 \end{Shaded}
 
 \begin{verbatim}
-#object["[Ljava.lang.String;" 0x5c8c0d2f "[Ljava.lang.String;@5c8c0d2f"]
-#object["[F" 0x4788c116 "[F@4788c116"]
+#object["[Ljava.lang.String;" 0x4a851c75 "[Ljava.lang.String;@4a851c75"]
+#object["[F" 0x5181d68e "[F@5181d68e"]
 \end{verbatim}
 
 \subsubsection{Rows}\label{rows}
@@ -3636,7 +3634,7 @@ Random row (single)
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3658,14 +3656,14 @@ Random \texttt{n} (default: row count) rows with repetition.
 \midrule
 \endhead
 2 & 4 & 0.5000 & A\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
 1 & 1 & 0.5000 & A\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3686,11 +3684,11 @@ Five random rows with repetition
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 5 & 1.000 & B\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3711,11 +3709,11 @@ Five random, non-repeating rows
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 7 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
 2 & 8 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3736,15 +3734,15 @@ Shuffle dataset
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 8 & 1.000 & B\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
 1 & 7 & 0.5000 & A\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3819,19 +3817,19 @@ Select 5 random rows from each group
 \midrule
 \endhead
 2 & 4 & 0.5000 & A\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
@@ -4486,8 +4484,8 @@ Random
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 5 & 1.000 & B\tabularnewline
 2 & 8 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -6460,6 +6458,57 @@ Both functions work only on regular dataset.
 
 \paragraph{Longer}\label{longer}
 
+\texttt{pivot-\textgreater{}longer} converts columns to rows. Column
+names are treated as data.
+
+Arguments:
+
+\begin{itemize}
+\tightlist
+\item
+  dataset
+\item
+  columns selector
+\item
+  options:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{:target-columns} - column name(s) where source column names
+    are stored, or columns pattern (see below) (default:
+    \texttt{:\$column})
+  \item
+    \texttt{:value-column-name} - name of the column for values
+    (default: \texttt{:\$value})
+  \item
+    \texttt{:splitter} - regular expression or function which splits
+    source column names into data
+  \item
+    \texttt{:drop-missing?} - remove rows with missing? (default:
+    \texttt{:true})
+  \item
+    \texttt{:datatypes} - map of target columns data types
+  \end{itemize}
+\end{itemize}
+
+\texttt{:target-columns} - can be:
+
+\begin{itemize}
+\tightlist
+\item
+  column name - source columns names are put there as a data
+\item
+  column names as seqence - source columns names after split are put
+  separately into \texttt{:target-columns} as data
+\item
+  pattern - is a sequence of names, where some of the names are
+  \texttt{nil}. \texttt{nil} is replaced by a name taken from splitter
+  and such column is used for values.
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
 Create rows from all columns but \texttt{"religion"}.
 
 \begin{Shaded}
@@ -6678,36 +6727,36 @@ Convert only columns starting with \texttt{"wk"} and pack them into
 \begin{Highlighting}[]
 \NormalTok{(}\KeywordTok{->>}\NormalTok{ bilboard}
 \NormalTok{     (api/column-names)}
-\NormalTok{     (}\KeywordTok{take} \DecValTok{11}\NormalTok{)}
+\NormalTok{     (}\KeywordTok{take} \DecValTok{13}\NormalTok{)}
 \NormalTok{     (api/select-columns bilboard)}
 \NormalTok{     (api/head))}
 \end{Highlighting}
 \end{Shaded}
 
-data/billboard.csv.gz {[}5 11{]}:
+data/billboard.csv.gz {[}5 13{]}:
 
-\begin{longtable}[]{@{}lllllllllll@{}}
+\begin{longtable}[]{@{}lllllllllllll@{}}
 \toprule
 artist & track & date.entered & wk1 & wk2 & wk3 & wk4 & wk5 & wk6 & wk7
-& wk8\tabularnewline
+& wk8 & wk9 & wk10\tabularnewline
 \midrule
 \endhead
 2 Pac & Baby Don't Cry (Keep\ldots{} & 2000-02-26 & 87 & 82 & 72 & 77 &
-87 & 94 & 99 &\tabularnewline
+87 & 94 & 99 & & &\tabularnewline
 2Ge+her & The Hardest Part Of \ldots{} & 2000-09-02 & 91 & 87 & 92 & & &
-& &\tabularnewline
+& & & &\tabularnewline
 3 Doors Down & Kryptonite & 2000-04-08 & 81 & 70 & 68 & 67 & 66 & 57 &
-54 & 53\tabularnewline
+54 & 53 & 51 & 51\tabularnewline
 3 Doors Down & Loser & 2000-10-21 & 76 & 76 & 72 & 69 & 67 & 65 & 55 &
-59\tabularnewline
+59 & 62 & 61\tabularnewline
 504 Boyz & Wobble Wobble & 2000-04-15 & 57 & 34 & 25 & 17 & 17 & 31 & 36
-& 49\tabularnewline
+& 49 & 53 & 57\tabularnewline
 \bottomrule
 \end{longtable}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{(api/pivot->longer bilboard #(clojure.string/starts-with? }\VariableTok{%} \StringTok{"wk"}\NormalTok{) \{}\AttributeTok{:target-cols} \AttributeTok{:week}
+\NormalTok{(api/pivot->longer bilboard #(clojure.string/starts-with? }\VariableTok{%} \StringTok{"wk"}\NormalTok{) \{}\AttributeTok{:target-columns} \AttributeTok{:week}
                                                                    \AttributeTok{:value-column-name} \AttributeTok{:rank}\NormalTok{\})}
 \end{Highlighting}
 \end{Shaded}
@@ -6759,7 +6808,7 @@ We can create numerical column out of column names
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{(api/pivot->longer bilboard #(clojure.string/starts-with? }\VariableTok{%} \StringTok{"wk"}\NormalTok{) \{}\AttributeTok{:target-cols} \AttributeTok{:week}
+\NormalTok{(api/pivot->longer bilboard #(clojure.string/starts-with? }\VariableTok{%} \StringTok{"wk"}\NormalTok{) \{}\AttributeTok{:target-columns} \AttributeTok{:week}
                                                                    \AttributeTok{:value-column-name} \AttributeTok{:rank}
                                                                    \AttributeTok{:splitter} \SpecialStringTok{#"wk(.*)"}
                                                                    \AttributeTok{:datatypes}\NormalTok{ \{}\AttributeTok{:week} \AttributeTok{:int16}\NormalTok{\}\})}
@@ -6807,7 +6856,1437 @@ Anthony, Marc & You Sang To Me & 2000-02-26 & 6 & 27\tabularnewline
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
+When column names contain observation data, such column names can be
+splitted and data can be restored into separate columns.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ who }\NormalTok{(api/dataset }\StringTok{"data/who.csv.gz"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->>}\NormalTok{ who}
+\NormalTok{     (api/column-names)}
+\NormalTok{     (}\KeywordTok{take} \DecValTok{10}\NormalTok{)}
+\NormalTok{     (api/select-columns who)}
+\NormalTok{     (api/head))}
+\end{Highlighting}
+\end{Shaded}
+
+data/who.csv.gz {[}5 10{]}:
+
+\begin{longtable}[]{@{}llllllllll@{}}
+\toprule
+\begin{minipage}[b]{0.08\columnwidth}\raggedright\strut
+country\strut
+\end{minipage} & \begin{minipage}[b]{0.04\columnwidth}\raggedright\strut
+iso2\strut
+\end{minipage} & \begin{minipage}[b]{0.04\columnwidth}\raggedright\strut
+iso3\strut
+\end{minipage} & \begin{minipage}[b]{0.04\columnwidth}\raggedright\strut
+year\strut
+\end{minipage} & \begin{minipage}[b]{0.08\columnwidth}\raggedright\strut
+new\_sp\_m014\strut
+\end{minipage} & \begin{minipage}[b]{0.09\columnwidth}\raggedright\strut
+new\_sp\_m1524\strut
+\end{minipage} & \begin{minipage}[b]{0.09\columnwidth}\raggedright\strut
+new\_sp\_m2534\strut
+\end{minipage} & \begin{minipage}[b]{0.09\columnwidth}\raggedright\strut
+new\_sp\_m3544\strut
+\end{minipage} & \begin{minipage}[b]{0.09\columnwidth}\raggedright\strut
+new\_sp\_m4554\strut
+\end{minipage} & \begin{minipage}[b]{0.09\columnwidth}\raggedright\strut
+new\_sp\_m5564\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1980\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1981\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1982\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1983\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+Afghanistan\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AF\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+AFG\strut
+\end{minipage} & \begin{minipage}[t]{0.04\columnwidth}\raggedright\strut
+1984\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/pivot->longer who #(clojure.string/starts-with? }\VariableTok{%} \StringTok{"new"}\NormalTok{) \{}\AttributeTok{:target-columns}\NormalTok{ [}\AttributeTok{:diagnosis} \AttributeTok{:gender} \AttributeTok{:age}\NormalTok{]}
+                                                               \AttributeTok{:splitter} \SpecialStringTok{#"new_?(.*)_(.)(.*)"}
+                                                               \AttributeTok{:value-column-name} \AttributeTok{:count}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+data/who.csv.gz {[}76046 8{]}:
+
+\begin{longtable}[]{@{}llllllll@{}}
+\toprule
+country & iso2 & iso3 & year & :diagnosis & :gender & :age &
+:count\tabularnewline
+\midrule
+\endhead
+Albania & AL & ALB & 2013 & rel & m & 1524 & 60\tabularnewline
+Algeria & DZ & DZA & 2013 & rel & m & 1524 & 1021\tabularnewline
+Andorra & AD & AND & 2013 & rel & m & 1524 & 0\tabularnewline
+Angola & AO & AGO & 2013 & rel & m & 1524 & 2992\tabularnewline
+Anguilla & AI & AIA & 2013 & rel & m & 1524 & 0\tabularnewline
+Antigua and Barbuda & AG & ATG & 2013 & rel & m & 1524 &
+1\tabularnewline
+Argentina & AR & ARG & 2013 & rel & m & 1524 & 1124\tabularnewline
+Armenia & AM & ARM & 2013 & rel & m & 1524 & 116\tabularnewline
+Australia & AU & AUS & 2013 & rel & m & 1524 & 105\tabularnewline
+Austria & AT & AUT & 2013 & rel & m & 1524 & 44\tabularnewline
+Azerbaijan & AZ & AZE & 2013 & rel & m & 1524 & 958\tabularnewline
+Bahamas & BS & BHS & 2013 & rel & m & 1524 & 2\tabularnewline
+Bahrain & BH & BHR & 2013 & rel & m & 1524 & 13\tabularnewline
+Bangladesh & BD & BGD & 2013 & rel & m & 1524 & 14705\tabularnewline
+Barbados & BB & BRB & 2013 & rel & m & 1524 & 0\tabularnewline
+Belarus & BY & BLR & 2013 & rel & m & 1524 & 162\tabularnewline
+Belgium & BE & BEL & 2013 & rel & m & 1524 & 63\tabularnewline
+Belize & BZ & BLZ & 2013 & rel & m & 1524 & 8\tabularnewline
+Benin & BJ & BEN & 2013 & rel & m & 1524 & 301\tabularnewline
+Bermuda & BM & BMU & 2013 & rel & m & 1524 & 0\tabularnewline
+Bhutan & BT & BTN & 2013 & rel & m & 1524 & 180\tabularnewline
+Bolivia (Plurinational State of) & BO & BOL & 2013 & rel & m & 1524 &
+1470\tabularnewline
+Bonaire, Saint Eustatius and Saba & BQ & BES & 2013 & rel & m & 1524 &
+0\tabularnewline
+Bosnia and Herzegovina & BA & BIH & 2013 & rel & m & 1524 &
+57\tabularnewline
+Botswana & BW & BWA & 2013 & rel & m & 1524 & 423\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+When data contains multiple observations per row, we can use splitter
+and pattern for target columns to create new columns and put values
+there. In following dataset we have two obseravations \texttt{dob} and
+\texttt{gender} for two childs. We want to put child infomation into the
+column and leave dob and gender for values.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ family }\NormalTok{(api/dataset }\StringTok{"data/family.csv"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{family}
+\end{Highlighting}
+\end{Shaded}
+
+data/family.csv {[}5 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+family & dob\_child1 & dob\_child2 & gender\_child1 &
+gender\_child2\tabularnewline
+\midrule
+\endhead
+1 & 1998-11-26 & 2000-01-29 & 1 & 2\tabularnewline
+2 & 1996-06-22 & & 2 &\tabularnewline
+3 & 2002-07-11 & 2004-04-05 & 2 & 2\tabularnewline
+4 & 2004-10-10 & 2009-08-27 & 1 & 1\tabularnewline
+5 & 2000-12-05 & 2005-02-28 & 2 & 1\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/pivot->longer family (}\KeywordTok{complement}\NormalTok{ #\{}\StringTok{"family"}\NormalTok{\}) \{}\AttributeTok{:target-columns}\NormalTok{ [}\VariableTok{nil} \AttributeTok{:child}\NormalTok{]}
+                                                    \AttributeTok{:splitter}\NormalTok{ #(clojure.string/split }\VariableTok{%} \SpecialStringTok{#"_"}\NormalTok{)}
+                                                    \AttributeTok{:datatypes}\NormalTok{ \{}\StringTok{"gender"} \AttributeTok{:int16}\NormalTok{\}\})}
+\end{Highlighting}
+\end{Shaded}
+
+data/family.csv {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+family & :child & dob & gender\tabularnewline
+\midrule
+\endhead
+1 & child1 & 1998-11-26 & 1\tabularnewline
+2 & child1 & 1996-06-22 & 2\tabularnewline
+3 & child1 & 2002-07-11 & 2\tabularnewline
+4 & child1 & 2004-10-10 & 1\tabularnewline
+5 & child1 & 2000-12-05 & 2\tabularnewline
+1 & child2 & 2000-01-29 & 2\tabularnewline
+3 & child2 & 2004-04-05 & 2\tabularnewline
+4 & child2 & 2009-08-27 & 1\tabularnewline
+5 & child2 & 2005-02-28 & 1\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Similar here, we have two observations: \texttt{x} and \texttt{y} in
+four groups.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ anscombe }\NormalTok{(api/dataset }\StringTok{"data/anscombe.csv"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{anscombe}
+\end{Highlighting}
+\end{Shaded}
+
+data/anscombe.csv {[}11 8{]}:
+
+\begin{longtable}[]{@{}llllllll@{}}
+\toprule
+x1 & x2 & x3 & x4 & y1 & y2 & y3 & y4\tabularnewline
+\midrule
+\endhead
+10 & 10 & 10 & 8 & 8.040 & 9.140 & 7.460 & 6.580\tabularnewline
+8 & 8 & 8 & 8 & 6.950 & 8.140 & 6.770 & 5.760\tabularnewline
+13 & 13 & 13 & 8 & 7.580 & 8.740 & 12.74 & 7.710\tabularnewline
+9 & 9 & 9 & 8 & 8.810 & 8.770 & 7.110 & 8.840\tabularnewline
+11 & 11 & 11 & 8 & 8.330 & 9.260 & 7.810 & 8.470\tabularnewline
+14 & 14 & 14 & 8 & 9.960 & 8.100 & 8.840 & 7.040\tabularnewline
+6 & 6 & 6 & 8 & 7.240 & 6.130 & 6.080 & 5.250\tabularnewline
+4 & 4 & 4 & 19 & 4.260 & 3.100 & 5.390 & 12.50\tabularnewline
+12 & 12 & 12 & 8 & 10.84 & 9.130 & 8.150 & 5.560\tabularnewline
+7 & 7 & 7 & 8 & 4.820 & 7.260 & 6.420 & 7.910\tabularnewline
+5 & 5 & 5 & 8 & 5.680 & 4.740 & 5.730 & 6.890\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/pivot->longer anscombe }\AttributeTok{:all}\NormalTok{ \{}\AttributeTok{:splitter} \SpecialStringTok{#"(.)(.)"}
+                                  \AttributeTok{:target-columns}\NormalTok{ [}\VariableTok{nil} \AttributeTok{:set}\NormalTok{]\})}
+\end{Highlighting}
+\end{Shaded}
+
+data/anscombe.csv {[}44 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:set & x & y\tabularnewline
+\midrule
+\endhead
+1 & 10 & 8.040\tabularnewline
+1 & 8 & 6.950\tabularnewline
+1 & 13 & 7.580\tabularnewline
+1 & 9 & 8.810\tabularnewline
+1 & 11 & 8.330\tabularnewline
+1 & 14 & 9.960\tabularnewline
+1 & 6 & 7.240\tabularnewline
+1 & 4 & 4.260\tabularnewline
+1 & 12 & 10.84\tabularnewline
+1 & 7 & 4.820\tabularnewline
+1 & 5 & 5.680\tabularnewline
+2 & 10 & 9.140\tabularnewline
+2 & 8 & 8.140\tabularnewline
+2 & 13 & 8.740\tabularnewline
+2 & 9 & 8.770\tabularnewline
+2 & 11 & 9.260\tabularnewline
+2 & 14 & 8.100\tabularnewline
+2 & 6 & 6.130\tabularnewline
+2 & 4 & 3.100\tabularnewline
+2 & 12 & 9.130\tabularnewline
+2 & 7 & 7.260\tabularnewline
+2 & 5 & 4.740\tabularnewline
+3 & 10 & 7.460\tabularnewline
+3 & 8 & 6.770\tabularnewline
+3 & 13 & 12.74\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ pnl }\NormalTok{(api/dataset \{}\AttributeTok{:x}\NormalTok{ [}\DecValTok{1} \DecValTok{2} \DecValTok{3} \DecValTok{4}\NormalTok{]}
+                       \AttributeTok{:a}\NormalTok{ [}\DecValTok{1} \DecValTok{1} \DecValTok{0} \DecValTok{0}\NormalTok{]}
+                       \AttributeTok{:b}\NormalTok{ [}\DecValTok{0} \DecValTok{1} \DecValTok{1} \DecValTok{1}\NormalTok{]}
+                       \AttributeTok{:y1}\NormalTok{ (}\KeywordTok{repeatedly} \DecValTok{4} \KeywordTok{rand}\NormalTok{)}
+                       \AttributeTok{:y2}\NormalTok{ (}\KeywordTok{repeatedly} \DecValTok{4} \KeywordTok{rand}\NormalTok{)}
+                       \AttributeTok{:z1}\NormalTok{ [}\DecValTok{3} \DecValTok{3} \DecValTok{3} \DecValTok{3}\NormalTok{]}
+                       \AttributeTok{:z2}\NormalTok{ [-}\DecValTok{2} \DecValTok{-2} \DecValTok{-2} \DecValTok{-2}\NormalTok{]\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pnl}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}4 7{]}:
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule
+:x & :a & :b & :y1 & :y2 & :z1 & :z2\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0 & 0.3789 & 0.9831 & 3 & -2\tabularnewline
+2 & 1 & 1 & 0.3252 & 0.9221 & 3 & -2\tabularnewline
+3 & 0 & 1 & 0.3689 & 0.6474 & 3 & -2\tabularnewline
+4 & 0 & 1 & 0.7811 & 0.8229 & 3 & -2\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/pivot->longer pnl [}\AttributeTok{:y1} \AttributeTok{:y2} \AttributeTok{:z1} \AttributeTok{:z2}\NormalTok{] \{}\AttributeTok{:target-columns}\NormalTok{ [}\VariableTok{nil} \AttributeTok{:times}\NormalTok{]}
+                                          \AttributeTok{:splitter} \SpecialStringTok{#":(.)(.)"}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}8 6{]}:
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+:x & :a & :b & :times & y & z\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0 & 1 & 0.3789 & 3\tabularnewline
+2 & 1 & 1 & 1 & 0.3252 & 3\tabularnewline
+3 & 0 & 1 & 1 & 0.3689 & 3\tabularnewline
+4 & 0 & 1 & 1 & 0.7811 & 3\tabularnewline
+1 & 1 & 0 & 2 & 0.9831 & -2\tabularnewline
+2 & 1 & 1 & 2 & 0.9221 & -2\tabularnewline
+3 & 0 & 1 & 2 & 0.6474 & -2\tabularnewline
+4 & 0 & 1 & 2 & 0.8229 & -2\tabularnewline
+\bottomrule
+\end{longtable}
+
 \paragraph{Wider}\label{wider}
+
+\texttt{pivot-\textgreater{}wider} converts rows to columns.
+
+Arguments:
+
+\begin{itemize}
+\tightlist
+\item
+  dataset
+\item
+  columns selector - values from selected columns are converted to new
+  columns
+\item
+  value columns - what are values
+\end{itemize}
+
+When multiple columns are used as columns selector, names are joined
+using \texttt{:separator} (default: ``\_``) option.
+
+When columns selector creates non unique set of values, they are folded
+using \texttt{:fold-fn} (default: \texttt{vec}) option.
+
+When value columns are a sequence, multiple observations as columns are
+created appending value column names into new columns. Column names are
+joined using \texttt{:value-separator} (default: ``-'') option.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Use \texttt{station} as a name source for columns and \texttt{seen} for
+values
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ fish }\NormalTok{(api/dataset }\StringTok{"data/fish_encounters.csv"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fish}
+\end{Highlighting}
+\end{Shaded}
+
+data/fish\_encounters.csv {[}114 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+fish & station & seen\tabularnewline
+\midrule
+\endhead
+4842 & Release & 1\tabularnewline
+4842 & I80\_1 & 1\tabularnewline
+4842 & Lisbon & 1\tabularnewline
+4842 & Rstr & 1\tabularnewline
+4842 & Base\_TD & 1\tabularnewline
+4842 & BCE & 1\tabularnewline
+4842 & BCW & 1\tabularnewline
+4842 & BCE2 & 1\tabularnewline
+4842 & BCW2 & 1\tabularnewline
+4842 & MAE & 1\tabularnewline
+4842 & MAW & 1\tabularnewline
+4843 & Release & 1\tabularnewline
+4843 & I80\_1 & 1\tabularnewline
+4843 & Lisbon & 1\tabularnewline
+4843 & Rstr & 1\tabularnewline
+4843 & Base\_TD & 1\tabularnewline
+4843 & BCE & 1\tabularnewline
+4843 & BCW & 1\tabularnewline
+4843 & BCE2 & 1\tabularnewline
+4843 & BCW2 & 1\tabularnewline
+4843 & MAE & 1\tabularnewline
+4843 & MAW & 1\tabularnewline
+4844 & Release & 1\tabularnewline
+4844 & I80\_1 & 1\tabularnewline
+4844 & Lisbon & 1\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/pivot->wider fish }\StringTok{"station"} \StringTok{"seen"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+data/fish\_encounters.csv {[}19 12{]}:
+
+\begin{longtable}[]{@{}llllllllllll@{}}
+\toprule
+fish & Rstr & Base\_TD & I80\_1 & Release & MAE & BCE2 & MAW & BCW2 &
+BCE & Lisbon & BCW\tabularnewline
+\midrule
+\endhead
+4842 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1\tabularnewline
+4843 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1\tabularnewline
+4844 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1\tabularnewline
+4850 & 1 & 1 & 1 & 1 & & & & & 1 & & 1\tabularnewline
+4857 & 1 & 1 & 1 & 1 & & 1 & & 1 & 1 & 1 & 1\tabularnewline
+4858 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1\tabularnewline
+4861 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1\tabularnewline
+4862 & 1 & 1 & 1 & 1 & & 1 & & 1 & 1 & 1 & 1\tabularnewline
+4864 & & & 1 & 1 & & & & & & &\tabularnewline
+4865 & & & 1 & 1 & & & & & & 1 &\tabularnewline
+4845 & 1 & 1 & 1 & 1 & & & & & & 1 &\tabularnewline
+4847 & & & 1 & 1 & & & & & & 1 &\tabularnewline
+4848 & 1 & & 1 & 1 & & & & & & 1 &\tabularnewline
+4849 & & & 1 & 1 & & & & & & &\tabularnewline
+4851 & & & 1 & 1 & & & & & & &\tabularnewline
+4854 & & & 1 & 1 & & & & & & &\tabularnewline
+4855 & 1 & 1 & 1 & 1 & & & & & & 1 &\tabularnewline
+4859 & 1 & 1 & 1 & 1 & & & & & & 1 &\tabularnewline
+4863 & & & 1 & 1 & & & & & & &\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+If selected columns contain multiple values, such values should be
+folded.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ warpbreaks }\NormalTok{(api/dataset }\StringTok{"data/warpbreaks.csv"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{warpbreaks}
+\end{Highlighting}
+\end{Shaded}
+
+data/warpbreaks.csv {[}54 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+breaks & wool & tension\tabularnewline
+\midrule
+\endhead
+26 & A & L\tabularnewline
+30 & A & L\tabularnewline
+54 & A & L\tabularnewline
+25 & A & L\tabularnewline
+70 & A & L\tabularnewline
+52 & A & L\tabularnewline
+51 & A & L\tabularnewline
+26 & A & L\tabularnewline
+67 & A & L\tabularnewline
+18 & A & M\tabularnewline
+21 & A & M\tabularnewline
+29 & A & M\tabularnewline
+17 & A & M\tabularnewline
+12 & A & M\tabularnewline
+18 & A & M\tabularnewline
+35 & A & M\tabularnewline
+30 & A & M\tabularnewline
+36 & A & M\tabularnewline
+36 & A & H\tabularnewline
+21 & A & H\tabularnewline
+24 & A & H\tabularnewline
+18 & A & H\tabularnewline
+10 & A & H\tabularnewline
+43 & A & H\tabularnewline
+28 & A & H\tabularnewline
+\bottomrule
+\end{longtable}
+
+Let's see how many values are for each type of \texttt{wool} and
+\texttt{tension} groups
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ warpbreaks}
+\NormalTok{    (api/group-by [}\StringTok{"wool"} \StringTok{"tension"}\NormalTok{])}
+\NormalTok{    (api/aggregate \{}\AttributeTok{:n}\NormalTok{ api/row-count\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}6 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+wool & tension & :n\tabularnewline
+\midrule
+\endhead
+A & H & 9\tabularnewline
+B & H & 9\tabularnewline
+A & L & 9\tabularnewline
+A & M & 9\tabularnewline
+B & L & 9\tabularnewline
+B & M & 9\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ warpbreaks}
+\NormalTok{    (api/reorder-columns [}\StringTok{"wool"} \StringTok{"tension"} \StringTok{"breaks"}\NormalTok{])}
+\NormalTok{    (api/pivot->wider }\StringTok{"wool"} \StringTok{"breaks"}\NormalTok{ \{}\AttributeTok{:fold-fn} \KeywordTok{vec}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+data/warpbreaks.csv {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+tension & B & A\tabularnewline
+\midrule
+\endhead
+M & {[}42 26 19 16 39 28 21 39 29{]} & {[}18 21 29 17 12 18 35 30
+36{]}\tabularnewline
+H & {[}20 21 24 17 13 15 15 16 28{]} & {[}36 21 24 18 10 43 28 15
+26{]}\tabularnewline
+L & {[}27 14 29 19 29 31 41 20 44{]} & {[}26 30 54 25 70 52 51 26
+67{]}\tabularnewline
+\bottomrule
+\end{longtable}
+
+We can also calculate mean (aggreate values)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ warpbreaks}
+\NormalTok{    (api/reorder-columns [}\StringTok{"wool"} \StringTok{"tension"} \StringTok{"breaks"}\NormalTok{])}
+\NormalTok{    (api/pivot->wider }\StringTok{"wool"} \StringTok{"breaks"}\NormalTok{ \{}\AttributeTok{:fold-fn}\NormalTok{ tech.v2.datatype.functional/mean\}))}
+\end{Highlighting}
+\end{Shaded}
+
+data/warpbreaks.csv {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+tension & B & A\tabularnewline
+\midrule
+\endhead
+H & 18.78 & 24.56\tabularnewline
+M & 28.78 & 24.00\tabularnewline
+L & 28.22 & 44.56\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Multiple source columns, joined with default separator.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ production }\NormalTok{(api/dataset }\StringTok{"data/production.csv"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{production}
+\end{Highlighting}
+\end{Shaded}
+
+data/production.csv {[}45 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+product & country & year & production\tabularnewline
+\midrule
+\endhead
+A & AI & 2000 & 1.637\tabularnewline
+A & AI & 2001 & 0.1587\tabularnewline
+A & AI & 2002 & -1.568\tabularnewline
+A & AI & 2003 & -0.4446\tabularnewline
+A & AI & 2004 & -0.07134\tabularnewline
+A & AI & 2005 & 1.612\tabularnewline
+A & AI & 2006 & -0.7043\tabularnewline
+A & AI & 2007 & -1.536\tabularnewline
+A & AI & 2008 & 0.8391\tabularnewline
+A & AI & 2009 & -0.3742\tabularnewline
+A & AI & 2010 & -0.7116\tabularnewline
+A & AI & 2011 & 1.128\tabularnewline
+A & AI & 2012 & 1.457\tabularnewline
+A & AI & 2013 & -1.559\tabularnewline
+A & AI & 2014 & -0.1170\tabularnewline
+B & AI & 2000 & -0.02618\tabularnewline
+B & AI & 2001 & -0.6886\tabularnewline
+B & AI & 2002 & 0.06249\tabularnewline
+B & AI & 2003 & -0.7234\tabularnewline
+B & AI & 2004 & 0.4725\tabularnewline
+B & AI & 2005 & -0.9417\tabularnewline
+B & AI & 2006 & -0.3478\tabularnewline
+B & AI & 2007 & 0.5243\tabularnewline
+B & AI & 2008 & 1.832\tabularnewline
+B & AI & 2009 & 0.1071\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/pivot->wider production [}\StringTok{"product"} \StringTok{"country"}\NormalTok{] }\StringTok{"production"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+data/production.csv {[}15 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+year & A\_AI & B\_EI & B\_AI\tabularnewline
+\midrule
+\endhead
+2000 & 1.637 & 1.405 & -0.02618\tabularnewline
+2001 & 0.1587 & -0.5962 & -0.6886\tabularnewline
+2002 & -1.568 & -0.2657 & 0.06249\tabularnewline
+2003 & -0.4446 & 0.6526 & -0.7234\tabularnewline
+2004 & -0.07134 & 0.6256 & 0.4725\tabularnewline
+2005 & 1.612 & -1.345 & -0.9417\tabularnewline
+2006 & -0.7043 & -0.9718 & -0.3478\tabularnewline
+2007 & -1.536 & -1.697 & 0.5243\tabularnewline
+2008 & 0.8391 & 0.04556 & 1.832\tabularnewline
+2009 & -0.3742 & 1.193 & 0.1071\tabularnewline
+2010 & -0.7116 & -1.606 & -0.3290\tabularnewline
+2011 & 1.128 & -0.7724 & -1.783\tabularnewline
+2012 & 1.457 & -2.503 & 0.6113\tabularnewline
+2013 & -1.559 & -1.628 & -0.7853\tabularnewline
+2014 & -0.1170 & 0.03330 & 0.9784\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Multiple value columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ income }\NormalTok{(api/dataset }\StringTok{"data/us_rent_income.csv"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{income}
+\end{Highlighting}
+\end{Shaded}
+
+data/us\_rent\_income.csv {[}104 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+GEOID & NAME & variable & estimate & moe\tabularnewline
+\midrule
+\endhead
+1 & Alabama & income & 24476 & 136\tabularnewline
+1 & Alabama & rent & 747 & 3\tabularnewline
+2 & Alaska & income & 32940 & 508\tabularnewline
+2 & Alaska & rent & 1200 & 13\tabularnewline
+4 & Arizona & income & 27517 & 148\tabularnewline
+4 & Arizona & rent & 972 & 4\tabularnewline
+5 & Arkansas & income & 23789 & 165\tabularnewline
+5 & Arkansas & rent & 709 & 5\tabularnewline
+6 & California & income & 29454 & 109\tabularnewline
+6 & California & rent & 1358 & 3\tabularnewline
+8 & Colorado & income & 32401 & 109\tabularnewline
+8 & Colorado & rent & 1125 & 5\tabularnewline
+9 & Connecticut & income & 35326 & 195\tabularnewline
+9 & Connecticut & rent & 1123 & 5\tabularnewline
+10 & Delaware & income & 31560 & 247\tabularnewline
+10 & Delaware & rent & 1076 & 10\tabularnewline
+11 & District of Columbia & income & 43198 & 681\tabularnewline
+11 & District of Columbia & rent & 1424 & 17\tabularnewline
+12 & Florida & income & 25952 & 70\tabularnewline
+12 & Florida & rent & 1077 & 3\tabularnewline
+13 & Georgia & income & 27024 & 106\tabularnewline
+13 & Georgia & rent & 927 & 3\tabularnewline
+15 & Hawaii & income & 32453 & 218\tabularnewline
+15 & Hawaii & rent & 1507 & 18\tabularnewline
+16 & Idaho & income & 25298 & 208\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/pivot->wider income }\StringTok{"variable"}\NormalTok{ [}\StringTok{"estimate"} \StringTok{"moe"}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+data/us\_rent\_income.csv {[}52 6{]}:
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+GEOID & NAME & estimate-rent & moe-rent & estimate-income &
+moe-income\tabularnewline
+\midrule
+\endhead
+1 & Alabama & 747 & 3 & 24476 & 136\tabularnewline
+2 & Alaska & 1200 & 13 & 32940 & 508\tabularnewline
+4 & Arizona & 972 & 4 & 27517 & 148\tabularnewline
+5 & Arkansas & 709 & 5 & 23789 & 165\tabularnewline
+6 & California & 1358 & 3 & 29454 & 109\tabularnewline
+8 & Colorado & 1125 & 5 & 32401 & 109\tabularnewline
+9 & Connecticut & 1123 & 5 & 35326 & 195\tabularnewline
+10 & Delaware & 1076 & 10 & 31560 & 247\tabularnewline
+11 & District of Columbia & 1424 & 17 & 43198 & 681\tabularnewline
+12 & Florida & 1077 & 3 & 25952 & 70\tabularnewline
+13 & Georgia & 927 & 3 & 27024 & 106\tabularnewline
+15 & Hawaii & 1507 & 18 & 32453 & 218\tabularnewline
+16 & Idaho & 792 & 7 & 25298 & 208\tabularnewline
+17 & Illinois & 952 & 3 & 30684 & 83\tabularnewline
+18 & Indiana & 782 & 3 & 27247 & 117\tabularnewline
+19 & Iowa & 740 & 4 & 30002 & 143\tabularnewline
+20 & Kansas & 801 & 5 & 29126 & 208\tabularnewline
+21 & Kentucky & 713 & 4 & 24702 & 159\tabularnewline
+22 & Louisiana & 825 & 4 & 25086 & 155\tabularnewline
+23 & Maine & 808 & 7 & 26841 & 187\tabularnewline
+24 & Maryland & 1311 & 5 & 37147 & 152\tabularnewline
+25 & Massachusetts & 1173 & 5 & 34498 & 199\tabularnewline
+26 & Michigan & 824 & 3 & 26987 & 82\tabularnewline
+27 & Minnesota & 906 & 4 & 32734 & 189\tabularnewline
+28 & Mississippi & 740 & 5 & 22766 & 194\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Reshape contact data
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ contacts }\NormalTok{(api/dataset }\StringTok{"data/contacts.csv"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{contacts}
+\end{Highlighting}
+\end{Shaded}
+
+data/contacts.csv {[}6 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+field & value & person\_id\tabularnewline
+\midrule
+\endhead
+name & Jiena McLellan & 1\tabularnewline
+company & Toyota & 1\tabularnewline
+name & John Smith & 2\tabularnewline
+company & google & 2\tabularnewline
+email & \href{mailto:john@google.com}{\nolinkurl{john@google.com}} &
+2\tabularnewline
+name & Huxley Ratcliffe & 3\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/pivot->wider contacts }\StringTok{"field"} \StringTok{"value"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+data/contacts.csv {[}3 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+person\_id & email & name & company\tabularnewline
+\midrule
+\endhead
+1 & & Jiena McLellan & Toyota\tabularnewline
+2 & \href{mailto:john@google.com}{\nolinkurl{john@google.com}} & John
+Smith & google\tabularnewline
+3 & & Huxley Ratcliffe &\tabularnewline
+\bottomrule
+\end{longtable}
+
+\paragraph{Reshaping}\label{reshaping}
+
+A couple of \texttt{tidyr} examples of more complex reshaping.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\href{https://tidyr.tidyverse.org/articles/pivot.html\#world-bank}{World
+bank}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ world-bank-pop }\NormalTok{(api/dataset }\StringTok{"data/world_bank_pop.csv.gz"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->>}\NormalTok{ world-bank-pop}
+\NormalTok{     (api/column-names)}
+\NormalTok{     (}\KeywordTok{take} \DecValTok{8}\NormalTok{)}
+\NormalTok{     (api/select-columns world-bank-pop)}
+\NormalTok{     (api/head))}
+\end{Highlighting}
+\end{Shaded}
+
+data/world\_bank\_pop.csv.gz {[}5 8{]}:
+
+\begin{longtable}[]{@{}llllllll@{}}
+\toprule
+country & indicator & 2000 & 2001 & 2002 & 2003 & 2004 &
+2005\tabularnewline
+\midrule
+\endhead
+ABW & SP.URB.TOTL & 4.244E+04 & 4.305E+04 & 4.367E+04 & 4.425E+04 &
+4.467E+04 & 4.489E+04\tabularnewline
+ABW & SP.URB.GROW & 1.183 & 1.413 & 1.435 & 1.310 & 0.9515 &
+0.4913\tabularnewline
+ABW & SP.POP.TOTL & 9.085E+04 & 9.290E+04 & 9.499E+04 & 9.702E+04 &
+9.874E+04 & 1.000E+05\tabularnewline
+ABW & SP.POP.GROW & 2.055 & 2.226 & 2.229 & 2.109 & 1.757 &
+1.302\tabularnewline
+AFG & SP.URB.TOTL & 4.436E+06 & 4.648E+06 & 4.893E+06 & 5.156E+06 &
+5.427E+06 & 5.692E+06\tabularnewline
+\bottomrule
+\end{longtable}
+
+Step 1 - convert years column into values
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ pop2 }\NormalTok{(api/pivot->longer world-bank-pop (}\KeywordTok{map} \KeywordTok{str}\NormalTok{ (}\KeywordTok{range} \DecValTok{2000} \DecValTok{2018}\NormalTok{)) \{}\AttributeTok{:drop-missing}\NormalTok{? }\VariableTok{false}
+                                                                         \AttributeTok{:target-columns}\NormalTok{ [}\StringTok{"year"}\NormalTok{]}
+                                                                         \AttributeTok{:value-column-name} \StringTok{"value"}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pop2}
+\end{Highlighting}
+\end{Shaded}
+
+data/world\_bank\_pop.csv.gz {[}19008 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+country & indicator & year & value\tabularnewline
+\midrule
+\endhead
+ABW & SP.URB.TOTL & 2013 & 4.436E+04\tabularnewline
+ABW & SP.URB.GROW & 2013 & 0.6695\tabularnewline
+ABW & SP.POP.TOTL & 2013 & 1.032E+05\tabularnewline
+ABW & SP.POP.GROW & 2013 & 0.5929\tabularnewline
+AFG & SP.URB.TOTL & 2013 & 7.734E+06\tabularnewline
+AFG & SP.URB.GROW & 2013 & 4.193\tabularnewline
+AFG & SP.POP.TOTL & 2013 & 3.173E+07\tabularnewline
+AFG & SP.POP.GROW & 2013 & 3.315\tabularnewline
+AGO & SP.URB.TOTL & 2013 & 1.612E+07\tabularnewline
+AGO & SP.URB.GROW & 2013 & 4.723\tabularnewline
+AGO & SP.POP.TOTL & 2013 & 2.600E+07\tabularnewline
+AGO & SP.POP.GROW & 2013 & 3.532\tabularnewline
+ALB & SP.URB.TOTL & 2013 & 1.604E+06\tabularnewline
+ALB & SP.URB.GROW & 2013 & 1.744\tabularnewline
+ALB & SP.POP.TOTL & 2013 & 2.895E+06\tabularnewline
+ALB & SP.POP.GROW & 2013 & -0.1832\tabularnewline
+AND & SP.URB.TOTL & 2013 & 7.153E+04\tabularnewline
+AND & SP.URB.GROW & 2013 & -2.119\tabularnewline
+AND & SP.POP.TOTL & 2013 & 8.079E+04\tabularnewline
+AND & SP.POP.GROW & 2013 & -2.013\tabularnewline
+ARB & SP.URB.TOTL & 2013 & 2.186E+08\tabularnewline
+ARB & SP.URB.GROW & 2013 & 2.783\tabularnewline
+ARB & SP.POP.TOTL & 2013 & 3.817E+08\tabularnewline
+ARB & SP.POP.GROW & 2013 & 2.249\tabularnewline
+ARE & SP.URB.TOTL & 2013 & 7.661E+06\tabularnewline
+\bottomrule
+\end{longtable}
+
+Step 2 - separate \texttt{"indicate"} column
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ pop3 }\NormalTok{(api/separate-column pop2}
+                               \StringTok{"indicator"}\NormalTok{ [}\StringTok{"area"} \StringTok{"variable"}\NormalTok{]}
+\NormalTok{                               #(}\KeywordTok{rest}\NormalTok{ (clojure.string/split }\VariableTok{%} \SpecialStringTok{#"\textbackslash{}."}\NormalTok{))))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pop3}
+\end{Highlighting}
+\end{Shaded}
+
+data/world\_bank\_pop.csv.gz {[}19008 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+country & area & variable & year & value\tabularnewline
+\midrule
+\endhead
+ABW & URB & TOTL & 2013 & 4.436E+04\tabularnewline
+ABW & URB & GROW & 2013 & 0.6695\tabularnewline
+ABW & POP & TOTL & 2013 & 1.032E+05\tabularnewline
+ABW & POP & GROW & 2013 & 0.5929\tabularnewline
+AFG & URB & TOTL & 2013 & 7.734E+06\tabularnewline
+AFG & URB & GROW & 2013 & 4.193\tabularnewline
+AFG & POP & TOTL & 2013 & 3.173E+07\tabularnewline
+AFG & POP & GROW & 2013 & 3.315\tabularnewline
+AGO & URB & TOTL & 2013 & 1.612E+07\tabularnewline
+AGO & URB & GROW & 2013 & 4.723\tabularnewline
+AGO & POP & TOTL & 2013 & 2.600E+07\tabularnewline
+AGO & POP & GROW & 2013 & 3.532\tabularnewline
+ALB & URB & TOTL & 2013 & 1.604E+06\tabularnewline
+ALB & URB & GROW & 2013 & 1.744\tabularnewline
+ALB & POP & TOTL & 2013 & 2.895E+06\tabularnewline
+ALB & POP & GROW & 2013 & -0.1832\tabularnewline
+AND & URB & TOTL & 2013 & 7.153E+04\tabularnewline
+AND & URB & GROW & 2013 & -2.119\tabularnewline
+AND & POP & TOTL & 2013 & 8.079E+04\tabularnewline
+AND & POP & GROW & 2013 & -2.013\tabularnewline
+ARB & URB & TOTL & 2013 & 2.186E+08\tabularnewline
+ARB & URB & GROW & 2013 & 2.783\tabularnewline
+ARB & POP & TOTL & 2013 & 3.817E+08\tabularnewline
+ARB & POP & GROW & 2013 & 2.249\tabularnewline
+ARE & URB & TOTL & 2013 & 7.661E+06\tabularnewline
+\bottomrule
+\end{longtable}
+
+Step 3 - Make columns based on \texttt{"variable"} values.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/pivot->wider pop3 }\StringTok{"variable"} \StringTok{"value"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+data/world\_bank\_pop.csv.gz {[}9504 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+country & area & year & GROW & TOTL\tabularnewline
+\midrule
+\endhead
+ABW & URB & 2013 & 0.6695 & 4.436E+04\tabularnewline
+ABW & POP & 2013 & 0.5929 & 1.032E+05\tabularnewline
+AFG & URB & 2013 & 4.193 & 7.734E+06\tabularnewline
+AFG & POP & 2013 & 3.315 & 3.173E+07\tabularnewline
+AGO & URB & 2013 & 4.723 & 1.612E+07\tabularnewline
+AGO & POP & 2013 & 3.532 & 2.600E+07\tabularnewline
+ALB & URB & 2013 & 1.744 & 1.604E+06\tabularnewline
+ALB & POP & 2013 & -0.1832 & 2.895E+06\tabularnewline
+AND & URB & 2013 & -2.119 & 7.153E+04\tabularnewline
+AND & POP & 2013 & -2.013 & 8.079E+04\tabularnewline
+ARB & URB & 2013 & 2.783 & 2.186E+08\tabularnewline
+ARB & POP & 2013 & 2.249 & 3.817E+08\tabularnewline
+ARE & URB & 2013 & 1.555 & 7.661E+06\tabularnewline
+ARE & POP & 2013 & 1.182 & 9.006E+06\tabularnewline
+ARG & URB & 2013 & 1.188 & 3.882E+07\tabularnewline
+ARG & POP & 2013 & 1.047 & 4.254E+07\tabularnewline
+ARM & URB & 2013 & 0.2810 & 1.828E+06\tabularnewline
+ARM & POP & 2013 & 0.4013 & 2.894E+06\tabularnewline
+ASM & URB & 2013 & 0.05798 & 4.831E+04\tabularnewline
+ASM & POP & 2013 & 0.1393 & 5.531E+04\tabularnewline
+ATG & URB & 2013 & 0.3838 & 2.480E+04\tabularnewline
+ATG & POP & 2013 & 1.076 & 9.782E+04\tabularnewline
+AUS & URB & 2013 & 1.875 & 1.979E+07\tabularnewline
+AUS & POP & 2013 & 1.758 & 2.315E+07\tabularnewline
+AUT & URB & 2013 & 0.9196 & 4.862E+06\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\href{https://tidyr.tidyverse.org/articles/pivot.html\#multi-choice}{Multi-choice}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ multi }\NormalTok{(api/dataset \{}\AttributeTok{:id}\NormalTok{ [}\DecValTok{1} \DecValTok{2} \DecValTok{3} \DecValTok{4}\NormalTok{]}
+                         \AttributeTok{:choice1}\NormalTok{ [}\StringTok{"A"} \StringTok{"C"} \StringTok{"D"} \StringTok{"B"}\NormalTok{]}
+                         \AttributeTok{:choice2}\NormalTok{ [}\StringTok{"B"} \StringTok{"B"} \VariableTok{nil} \StringTok{"D"}\NormalTok{]}
+                         \AttributeTok{:choice3}\NormalTok{ [}\StringTok{"C"} \VariableTok{nil} \VariableTok{nil} \VariableTok{nil}\NormalTok{]\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{multi}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}4 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:id & :choice1 & :choice2 & :choice3\tabularnewline
+\midrule
+\endhead
+1 & A & B & C\tabularnewline
+2 & C & B &\tabularnewline
+3 & D & &\tabularnewline
+4 & B & D &\tabularnewline
+\bottomrule
+\end{longtable}
+
+Step 1 - convert all choices into rows and add artificial column to all
+values which are not missing.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ multi2 }\NormalTok{(}\KeywordTok{->}\NormalTok{ multi}
+\NormalTok{                (api/pivot->longer (}\KeywordTok{complement}\NormalTok{ #\{}\AttributeTok{:id}\NormalTok{\}))}
+\NormalTok{                (api/add-or-update-column }\AttributeTok{:checked} \VariableTok{true}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{multi2}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}8 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:id & :\$column & :\$value & :checked\tabularnewline
+\midrule
+\endhead
+1 & :choice1 & A & true\tabularnewline
+2 & :choice1 & C & true\tabularnewline
+3 & :choice1 & D & true\tabularnewline
+4 & :choice1 & B & true\tabularnewline
+1 & :choice2 & B & true\tabularnewline
+2 & :choice2 & B & true\tabularnewline
+4 & :choice2 & D & true\tabularnewline
+1 & :choice3 & C & true\tabularnewline
+\bottomrule
+\end{longtable}
+
+Step 2 - Convert back to wide form with actual choices as columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ multi2}
+\NormalTok{    (api/drop-columns :$column)}
+\NormalTok{    (api/pivot->wider :$value }\AttributeTok{:checked}\NormalTok{ \{}\AttributeTok{:drop-missing}\NormalTok{? }\VariableTok{false}\NormalTok{\})}
+\NormalTok{    (api/order-by }\AttributeTok{:id}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}4 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:id & A & B & C & D\tabularnewline
+\midrule
+\endhead
+1 & true & true & true &\tabularnewline
+2 & & true & true &\tabularnewline
+3 & & & & true\tabularnewline
+4 & & true & & true\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\href{https://tidyr.tidyverse.org/articles/pivot.html\#by-hand}{Construction}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ construction }\NormalTok{(api/dataset }\StringTok{"data/construction.csv"}\NormalTok{))}
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ construction-unit-map }\NormalTok{\{}\StringTok{"1 unit"} \StringTok{"1"}
+                            \StringTok{"2 to 4 units"} \StringTok{"2-4"}
+                            \StringTok{"5 units or more"} \StringTok{"5+"}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{construction}
+\end{Highlighting}
+\end{Shaded}
+
+data/construction.csv {[}9 9{]}:
+
+\begin{longtable}[]{@{}lllllllll@{}}
+\toprule
+Year & Month & 1 unit & 2 to 4 units & 5 units or more & Northeast &
+Midwest & South & West\tabularnewline
+\midrule
+\endhead
+2018 & January & 859 & & 348 & 114 & 169 & 596 & 339\tabularnewline
+2018 & February & 882 & & 400 & 138 & 160 & 655 & 336\tabularnewline
+2018 & March & 862 & & 356 & 150 & 154 & 595 & 330\tabularnewline
+2018 & April & 797 & & 447 & 144 & 196 & 613 & 304\tabularnewline
+2018 & May & 875 & & 364 & 90 & 169 & 673 & 319\tabularnewline
+2018 & June & 867 & & 342 & 76 & 170 & 610 & 360\tabularnewline
+2018 & July & 829 & & 360 & 108 & 183 & 594 & 310\tabularnewline
+2018 & August & 939 & & 286 & 90 & 205 & 649 & 286\tabularnewline
+2018 & September & 835 & & 304 & 117 & 175 & 560 & 296\tabularnewline
+\bottomrule
+\end{longtable}
+
+Conversion 1 - Group two column types
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ construction}
+\NormalTok{    (api/pivot->longer }\SpecialStringTok{#"^[125NWS].*|Midwest"}\NormalTok{ \{}\AttributeTok{:target-columns}\NormalTok{ [}\AttributeTok{:units} \AttributeTok{:region}\NormalTok{]}
+                                               \AttributeTok{:splitter}\NormalTok{ (}\KeywordTok{fn}\NormalTok{ [col-name]}
+\NormalTok{                                                           (}\KeywordTok{if}\NormalTok{ (}\KeywordTok{re-matches} \SpecialStringTok{#"^[125].*"}\NormalTok{ col-name)}
+\NormalTok{                                                             [(construction-unit-map col-name) }\VariableTok{nil}\NormalTok{]}
+\NormalTok{                                                             [}\VariableTok{nil}\NormalTok{ col-name]))}
+                                               \AttributeTok{:value-column-name} \AttributeTok{:n}
+                                               \AttributeTok{:drop-missing}\NormalTok{? }\VariableTok{false}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+data/construction.csv {[}63 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+Year & Month & :units & :region & :n\tabularnewline
+\midrule
+\endhead
+2018 & January & 1 & & 859\tabularnewline
+2018 & February & 1 & & 882\tabularnewline
+2018 & March & 1 & & 862\tabularnewline
+2018 & April & 1 & & 797\tabularnewline
+2018 & May & 1 & & 875\tabularnewline
+2018 & June & 1 & & 867\tabularnewline
+2018 & July & 1 & & 829\tabularnewline
+2018 & August & 1 & & 939\tabularnewline
+2018 & September & 1 & & 835\tabularnewline
+2018 & January & 2-4 & &\tabularnewline
+2018 & February & 2-4 & &\tabularnewline
+2018 & March & 2-4 & &\tabularnewline
+2018 & April & 2-4 & &\tabularnewline
+2018 & May & 2-4 & &\tabularnewline
+2018 & June & 2-4 & &\tabularnewline
+2018 & July & 2-4 & &\tabularnewline
+2018 & August & 2-4 & &\tabularnewline
+2018 & September & 2-4 & &\tabularnewline
+2018 & January & 5+ & & 348\tabularnewline
+2018 & February & 5+ & & 400\tabularnewline
+2018 & March & 5+ & & 356\tabularnewline
+2018 & April & 5+ & & 447\tabularnewline
+2018 & May & 5+ & & 364\tabularnewline
+2018 & June & 5+ & & 342\tabularnewline
+2018 & July & 5+ & & 360\tabularnewline
+\bottomrule
+\end{longtable}
+
+Conversion 2 - Convert to longer form and back and rename columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ construction}
+\NormalTok{    (api/pivot->longer }\SpecialStringTok{#"^[125NWS].*|Midwest"}\NormalTok{ \{}\AttributeTok{:target-columns}\NormalTok{ [}\AttributeTok{:units} \AttributeTok{:region}\NormalTok{]}
+                                               \AttributeTok{:splitter}\NormalTok{ (}\KeywordTok{fn}\NormalTok{ [col-name]}
+\NormalTok{                                                           (}\KeywordTok{if}\NormalTok{ (}\KeywordTok{re-matches} \SpecialStringTok{#"^[125].*"}\NormalTok{ col-name)}
+\NormalTok{                                                             [(construction-unit-map col-name) }\VariableTok{nil}\NormalTok{]}
+\NormalTok{                                                             [}\VariableTok{nil}\NormalTok{ col-name]))}
+                                               \AttributeTok{:value-column-name} \AttributeTok{:n}
+                                               \AttributeTok{:drop-missing}\NormalTok{? }\VariableTok{false}\NormalTok{\})}
+\NormalTok{    (api/pivot->wider [}\AttributeTok{:units} \AttributeTok{:region}\NormalTok{] }\AttributeTok{:n}\NormalTok{)}
+\NormalTok{    (api/rename-columns (}\KeywordTok{zipmap}\NormalTok{ (}\KeywordTok{vals}\NormalTok{ construction-unit-map)}
+\NormalTok{                                (}\KeywordTok{keys}\NormalTok{ construction-unit-map))))}
+\end{Highlighting}
+\end{Shaded}
+
+data/construction.csv {[}9 9{]}:
+
+\begin{longtable}[]{@{}lllllllll@{}}
+\toprule
+Year & Month & Midwest & 5 units or more & 2 to 4 units & Northeast &
+South & 1 unit & West\tabularnewline
+\midrule
+\endhead
+2018 & January & 169 & 348 & & 114 & 596 & 859 & 339\tabularnewline
+2018 & February & 160 & 400 & & 138 & 655 & 882 & 336\tabularnewline
+2018 & March & 154 & 356 & & 150 & 595 & 862 & 330\tabularnewline
+2018 & April & 196 & 447 & & 144 & 613 & 797 & 304\tabularnewline
+2018 & May & 169 & 364 & & 90 & 673 & 875 & 319\tabularnewline
+2018 & June & 170 & 342 & & 76 & 610 & 867 & 360\tabularnewline
+2018 & July & 183 & 360 & & 108 & 594 & 829 & 310\tabularnewline
+2018 & August & 205 & 286 & & 90 & 649 & 939 & 286\tabularnewline
+2018 & September & 175 & 304 & & 117 & 560 & 835 & 296\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Various operations on stocks, examples taken from
+\href{https://tidyr.tidyverse.org/reference/gather.html}{gather} and
+\href{https://tidyr.tidyverse.org/reference/spread.html}{spread}
+manuals.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ stocks-tidyr }\NormalTok{(api/dataset }\StringTok{"data/stockstidyr.csv"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{stocks-tidyr}
+\end{Highlighting}
+\end{Shaded}
+
+data/stockstidyr.csv {[}10 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+time & X & Y & Z\tabularnewline
+\midrule
+\endhead
+2009-01-01 & 1.310 & -1.890 & -1.779\tabularnewline
+2009-01-02 & -0.2999 & -1.825 & 2.399\tabularnewline
+2009-01-03 & 0.5365 & -1.036 & -3.987\tabularnewline
+2009-01-04 & -1.884 & -0.5218 & -2.831\tabularnewline
+2009-01-05 & -0.9605 & -2.217 & 1.437\tabularnewline
+2009-01-06 & -1.185 & -2.894 & 3.398\tabularnewline
+2009-01-07 & -0.8521 & -2.168 & -1.201\tabularnewline
+2009-01-08 & 0.2523 & -0.3285 & -1.532\tabularnewline
+2009-01-09 & 0.4026 & 1.964 & -6.809\tabularnewline
+2009-01-10 & -0.6438 & 2.686 & -2.559\tabularnewline
+\bottomrule
+\end{longtable}
+
+Convert to longer form
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ stocks-long }\NormalTok{(api/pivot->longer stocks-tidyr [}\StringTok{"X"} \StringTok{"Y"} \StringTok{"Z"}\NormalTok{] \{}\AttributeTok{:value-column-name} \AttributeTok{:price}
+                                                                \AttributeTok{:target-columns} \AttributeTok{:stocks}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{stocks-long}
+\end{Highlighting}
+\end{Shaded}
+
+data/stockstidyr.csv {[}30 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+time & :stocks & :price\tabularnewline
+\midrule
+\endhead
+2009-01-01 & X & 1.310\tabularnewline
+2009-01-02 & X & -0.2999\tabularnewline
+2009-01-03 & X & 0.5365\tabularnewline
+2009-01-04 & X & -1.884\tabularnewline
+2009-01-05 & X & -0.9605\tabularnewline
+2009-01-06 & X & -1.185\tabularnewline
+2009-01-07 & X & -0.8521\tabularnewline
+2009-01-08 & X & 0.2523\tabularnewline
+2009-01-09 & X & 0.4026\tabularnewline
+2009-01-10 & X & -0.6438\tabularnewline
+2009-01-01 & Y & -1.890\tabularnewline
+2009-01-02 & Y & -1.825\tabularnewline
+2009-01-03 & Y & -1.036\tabularnewline
+2009-01-04 & Y & -0.5218\tabularnewline
+2009-01-05 & Y & -2.217\tabularnewline
+2009-01-06 & Y & -2.894\tabularnewline
+2009-01-07 & Y & -2.168\tabularnewline
+2009-01-08 & Y & -0.3285\tabularnewline
+2009-01-09 & Y & 1.964\tabularnewline
+2009-01-10 & Y & 2.686\tabularnewline
+2009-01-01 & Z & -1.779\tabularnewline
+2009-01-02 & Z & 2.399\tabularnewline
+2009-01-03 & Z & -3.987\tabularnewline
+2009-01-04 & Z & -2.831\tabularnewline
+2009-01-05 & Z & 1.437\tabularnewline
+\bottomrule
+\end{longtable}
+
+Convert back to wide form
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/pivot->wider stocks-long }\AttributeTok{:stocks} \AttributeTok{:price}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+data/stockstidyr.csv {[}10 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+time & Z & X & Y\tabularnewline
+\midrule
+\endhead
+2009-01-01 & -1.779 & 1.310 & -1.890\tabularnewline
+2009-01-02 & 2.399 & -0.2999 & -1.825\tabularnewline
+2009-01-03 & -3.987 & 0.5365 & -1.036\tabularnewline
+2009-01-04 & -2.831 & -1.884 & -0.5218\tabularnewline
+2009-01-05 & 1.437 & -0.9605 & -2.217\tabularnewline
+2009-01-06 & 3.398 & -1.185 & -2.894\tabularnewline
+2009-01-07 & -1.201 & -0.8521 & -2.168\tabularnewline
+2009-01-08 & -1.532 & 0.2523 & -0.3285\tabularnewline
+2009-01-09 & -6.809 & 0.4026 & 1.964\tabularnewline
+2009-01-10 & -2.559 & -0.6438 & 2.686\tabularnewline
+\bottomrule
+\end{longtable}
+
+Convert to wide form on time column (let's limit values to a couple of
+rows)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ stocks-long}
+\NormalTok{    (api/select-rows (}\KeywordTok{range} \DecValTok{0} \DecValTok{30} \DecValTok{4}\NormalTok{))}
+\NormalTok{    (api/pivot->wider }\StringTok{"time"} \AttributeTok{:price}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+data/stockstidyr.csv {[}3 6{]}:
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+:stocks & 2009-01-05 & 2009-01-07 & 2009-01-01 & 2009-01-03 &
+2009-01-09\tabularnewline
+\midrule
+\endhead
+X & -0.9605 & & 1.310 & & 0.4026\tabularnewline
+Z & 1.437 & & -1.779 & & -6.809\tabularnewline
+Y & & -2.168 & & -1.036 &\tabularnewline
+\bottomrule
+\end{longtable}
 
 \subsubsection{Join/Concat}\label{joinconcat}
 

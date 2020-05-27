@@ -136,11 +136,10 @@
    (reduce-kv (fn [ds k v] (add-or-update-column ds k v size-strategy)) ds columns-map)))
 
 (defn map-columns
-  ([ds column-name map-fn columns-selector] (map-columns ds column-name map-fn columns-selector nil))
-  ([ds column-name map-fn columns-selector meta-field]
-   (if (grouped? ds)
-     (process-group-data ds #(map-columns % column-name map-fn columns-selector meta-field))
-     (apply ds/column-map ds column-name map-fn (column-names ds columns-selector meta-field)))))
+  [ds column-name map-fn columns-selector]
+  (if (grouped? ds)
+    (process-group-data ds #(map-columns % column-name map-fn columns-selector))
+    (apply ds/column-map ds column-name map-fn (column-names ds columns-selector))))
 
 (defn reorder-columns
   "Reorder columns using column selector(s). When column names are incomplete, the missing will be attached at the end."

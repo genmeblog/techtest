@@ -471,7 +471,7 @@
 ;;    |    B |       L |  9 |
 ;;    |    B |       M |  9 |
 
-(pivot->wider (select-columns warpbreaks ["wool" "tension" "breaks"]) "wool" "breaks" {:fold-fn vec})
+(pivot->wider (reorder-columns warpbreaks ["wool" "tension" "breaks"]) "wool" "breaks" {:fold-fn vec})
 
 ;; => data/warpbreaks.csv [3 3]:
 ;;    | tension |                            B |                            A |

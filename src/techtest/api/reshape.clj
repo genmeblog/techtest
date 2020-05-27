@@ -14,16 +14,16 @@
             [techtest.api.missing :refer [drop-missing]]))
 
 (defn- regroup-cols-from-template
-  [ds cols target-cols value-name column-split-fn]
-  (let [template? (some nil? target-cols)
+  [ds cols target-columns value-name column-split-fn]
+  (let [template? (some nil? target-columns)
         pre-groups (->> cols
                         (map (fn [col-name]
                                (let [col (ds col-name)
                                      split (column-split-fn col-name)
                                      buff (if template? {} {value-name col})]
                                  (into buff (mapv (fn [k v] (if k [k v] [v col]))
-                                                  target-cols split))))))
-        groups (-> (->> target-cols
+                                                  target-columns split))))))
+        groups (-> (->> target-columns
                         (remove nil?)
                         (map #(fn [n] (get n %)))
                         (apply juxt))
@@ -38,7 +38,7 @@
                                :else vector)]
      (regroup-cols-from-template ds cols names value-name column-split-fn))))
 
-(defn- pre-longer->target-cols
+(defn- pre-longer->target-columns
   [ds cnt m]
   (let [new-cols (map (fn [[col-name maybe-column]]
                         (if (col/is-column? maybe-column)
@@ -49,23 +49,23 @@
 (defn pivot->longer
   "`tidyr` pivot_longer api"
   ([ds columns-selector] (pivot->longer ds columns-selector nil))
-  ([ds columns-selector {:keys [target-cols value-column-name splitter drop-missing? meta-field datatypes]
-                         :or {target-cols :$column
+  ([ds columns-selector {:keys [target-columns value-column-name splitter drop-missing? datatypes]
+                         :or {target-columns :$column
                               value-column-name :$value
                               drop-missing? true}}]
-   (let [cols (column-names ds columns-selector meta-field)
-         target-cols (if (iterable-sequence? target-cols) target-cols [target-cols])
-         groups (cols->pre-longer ds cols target-cols value-column-name splitter)
+   (let [cols (column-names ds columns-selector)
+         target-columns (if (iterable-sequence? target-columns) target-columns [target-columns])
+         groups (cols->pre-longer ds cols target-columns value-column-name splitter)
          cols-to-add (keys (clojure.core/first groups))
          ds-template (drop-columns ds cols)
-         cnt (ds/row-count ds-template)]
+         cnt (ds/row-count ds)]
      (as-> (ds/set-metadata (->> groups                                        
-                                 (map (partial pre-longer->target-cols ds-template cnt))
+                                 (map (partial pre-longer->target-columns ds-template cnt))
                                  (apply ds/concat))
                             (ds/metadata ds)) final-ds
        (if drop-missing? (drop-missing final-ds cols-to-add) final-ds)
        (if datatypes (convert-column-type final-ds datatypes) final-ds)
-       (reorder-columns final-ds (ds/column-names ds-template) (remove nil? target-cols))))))
+       (reorder-columns final-ds (ds/column-names ds-template) (remove nil? target-columns))))))
 
 (defn- drop-join-leftovers
   [data join-name]
@@ -79,15 +79,14 @@
 
 (defn- make-apply-join-fn
   "Perform left-join on groups and create new columns"
-  [group-name->names single-value? value-names join-name starting-ds-count fold-fn rename-map]
+  [group-name->names single-value? value-names join-name starting-ds-count fold-fn separator value-separator]
   (fn [curr-ds {:keys [name group-id data]}]
-    (let [col-name (str/join "_" (->> name
-                                      group-name->names
-                                      (remove nil?))) ;; source names
-          col-name (get rename-map col-name col-name)
+    (let [col-name (str/join separator (->> name
+                                            group-name->names
+                                            (remove nil?))) ;; source names
           target-names (if single-value?
                          [col-name]
-                         (map #(str % "-" col-name) value-names)) ;; traget column names
+                         (map #(str % value-separator col-name) value-names)) ;; traget column names
           rename-map (zipmap value-names target-names) ;; renaming map
           data (-> data
                    (rename-columns rename-map) ;; rename value column
@@ -103,7 +102,8 @@
 
 (defn pivot->wider
   ([ds columns-selector value-columns] (pivot->wider ds columns-selector value-columns nil))
-  ([ds columns-selector value-columns {:keys [fold-fn rename-map]}]
+  ([ds columns-selector value-columns {:keys [fold-fn separator value-separator]
+                                       :or {separator "_" value-separator "-"}}]
    (let [col-names (column-names ds columns-selector) ;; columns to be unrolled
          value-names (column-names ds value-columns) ;; columns to be used as values
          single-value? (= (count value-names) 1) ;; maybe this is one column? (different name creation rely on this)
@@ -127,7 +127,8 @@
                                 (map #(fn [m] (get m %)))
                                 (apply juxt)) ;; create function which extract new column name
          result (reduce (make-apply-join-fn group-name->names single-value? value-names
-                                            join-name starting-ds-count fold-fn rename-map)
+                                            join-name starting-ds-count fold-fn
+                                            separator value-separator)
                         starting-ds
                         (ds/mapseq-reader grouped-ds))] ;; perform join on groups and create new columns
      (-> (if join-on-single? ;; finalize, recreate original columns from join column, and reorder stuff
@@ -135,4 +136,3 @@
            (-> (separate-column result join-name rest-cols identity {:drop-column? true})
                (reorder-columns rest-cols)))
          (ds/set-dataset-name (ds/dataset-name ds))))))
-

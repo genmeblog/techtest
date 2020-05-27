@@ -705,7 +705,7 @@ To select dataset columns or column names `columns-selector` is used. `columns-s
 
 Column name can be anything.
 
-`column-names` function returns names according to `columns-selector` and optional `meta-filed`. `meta-field` is one of the following:
+`column-names` function returns names according to `columns-selector` and optional `meta-field`. `meta-field` is one of the following:
 
 * `:name` (default) - to operate on column names
 * `:datatype` - to operated on column types
@@ -989,7 +989,6 @@ Arguments:
 * `column-name` - target column name
 * `map-fn` - mapping function
 * `columns-selector` - columns selected
-* `meta-field` (optional) - column selector option
 
 ---
 
@@ -997,7 +996,7 @@ Let's add numerical columns together
 
 ```{clojure results="asis"}
 (api/map-columns DS :sum-of-numbers (fn [& rows]
-                                      (reduce + rows)) #{:int64 :float64} :datatype)
+                                      (reduce + rows)) (api/column-names DS  #{:int64 :float64} :datatype))
 ```
 
 The same works on grouped dataset
@@ -1006,7 +1005,7 @@ The same works on grouped dataset
 (-> DS
     (api/group-by :V4)
     (api/map-columns :sum-of-numbers (fn [& rows]
-                                       (reduce + rows)) #{:int64 :float64} :datatype)
+                                       (reduce + rows)) (api/column-names DS  #{:int64 :float64} :datatype))
     (api/ungroup))
 ```
 
@@ -2156,6 +2155,27 @@ Both functions work only on regular dataset.
 
 #### Longer
 
+`pivot->longer` converts columns to rows. Column names are treated as data.
+
+Arguments:
+
+* dataset
+* columns selector
+* options:
+    - `:target-columns` - column name(s) where source column names are stored, or columns pattern (see below) (default: `:$column`)
+    - `:value-column-name` - name of the column for values (default: `:$value`)
+    - `:splitter` - regular expression or function which splits source column names into data
+    - `:drop-missing?` - remove rows with missing? (default: `:true`)
+    - `:datatypes` - map of target columns data types
+
+`:target-columns` - can be:
+
+* column name - source columns names are put there as a data
+* column names as seqence - source columns names after split are put separately into `:target-columns` as data
+* pattern - is a sequence of names, where some of the names are `nil`. `nil` is replaced by a name taken from splitter and such column is used for values.
+
+---
+
 Create rows from all columns but `"religion"`.
 
 ```{clojure results="hide"}
@@ -2182,13 +2202,13 @@ Convert only columns starting with `"wk"` and pack them into `:week` column, val
 ```{clojure results="asis"}
 (->> bilboard
      (api/column-names)
-     (take 11)
+     (take 13)
      (api/select-columns bilboard)
      (api/head))
 ```
 
 ```{clojure results="asis"}
-(api/pivot->longer bilboard #(clojure.string/starts-with? % "wk") {:target-cols :week
+(api/pivot->longer bilboard #(clojure.string/starts-with? % "wk") {:target-columns :week
                                                                    :value-column-name :rank})
 ```
 
@@ -2197,7 +2217,7 @@ Convert only columns starting with `"wk"` and pack them into `:week` column, val
 We can create numerical column out of column names
 
 ```{clojure results="asis"}
-(api/pivot->longer bilboard #(clojure.string/starts-with? % "wk") {:target-cols :week
+(api/pivot->longer bilboard #(clojure.string/starts-with? % "wk") {:target-columns :week
                                                                    :value-column-name :rank
                                                                    :splitter #"wk(.*)"
                                                                    :datatypes {:week :int16}})
@@ -2206,9 +2226,370 @@ We can create numerical column out of column names
 
 ---
 
+When column names contain observation data, such column names can be splitted and data can be restored into separate columns.
 
+```{clojure results="hide"}
+(def who (api/dataset "data/who.csv.gz"))
+```
+
+```{clojure results="asis"}
+(->> who
+     (api/column-names)
+     (take 10)
+     (api/select-columns who)
+     (api/head))
+```
+
+```{clojure results="asis"}
+(api/pivot->longer who #(clojure.string/starts-with? % "new") {:target-columns [:diagnosis :gender :age]
+                                                               :splitter #"new_?(.*)_(.)(.*)"
+                                                               :value-column-name :count})
+```
+
+---
+
+When data contains multiple observations per row, we can use splitter and pattern for target columns to create new columns and put values there. In following dataset we have two obseravations `dob` and `gender` for two childs. We want to put child infomation into the column and leave dob and gender for values.
+
+```{clojure results="hide"}
+(def family (api/dataset "data/family.csv"))
+```
+
+```{clojure results="asis"}
+family
+```
+
+```{clojure results="asis"}
+(api/pivot->longer family (complement #{"family"}) {:target-columns [nil :child]
+                                                    :splitter #(clojure.string/split % #"_")
+                                                    :datatypes {"gender" :int16}})
+```
+
+---
+
+Similar here, we have two observations: `x` and `y` in four groups.
+
+```{clojure results="hide"}
+(def anscombe (api/dataset "data/anscombe.csv"))
+```
+
+```{clojure results="asis"}
+anscombe
+```
+
+```{clojure results="asis"}
+(api/pivot->longer anscombe :all {:splitter #"(.)(.)"
+                                  :target-columns [nil :set]})
+```
+
+---
+
+```{clojure results="hide"}
+(def pnl (api/dataset {:x [1 2 3 4]
+                       :a [1 1 0 0]
+                       :b [0 1 1 1]
+                       :y1 (repeatedly 4 rand)
+                       :y2 (repeatedly 4 rand)
+                       :z1 [3 3 3 3]
+                       :z2 [-2 -2 -2 -2]}))
+```
+
+```{clojure results="asis"}
+pnl
+```
+
+```{clojure results="asis"}
+(api/pivot->longer pnl [:y1 :y2 :z1 :z2] {:target-columns [nil :times]
+                                          :splitter #":(.)(.)"})
+```
 
 #### Wider
+
+`pivot->wider` converts rows to columns.
+
+Arguments:
+
+* dataset
+* columns selector - values from selected columns are converted to new columns
+* value columns - what are values
+
+When multiple columns are used as columns selector, names are joined using `:separator` (default: "_") option.
+
+When columns selector creates non unique set of values, they are folded using `:fold-fn` (default: `vec`) option.
+
+When value columns are a sequence, multiple observations as columns are created appending value column names into new columns. Column names are joined using `:value-separator` (default: "-") option.
+
+---
+
+Use `station` as a name source for columns and `seen` for values
+
+```{clojure results="hide"}
+(def fish (api/dataset "data/fish_encounters.csv"))
+```
+
+```{clojure results="asis"}
+fish
+```
+
+```{clojure results="asis"}
+(api/pivot->wider fish "station" "seen")
+```
+
+---
+
+If selected columns contain multiple values, such values should be folded.
+
+```{clojure results="hide"}
+(def warpbreaks (api/dataset "data/warpbreaks.csv"))
+```
+
+```{clojure results="asis"}
+warpbreaks
+```
+
+Let's see how many values are for each type of `wool` and `tension` groups
+
+```{clojure results="asis"}
+(-> warpbreaks
+    (api/group-by ["wool" "tension"])
+    (api/aggregate {:n api/row-count}))
+```
+
+```{clojure results="asis"}
+(-> warpbreaks
+    (api/reorder-columns ["wool" "tension" "breaks"])
+    (api/pivot->wider "wool" "breaks" {:fold-fn vec}))
+```
+
+We can also calculate mean (aggreate values)
+
+```{clojure results="asis"}
+(-> warpbreaks
+    (api/reorder-columns ["wool" "tension" "breaks"])
+    (api/pivot->wider "wool" "breaks" {:fold-fn tech.v2.datatype.functional/mean}))
+```
+
+---
+
+Multiple source columns, joined with default separator.
+
+```{clojure results="hide"}
+(def production (api/dataset "data/production.csv"))
+```
+
+```{clojure results="asis"}
+production
+```
+
+```{clojure results="asis"}
+(api/pivot->wider production ["product" "country"] "production")
+```
+
+---
+
+Multiple value columns
+
+```{clojure results="hide"}
+(def income (api/dataset "data/us_rent_income.csv"))
+```
+
+```{clojure results="asis"}
+income
+```
+
+```{clojure results="asis"}
+(api/pivot->wider income "variable" ["estimate" "moe"])
+```
+
+---
+
+Reshape contact data
+
+```{clojure results="hide"}
+(def contacts (api/dataset "data/contacts.csv"))
+```
+
+```{clojure results="asis"}
+contacts
+```
+
+```{clojure results="asis"}
+(api/pivot->wider contacts "field" "value")
+
+```
+
+#### Reshaping
+
+A couple of `tidyr` examples of more complex reshaping.
+
+---
+
+[World bank](https://tidyr.tidyverse.org/articles/pivot.html#world-bank)
+
+```{clojure results="hide"}
+(def world-bank-pop (api/dataset "data/world_bank_pop.csv.gz"))
+```
+
+```{clojure results="asis"}
+(->> world-bank-pop
+     (api/column-names)
+     (take 8)
+     (api/select-columns world-bank-pop)
+     (api/head))
+```
+
+Step 1 - convert years column into values
+
+```{clojure results="hide"}
+(def pop2 (api/pivot->longer world-bank-pop (map str (range 2000 2018)) {:drop-missing? false
+                                                                         :target-columns ["year"]
+                                                                         :value-column-name "value"}))
+```
+
+```{clojure results="asis"}
+pop2
+```
+
+Step 2 - separate `"indicate"` column
+
+```{clojure results="hide"}
+(def pop3 (api/separate-column pop2
+                               "indicator" ["area" "variable"]
+                               #(rest (clojure.string/split % #"\."))))
+```
+
+```{clojure results="asis"}
+pop3
+```
+
+Step 3 - Make columns based on `"variable"` values.
+
+```{clojure results="asis"}
+(api/pivot->wider pop3 "variable" "value")
+```
+
+---
+
+---
+
+[Multi-choice](https://tidyr.tidyverse.org/articles/pivot.html#multi-choice)
+
+```{clojure results="hide"}
+(def multi (api/dataset {:id [1 2 3 4]
+                         :choice1 ["A" "C" "D" "B"]
+                         :choice2 ["B" "B" nil "D"]
+                         :choice3 ["C" nil nil nil]}))
+```
+
+```{clojure results="asis"}
+multi
+```
+
+Step 1 - convert all choices into rows and add artificial column to all values which are not missing.
+
+```{clojure results="hide"}
+(def multi2 (-> multi
+                (api/pivot->longer (complement #{:id}))
+                (api/add-or-update-column :checked true)))
+```
+
+```{clojure results="asis"}
+multi2
+```
+
+Step 2 - Convert back to wide form with actual choices as columns
+
+```{clojure results="asis"}
+(-> multi2
+    (api/drop-columns :$column)
+    (api/pivot->wider :$value :checked {:drop-missing? false})
+    (api/order-by :id))
+```
+
+---
+
+---
+
+[Construction](https://tidyr.tidyverse.org/articles/pivot.html#by-hand)
+
+```{clojure results="hide"}
+(def construction (api/dataset "data/construction.csv"))
+(def construction-unit-map {"1 unit" "1"
+                            "2 to 4 units" "2-4"
+                            "5 units or more" "5+"})
+
+```
+
+```{clojure results="asis"}
+construction
+```
+
+Conversion 1 - Group two column types
+
+```{clojure results="asis"}
+(-> construction
+    (api/pivot->longer #"^[125NWS].*|Midwest" {:target-columns [:units :region]
+                                               :splitter (fn [col-name]
+                                                           (if (re-matches #"^[125].*" col-name)
+                                                             [(construction-unit-map col-name) nil]
+                                                             [nil col-name]))
+                                               :value-column-name :n
+                                               :drop-missing? false}))
+```
+
+Conversion 2 - Convert to longer form and back and rename columns
+
+```{clojure results="asis"}
+(-> construction
+    (api/pivot->longer #"^[125NWS].*|Midwest" {:target-columns [:units :region]
+                                               :splitter (fn [col-name]
+                                                           (if (re-matches #"^[125].*" col-name)
+                                                             [(construction-unit-map col-name) nil]
+                                                             [nil col-name]))
+                                               :value-column-name :n
+                                               :drop-missing? false})
+    (api/pivot->wider [:units :region] :n)
+    (api/rename-columns (zipmap (vals construction-unit-map)
+                                (keys construction-unit-map))))
+```
+
+---
+
+---
+
+Various operations on stocks, examples taken from [gather](https://tidyr.tidyverse.org/reference/gather.html) and [spread](https://tidyr.tidyverse.org/reference/spread.html) manuals.
+
+```{clojure results="hide"}
+(def stocks-tidyr (api/dataset "data/stockstidyr.csv"))
+```
+
+```{clojure results="asis"}
+stocks-tidyr
+```
+
+Convert to longer form
+
+```{clojure results="hide"}
+(def stocks-long (api/pivot->longer stocks-tidyr ["X" "Y" "Z"] {:value-column-name :price
+                                                                :target-columns :stocks}))
+```
+
+```{clojure results="asis"}
+stocks-long
+```
+
+Convert back to wide form
+
+```{clojure results="asis"}
+(api/pivot->wider stocks-long :stocks :price)
+```
+
+Convert to wide form on time column (let's limit values to a couple of rows)
+
+```{clojure results="asis"}
+(-> stocks-long
+    (api/select-rows (range 0 30 4))
+    (api/pivot->wider "time" :price))
+```
 
 ### Join/Concat
 
