@@ -21,6 +21,8 @@ If you want to know more about `tech.ml.dataset` and `tech.ml.datatype` please r
 -   [Date/time](https://github.com/techascent/tech.datatype/blob/master/docs/datetime.md)
 -   [Dataset](https://github.com/techascent/tech.ml.dataset/blob/master/docs/walkthrough.md)
 
+[SOURCE CODE](https://github.com/genmeblog/techtest/blob/master/src/techtest/api.clj)
+
 INFO: The future of this API is not known yet. Two directions are possible: integration into `tech.ml` or development under `Scicloj` organization. For the time being use this repo if you want to try. Join the discussion on [Zulip](https://clojurians.zulipchat.com/#narrow/stream/236259-tech.2Eml.2Edataset.2Edev/topic/api)
 
 Let's require main namespace and define dataset used in most examples:
@@ -74,12 +76,12 @@ Dataset can be created from various of types of Clojure structures and files:
 
 -   data
 -   options (see documentation of `tech.ml.dataset/->dataset` function for full list):
--   `:dataset-name` - name of the dataset
--   `:num-rows` - number of rows to read from file
--   `:header-row?` - indication if first row in file is a header
--   `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
--   `:separator` - column separator
--   `:single-value-column-name` - name of the column when single value is provided
+    -   `:dataset-name` - name of the dataset
+    -   `:num-rows` - number of rows to read from file
+    -   `:header-row?` - indication if first row in file is a header
+    -   `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
+    -   `:separator` - column separator
+    -   `:single-value-column-name` - name of the column when single value is provided
 
 ------------------------------------------------------------------------
 
@@ -313,7 +315,7 @@ Export dataset to a file or output stream can be done by calling `api/write-csv!
 -   dataset
 -   file name with one of the extensions: `.csv`, `.tsv`, `.csv.gz` and `.tsv.gz` or output stream
 -   options:
--   `:separator` - string or separator char.
+    -   `:separator` - string or separator char.
 
 ``` clojure
 (api/write-csv! ds "output.tsv.gz")
@@ -362,8 +364,8 @@ Shape of the dataset, \[row count, column count\]
 General info about dataset. There are three variants:
 
 -   default - containing information about columns with basic statistics
--   `:basic` - just name, row and column count and information if dataset is a result of `group-by` operation
--   `:columns` - columns' metadata
+    -   `:basic` - just name, row and column count and information if dataset is a result of `group-by` operation
+    -   `:columns` - columns' metadata
 
 ``` clojure
 (api/info ds)
@@ -588,7 +590,7 @@ Rows as sequence of sequences
 (take 2 (api/rows ds))
 ```
 
-    ([#object[java.time.LocalDate 0x5a1db149 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x298a20c "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+    ([#object[java.time.LocalDate 0x45cdef0c "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x336b5dc4 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 
 ------------------------------------------------------------------------
 
@@ -598,13 +600,13 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
-    ({"date" #object[java.time.LocalDate 0x6972a18e "2012-01-01"],
+    ({"date" #object[java.time.LocalDate 0x5ef95a9c "2012-01-01"],
       "precipitation" 0.0,
       "temp_min" 5.0,
       "weather" "drizzle",
       "temp_max" 12.8,
       "wind" 4.7}
-     {"date" #object[java.time.LocalDate 0xa646d75 "2012-01-02"],
+     {"date" #object[java.time.LocalDate 0x4dc0d28c "2012-01-02"],
       "precipitation" 10.9,
       "temp_min" 2.8,
       "weather" "rain",
@@ -1700,7 +1702,7 @@ If you want to rename colums use `rename-columns` and pass map where keys are ol
 
 \_unnamed \[9 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@33b6f57d> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@7664734f> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 2   | 2   | 1.000     | B                           |
@@ -1728,7 +1730,7 @@ Function works on grouped dataset
 
 {1 Group: 1 \[5 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@77227969> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@48fc1ae2> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 1   | 3   | 1.500     | C                           |
@@ -1738,7 +1740,7 @@ Function works on grouped dataset
 
 , 2 Group: 2 \[4 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@77227969> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@48fc1ae2> |
 |-----|-----|-----------|-----------------------------|
 | 2   | 2   | 1.000     | B                           |
 | 2   | 4   | 0.5000    | A                           |
@@ -1792,17 +1794,17 @@ Replace one column (column is trimmed)
 
 \_unnamed \[9 4\]:
 
-| :V1      | :V2 | :V3    | :V4 |
-|----------|-----|--------|-----|
-| 0.1303   | 1   | 0.5000 | A   |
-| 0.03161  | 2   | 1.000  | B   |
-| 0.7672   | 3   | 1.500  | C   |
-| 0.9834   | 4   | 0.5000 | A   |
-| 0.5264   | 5   | 1.000  | B   |
-| 0.1822   | 6   | 1.500  | C   |
-| 0.8446   | 7   | 0.5000 | A   |
-| 0.3061   | 8   | 1.000  | B   |
-| 0.003862 | 9   | 1.500  | C   |
+| :V1     | :V2 | :V3    | :V4 |
+|---------|-----|--------|-----|
+| 0.2692  | 1   | 0.5000 | A   |
+| 0.05732 | 2   | 1.000  | B   |
+| 0.5724  | 3   | 1.500  | C   |
+| 0.3523  | 4   | 0.5000 | A   |
+| 0.3753  | 5   | 1.000  | B   |
+| 0.2597  | 6   | 1.500  | C   |
+| 0.2556  | 7   | 0.5000 | A   |
+| 0.1739  | 8   | 1.000  | B   |
+| 0.07748 | 9   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -2202,7 +2204,7 @@ Double array conversion.
 (api/->array DS :V1)
 ```
 
-    #object["[J" 0x417bfcd "[J@417bfcd"]
+    #object["[J" 0x65f0f299 "[J@65f0f299"]
 
 ------------------------------------------------------------------------
 
@@ -2214,7 +2216,7 @@ Function also works on grouped dataset
     (api/->array :V2))
 ```
 
-    (#object["[J" 0x6f8e453f "[J@6f8e453f"] #object["[J" 0xbe1682 "[J@be1682"] #object["[J" 0x63fc1acc "[J@63fc1acc"])
+    (#object["[J" 0x1c06c8f4 "[J@1c06c8f4"] #object["[J" 0x6ee07439 "[J@6ee07439"] #object["[J" 0x4bad618e "[J@4bad618e"])
 
 ------------------------------------------------------------------------
 
@@ -2225,8 +2227,8 @@ You can also cast the type to the other one (if casting is possible):
 (api/->array DS :V1 :float32)
 ```
 
-    #object["[Ljava.lang.String;" 0x4705675e "[Ljava.lang.String;@4705675e"]
-    #object["[F" 0x5c01eb34 "[F@5c01eb34"]
+    #object["[Ljava.lang.String;" 0x8a9ca21 "[Ljava.lang.String;@8a9ca21"]
+    #object["[F" 0x13ad201a "[F@13ad201a"]
 
 ### Rows
 
@@ -2410,7 +2412,7 @@ Random row (single)
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
-| 1   | 3   | 1.500 | C   |
+| 1   | 5   | 1.000 | B   |
 
 ------------------------------------------------------------------------
 
@@ -2424,15 +2426,15 @@ Random `n` (default: row count) rows with repetition.
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 2   | 6   | 1.500  | C   |
-| 1   | 1   | 0.5000 | A   |
-| 2   | 8   | 1.000  | B   |
-| 1   | 5   | 1.000  | B   |
-| 2   | 2   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
 | 1   | 1   | 0.5000 | A   |
 | 2   | 4   | 0.5000 | A   |
-| 2   | 2   | 1.000  | B   |
+| 1   | 1   | 0.5000 | A   |
 | 2   | 8   | 1.000  | B   |
+| 1   | 1   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2444,13 +2446,13 @@ Five random rows with repetition
 
 \_unnamed \[5 4\]:
 
-| :V1 | :V2 | :V3    | :V4 |
-|-----|-----|--------|-----|
-| 1   | 5   | 1.000  | B   |
-| 1   | 7   | 0.5000 | A   |
-| 1   | 3   | 1.500  | C   |
-| 2   | 2   | 1.000  | B   |
-| 2   | 6   | 1.500  | C   |
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 2   | 2   | 1.000 | B   |
+| 2   | 8   | 1.000 | B   |
+| 1   | 3   | 1.500 | C   |
+| 1   | 9   | 1.500 | C   |
+| 1   | 9   | 1.500 | C   |
 
 ------------------------------------------------------------------------
 
@@ -2464,11 +2466,11 @@ Five random, non-repeating rows
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
+| 2   | 2   | 1.000  | B   |
+| 1   | 1   | 0.5000 | A   |
 | 2   | 6   | 1.500  | C   |
-| 1   | 9   | 1.500  | C   |
-| 1   | 7   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
 | 1   | 5   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2482,15 +2484,15 @@ Shuffle dataset
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 3   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
 | 2   | 8   | 1.000  | B   |
 | 2   | 6   | 1.500  | C   |
-| 2   | 4   | 0.5000 | A   |
-| 2   | 2   | 1.000  | B   |
-| 1   | 7   | 0.5000 | A   |
 | 1   | 5   | 1.000  | B   |
-| 1   | 1   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
 | 1   | 9   | 1.500  | C   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 1   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2544,20 +2546,20 @@ Select 5 random rows from each group
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
 | 1   | 7   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
 | 1   | 1   | 0.5000 | A   |
 | 1   | 7   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
 | 2   | 2   | 1.000  | B   |
+| 1   | 5   | 1.000  | B   |
 | 2   | 8   | 1.000  | B   |
-| 2   | 8   | 1.000  | B   |
 | 2   | 2   | 1.000  | B   |
-| 2   | 2   | 1.000  | B   |
-| 1   | 3   | 1.500  | C   |
 | 1   | 9   | 1.500  | C   |
 | 1   | 9   | 1.500  | C   |
 | 2   | 6   | 1.500  | C   |
-| 1   | 3   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
 
 ### Aggregate
 
@@ -5399,10 +5401,10 @@ pnl
 
 | :x  | :a  | :b  | :y1    | :y2    | :z1 | :z2 |
 |-----|-----|-----|--------|--------|-----|-----|
-| 1   | 1   | 0   | 0.7783 | 0.9386 | 3   | -2  |
-| 2   | 1   | 1   | 0.7154 | 0.4173 | 3   | -2  |
-| 3   | 0   | 1   | 0.9651 | 0.3404 | 3   | -2  |
-| 4   | 0   | 1   | 0.2041 | 0.2734 | 3   | -2  |
+| 1   | 1   | 0   | 0.4205 | 0.2707 | 3   | -2  |
+| 2   | 1   | 1   | 0.5510 | 0.7267 | 3   | -2  |
+| 3   | 0   | 1   | 0.7729 | 0.5331 | 3   | -2  |
+| 4   | 0   | 1   | 0.7506 | 0.7585 | 3   | -2  |
 
 ``` clojure
 (api/pivot->longer pnl [:y1 :y2 :z1 :z2] {:target-columns [nil :times]
@@ -5413,14 +5415,14 @@ pnl
 
 | :x  | :a  | :b  | :times | y      | z   |
 |-----|-----|-----|--------|--------|-----|
-| 1   | 1   | 0   | 1      | 0.7783 | 3   |
-| 2   | 1   | 1   | 1      | 0.7154 | 3   |
-| 3   | 0   | 1   | 1      | 0.9651 | 3   |
-| 4   | 0   | 1   | 1      | 0.2041 | 3   |
-| 1   | 1   | 0   | 2      | 0.9386 | -2  |
-| 2   | 1   | 1   | 2      | 0.4173 | -2  |
-| 3   | 0   | 1   | 2      | 0.3404 | -2  |
-| 4   | 0   | 1   | 2      | 0.2734 | -2  |
+| 1   | 1   | 0   | 1      | 0.4205 | 3   |
+| 2   | 1   | 1   | 1      | 0.5510 | 3   |
+| 3   | 0   | 1   | 1      | 0.7729 | 3   |
+| 4   | 0   | 1   | 1      | 0.7506 | 3   |
+| 1   | 1   | 0   | 2      | 0.2707 | -2  |
+| 2   | 1   | 1   | 2      | 0.7267 | -2  |
+| 3   | 0   | 1   | 2      | 0.5331 | -2  |
+| 4   | 0   | 1   | 2      | 0.7585 | -2  |
 
 #### Wider
 
@@ -6227,7 +6229,7 @@ data/stockstidyr.csv \[3 6\]:
 
 ### Join/Concat Datasets
 
-Dataset joins and concatenations functions.
+Dataset join and concatenation functions.
 
 Joins accept left-side and right-side datasets and columns selector. Options are the same as in `tech.ml.dataset` functions.
 
@@ -6567,33 +6569,34 @@ null \[27 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
+| 1   | 5   | 1.000  | B   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
 | 1   | 9   | 1.500  | C   |
 | 1   | 9   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
 | 2   | 6   | 1.500  | C   |
 | 1   | 3   | 1.500  | C   |
-| 1   | 7   | 0.5000 | A   |
 | 2   | 8   | 1.000  | B   |
-| 1   | 3   | 1.500  | C   |
-| 1   | 3   | 1.500  | C   |
-| 2   | 2   | 1.000  | B   |
-| 2   | 8   | 1.000  | B   |
-| 2   | 8   | 1.000  | B   |
-| 2   | 4   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
 | 1   | 7   | 0.5000 | A   |
 | 2   | 8   | 1.000  | B   |
 | 1   | 5   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
 | 1   | 1   | 0.5000 | A   |
-| 1   | 5   | 1.000  | B   |
-| 2   | 4   | 0.5000 | A   |
-| 1   | 3   | 1.500  | C   |
-| 1   | 7   | 0.5000 | A   |
-| 1   | 7   | 0.5000 | A   |
-| 1   | 3   | 1.500  | C   |
-| 2   | 8   | 1.000  | B   |
-| 1   | 3   | 1.500  | C   |
 
-### Functions
+Functions
+---------
 
 This API doesn't provide any statistical, numerical or date/time functions. Use below namespaces:
 
@@ -6604,9 +6607,10 @@ This API doesn't provide any statistical, numerical or date/time functions. Use 
 | `tech.v2.datatype.datetime.operations` | date/time functions                       |
 | `tech.ml.dataset.pipeline`             | pipeline operations                       |
 
-### Other examples
+Other examples
+--------------
 
-#### Flights
+### Flights
 
 ``` clojure
 (defonce flights (api/dataset "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv"))
@@ -6687,7 +6691,7 @@ flights
 | 7     | EWR    | PHX  | -5.103          | 0.2759          |
 | 8     | EWR    | PHX  | 3.548           | 6.226           |
 
-#### Stocks
+### Stocks
 
 ``` clojure
 (defonce stocks (api/dataset "https://raw.githubusercontent.com/techascent/tech.ml.dataset/master/test/data/stocks.csv" {:key-fn keyword}))
@@ -6804,7 +6808,7 @@ stocks
 | AAPL    | 2000  | 21.75    |
 | MSFT    | 2007  | 29.28    |
 
-#### data.table
+### data.table
 
 Snippets taken from [Introduction to data.table](https://rdatatable.gitlab.io/data.table/articles/datatable-intro.html)
 

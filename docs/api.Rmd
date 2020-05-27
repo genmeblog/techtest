@@ -86,6 +86,8 @@ If you want to know more about `tech.ml.dataset` and `tech.ml.datatype` please r
 * [Date/time](https://github.com/techascent/tech.datatype/blob/master/docs/datetime.md)
 * [Dataset](https://github.com/techascent/tech.ml.dataset/blob/master/docs/walkthrough.md)
 
+[SOURCE CODE](https://github.com/genmeblog/techtest/blob/master/src/techtest/api.clj)
+
 INFO: The future of this API is not known yet. Two directions are possible: integration into `tech.ml` or development under `Scicloj` organization. For the time being use this repo if you want to try. Join the discussion on [Zulip](https://clojurians.zulipchat.com/#narrow/stream/236259-tech.2Eml.2Edataset.2Edev/topic/api)
 
 Let's require main namespace and define dataset used in most examples:
@@ -125,12 +127,12 @@ Dataset can be created from various of types of Clojure structures and files:
 
 * data
 * options (see documentation of `tech.ml.dataset/->dataset` function for full list):
-- `:dataset-name` - name of the dataset
-- `:num-rows` - number of rows to read from file
-- `:header-row?` - indication if first row in file is a header
-- `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
-- `:separator` - column separator
-- `:single-value-column-name` - name of the column when single value is provided
+    - `:dataset-name` - name of the dataset
+    - `:num-rows` - number of rows to read from file
+    - `:header-row?` - indication if first row in file is a header
+    - `:key-fn` - function applied to column names (eg. `keyword`, to convert column names to keywords)
+    - `:separator` - column separator
+    - `:single-value-column-name` - name of the column when single value is provided
 
 ---
 
@@ -236,7 +238,7 @@ Export dataset to a file or output stream can be done by calling `api/write-csv!
 * dataset
 * file name with one of the extensions: `.csv`, `.tsv`, `.csv.gz` and `.tsv.gz` or output stream
 * options:
-- `:separator` - string or separator char.
+    - `:separator` - string or separator char.
 
 ```{clojure}
 (api/write-csv! ds "output.tsv.gz")
@@ -276,8 +278,8 @@ Shape of the dataset, [row count, column count]
 General info about dataset. There are three variants:
 
 * default - containing information about columns with basic statistics
-* `:basic` - just name, row and column count and information if dataset is a result of `group-by` operation
-* `:columns` - columns' metadata
+    - `:basic` - just name, row and column count and information if dataset is a result of `group-by` operation
+    - `:columns` - columns' metadata
 
 ```{clojure results="asis"}
 (api/info ds)
@@ -2589,7 +2591,7 @@ Convert to wide form on time column (let's limit values to a couple of rows)
 
 ### Join/Concat Datasets
 
-Dataset joins and concatenations functions.
+Dataset join and concatenation functions.
 
 Joins accept left-side and right-side datasets and columns selector. Options are the same as in `tech.ml.dataset` functions.
 
@@ -2704,7 +2706,7 @@ ds2
 (apply api/concat (repeatedly 3 #(api/random DS)))
 ```
 
-### Functions
+## Functions
 
 This API doesn't provide any statistical, numerical or date/time functions. Use below namespaces:
 
@@ -2715,9 +2717,9 @@ This API doesn't provide any statistical, numerical or date/time functions. Use 
 | `tech.v2.datatype.datetime.operations` | date/time functions |
 | `tech.ml.dataset.pipeline` | pipeline operations |
 
-### Other examples
+## Other examples
 
-#### Flights
+### Flights
 
 ```{clojure results="hide"}
 (defonce flights (api/dataset "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv"))
@@ -2738,7 +2740,7 @@ flights
     )
 ```
 
-#### Stocks
+### Stocks
 
 ```{clojure results="hide"}
 (defonce stocks (api/dataset "https://raw.githubusercontent.com/techascent/tech.ml.dataset/master/test/data/stocks.csv" {:key-fn keyword}))
@@ -2765,7 +2767,7 @@ stocks
                          :$group-name-1 :year}))
 ```
 
-#### data.table
+### data.table
 
 Snippets taken from [Introduction to data.table](https://rdatatable.gitlab.io/data.table/articles/datatable-intro.html)
 
