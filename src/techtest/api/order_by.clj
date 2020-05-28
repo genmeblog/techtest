@@ -4,6 +4,8 @@
             [techtest.api.utils :refer [iterable-sequence?]]
             [techtest.api.group-by :refer [grouped? process-group-data]]))
 
+(set! *unchecked-math* :warn-on-boxed)
+
 (defn- comparator->fn
   [c]
   (cond
@@ -17,13 +19,13 @@
     (comparator->fn orders)
     (if (every? #(= % :asc) orders)
       compare
-      (let [comparators (map comparator->fn orders)]
-        (fn [v1 v2]
+      (let [comparators (mapv comparator->fn orders)]
+        (fn ^long [v1 v2]
           (loop [v1 v1
                  v2 v2
                  cmptrs comparators]
             (if-let [cmptr (first cmptrs)]
-              (let [c (cmptr (first v1) (first v2))]
+              (let [^long c (cmptr (first v1) (first v2))]
                 (if-not (zero? c)
                   c
                   (recur (rest v1) (rest v2) (rest cmptrs))))

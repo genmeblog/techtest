@@ -1010,7 +1010,7 @@ Rows as sequence of sequences
 \end{Shaded}
 
 \begin{verbatim}
-([#object[java.time.LocalDate 0x2bbce75a "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x2ca68dcd "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+([#object[java.time.LocalDate 0x372229e5 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x8f50918 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -1024,13 +1024,13 @@ Rows as sequence of maps
 \end{Shaded}
 
 \begin{verbatim}
-({"date" #object[java.time.LocalDate 0x6b9095be "2012-01-01"],
+({"date" #object[java.time.LocalDate 0x4381a50f "2012-01-01"],
   "precipitation" 0.0,
   "temp_min" 5.0,
   "weather" "drizzle",
   "temp_max" 12.8,
   "wind" 4.7}
- {"date" #object[java.time.LocalDate 0x74239453 "2012-01-02"],
+ {"date" #object[java.time.LocalDate 0x447ce3c4 "2012-01-02"],
   "precipitation" 10.9,
   "temp_min" 2.8,
   "weather" "rain",
@@ -2634,7 +2634,7 @@ where keys are old names, values new ones.
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@76e3ef64}{\nolinkurl{java.lang.Object@76e3ef64}}\tabularnewline
+\href{mailto:java.lang.Object@69194e2b}{\nolinkurl{java.lang.Object@69194e2b}}\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2670,7 +2670,7 @@ Function works on grouped dataset
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@279b69db}{\nolinkurl{java.lang.Object@279b69db}}\tabularnewline
+\href{mailto:java.lang.Object@2e224912}{\nolinkurl{java.lang.Object@2e224912}}\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2686,7 +2686,7 @@ v1 & v2 & {[}1 2 3{]} &
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@279b69db}{\nolinkurl{java.lang.Object@279b69db}}\tabularnewline
+\href{mailto:java.lang.Object@2e224912}{\nolinkurl{java.lang.Object@2e224912}}\tabularnewline
 \midrule
 \endhead
 2 & 2 & 1.000 & B\tabularnewline
@@ -2776,15 +2776,15 @@ Replace one column (column is trimmed)
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-0.2013 & 1 & 0.5000 & A\tabularnewline
-0.5372 & 2 & 1.000 & B\tabularnewline
-0.5389 & 3 & 1.500 & C\tabularnewline
-0.4949 & 4 & 0.5000 & A\tabularnewline
-0.9283 & 5 & 1.000 & B\tabularnewline
-0.4370 & 6 & 1.500 & C\tabularnewline
-0.9782 & 7 & 0.5000 & A\tabularnewline
-0.3579 & 8 & 1.000 & B\tabularnewline
-0.9631 & 9 & 1.500 & C\tabularnewline
+0.6420 & 1 & 0.5000 & A\tabularnewline
+0.1798 & 2 & 1.000 & B\tabularnewline
+0.6046 & 3 & 1.500 & C\tabularnewline
+0.9266 & 4 & 0.5000 & A\tabularnewline
+0.1213 & 5 & 1.000 & B\tabularnewline
+0.3460 & 6 & 1.500 & C\tabularnewline
+0.2824 & 7 & 0.5000 & A\tabularnewline
+0.8035 & 8 & 1.000 & B\tabularnewline
+0.08914 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3347,7 +3347,7 @@ Double array conversion.
 \end{Shaded}
 
 \begin{verbatim}
-#object["[J" 0x74bea05f "[J@74bea05f"]
+#object["[J" 0x53acfcc2 "[J@53acfcc2"]
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3363,7 +3363,7 @@ Function also works on grouped dataset
 \end{Shaded}
 
 \begin{verbatim}
-(#object["[J" 0x40f3701e "[J@40f3701e"] #object["[J" 0x27cbf826 "[J@27cbf826"] #object["[J" 0x3c96208b "[J@3c96208b"])
+(#object["[J" 0x9e81183 "[J@9e81183"] #object["[J" 0x452d614 "[J@452d614"] #object["[J" 0x14a5682b "[J@14a5682b"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3378,8 +3378,8 @@ You can also cast the type to the other one (if casting is possible):
 \end{Shaded}
 
 \begin{verbatim}
-#object["[Ljava.lang.String;" 0x67a6544d "[Ljava.lang.String;@67a6544d"]
-#object["[F" 0x7ca2387b "[F@7ca2387b"]
+#object["[Ljava.lang.String;" 0x25fb5e87 "[Ljava.lang.String;@25fb5e87"]
+#object["[F" 0x3effb761 "[F@3effb761"]
 \end{verbatim}
 
 \subsubsection{Rows}\label{rows}
@@ -3649,7 +3649,7 @@ Random row (single)
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 2 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3670,15 +3670,15 @@ Random \texttt{n} (default: row count) rows with repetition.
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0.5000 & A\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
 1 & 7 & 0.5000 & A\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3699,11 +3699,11 @@ Five random rows with repetition
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 2 & 1.000 & B\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
 1 & 7 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3724,11 +3724,11 @@ Five random, non-repeating rows
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 2 & 1.000 & B\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
 1 & 1 & 0.5000 & A\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3749,15 +3749,15 @@ Shuffle dataset
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3831,21 +3831,21 @@ Select 5 random rows from each group
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 4 & 0.5000 & A\tabularnewline
 1 & 7 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
 1 & 1 & 0.5000 & A\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
 2 & 8 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -4499,8 +4499,8 @@ Random
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 8 & 1.000 & B\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -8000,10 +8000,10 @@ data/anscombe.csv {[}44 3{]}:
 :x & :a & :b & :y1 & :y2 & :z1 & :z2\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0 & 0.3640 & 0.2638 & 3 & -2\tabularnewline
-2 & 1 & 1 & 0.9548 & 0.7415 & 3 & -2\tabularnewline
-3 & 0 & 1 & 0.4080 & 0.8429 & 3 & -2\tabularnewline
-4 & 0 & 1 & 0.2622 & 0.2090 & 3 & -2\tabularnewline
+1 & 1 & 0 & 0.2284 & 0.7376 & 3 & -2\tabularnewline
+2 & 1 & 1 & 0.4162 & 0.7503 & 3 & -2\tabularnewline
+3 & 0 & 1 & 0.1670 & 0.1311 & 3 & -2\tabularnewline
+4 & 0 & 1 & 0.5422 & 0.4144 & 3 & -2\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -8021,14 +8021,14 @@ data/anscombe.csv {[}44 3{]}:
 :x & :a & :b & :times & y & z\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0 & 1 & 0.3640 & 3\tabularnewline
-2 & 1 & 1 & 1 & 0.9548 & 3\tabularnewline
-3 & 0 & 1 & 1 & 0.4080 & 3\tabularnewline
-4 & 0 & 1 & 1 & 0.2622 & 3\tabularnewline
-1 & 1 & 0 & 2 & 0.2638 & -2\tabularnewline
-2 & 1 & 1 & 2 & 0.7415 & -2\tabularnewline
-3 & 0 & 1 & 2 & 0.8429 & -2\tabularnewline
-4 & 0 & 1 & 2 & 0.2090 & -2\tabularnewline
+1 & 1 & 0 & 1 & 0.2284 & 3\tabularnewline
+2 & 1 & 1 & 1 & 0.4162 & 3\tabularnewline
+3 & 0 & 1 & 1 & 0.1670 & 3\tabularnewline
+4 & 0 & 1 & 1 & 0.5422 & 3\tabularnewline
+1 & 1 & 0 & 2 & 0.7376 & -2\tabularnewline
+2 & 1 & 1 & 2 & 0.7503 & -2\tabularnewline
+3 & 0 & 1 & 2 & 0.1311 & -2\tabularnewline
+4 & 0 & 1 & 2 & 0.4144 & -2\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -9561,31 +9561,31 @@ null {[}27 4{]}:
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0.5000 & A\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -9861,7 +9861,9 @@ MSFT & 2007 & 29.28\tabularnewline
 
 Snippets taken from
 \href{https://rdatatable.gitlab.io/data.table/articles/datatable-intro.html}{Introduction
-to data.table}
+to \texttt{data.table}}
+
+R
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9889,6 +9891,1061 @@ air\_time & distance & hour\tabularnewline
 \bottomrule
 \end{longtable}
 
-TBC
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{require}\NormalTok{ '[tech.v2.datatype.functional }\AttributeTok{:as}\NormalTok{ dfn]}
+\NormalTok{         '[tech.v2.datatype }\AttributeTok{:as}\NormalTok{ dtype])}
+
+\NormalTok{(}\BuiltInTok{defonce}\FunctionTok{ flights }\NormalTok{(api/dataset }\StringTok{"https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/head flights }\DecValTok{6}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\url{https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv}
+{[}6 11{]}:
+
+\begin{longtable}[]{@{}lllllllllll@{}}
+\toprule
+year & month & day & dep\_delay & arr\_delay & carrier & origin & dest &
+air\_time & distance & hour\tabularnewline
+\midrule
+\endhead
+2014 & 1 & 1 & 14 & 13 & AA & JFK & LAX & 359 & 2475 & 9\tabularnewline
+2014 & 1 & 1 & -3 & 13 & AA & JFK & LAX & 363 & 2475 & 11\tabularnewline
+2014 & 1 & 1 & 2 & 9 & AA & JFK & LAX & 351 & 2475 & 19\tabularnewline
+2014 & 1 & 1 & -8 & -26 & AA & LGA & PBI & 157 & 1035 & 7\tabularnewline
+2014 & 1 & 1 & 2 & 1 & AA & JFK & LAX & 350 & 2475 & 13\tabularnewline
+2014 & 1 & 1 & 4 & 0 & AA & EWR & LAX & 339 & 2454 & 18\tabularnewline
+\bottomrule
+\end{longtable}
+
+\paragraph{Shape of loaded data}\label{shape-of-loaded-data}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dim}\NormalTok{(flights)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 253316     11
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/shape flights)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[253316 11]
+\end{verbatim}
+
+\paragraph{\texorpdfstring{What is
+\texttt{data.table}?}{What is data.table?}}\label{what-is-data.table}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DT =}\StringTok{ }\KeywordTok{data.table}\NormalTok{(}
+  \DataTypeTok{ID =} \KeywordTok{c}\NormalTok{(}\StringTok{"b"}\NormalTok{,}\StringTok{"b"}\NormalTok{,}\StringTok{"b"}\NormalTok{,}\StringTok{"a"}\NormalTok{,}\StringTok{"a"}\NormalTok{,}\StringTok{"c"}\NormalTok{),}
+  \DataTypeTok{a =} \DecValTok{1}\OperatorTok{:}\DecValTok{6}\NormalTok{,}
+  \DataTypeTok{b =} \DecValTok{7}\OperatorTok{:}\DecValTok{12}\NormalTok{,}
+  \DataTypeTok{c =} \DecValTok{13}\OperatorTok{:}\DecValTok{18}
+\NormalTok{)}
+
+\KeywordTok{kable}\NormalTok{(DT)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lrrr@{}}
+\toprule
+ID & a & b & c\tabularnewline
+\midrule
+\endhead
+b & 1 & 7 & 13\tabularnewline
+b & 2 & 8 & 14\tabularnewline
+b & 3 & 9 & 15\tabularnewline
+a & 4 & 10 & 16\tabularnewline
+a & 5 & 11 & 17\tabularnewline
+c & 6 & 12 & 18\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{(DT}\OperatorTok{$}\NormalTok{ID)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] "character"
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DT }\NormalTok{(api/dataset \{}\AttributeTok{:ID}\NormalTok{ [}\StringTok{"b"} \StringTok{"b"} \StringTok{"b"} \StringTok{"c"} \StringTok{"c"} \StringTok{"a"}\NormalTok{]}
+                      \AttributeTok{:a}\NormalTok{ (}\KeywordTok{range} \DecValTok{1} \DecValTok{7}\NormalTok{)}
+                      \AttributeTok{:b}\NormalTok{ (}\KeywordTok{range} \DecValTok{7} \DecValTok{13}\NormalTok{)}
+                      \AttributeTok{:c}\NormalTok{ (}\KeywordTok{range} \DecValTok{13} \DecValTok{19}\NormalTok{)\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DT}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}6 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:ID & :a & :b & :c\tabularnewline
+\midrule
+\endhead
+b & 1 & 7 & 13\tabularnewline
+b & 2 & 8 & 14\tabularnewline
+b & 3 & 9 & 15\tabularnewline
+c & 4 & 10 & 16\tabularnewline
+c & 5 & 11 & 17\tabularnewline
+a & 6 & 12 & 18\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->} \AttributeTok{:ID}\NormalTok{ DT }\KeywordTok{meta} \AttributeTok{:datatype}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+:string
+\end{verbatim}
+
+\paragraph{Subset rows}\label{subset-rows}
+
+\subparagraph{\texorpdfstring{Get all the flights with ``JFK'' as the
+origin airport in the month of
+June.}{Get all the flights with JFK as the origin airport in the month of June.}}\label{get-all-the-flights-with-jfk-as-the-origin-airport-in-the-month-of-june.}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[origin }\OperatorTok{==}\StringTok{ "JFK"} \OperatorTok{&}\StringTok{ }\NormalTok{month }\OperatorTok{==}\StringTok{ }\NormalTok{6L]}
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{head}\NormalTok{(ans))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}rrrrrlllrrr@{}}
+\toprule
+year & month & day & dep\_delay & arr\_delay & carrier & origin & dest &
+air\_time & distance & hour\tabularnewline
+\midrule
+\endhead
+2014 & 6 & 1 & -9 & -5 & AA & JFK & LAX & 324 & 2475 & 8\tabularnewline
+2014 & 6 & 1 & -10 & -13 & AA & JFK & LAX & 329 & 2475 &
+12\tabularnewline
+2014 & 6 & 1 & 18 & -1 & AA & JFK & LAX & 326 & 2475 & 7\tabularnewline
+2014 & 6 & 1 & -6 & -16 & AA & JFK & LAX & 320 & 2475 &
+10\tabularnewline
+2014 & 6 & 1 & -4 & -45 & AA & JFK & LAX & 326 & 2475 &
+18\tabularnewline
+2014 & 6 & 1 & -6 & -23 & AA & JFK & LAX & 329 & 2475 &
+14\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ flights}
+\NormalTok{    (api/select-rows (}\KeywordTok{fn}\NormalTok{ [row] (}\KeywordTok{and}\NormalTok{ (}\KeywordTok{=}\NormalTok{ (}\KeywordTok{get}\NormalTok{ row }\StringTok{"origin"}\NormalTok{) }\StringTok{"JFK"}\NormalTok{)}
+\NormalTok{                                   (}\KeywordTok{=}\NormalTok{ (}\KeywordTok{get}\NormalTok{ row }\StringTok{"month"}\NormalTok{) }\DecValTok{6}\NormalTok{))))}
+\NormalTok{    (api/head }\DecValTok{6}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\url{https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv}
+{[}6 11{]}:
+
+\begin{longtable}[]{@{}lllllllllll@{}}
+\toprule
+year & month & day & dep\_delay & arr\_delay & carrier & origin & dest &
+air\_time & distance & hour\tabularnewline
+\midrule
+\endhead
+2014 & 6 & 1 & -9 & -5 & AA & JFK & LAX & 324 & 2475 & 8\tabularnewline
+2014 & 6 & 1 & -10 & -13 & AA & JFK & LAX & 329 & 2475 &
+12\tabularnewline
+2014 & 6 & 1 & 18 & -1 & AA & JFK & LAX & 326 & 2475 & 7\tabularnewline
+2014 & 6 & 1 & -6 & -16 & AA & JFK & LAX & 320 & 2475 &
+10\tabularnewline
+2014 & 6 & 1 & -4 & -45 & AA & JFK & LAX & 326 & 2475 &
+18\tabularnewline
+2014 & 6 & 1 & -6 & -23 & AA & JFK & LAX & 329 & 2475 &
+14\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subparagraph{\texorpdfstring{Get the first two rows from
+\texttt{flights}.}{Get the first two rows from flights.}}\label{get-the-first-two-rows-from-flights.}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{]}
+\KeywordTok{kable}\NormalTok{(ans)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}rrrrrlllrrr@{}}
+\toprule
+year & month & day & dep\_delay & arr\_delay & carrier & origin & dest &
+air\_time & distance & hour\tabularnewline
+\midrule
+\endhead
+2014 & 1 & 1 & 14 & 13 & AA & JFK & LAX & 359 & 2475 & 9\tabularnewline
+2014 & 1 & 1 & -3 & 13 & AA & JFK & LAX & 363 & 2475 & 11\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/select-rows flights (}\KeywordTok{range} \DecValTok{2}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\url{https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv}
+{[}2 11{]}:
+
+\begin{longtable}[]{@{}lllllllllll@{}}
+\toprule
+year & month & day & dep\_delay & arr\_delay & carrier & origin & dest &
+air\_time & distance & hour\tabularnewline
+\midrule
+\endhead
+2014 & 1 & 1 & 14 & 13 & AA & JFK & LAX & 359 & 2475 & 9\tabularnewline
+2014 & 1 & 1 & -3 & 13 & AA & JFK & LAX & 363 & 2475 & 11\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subparagraph{\texorpdfstring{Sort \texttt{flights} first by column
+\texttt{origin} in ascending order, and then by \texttt{dest} in
+descending
+order}{Sort flights first by column origin in ascending order, and then by dest in descending order}}\label{sort-flights-first-by-column-origin-in-ascending-order-and-then-by-dest-in-descending-order}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[}\KeywordTok{order}\NormalTok{(origin, }\OperatorTok{-}\NormalTok{dest)]}
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{head}\NormalTok{(ans))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}rrrrrlllrrr@{}}
+\toprule
+year & month & day & dep\_delay & arr\_delay & carrier & origin & dest &
+air\_time & distance & hour\tabularnewline
+\midrule
+\endhead
+2014 & 1 & 5 & 6 & 49 & EV & EWR & XNA & 195 & 1131 & 8\tabularnewline
+2014 & 1 & 6 & 7 & 13 & EV & EWR & XNA & 190 & 1131 & 8\tabularnewline
+2014 & 1 & 7 & -6 & -13 & EV & EWR & XNA & 179 & 1131 & 8\tabularnewline
+2014 & 1 & 8 & -7 & -12 & EV & EWR & XNA & 184 & 1131 & 8\tabularnewline
+2014 & 1 & 9 & 16 & 7 & EV & EWR & XNA & 181 & 1131 & 8\tabularnewline
+2014 & 1 & 13 & 66 & 66 & EV & EWR & XNA & 188 & 1131 & 9\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ flights}
+\NormalTok{    (api/order-by [}\StringTok{"origin"} \StringTok{"dest"}\NormalTok{] [}\AttributeTok{:asc} \AttributeTok{:desc}\NormalTok{])}
+\NormalTok{    (api/head }\DecValTok{6}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\url{https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv}
+{[}6 11{]}:
+
+\begin{longtable}[]{@{}lllllllllll@{}}
+\toprule
+year & month & day & dep\_delay & arr\_delay & carrier & origin & dest &
+air\_time & distance & hour\tabularnewline
+\midrule
+\endhead
+2014 & 6 & 3 & -6 & -38 & EV & EWR & XNA & 154 & 1131 & 6\tabularnewline
+2014 & 1 & 20 & -9 & -17 & EV & EWR & XNA & 177 & 1131 &
+8\tabularnewline
+2014 & 3 & 19 & -6 & 10 & EV & EWR & XNA & 201 & 1131 & 6\tabularnewline
+2014 & 2 & 3 & 231 & 268 & EV & EWR & XNA & 184 & 1131 &
+12\tabularnewline
+2014 & 4 & 25 & -8 & -32 & EV & EWR & XNA & 159 & 1131 &
+6\tabularnewline
+2014 & 2 & 19 & 21 & 10 & EV & EWR & XNA & 176 & 1131 & 8\tabularnewline
+\bottomrule
+\end{longtable}
+
+\paragraph{Select column(s)}\label{select-columns}
+
+\subparagraph{\texorpdfstring{Select \texttt{arr\_delay} column, but
+return it as a
+vector}{Select arr\_delay column, but return it as a vector}}\label{select-arr_delay-column-but-return-it-as-a-vector}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[, arr_delay]}
+\KeywordTok{head}\NormalTok{(ans)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1]  13  13   9 -26   1   0
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{take} \DecValTok{6}\NormalTok{ (flights }\StringTok{"arr_delay"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(13 13 9 -26 1 0)
+\end{verbatim}
+
+\subparagraph{\texorpdfstring{Select \texttt{arr\_delay} column, but
+return as a data.table
+instead}{Select arr\_delay column, but return as a data.table instead}}\label{select-arr_delay-column-but-return-as-a-data.table-instead}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[, }\KeywordTok{list}\NormalTok{(arr_delay)]}
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{head}\NormalTok{(ans))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}r@{}}
+\toprule
+arr\_delay\tabularnewline
+\midrule
+\endhead
+13\tabularnewline
+13\tabularnewline
+9\tabularnewline
+-26\tabularnewline
+1\tabularnewline
+0\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ flights}
+\NormalTok{    (api/select-columns }\StringTok{"arr_delay"}\NormalTok{)}
+\NormalTok{    (api/head }\DecValTok{6}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\url{https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv}
+{[}6 1{]}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+arr\_delay\tabularnewline
+\midrule
+\endhead
+13\tabularnewline
+13\tabularnewline
+9\tabularnewline
+-26\tabularnewline
+1\tabularnewline
+0\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subparagraph{\texorpdfstring{Select both \texttt{arr\_delay} and
+\texttt{dep\_delay}
+columns}{Select both arr\_delay and dep\_delay columns}}\label{select-both-arr_delay-and-dep_delay-columns}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[, .(arr_delay, dep_delay)]}
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{head}\NormalTok{(ans))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}rr@{}}
+\toprule
+arr\_delay & dep\_delay\tabularnewline
+\midrule
+\endhead
+13 & 14\tabularnewline
+13 & -3\tabularnewline
+9 & 2\tabularnewline
+-26 & -8\tabularnewline
+1 & 2\tabularnewline
+0 & 4\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ flights}
+\NormalTok{    (api/select-columns [}\StringTok{"arr_delay"} \StringTok{"dep_delay"}\NormalTok{])}
+\NormalTok{    (api/head }\DecValTok{6}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\url{https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv}
+{[}6 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+dep\_delay & arr\_delay\tabularnewline
+\midrule
+\endhead
+14 & 13\tabularnewline
+-3 & 13\tabularnewline
+2 & 9\tabularnewline
+-8 & -26\tabularnewline
+2 & 1\tabularnewline
+4 & 0\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subparagraph{\texorpdfstring{Select both \texttt{arr\_delay} and
+\texttt{dep\_delay} columns and rename them to \texttt{delay\_arr} and
+\texttt{delay\_dep}}{Select both arr\_delay and dep\_delay columns and rename them to delay\_arr and delay\_dep}}\label{select-both-arr_delay-and-dep_delay-columns-and-rename-them-to-delay_arr-and-delay_dep}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[, .(}\DataTypeTok{delay_arr =}\NormalTok{ arr_delay, }\DataTypeTok{delay_dep =}\NormalTok{ dep_delay)]}
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{head}\NormalTok{(ans))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}rr@{}}
+\toprule
+delay\_arr & delay\_dep\tabularnewline
+\midrule
+\endhead
+13 & 14\tabularnewline
+13 & -3\tabularnewline
+9 & 2\tabularnewline
+-26 & -8\tabularnewline
+1 & 2\tabularnewline
+0 & 4\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ flights}
+\NormalTok{    (api/select-columns \{}\StringTok{"arr_delay"} \StringTok{"delay_arr"}
+                         \StringTok{"dep_delay"} \StringTok{"delay_arr"}\NormalTok{\})}
+\NormalTok{    (api/head }\DecValTok{6}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\url{https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv}
+{[}6 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+delay\_arr & delay\_arr\tabularnewline
+\midrule
+\endhead
+14 & 13\tabularnewline
+-3 & 13\tabularnewline
+2 & 9\tabularnewline
+-8 & -26\tabularnewline
+2 & 1\tabularnewline
+4 & 0\tabularnewline
+\bottomrule
+\end{longtable}
+
+\paragraph{Compute or do}\label{compute-or-do}
+
+\subparagraph{How many trips have had total delay \textless{}
+0?}\label{how-many-trips-have-had-total-delay-0}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[, }\KeywordTok{sum}\NormalTok{( (arr_delay }\OperatorTok{+}\StringTok{ }\NormalTok{dep_delay) }\OperatorTok{<}\StringTok{ }\DecValTok{0}\NormalTok{ )]}
+\NormalTok{ans}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 141814
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->>}\NormalTok{ (dfn/+ (flights }\StringTok{"arr_delay"}\NormalTok{) (flights }\StringTok{"dep_delay"}\NormalTok{))}
+\NormalTok{     (dfn/argfilter #(}\KeywordTok{<} \VariableTok{%} \FloatTok{0.0}\NormalTok{))}
+\NormalTok{     (dtype/ecount))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+141814
+\end{verbatim}
+
+or pure clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->>}\NormalTok{ (}\KeywordTok{map} \KeywordTok{+}\NormalTok{ (flights }\StringTok{"arr_delay"}\NormalTok{) (flights }\StringTok{"dep_delay"}\NormalTok{))}
+\NormalTok{     (}\KeywordTok{filter} \KeywordTok{neg?}\NormalTok{)}
+\NormalTok{     (}\KeywordTok{count}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+141814
+\end{verbatim}
+
+\paragraph{Subset and do}\label{subset-and-do}
+
+\subparagraph{\texorpdfstring{Calculate the average arrival and
+departure delay for all flights with ``JFK'' as the origin airport in
+the month of
+June}{Calculate the average arrival and departure delay for all flights with JFK as the origin airport in the month of June}}\label{calculate-the-average-arrival-and-departure-delay-for-all-flights-with-jfk-as-the-origin-airport-in-the-month-of-june}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[origin }\OperatorTok{==}\StringTok{ "JFK"} \OperatorTok{&}\StringTok{ }\NormalTok{month }\OperatorTok{==}\StringTok{ }\NormalTok{6L,}
+\NormalTok{               .(}\DataTypeTok{m_arr =} \KeywordTok{mean}\NormalTok{(arr_delay), }\DataTypeTok{m_dep =} \KeywordTok{mean}\NormalTok{(dep_delay))]}
+\NormalTok{ans}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+      m_arr    m_dep
+1: 5.839349 9.807884
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ flights}
+\NormalTok{    (api/select-rows (}\KeywordTok{fn}\NormalTok{ [row] (}\KeywordTok{and}\NormalTok{ (}\KeywordTok{=}\NormalTok{ (}\KeywordTok{get}\NormalTok{ row }\StringTok{"origin"}\NormalTok{) }\StringTok{"JFK"}\NormalTok{)}
+\NormalTok{                                   (}\KeywordTok{=}\NormalTok{ (}\KeywordTok{get}\NormalTok{ row }\StringTok{"month"}\NormalTok{) }\DecValTok{6}\NormalTok{))))}
+\NormalTok{    (api/aggregate \{}\AttributeTok{:m}\NormalTok{_arr #(dfn/mean (}\VariableTok{%} \StringTok{"arr_delay"}\NormalTok{))}
+                    \AttributeTok{:m}\NormalTok{_dep #(dfn/mean (}\VariableTok{%} \StringTok{"dep_delay"}\NormalTok{))\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:m\_arr & :m\_dep\tabularnewline
+\midrule
+\endhead
+5.839 & 9.808\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subparagraph{\texorpdfstring{How many trips have been made in 2014 from
+``JFK'' airport in the month of
+June?}{How many trips have been made in 2014 from JFK airport in the month of June?}}\label{how-many-trips-have-been-made-in-2014-from-jfk-airport-in-the-month-of-june}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[origin }\OperatorTok{==}\StringTok{ "JFK"} \OperatorTok{&}\StringTok{ }\NormalTok{month }\OperatorTok{==}\StringTok{ }\NormalTok{6L, }\KeywordTok{length}\NormalTok{(dest)]}
+\NormalTok{ans}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 8422
+\end{verbatim}
+
+or
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[origin }\OperatorTok{==}\StringTok{ "JFK"} \OperatorTok{&}\StringTok{ }\NormalTok{month }\OperatorTok{==}\StringTok{ }\NormalTok{6L, .N]}
+\NormalTok{ans}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 8422
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ flights}
+\NormalTok{    (api/select-rows (}\KeywordTok{fn}\NormalTok{ [row] (}\KeywordTok{and}\NormalTok{ (}\KeywordTok{=}\NormalTok{ (}\KeywordTok{get}\NormalTok{ row }\StringTok{"origin"}\NormalTok{) }\StringTok{"JFK"}\NormalTok{)}
+\NormalTok{                                   (}\KeywordTok{=}\NormalTok{ (}\KeywordTok{get}\NormalTok{ row }\StringTok{"month"}\NormalTok{) }\DecValTok{6}\NormalTok{))))}
+\NormalTok{    (api/row-count))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+8422
+\end{verbatim}
+
+\paragraph{Columns by names}\label{columns-by-names}
+
+Most of the R code is skipped since it doesn't bring anything API
+specific.
+
+\subparagraph{deselect columns using - or
+!}\label{deselect-columns-using---or}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[, }\OperatorTok{!}\KeywordTok{c}\NormalTok{(}\StringTok{"arr_delay"}\NormalTok{, }\StringTok{"dep_delay"}\NormalTok{)]}
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{head}\NormalTok{(ans))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}rrrlllrrr@{}}
+\toprule
+year & month & day & carrier & origin & dest & air\_time & distance &
+hour\tabularnewline
+\midrule
+\endhead
+2014 & 1 & 1 & AA & JFK & LAX & 359 & 2475 & 9\tabularnewline
+2014 & 1 & 1 & AA & JFK & LAX & 363 & 2475 & 11\tabularnewline
+2014 & 1 & 1 & AA & JFK & LAX & 351 & 2475 & 19\tabularnewline
+2014 & 1 & 1 & AA & LGA & PBI & 157 & 1035 & 7\tabularnewline
+2014 & 1 & 1 & AA & JFK & LAX & 350 & 2475 & 13\tabularnewline
+2014 & 1 & 1 & AA & EWR & LAX & 339 & 2454 & 18\tabularnewline
+\bottomrule
+\end{longtable}
+
+or
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[, }\OperatorTok{-}\KeywordTok{c}\NormalTok{(}\StringTok{"arr_delay"}\NormalTok{, }\StringTok{"dep_delay"}\NormalTok{)]}
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{head}\NormalTok{(ans))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}rrrlllrrr@{}}
+\toprule
+year & month & day & carrier & origin & dest & air\_time & distance &
+hour\tabularnewline
+\midrule
+\endhead
+2014 & 1 & 1 & AA & JFK & LAX & 359 & 2475 & 9\tabularnewline
+2014 & 1 & 1 & AA & JFK & LAX & 363 & 2475 & 11\tabularnewline
+2014 & 1 & 1 & AA & JFK & LAX & 351 & 2475 & 19\tabularnewline
+2014 & 1 & 1 & AA & LGA & PBI & 157 & 1035 & 7\tabularnewline
+2014 & 1 & 1 & AA & JFK & LAX & 350 & 2475 & 13\tabularnewline
+2014 & 1 & 1 & AA & EWR & LAX & 339 & 2454 & 18\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ flights}
+\NormalTok{    (api/select-columns (}\KeywordTok{complement}\NormalTok{ #\{}\StringTok{"arr_delay"} \StringTok{"dep_delay"}\NormalTok{\}))}
+\NormalTok{    (api/head }\DecValTok{6}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\url{https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv}
+{[}6 9{]}:
+
+\begin{longtable}[]{@{}lllllllll@{}}
+\toprule
+year & month & day & carrier & origin & dest & air\_time & distance &
+hour\tabularnewline
+\midrule
+\endhead
+2014 & 1 & 1 & AA & JFK & LAX & 359 & 2475 & 9\tabularnewline
+2014 & 1 & 1 & AA & JFK & LAX & 363 & 2475 & 11\tabularnewline
+2014 & 1 & 1 & AA & JFK & LAX & 351 & 2475 & 19\tabularnewline
+2014 & 1 & 1 & AA & LGA & PBI & 157 & 1035 & 7\tabularnewline
+2014 & 1 & 1 & AA & JFK & LAX & 350 & 2475 & 13\tabularnewline
+2014 & 1 & 1 & AA & EWR & LAX & 339 & 2454 & 18\tabularnewline
+\bottomrule
+\end{longtable}
+
+\paragraph{Grouping}\label{grouping-1}
+
+\subparagraph{How can we get the number of trips corresponding to each
+origin
+airport?}\label{how-can-we-get-the-number-of-trips-corresponding-to-each-origin-airport}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[, .(.N), by =}\StringTok{ }\NormalTok{.(origin)]}
+\KeywordTok{kable}\NormalTok{(ans)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+origin & N\tabularnewline
+\midrule
+\endhead
+JFK & 81483\tabularnewline
+LGA & 84433\tabularnewline
+EWR & 87400\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ flights}
+\NormalTok{    (api/group-by [}\StringTok{"origin"}\NormalTok{])}
+\NormalTok{    (api/aggregate \{}\AttributeTok{:N}\NormalTok{ api/row-count\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+origin & :N\tabularnewline
+\midrule
+\endhead
+LGA & 84433\tabularnewline
+EWR & 87400\tabularnewline
+JFK & 81483\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subparagraph{\texorpdfstring{How can we calculate the number of trips
+for each origin airport for carrier code
+``AA''?}{How can we calculate the number of trips for each origin airport for carrier code AA?}}\label{how-can-we-calculate-the-number-of-trips-for-each-origin-airport-for-carrier-code-aa}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[carrier }\OperatorTok{==}\StringTok{ "AA"}\NormalTok{, .N, by =}\StringTok{ }\NormalTok{origin]}
+\KeywordTok{kable}\NormalTok{(ans)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+origin & N\tabularnewline
+\midrule
+\endhead
+JFK & 11923\tabularnewline
+LGA & 11730\tabularnewline
+EWR & 2649\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ flights}
+\NormalTok{    (api/select-rows #(}\KeywordTok{=}\NormalTok{ (}\KeywordTok{get} \VariableTok{%} \StringTok{"carrier"}\NormalTok{) }\StringTok{"AA"}\NormalTok{))}
+\NormalTok{    (api/group-by [}\StringTok{"origin"}\NormalTok{])}
+\NormalTok{    (api/aggregate \{}\AttributeTok{:N}\NormalTok{ api/row-count\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+origin & :N\tabularnewline
+\midrule
+\endhead
+LGA & 11730\tabularnewline
+EWR & 2649\tabularnewline
+JFK & 11923\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subparagraph{\texorpdfstring{How can we get the total number of trips
+for each \texttt{origin}, \texttt{dest} pair for carrier code
+``AA''?}{How can we get the total number of trips for each origin, dest pair for carrier code AA?}}\label{how-can-we-get-the-total-number-of-trips-for-each-origin-dest-pair-for-carrier-code-aa}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[carrier }\OperatorTok{==}\StringTok{ "AA"}\NormalTok{, .N, by =}\StringTok{ }\NormalTok{.(origin, dest)]}
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{head}\NormalTok{(ans))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}llr@{}}
+\toprule
+origin & dest & N\tabularnewline
+\midrule
+\endhead
+JFK & LAX & 3387\tabularnewline
+LGA & PBI & 245\tabularnewline
+EWR & LAX & 62\tabularnewline
+JFK & MIA & 1876\tabularnewline
+JFK & SEA & 298\tabularnewline
+EWR & MIA & 848\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ flights}
+\NormalTok{    (api/select-rows #(}\KeywordTok{=}\NormalTok{ (}\KeywordTok{get} \VariableTok{%} \StringTok{"carrier"}\NormalTok{) }\StringTok{"AA"}\NormalTok{))}
+\NormalTok{    (api/group-by [}\StringTok{"origin"} \StringTok{"dest"}\NormalTok{])}
+\NormalTok{    (api/aggregate \{}\AttributeTok{:N}\NormalTok{ api/row-count\})}
+\NormalTok{    (api/head }\DecValTok{6}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}6 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+origin & dest & :N\tabularnewline
+\midrule
+\endhead
+JFK & MIA & 1876\tabularnewline
+LGA & PBI & 245\tabularnewline
+JFK & SEA & 298\tabularnewline
+LGA & DFW & 3785\tabularnewline
+JFK & AUS & 297\tabularnewline
+JFK & STT & 229\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subparagraph{\texorpdfstring{How can we get the average arrival and
+departure delay for each \texttt{orig},\texttt{dest} pair for each month
+for carrier code
+``AA''?}{How can we get the average arrival and departure delay for each orig,dest pair for each month for carrier code AA?}}\label{how-can-we-get-the-average-arrival-and-departure-delay-for-each-origdest-pair-for-each-month-for-carrier-code-aa}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[carrier }\OperatorTok{==}\StringTok{ "AA"}\NormalTok{,}
+\NormalTok{        .(}\KeywordTok{mean}\NormalTok{(arr_delay), }\KeywordTok{mean}\NormalTok{(dep_delay)),}
+\NormalTok{        by =}\StringTok{ }\NormalTok{.(origin, dest, month)]}
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{head}\NormalTok{(ans,}\DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}llrrr@{}}
+\toprule
+origin & dest & month & V1 & V2\tabularnewline
+\midrule
+\endhead
+JFK & LAX & 1 & 6.590361 & 14.2289157\tabularnewline
+LGA & PBI & 1 & -7.758621 & 0.3103448\tabularnewline
+EWR & LAX & 1 & 1.366667 & 7.5000000\tabularnewline
+JFK & MIA & 1 & 15.720670 & 18.7430168\tabularnewline
+JFK & SEA & 1 & 14.357143 & 30.7500000\tabularnewline
+EWR & MIA & 1 & 11.011236 & 12.1235955\tabularnewline
+JFK & SFO & 1 & 19.252252 & 28.6396396\tabularnewline
+JFK & BOS & 1 & 12.919643 & 15.2142857\tabularnewline
+JFK & ORD & 1 & 31.586207 & 40.1724138\tabularnewline
+JFK & IAH & 1 & 28.857143 & 14.2857143\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ flights}
+\NormalTok{    (api/select-rows #(}\KeywordTok{=}\NormalTok{ (}\KeywordTok{get} \VariableTok{%} \StringTok{"carrier"}\NormalTok{) }\StringTok{"AA"}\NormalTok{))}
+\NormalTok{    (api/group-by [}\StringTok{"origin"} \StringTok{"dest"} \StringTok{"month"}\NormalTok{])}
+\NormalTok{    (api/aggregate \{}\AttributeTok{:m}\NormalTok{_arr #(dfn/mean (}\VariableTok{%} \StringTok{"arr_delay"}\NormalTok{))}
+                    \AttributeTok{:m}\NormalTok{_dep #(dfn/mean (}\VariableTok{%} \StringTok{"dep_delay"}\NormalTok{))\})}
+\NormalTok{    (api/head }\DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}10 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+month & origin & dest & :m\_arr & :m\_dep\tabularnewline
+\midrule
+\endhead
+9 & LGA & DFW & -8.788 & -0.2558\tabularnewline
+10 & LGA & DFW & 3.500 & 4.553\tabularnewline
+1 & JFK & AUS & 25.20 & 27.60\tabularnewline
+4 & JFK & AUS & 4.367 & -0.1333\tabularnewline
+5 & JFK & AUS & 6.767 & 14.73\tabularnewline
+2 & JFK & AUS & 26.27 & 21.50\tabularnewline
+3 & JFK & AUS & 8.194 & 2.710\tabularnewline
+8 & JFK & AUS & 20.42 & 20.77\tabularnewline
+1 & EWR & LAX & 1.367 & 7.500\tabularnewline
+9 & JFK & AUS & 16.27 & 14.37\tabularnewline
+\bottomrule
+\end{longtable}
+
+\paragraph{Sorted by}\label{sorted-by}
+
+\subparagraph{So how can we directly order by all the grouping
+variables?}\label{so-how-can-we-directly-order-by-all-the-grouping-variables}
+
+R
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{flights[carrier }\OperatorTok{==}\StringTok{ "AA"}\NormalTok{,}
+\NormalTok{        .(}\KeywordTok{mean}\NormalTok{(arr_delay), }\KeywordTok{mean}\NormalTok{(dep_delay)),}
+\NormalTok{        keyby =}\StringTok{ }\NormalTok{.(origin, dest, month)]}
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{head}\NormalTok{(ans,}\DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}llrrr@{}}
+\toprule
+origin & dest & month & V1 & V2\tabularnewline
+\midrule
+\endhead
+EWR & DFW & 1 & 6.427673 & 10.012579\tabularnewline
+EWR & DFW & 2 & 10.536765 & 11.345588\tabularnewline
+EWR & DFW & 3 & 12.865031 & 8.079755\tabularnewline
+EWR & DFW & 4 & 17.792683 & 12.920732\tabularnewline
+EWR & DFW & 5 & 18.487805 & 18.682927\tabularnewline
+EWR & DFW & 6 & 37.005952 & 38.744048\tabularnewline
+EWR & DFW & 7 & 20.250000 & 21.154762\tabularnewline
+EWR & DFW & 8 & 16.936046 & 22.069767\tabularnewline
+EWR & DFW & 9 & 5.865031 & 13.055215\tabularnewline
+EWR & DFW & 10 & 18.813665 & 18.894410\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Clojure
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ flights}
+\NormalTok{    (api/select-rows #(}\KeywordTok{=}\NormalTok{ (}\KeywordTok{get} \VariableTok{%} \StringTok{"carrier"}\NormalTok{) }\StringTok{"AA"}\NormalTok{))}
+\NormalTok{    (api/group-by [}\StringTok{"origin"} \StringTok{"dest"} \StringTok{"month"}\NormalTok{])}
+\NormalTok{    (api/aggregate \{}\AttributeTok{:m}\NormalTok{_arr #(dfn/mean (}\VariableTok{%} \StringTok{"arr_delay"}\NormalTok{))}
+                    \AttributeTok{:m}\NormalTok{_dep #(dfn/mean (}\VariableTok{%} \StringTok{"dep_delay"}\NormalTok{))\})}
+\NormalTok{    (api/order-by [}\StringTok{"origin"} \StringTok{"dest"} \StringTok{"month"}\NormalTok{])}
+\NormalTok{    (api/head }\DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}10 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+month & origin & dest & :m\_arr & :m\_dep\tabularnewline
+\midrule
+\endhead
+1 & EWR & DFW & 6.428 & 10.01\tabularnewline
+2 & EWR & DFW & 10.54 & 11.35\tabularnewline
+3 & EWR & DFW & 12.87 & 8.080\tabularnewline
+4 & EWR & DFW & 17.79 & 12.92\tabularnewline
+5 & EWR & DFW & 18.49 & 18.68\tabularnewline
+6 & EWR & DFW & 37.01 & 38.74\tabularnewline
+7 & EWR & DFW & 20.25 & 21.15\tabularnewline
+8 & EWR & DFW & 16.94 & 22.07\tabularnewline
+9 & EWR & DFW & 5.865 & 13.06\tabularnewline
+10 & EWR & DFW & 18.81 & 18.89\tabularnewline
+\bottomrule
+\end{longtable}
 
 \end{document}

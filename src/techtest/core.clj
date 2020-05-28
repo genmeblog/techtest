@@ -197,9 +197,9 @@ ans
       compare-first
       (- (compare d1 d2)))))
 
-(def ans (ds/sort-by #(vector (get % "origin")
-                              (get % "dest"))
-                     string-pair-comparator flights))
+(def ans (time (ds/sort-by #(vector (get % "origin")
+                                    (get % "dest"))
+                           string-pair-comparator flights)))
 
 (ds/select-rows ans (range 6))
 ;; => https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv [6 11]:

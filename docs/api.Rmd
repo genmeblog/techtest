@@ -24,8 +24,26 @@ output:
 ```{css echo=FALSE}
 table { width: auto !important; margin-right: auto; margin-left: 2%; }
 h1, h2, h3, h4, h5, h6 { padding-top: 16px; border-bottom: 1px solid; }
+pre.sourceCode { position: relative; }
+code.clojure::before {
+    content: "Clojure";
+    opacity: 0.2;
+    font-size: 150%;
+    position: absolute;
+    text-align: right;
+    right: 8px;
+    bottom: 0px;
+}
+code.r::before {
+    content: "R";
+    opacity: 0.2;
+    font-size: 150%;
+    position: absolute;
+    text-align: right;
+    right: 8px;
+    bottom: 0px;
+}
 ```
-
 
 ```{r setup, include=FALSE}
 find_nrepl_port_up <- function() {
@@ -2769,7 +2787,9 @@ stocks
 
 ### data.table
 
-Snippets taken from [Introduction to data.table](https://rdatatable.gitlab.io/data.table/articles/datatable-intro.html)
+Snippets taken from [Introduction to `data.table`](https://rdatatable.gitlab.io/data.table/articles/datatable-intro.html)
+
+R
 
 ```{r}
 library(data.table)
@@ -2780,4 +2800,427 @@ flights <- fread("https://raw.githubusercontent.com/Rdatatable/data.table/master
 kable(head(flights))
 ```
 
-TBC
+---
+
+Clojure
+
+```{clojure results="hide"}
+(require '[tech.v2.datatype.functional :as dfn]
+         '[tech.v2.datatype :as dtype])
+
+(defonce flights (api/dataset "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv"))
+```
+
+```{clojure results="asis"}
+(api/head flights 6)
+```
+
+#### Shape of loaded data
+
+R
+
+```{r}
+dim(flights)
+```
+
+---
+
+Clojure
+
+```{clojure}
+(api/shape flights)
+```
+
+#### What is `data.table`?
+
+R
+
+```{r}
+DT = data.table(
+  ID = c("b","b","b","a","a","c"),
+  a = 1:6,
+  b = 7:12,
+  c = 13:18
+)
+
+kable(DT)
+
+class(DT$ID)
+```
+
+---
+
+Clojure
+
+```{clojure results="hide"}
+(def DT (api/dataset {:ID ["b" "b" "b" "c" "c" "a"]
+                      :a (range 1 7)
+                      :b (range 7 13)
+                      :c (range 13 19)}))
+```
+
+```{clojure results="asis"}
+DT
+```
+
+```{clojure}
+(-> :ID DT meta :datatype)
+```
+
+#### Subset rows
+
+##### Get all the flights with “JFK” as the origin airport in the month of June.
+
+R
+
+```{r}
+ans <- flights[origin == "JFK" & month == 6L]
+kable(head(ans))
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(-> flights
+    (api/select-rows (fn [row] (and (= (get row "origin") "JFK")
+                                   (= (get row "month") 6))))
+    (api/head 6))
+```
+
+##### Get the first two rows from `flights`.
+
+R
+
+```{r}
+ans <- flights[1:2]
+kable(ans)
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(api/select-rows flights (range 2))
+```
+
+##### Sort `flights` first by column `origin` in ascending order, and then by `dest` in descending order
+
+R
+
+```{r}
+ans <- flights[order(origin, -dest)]
+kable(head(ans))
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(-> flights
+    (api/order-by ["origin" "dest"] [:asc :desc])
+    (api/head 6))
+```
+
+#### Select column(s)
+
+##### Select `arr_delay` column, but return it as a vector
+
+R
+
+```{r}
+ans <- flights[, arr_delay]
+head(ans)
+```
+
+---
+
+Clojure
+
+```{clojure}
+(take 6 (flights "arr_delay"))
+```
+
+##### Select `arr_delay` column, but return as a data.table instead
+
+R
+
+```{r}
+ans <- flights[, list(arr_delay)]
+kable(head(ans))
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(-> flights
+    (api/select-columns "arr_delay")
+    (api/head 6))
+```
+
+##### Select both `arr_delay` and `dep_delay` columns
+
+R
+
+```{r}
+ans <- flights[, .(arr_delay, dep_delay)]
+kable(head(ans))
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(-> flights
+    (api/select-columns ["arr_delay" "dep_delay"])
+    (api/head 6))
+```
+
+##### Select both `arr_delay` and `dep_delay` columns and rename them to `delay_arr` and `delay_dep`
+
+R
+
+```{r}
+ans <- flights[, .(delay_arr = arr_delay, delay_dep = dep_delay)]
+kable(head(ans))
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(-> flights
+    (api/select-columns {"arr_delay" "delay_arr"
+                         "dep_delay" "delay_arr"})
+    (api/head 6))
+```
+
+#### Compute or do
+
+##### How many trips have had total delay < 0?
+
+R
+
+```{r}
+ans <- flights[, sum( (arr_delay + dep_delay) < 0 )]
+ans
+```
+
+---
+
+Clojure
+
+```{clojure}
+(->> (dfn/+ (flights "arr_delay") (flights "dep_delay"))
+     (dfn/argfilter #(< % 0.0))
+     (dtype/ecount))
+```
+
+or pure clojure
+
+```{clojure}
+(->> (map + (flights "arr_delay") (flights "dep_delay"))
+     (filter neg?)
+     (count))
+```
+
+#### Subset and do
+
+##### Calculate the average arrival and departure delay for all flights with “JFK” as the origin airport in the month of June
+
+R
+
+```{r}
+ans <- flights[origin == "JFK" & month == 6L,
+               .(m_arr = mean(arr_delay), m_dep = mean(dep_delay))]
+ans
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(-> flights
+    (api/select-rows (fn [row] (and (= (get row "origin") "JFK")
+                                   (= (get row "month") 6))))
+    (api/aggregate {:m_arr #(dfn/mean (% "arr_delay"))
+                    :m_dep #(dfn/mean (% "dep_delay"))}))
+```
+
+##### How many trips have been made in 2014 from “JFK” airport in the month of June?
+
+R
+
+```{r}
+ans <- flights[origin == "JFK" & month == 6L, length(dest)]
+ans
+```
+
+or
+
+```{r}
+ans <- flights[origin == "JFK" & month == 6L, .N]
+ans
+```
+
+---
+
+Clojure
+
+```{clojure}
+(-> flights
+    (api/select-rows (fn [row] (and (= (get row "origin") "JFK")
+                                   (= (get row "month") 6))))
+    (api/row-count))
+```
+
+#### Columns by names
+
+Most of the R code is skipped since it doesn't bring anything API specific.
+
+##### deselect columns using - or !
+
+R
+
+```{r}
+ans <- flights[, !c("arr_delay", "dep_delay")]
+kable(head(ans))
+```
+
+or
+
+```{r}
+ans <- flights[, -c("arr_delay", "dep_delay")]
+kable(head(ans))
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(-> flights
+    (api/select-columns (complement #{"arr_delay" "dep_delay"}))
+    (api/head 6))
+```
+
+#### Grouping
+
+##### How can we get the number of trips corresponding to each origin airport?
+
+R
+
+```{r}
+ans <- flights[, .(.N), by = .(origin)]
+kable(ans)
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(-> flights
+    (api/group-by ["origin"])
+    (api/aggregate {:N api/row-count}))
+```
+
+##### How can we calculate the number of trips for each origin airport for carrier code "AA"?
+
+R
+
+```{r}
+ans <- flights[carrier == "AA", .N, by = origin]
+kable(ans)
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(-> flights
+    (api/select-rows #(= (get % "carrier") "AA"))
+    (api/group-by ["origin"])
+    (api/aggregate {:N api/row-count}))
+```
+
+##### How can we get the total number of trips for each `origin`, `dest` pair for carrier code "AA"?
+
+R
+
+```{r}
+ans <- flights[carrier == "AA", .N, by = .(origin, dest)]
+kable(head(ans))
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(-> flights
+    (api/select-rows #(= (get % "carrier") "AA"))
+    (api/group-by ["origin" "dest"])
+    (api/aggregate {:N api/row-count})
+    (api/head 6))
+```
+
+##### How can we get the average arrival and departure delay for each `orig`,`dest` pair for each month for carrier code "AA"?
+
+R
+
+```{r}
+ans <- flights[carrier == "AA",
+        .(mean(arr_delay), mean(dep_delay)),
+        by = .(origin, dest, month)]
+kable(head(ans,10))
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(-> flights
+    (api/select-rows #(= (get % "carrier") "AA"))
+    (api/group-by ["origin" "dest" "month"])
+    (api/aggregate {:m_arr #(dfn/mean (% "arr_delay"))
+                    :m_dep #(dfn/mean (% "dep_delay"))})
+    (api/head 10))
+```
+
+#### Sorted by
+
+##### So how can we directly order by all the grouping variables?
+
+R
+
+```{r}
+ans <- flights[carrier == "AA",
+        .(mean(arr_delay), mean(dep_delay)),
+        keyby = .(origin, dest, month)]
+kable(head(ans,10))
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(-> flights
+    (api/select-rows #(= (get % "carrier") "AA"))
+    (api/group-by ["origin" "dest" "month"])
+    (api/aggregate {:m_arr #(dfn/mean (% "arr_delay"))
+                    :m_dep #(dfn/mean (% "dep_delay"))})
+    (api/order-by ["origin" "dest" "month"])
+    (api/head 10))
+```

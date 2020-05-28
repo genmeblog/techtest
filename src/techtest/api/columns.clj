@@ -8,6 +8,13 @@
             [techtest.api.dataset :refer [dataset]]
             [techtest.api.group-by :refer [grouped? process-group-data]]))
 
+(defn rename-columns
+  "Rename columns with provided old -> new name map"
+  [ds columns-map]
+  (if (grouped? ds)
+    (process-group-data ds #(ds/rename-columns % columns-map))
+    (ds/rename-columns ds columns-map)))
+
 (defn- filter-column-names
   "Filter column names"
   [ds columns-selector meta-field]
@@ -36,12 +43,15 @@
 
 (defn- select-or-drop-columns
   "Select or drop columns."
-  ([f ds] (select-or-drop-columns f ds :all))
-  ([f ds columns-selector] (select-or-drop-columns f ds columns-selector nil))
-  ([f ds columns-selector meta-field]
+  ([f rename-enabled? ds] (select-or-drop-columns f rename-enabled? ds :all))
+  ([f rename-enabled? ds columns-selector] (select-or-drop-columns f rename-enabled? ds columns-selector nil))
+  ([f rename-enabled? ds columns-selector meta-field]
    (if (grouped? ds)
-     (process-group-data ds #(select-or-drop-columns f % columns-selector))
-     (f ds (column-names ds columns-selector meta-field)))))
+     (process-group-data ds #(select-or-drop-columns f rename-enabled? % columns-selector))
+     (let [nds (f ds (column-names ds columns-selector meta-field))]
+       (if (and rename-enabled? (map? columns-selector))
+         (ds/rename-columns nds columns-selector)
+         nds)))))
 
 (defn- select-or-drop-colums-docstring
   [op]
@@ -53,17 +63,10 @@
   - function which filter names (via column metadata)"))
 
 (def ^{:doc (select-or-drop-colums-docstring "Select")}
-  select-columns (partial select-or-drop-columns ds/select-columns))
+  select-columns (partial select-or-drop-columns ds/select-columns true))
 
 (def ^{:doc (select-or-drop-colums-docstring "Drop")}
-  drop-columns (partial select-or-drop-columns ds/drop-columns))
-
-(defn rename-columns
-  "Rename columns with provided old -> new name map"
-  [ds columns-map]
-  (if (grouped? ds)
-    (process-group-data ds #(ds/rename-columns % columns-map))
-    (ds/rename-columns ds columns-map)))
+  drop-columns (partial select-or-drop-columns ds/drop-columns false))
 
 ;;
 
