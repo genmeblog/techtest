@@ -2721,6 +2721,84 @@ ds2
 (api/inner-join ds2 ds1 [:a :b])
 ```
 
+#### Full
+
+Join keeping all rows
+
+```{clojure results="asis"}
+(api/full-join ds1 ds2 :b)
+```
+
+---
+
+```{clojure results="asis"}
+(api/full-join ds2 ds1 :b)
+```
+
+---
+
+```{clojure results="asis"}
+(api/full-join ds1 ds2 [:a :b])
+```
+
+---
+
+```{clojure results="asis"}
+(api/full-join ds2 ds1 [:a :b])
+```
+
+#### Semi
+
+Return rows from ds1 matching ds2
+
+```{clojure results="asis"}
+(api/semi-join ds1 ds2 :b)
+```
+
+---
+
+```{clojure results="asis"}
+(api/semi-join ds2 ds1 :b)
+```
+
+---
+
+```{clojure results="asis"}
+(api/semi-join ds1 ds2 [:a :b])
+```
+
+---
+
+```{clojure results="asis"}
+(api/semi-join ds2 ds1 [:a :b])
+```
+
+#### Anti
+
+Return rows from ds1 not matching ds2
+
+```{clojure results="asis"}
+(api/anti-join ds1 ds2 :b)
+```
+
+---
+
+```{clojure results="asis"}
+(api/anti-join ds2 ds1 :b)
+```
+
+---
+
+```{clojure results="asis"}
+(api/anti-join ds1 ds2 [:a :b])
+```
+
+---
+
+```{clojure results="asis"}
+(api/anti-join ds2 ds1 [:a :b])
+```
+
 #### Concat
 
 `contact` joins rows from other datasets
