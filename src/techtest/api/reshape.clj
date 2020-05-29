@@ -77,16 +77,30 @@
   [join-ds curr-ds join-name]
   (ds/left-join join-name curr-ds join-ds))
 
+(defn- process-column-name
+  [concat-columns-with names]
+  (cond
+    (string? concat-columns-with) (str/join concat-columns-with names)
+    (fn? concat-columns-with) (concat-columns-with names)
+    :else names))
+
+(defn- process-target-name
+  [value concat-value-with col-name]
+  (cond
+    (string? concat-value-with) (str value concat-value-with col-name)
+    (fn? concat-value-with) (concat-value-with col-name value)
+    :else [col-name value]))
+
 (defn- make-apply-join-fn
   "Perform left-join on groups and create new columns"
-  [group-name->names single-value? value-names join-name starting-ds-count fold-fn separator value-separator]
-  (fn [curr-ds {:keys [name group-id data]}]
-    (let [col-name (str/join separator (->> name
-                                            group-name->names
-                                            (remove nil?))) ;; source names
+  [group-name->names single-value? value-names join-name starting-ds-count fold-fn concat-columns-with concat-value-with]
+  (fn [curr-ds {:keys [name data]}]
+    (let [col-name (process-column-name concat-columns-with (->> name
+                                                                 group-name->names
+                                                                 (remove nil?))) ;; source names
           target-names (if single-value?
                          [col-name]
-                         (map #(str % value-separator col-name) value-names)) ;; traget column names
+                         (map #(process-target-name % concat-value-with col-name) value-names)) ;; traget column names
           rename-map (zipmap value-names target-names) ;; renaming map
           data (-> data
                    (rename-columns rename-map) ;; rename value column
@@ -102,8 +116,8 @@
 
 (defn pivot->wider
   ([ds columns-selector value-columns] (pivot->wider ds columns-selector value-columns nil))
-  ([ds columns-selector value-columns {:keys [fold-fn separator value-separator]
-                                       :or {separator "_" value-separator "-"}}]
+  ([ds columns-selector value-columns {:keys [fold-fn concat-columns-with concat-value-with]
+                                       :or {concat-columns-with "_" concat-value-with "-"}}]
    (let [col-names (column-names ds columns-selector) ;; columns to be unrolled
          value-names (column-names ds value-columns) ;; columns to be used as values
          single-value? (= (count value-names) 1) ;; maybe this is one column? (different name creation rely on this)
@@ -128,7 +142,7 @@
                                 (apply juxt)) ;; create function which extract new column name
          result (reduce (make-apply-join-fn group-name->names single-value? value-names
                                             join-name starting-ds-count fold-fn
-                                            separator value-separator)
+                                            concat-columns-with concat-value-with)
                         starting-ds
                         (ds/mapseq-reader grouped-ds))] ;; perform join on groups and create new columns
      (-> (if join-on-single? ;; finalize, recreate original columns from join column, and reorder stuff
@@ -136,3 +150,4 @@
            (-> (separate-column result join-name rest-cols identity {:drop-column? true})
                (reorder-columns rest-cols)))
          (ds/set-dataset-name (ds/dataset-name ds))))))
+

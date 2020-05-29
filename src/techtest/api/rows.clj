@@ -19,30 +19,33 @@
 
 (defn- find-indexes-from-fn
   "Filter rows"
-  [ds rows-selector limit-columns]
-  (->> (or limit-columns :all)
+  [ds rows-selector selected-keys]
+  (->> (or selected-keys :all)
        (ds/select-columns ds)
        (ds/mapseq-reader)
        (dfn/argfilter rows-selector)))
 
 (defn- find-indexes
   ([ds rows-selector] (find-indexes ds rows-selector nil))
-  ([ds rows-selector limit-columns]
+  ([ds rows-selector selected-keys]
    (cond
      (number? rows-selector) [(long rows-selector)]
      (iterable-sequence? rows-selector) (find-indexes-from-seq ds rows-selector)
-     (fn? rows-selector) (find-indexes-from-fn ds rows-selector limit-columns))))
+     (fn? rows-selector) (find-indexes-from-fn ds rows-selector selected-keys))))
 
 (defn- select-or-drop-rows
   "Select or drop rows."
   ([f ds rows-selector] (select-or-drop-rows f ds rows-selector nil))
-  ([f ds rows-selector {:keys [limit-columns pre]}]
-   (if (grouped? ds)
-     (let [pre-ds (map #(add-or-update-columns % pre) (ds :data))
-           indices (map #(find-indexes % rows-selector limit-columns) pre-ds)]       
-       (ds/add-or-update-column ds :data (map #(select-or-drop-rows f %1 %2) (ds :data) indices)))
-     
-     (f ds (find-indexes (add-or-update-columns ds pre) rows-selector limit-columns)))))
+  ([f ds rows-selector {:keys [select-keys pre]}]
+   (let [selected-keys (when select-keys (column-names (if (grouped? ds)
+                                                         (clojure.core/first (ds :data))
+                                                         ds) select-keys))]
+     (if (grouped? ds)
+       (let [pre-ds (map #(add-or-update-columns % pre) (ds :data))
+             indices (map #(find-indexes % rows-selector selected-keys) pre-ds)]       
+         (ds/add-or-update-column ds :data (map #(select-or-drop-rows f %1 %2) (ds :data) indices)))
+       
+       (f ds (find-indexes (add-or-update-columns ds pre) rows-selector selected-keys))))))
 
 (defn- select-or-drop-rows-docstring
   [op]

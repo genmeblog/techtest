@@ -3,7 +3,7 @@
             [tech.ml.dataset.column :as col]
             [tech.v2.datatype :as dtype]
             
-
+            [techtest.api.columns :refer [column-names]]
             [techtest.api.utils :refer [iterable-sequence? ->str]]
             [techtest.api.dataset :refer [dataset]])
   (:refer-clojure :exclude [group-by]))
@@ -29,11 +29,11 @@
 
 (defn- find-group-indexes
   "Calulate indexes for groups"
-  [ds grouping-selector limit-columns]
+  [ds grouping-selector selected-keys]
   (cond
     (map? grouping-selector) grouping-selector
     (iterable-sequence? grouping-selector) (ds/group-by->indexes identity grouping-selector ds)
-    (fn? grouping-selector) (ds/group-by->indexes grouping-selector limit-columns ds)
+    (fn? grouping-selector) (ds/group-by->indexes grouping-selector selected-keys ds)
     :else (ds/group-by-column->indexes grouping-selector ds)))
 
 (defn- subdataset
@@ -68,7 +68,7 @@
 
   Options are:
 
-  - limit-columns - when grouping is done by function, you can limit fields to a `limit-columns` seq.
+  - select-keys - when grouping is done by function, you can limit fields to a `select-keys` seq.
   - result-type - return results as dataset (`:as-dataset`, default) or as map of datasets (`:as-map`) or as map of row indexes (`:as-indexes`) or as sequence of (sub)datasets
   - other parameters which are passed to `dataset` fn
 
@@ -78,10 +78,11 @@
   - group-id - id of the group (int)
   - data - group as dataset"
   ([ds grouping-selector] (group-by ds grouping-selector nil))
-  ([ds grouping-selector {:keys [limit-columns result-type]
+  ([ds grouping-selector {:keys [select-keys result-type]
                           :or {result-type :as-dataset}
                           :as options}]
-   (let [group-indexes (find-group-indexes ds grouping-selector limit-columns)]
+   (let [selected-keys (when select-keys (column-names ds select-keys))
+         group-indexes (find-group-indexes ds grouping-selector selected-keys)]
      (condp = result-type
        :as-indexes group-indexes
        :as-seq (->> group-indexes ;; java.util.HashMap
@@ -170,9 +171,10 @@
 (defn- order-ds-for-ungrouping
   "Order results by group name or leave untouched."
   [prepared-ds order-by-group?]
-  (if order-by-group?
-    (sort-by :name prepared-ds)
-    prepared-ds))
+  (cond
+    (= :desc order-by-group?) (sort-by :name #(compare %2 %1) prepared-ds)
+    order-by-group? (sort-by :name prepared-ds)
+    :else prepared-ds))
 
 (defn ungroup
   "Concat groups into dataset.

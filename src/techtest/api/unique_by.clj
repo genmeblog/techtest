@@ -32,7 +32,7 @@
          (ungroup ungroup-options)))))
 
 (defn- unique-by-fn
-  [strategy columns-selector limit-columns options]
+  [strategy columns-selector selected-keys options]
   (if (fn? strategy)
 
     (fn [ds] (strategy-fold ds columns-selector strategy options))
@@ -44,8 +44,8 @@
                                                   (if (= (count columns-selector) 1)
                                                     (ds/unique-by-column (clojure.core/first columns-selector) local-options ds)
                                                     (ds/unique-by identity local-options ds))))
-        (fn? columns-selector) (let [local-options (if limit-columns
-                                                     (assoc local-options :column-name-seq limit-columns)
+        (fn? columns-selector) (let [local-options (if selected-keys
+                                                     (assoc local-options :column-name-seq selected-keys)
                                                      local-options)]
                                  (fn [ds] (ds/unique-by columns-selector local-options ds)))
         :else (fn [ds] (ds/unique-by-column columns-selector local-options ds))))))
@@ -59,11 +59,13 @@
 (defn unique-by
   ([ds] (unique-by ds (ds/column-names ds)))
   ([ds columns-selector] (unique-by ds columns-selector nil))
-  ([ds columns-selector {:keys [strategy limit-columns]
+  ([ds columns-selector {:keys [strategy select-keys]
                          :or {strategy :first}
                          :as options}]
-
-   (let [ufn (unique-by-fn strategy columns-selector limit-columns options)]
+   (let [selected-keys (when select-keys (column-names (if (grouped? ds)
+                                                         (clojure.core/first (ds :data))
+                                                         ds) select-keys))
+         ufn (unique-by-fn strategy columns-selector selected-keys options)]
 
      (if (grouped? ds)
        (process-group-data ds #(maybe-skip-unique % ufn))

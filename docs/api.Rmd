@@ -196,7 +196,7 @@ Not sequential values are repeated row-count number of times.
 
 ---
 
-Dataset created from map (keys = column name, second = value(s)). Works the same as sequence of pairs.
+Dataset created from map (keys = column names, vals = value(s)). Works the same as sequence of pairs.
 
 ```{clojure results="asis"}
 (api/dataset {:A 33})
@@ -380,6 +380,10 @@ Dataset is printed using `dataset->str` or `print-dataset` functions. Options ar
 (api/print-dataset (api/group-by DS :V1) {:print-line-policy :repl})
 ```
 
+```{clojure stdout_only=TRUE}
+(api/print-dataset (api/group-by DS :V1) {:print-line-policy :single})
+```
+
 
 ### Group-by
 
@@ -407,7 +411,7 @@ Grouping is done by calling `group-by` function with arguments:
         * `:as-indexes` - return rows ids (row number from original dataset)
         * `:as-map` - return map with group names as keys and subdataset as values
         * `:as-seq` - return sequens of subdatasets
-    - `:limit-columns` - list of the columns which should be returned during grouping by function.
+    - `:select-keys` - list of the columns passed to a grouping selector function
 
 All subdatasets (groups) have set name as the group name, additionally `group-id` is in meta.
 
@@ -416,7 +420,7 @@ Grouping can be done by:
 * single column name
 * seq of column names
 * map of keys (group names) and row indexes
-* value returned by function taking row as map
+* value returned by function taking row as map (limited to `:select-keys`)
 
 Note: currently dataset inside dataset is printed recursively so it renders poorly from markdown. So I will use `:as-seq` result type to show just group names and groups.
 
@@ -519,7 +523,7 @@ Grouping can be done by providing just row indexes. This way you can assign the 
 
 ---
 
-You can group by a result of gruping function which gets row as map and should return group name. When map is used as a group name, ungrouping restore original column names.
+You can group by a result of grouping function which gets row as map and should return group name. When map is used as a group name, ungrouping restore original column names.
 
 ```{clojure results="asis"}
 (api/group-by DS (fn [row] (* (:V1 row)
@@ -548,7 +552,7 @@ You can use any predicate on column to split dataset into two groups.
 
 ```{clojure results="asis"}
 (api/group-by DS identity {:result-type :as-seq
-                           :limit-columns [:V1]})
+                           :select-keys [:V1]})
 ```
 
 #### Ungrouping
@@ -585,6 +589,17 @@ Groups sorted by group name and named.
     (api/group-by :V3)
     (api/ungroup {:order? true
                   :dataset-name "Ordered by V3"}))
+```
+
+---
+
+Groups sorted descending by group name and named.
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by :V3)
+    (api/ungroup {:order? :desc
+                  :dataset-name "Ordered by V3 descending"}))
 ```
 
 ---
@@ -876,11 +891,29 @@ If we have grouped data set, column selection is applied to every group separate
 
 If you want to rename colums use `rename-columns` and pass map where keys are old names, values new ones.
 
+You can also pass mapping function with optional columns-selector
+
 ```{clojure results="asis"}
 (api/rename-columns DS {:V1 "v1"
                         :V2 "v2"
                         :V3 [1 2 3]
                         :V4 (Object.)})
+```
+
+---
+
+Map all names with function
+
+```{clojure results="asis"}
+(api/rename-columns DS (comp str second name))
+```
+
+---
+
+Map selected names with function
+
+```{clojure results="asis"}
+(api/rename-columns DS [:V1 :V3] (comp str second name))
 ```
 
 ---
@@ -908,6 +941,7 @@ To add (or update existing) column call `add-or-update-column` function. Functio
 * `size-strategy` (optional) - when new column is shorter than dataset row count, following strategies are applied:
     - `:cycle` (default) - repeat data
     - `:na` - append missing values
+    - `:strict` - throws an exception when sizes mismatch
 
 Function works on grouped dataset.
 
@@ -964,6 +998,14 @@ When column which is added is longer than row count in dataset, column is trimme
 
 ```{clojure results="asis"}
 (api/add-or-update-column DS :V5 [:r :b] :na)
+```
+
+Exception is thrown when `:strict` strategy is used and column size is not equal row count
+
+```{clojure}
+(try
+  (api/add-or-update-column DS :V5 [:r :b] :strict)
+  (catch Exception e (str "Exception caught: "(ex-message e))))
 ```
 
 ---
@@ -1058,7 +1100,7 @@ Arguments:
 `new-type` can be:
 
 * a type like `:int64` or `:string` 
-* or pair of datetime and conversion function
+* or pair of datetype and conversion function
 
 After conversion additional infomation is given on problematic values.
 
@@ -1143,7 +1185,7 @@ Rows can be selected or dropped using various selectors:
 * sequence of true/false values
 * filter by predicate (argument is row as a map)
 
-When predicate is used you may want to limit columns passed to the function (`limit-columns` option).
+When predicate is used you may want to limit columns passed to the function (`select-keys` option).
 
 Additionally you may want to precalculate some values which will be visible for predicate as additional columns. It's done internally by calling `add-or-update-columns` on a dataset. `:pre` is used as a column definitions.
 
@@ -1367,7 +1409,7 @@ Aggregator is a function or sequence or map of functions which accept dataset as
 
 Where map is given as an input or result, keys are treated as column names.
 
-Grouped dataset is ungrouped after aggreation. This can be turned of by setting `:ungroup` to false. In case you want to pass additional ungrouping parameters add them to the options.
+Grouped dataset is ungrouped after aggreation. This can be turned off by setting `:ungroup` to false. In case you want to pass additional ungrouping parameters add them to the options.
 
 By default resulting column names are prefixed with `summary` prefix (set it with `:default-column-name-prefix` option).
 
@@ -1453,7 +1495,7 @@ Ordering can be done by column(s) or any function operating on row. Possible ord
 * `:desc` for descending order
 * custom comparator
 
-`:limit-columns` limits row map provided to ordering functions.
+`:select-keys` limits row map provided to ordering functions.
 
 ---
 
@@ -1502,12 +1544,12 @@ Custom function can be used to provied ordering key. Here order by `:V4` descend
 ```{clojure results="asis"}
 (api/order-by DS [:V4 (fn [row] (* (:V1 row)
                                   (:V2 row)
-                                  (:V3 row)))] [:desc :asc] {:limit-columns [:V1 :V2 :V3]})
+                                  (:V3 row)))] [:desc :asc] {:select-keys [:V1 :V2 :V3]})
 ```
 
 ---
 
-Custom comparator also can be used in case objects are not comparable by default. Let's define artificial one: if euclidean distance is lower than 2, compare along `z` else along `x` and `y`. We use first three columns for that.
+Custom comparator also can be used in case objects are not comparable by default. Let's define artificial one: if Euclidean distance is lower than 2, compare along `z` else along `x` and `y`. We use first three columns for that.
 
 ```{clojure}
 (defn dist
@@ -2252,7 +2294,7 @@ Arguments:
 * dataset
 * columns selector
 * options:
-    - `:target-columns` - column name(s) where source column names are stored, or columns pattern (see below) (default: `:$column`)
+    - `:target-columns` - names of the columns created or columns pattern (see below) (default: `:$column`)
     - `:value-column-name` - name of the column for values (default: `:$value`)
     - `:splitter` - regular expression or function which splits source column names into data
     - `:drop-missing?` - remove rows with missing? (default: `:true`)
@@ -2397,14 +2439,16 @@ pnl
 Arguments:
 
 * dataset
-* columns selector - values from selected columns are converted to new columns
-* value columns - what are values
+* `columns-selector` - values from selected columns are converted to new columns
+* `value-columns` - what are values
 
-When multiple columns are used as columns selector, names are joined using `:separator` (default: "_") option.
+When multiple columns are used as columns selector, names are joined using `:concat-columns-with` option.
+`:concat-columns-with` can be a string or function (default: "_"). Function accepts sequence of names.
 
-When columns selector creates non unique set of values, they are folded using `:fold-fn` (default: `vec`) option.
+When `columns-selector` creates non unique set of values, they are folded using `:fold-fn` (default: `vec`) option.
 
-When value columns are a sequence, multiple observations as columns are created appending value column names into new columns. Column names are joined using `:value-separator` (default: "-") option.
+When `value-columns` is a sequence, multiple observations as columns are created appending value column names into new columns. Column names are joined using `:concat-value-with` option.
+`:concat-value-with` can be a string or function (default: "-"). Function accepts current column name and value.
 
 ---
 
@@ -2472,6 +2516,12 @@ production
 (api/pivot->wider production ["product" "country"] "production")
 ```
 
+Joined with custom function
+
+```{clojure results="asis"}
+(api/pivot->wider production ["product" "country"] "production" {:concat-columns-with (comp str vec)})
+```
+
 ---
 
 Multiple value columns
@@ -2486,6 +2536,12 @@ income
 
 ```{clojure results="asis"}
 (api/pivot->wider income "variable" ["estimate" "moe"])
+```
+
+Value concatenated by custom function
+
+```{clojure results="asis"}
+(api/pivot->wider income "variable" ["estimate" "moe"] {:concat-value-with (comp str vector)})
 ```
 
 ---
@@ -2918,7 +2974,7 @@ This API doesn't provide any statistical, numerical or date/time functions. Use 
 | Namespace | functions |
 |-----------|-----------|
 | `tech.v2.datatype.functional` | primitive oprations, reducers, statistics |
-| `tech.v2.datatype.datatime` | date/time converters |
+| `tech.v2.datatype.datetime` | date/time converters |
 | `tech.v2.datatype.datetime.operations` | date/time functions |
 | `tech.ml.dataset.pipeline` | pipeline operations |
 

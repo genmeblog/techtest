@@ -164,7 +164,7 @@ Not sequential values are repeated row-count number of times.
 
 ------------------------------------------------------------------------
 
-Dataset created from map (keys = column name, second = value(s)). Works the same as sequence of pairs.
+Dataset created from map (keys = column names, vals = value(s)). Works the same as sequence of pairs.
 
 ``` clojure
 (api/dataset {:A 33})
@@ -590,7 +590,7 @@ Rows as sequence of sequences
 (take 2 (api/rows ds))
 ```
 
-    ([#object[java.time.LocalDate 0x1b2e6bf5 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x62709059 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+    ([#object[java.time.LocalDate 0x2ec39060 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x3996202a "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 
 ------------------------------------------------------------------------
 
@@ -600,13 +600,13 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
-    ({"date" #object[java.time.LocalDate 0xa66a2fb "2012-01-01"],
+    ({"date" #object[java.time.LocalDate 0x69146cb0 "2012-01-01"],
       "precipitation" 0.0,
       "temp_min" 5.0,
       "weather" "drizzle",
       "temp_max" 12.8,
       "wind" 4.7}
-     {"date" #object[java.time.LocalDate 0xa0e9c82 "2012-01-02"],
+     {"date" #object[java.time.LocalDate 0x7ab701a6 "2012-01-02"],
       "precipitation" 10.9,
       "temp_min" 2.8,
       "weather" "rain",
@@ -654,6 +654,17 @@ Dataset is printed using `dataset->str` or `print-dataset` functions. Options ar
     |       |           | \|   2 \|   6 \|  1.500 \|   C \| |
     |       |           | \|   2 \|   8 \|  1.000 \|   B \| |
 
+``` clojure
+(api/print-dataset (api/group-by DS :V1) {:print-line-policy :single})
+```
+
+    _unnamed [2 3]:
+
+    | :name | :group-id |           :data |
+    |-------|-----------|-----------------|
+    |     1 |         0 | Group: 1 [5 4]: |
+    |     2 |         1 | Group: 2 [4 4]: |
+
 ### Group-by
 
 Grouping by is an operation which splits dataset into subdatasets and pack it into new special type of... dataset. I distinguish two types of dataset: regular dataset and grouped dataset. The latter is the result of grouping.
@@ -680,7 +691,7 @@ Grouping is done by calling `group-by` function with arguments:
         -   `:as-indexes` - return rows ids (row number from original dataset)
         -   `:as-map` - return map with group names as keys and subdataset as values
         -   `:as-seq` - return sequens of subdatasets
-    -   `:limit-columns` - list of the columns which should be returned during grouping by function.
+    -   `:select-keys` - list of the columns passed to a grouping selector function
 
 All subdatasets (groups) have set name as the group name, additionally `group-id` is in meta.
 
@@ -689,7 +700,7 @@ Grouping can be done by:
 -   single column name
 -   seq of column names
 -   map of keys (group names) and row indexes
--   value returned by function taking row as map
+-   value returned by function taking row as map (limited to `:select-keys`)
 
 Note: currently dataset inside dataset is printed recursively so it renders poorly from markdown. So I will use `:as-seq` result type to show just group names and groups.
 
@@ -960,7 +971,7 @@ Group: group-b \[4 4\]:
 
 ------------------------------------------------------------------------
 
-You can group by a result of gruping function which gets row as map and should return group name. When map is used as a group name, ungrouping restore original column names.
+You can group by a result of grouping function which gets row as map and should return group name. When map is used as a group name, ungrouping restore original column names.
 
 ``` clojure
 (api/group-by DS (fn [row] (* (:V1 row)
@@ -1087,7 +1098,7 @@ Group: \[2 1.0\] \[2 4\]:
 
 ``` clojure
 (api/group-by DS identity {:result-type :as-seq
-                           :limit-columns [:V1]})
+                           :select-keys [:V1]})
 ```
 
 (Group: {:V1 1} \[5 4\]:
@@ -1174,6 +1185,31 @@ Ordered by V3 \[9 4\]:
 | 1   | 3   | 1.500  | C   |
 | 2   | 6   | 1.500  | C   |
 | 1   | 9   | 1.500  | C   |
+
+------------------------------------------------------------------------
+
+Groups sorted descending by group name and named.
+
+``` clojure
+(-> DS
+    (api/group-by :V3)
+    (api/ungroup {:order? :desc
+                  :dataset-name "Ordered by V3 descending"}))
+```
+
+Ordered by V3 descending \[9 4\]:
+
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 3   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 1   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -1693,6 +1729,8 @@ If we have grouped data set, column selection is applied to every group separate
 
 If you want to rename colums use `rename-columns` and pass map where keys are old names, values new ones.
 
+You can also pass mapping function with optional columns-selector
+
 ``` clojure
 (api/rename-columns DS {:V1 "v1"
                         :V2 "v2"
@@ -1702,7 +1740,7 @@ If you want to rename colums use `rename-columns` and pass map where keys are ol
 
 \_unnamed \[9 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@60230d88> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@328f2bd2> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 2   | 2   | 1.000     | B                           |
@@ -1713,6 +1751,50 @@ If you want to rename colums use `rename-columns` and pass map where keys are ol
 | 1   | 7   | 0.5000    | A                           |
 | 2   | 8   | 1.000     | B                           |
 | 1   | 9   | 1.500     | C                           |
+
+------------------------------------------------------------------------
+
+Map all names with function
+
+``` clojure
+(api/rename-columns DS (comp str second name))
+```
+
+\_unnamed \[9 4\]:
+
+| 1   | 2   | 3      | 4   |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 9   | 1.500  | C   |
+
+------------------------------------------------------------------------
+
+Map selected names with function
+
+``` clojure
+(api/rename-columns DS [:V1 :V3] (comp str second name))
+```
+
+\_unnamed \[9 4\]:
+
+| 1   | :V2 | 3      | :V4 |
+|-----|-----|--------|-----|
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 9   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -1730,7 +1812,7 @@ Function works on grouped dataset
 
 {1 Group: 1 \[5 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@259b12d3> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@4ddc7dbd> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 1   | 3   | 1.500     | C                           |
@@ -1740,7 +1822,7 @@ Function works on grouped dataset
 
 , 2 Group: 2 \[4 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@259b12d3> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@4ddc7dbd> |
 |-----|-----|-----------|-----------------------------|
 | 2   | 2   | 1.000     | B                           |
 | 2   | 4   | 0.5000    | A                           |
@@ -1759,6 +1841,7 @@ To add (or update existing) column call `add-or-update-column` function. Functio
 -   `size-strategy` (optional) - when new column is shorter than dataset row count, following strategies are applied:
     -   `:cycle` (default) - repeat data
     -   `:na` - append missing values
+    -   `:strict` - throws an exception when sizes mismatch
 
 Function works on grouped dataset.
 
@@ -1796,15 +1879,15 @@ Replace one column (column is trimmed)
 
 | :V1    | :V2 | :V3    | :V4 |
 |--------|-----|--------|-----|
-| 0.6266 | 1   | 0.5000 | A   |
-| 0.8438 | 2   | 1.000  | B   |
-| 0.7089 | 3   | 1.500  | C   |
-| 0.6904 | 4   | 0.5000 | A   |
-| 0.9323 | 5   | 1.000  | B   |
-| 0.4475 | 6   | 1.500  | C   |
-| 0.4731 | 7   | 0.5000 | A   |
-| 0.9246 | 8   | 1.000  | B   |
-| 0.3941 | 9   | 1.500  | C   |
+| 0.8688 | 1   | 0.5000 | A   |
+| 0.6554 | 2   | 1.000  | B   |
+| 0.9349 | 3   | 1.500  | C   |
+| 0.6193 | 4   | 0.5000 | A   |
+| 0.8615 | 5   | 1.000  | B   |
+| 0.7473 | 6   | 1.500  | C   |
+| 0.1402 | 7   | 0.5000 | A   |
+| 0.9501 | 8   | 1.000  | B   |
+| 0.3579 | 9   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -1914,6 +1997,16 @@ When column which is added is longer than row count in dataset, column is trimme
 | 1   | 7   | 0.5000 | A   |     |
 | 2   | 8   | 1.000  | B   |     |
 | 1   | 9   | 1.500  | C   |     |
+
+Exception is thrown when `:strict` strategy is used and column size is not equal row count
+
+``` clojure
+(try
+  (api/add-or-update-column DS :V5 [:r :b] :strict)
+  (catch Exception e (str "Exception caught: "(ex-message e))))
+```
+
+    "Exception caught: Sequence size (2) should be exactly the same as dataset row count (9)"
 
 ------------------------------------------------------------------------
 
@@ -2105,7 +2198,7 @@ Arguments:
 `new-type` can be:
 
 -   a type like `:int64` or `:string`
--   or pair of datetime and conversion function
+-   or pair of datetype and conversion function
 
 After conversion additional infomation is given on problematic values.
 
@@ -2204,7 +2297,7 @@ Double array conversion.
 (api/->array DS :V1)
 ```
 
-    #object["[J" 0x2465521 "[J@2465521"]
+    #object["[J" 0x1c4ea229 "[J@1c4ea229"]
 
 ------------------------------------------------------------------------
 
@@ -2216,7 +2309,7 @@ Function also works on grouped dataset
     (api/->array :V2))
 ```
 
-    (#object["[J" 0x1f4249ca "[J@1f4249ca"] #object["[J" 0x1860121f "[J@1860121f"] #object["[J" 0x2d313217 "[J@2d313217"])
+    (#object["[J" 0x5b580993 "[J@5b580993"] #object["[J" 0x16389815 "[J@16389815"] #object["[J" 0x43e95f53 "[J@43e95f53"])
 
 ------------------------------------------------------------------------
 
@@ -2227,8 +2320,8 @@ You can also cast the type to the other one (if casting is possible):
 (api/->array DS :V1 :float32)
 ```
 
-    #object["[Ljava.lang.String;" 0x245a94df "[Ljava.lang.String;@245a94df"]
-    #object["[F" 0x3f5e7f99 "[F@3f5e7f99"]
+    #object["[Ljava.lang.String;" 0x692d95cf "[Ljava.lang.String;@692d95cf"]
+    #object["[F" 0x72293de0 "[F@72293de0"]
 
 ### Rows
 
@@ -2238,7 +2331,7 @@ Rows can be selected or dropped using various selectors:
 -   sequence of true/false values
 -   filter by predicate (argument is row as a map)
 
-When predicate is used you may want to limit columns passed to the function (`limit-columns` option).
+When predicate is used you may want to limit columns passed to the function (`select-keys` option).
 
 Additionally you may want to precalculate some values which will be visible for predicate as additional columns. It's done internally by calling `add-or-update-columns` on a dataset. `:pre` is used as a column definitions.
 
@@ -2414,7 +2507,7 @@ Random row (single)
 
 | :V1 | :V2 | :V3   | :V4 |
 |-----|-----|-------|-----|
-| 1   | 3   | 1.500 | C   |
+| 2   | 6   | 1.500 | C   |
 
 ------------------------------------------------------------------------
 
@@ -2442,15 +2535,15 @@ Random `n` (default: row count) rows with repetition.
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 7   | 0.5000 | A   |
-| 1   | 7   | 0.5000 | A   |
-| 1   | 7   | 0.5000 | A   |
 | 1   | 5   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
 | 2   | 4   | 0.5000 | A   |
-| 1   | 9   | 1.500  | C   |
-| 1   | 9   | 1.500  | C   |
 | 1   | 1   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 5   | 1.000  | B   |
 
 ------------------------------------------------------------------------
 
@@ -2464,11 +2557,11 @@ Five random rows with repetition
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
+| 2   | 4   | 0.5000 | A   |
 | 2   | 8   | 1.000  | B   |
-| 1   | 7   | 0.5000 | A   |
-| 1   | 7   | 0.5000 | A   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 1   | 0.5000 | A   |
 | 1   | 9   | 1.500  | C   |
-| 2   | 8   | 1.000  | B   |
 
 ------------------------------------------------------------------------
 
@@ -2482,11 +2575,11 @@ Five random, non-repeating rows
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 7   | 0.5000 | A   |
-| 1   | 9   | 1.500  | C   |
-| 2   | 8   | 1.000  | B   |
-| 2   | 4   | 0.5000 | A   |
 | 1   | 1   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 9   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2518,15 +2611,15 @@ Shuffle dataset
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 1   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 5   | 1.000  | B   |
 | 2   | 4   | 0.5000 | A   |
 | 1   | 3   | 1.500  | C   |
-| 2   | 6   | 1.500  | C   |
-| 2   | 2   | 1.000  | B   |
 | 2   | 8   | 1.000  | B   |
-| 1   | 9   | 1.500  | C   |
-| 1   | 7   | 0.5000 | A   |
-| 1   | 5   | 1.000  | B   |
+| 1   | 1   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2651,20 +2744,20 @@ Select 5 random rows from each group
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
 | 2   | 4   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 4   | 0.5000 | A   |
 | 1   | 1   | 0.5000 | A   |
 | 2   | 4   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 2   | 1.000  | B   |
 | 2   | 2   | 1.000  | B   |
 | 1   | 5   | 1.000  | B   |
-| 1   | 5   | 1.000  | B   |
-| 2   | 2   | 1.000  | B   |
 | 2   | 8   | 1.000  | B   |
-| 1   | 9   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
 | 1   | 3   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
 | 1   | 9   | 1.500  | C   |
-| 1   | 9   | 1.500  | C   |
-| 1   | 9   | 1.500  | C   |
+| 2   | 6   | 1.500  | C   |
 
 ### Aggregate
 
@@ -2674,7 +2767,7 @@ Aggregator is a function or sequence or map of functions which accept dataset as
 
 Where map is given as an input or result, keys are treated as column names.
 
-Grouped dataset is ungrouped after aggreation. This can be turned of by setting `:ungroup` to false. In case you want to pass additional ungrouping parameters add them to the options.
+Grouped dataset is ungrouped after aggreation. This can be turned off by setting `:ungroup` to false. In case you want to pass additional ungrouping parameters add them to the options.
 
 By default resulting column names are prefixed with `summary` prefix (set it with `:default-column-name-prefix` option).
 
@@ -2813,7 +2906,7 @@ Ordering can be done by column(s) or any function operating on row. Possible ord
 -   `:desc` for descending order
 -   custom comparator
 
-`:limit-columns` limits row map provided to ordering functions.
+`:select-keys` limits row map provided to ordering functions.
 
 ------------------------------------------------------------------------
 
@@ -2946,7 +3039,7 @@ Custom function can be used to provied ordering key. Here order by `:V4` descend
 ``` clojure
 (api/order-by DS [:V4 (fn [row] (* (:V1 row)
                                   (:V2 row)
-                                  (:V3 row)))] [:desc :asc] {:limit-columns [:V1 :V2 :V3]})
+                                  (:V3 row)))] [:desc :asc] {:select-keys [:V1 :V2 :V3]})
 ```
 
 \_unnamed \[9 4\]:
@@ -2965,7 +3058,7 @@ Custom function can be used to provied ordering key. Here order by `:V4` descend
 
 ------------------------------------------------------------------------
 
-Custom comparator also can be used in case objects are not comparable by default. Let's define artificial one: if euclidean distance is lower than 2, compare along `z` else along `x` and `y`. We use first three columns for that.
+Custom comparator also can be used in case objects are not comparable by default. Let's define artificial one: if Euclidean distance is lower than 2, compare along `z` else along `x` and `y`. We use first three columns for that.
 
 ``` clojure
 (defn dist
@@ -4578,7 +4671,7 @@ Arguments:
 -   dataset
 -   columns selector
 -   options:
-    -   `:target-columns` - column name(s) where source column names are stored, or columns pattern (see below) (default: `:$column`)
+    -   `:target-columns` - names of the columns created or columns pattern (see below) (default: `:$column`)
     -   `:value-column-name` - name of the column for values (default: `:$value`)
     -   `:splitter` - regular expression or function which splits source column names into data
     -   `:drop-missing?` - remove rows with missing? (default: `:true`)
@@ -5534,12 +5627,12 @@ pnl
 
 \_unnamed \[4 7\]:
 
-| :x  | :a  | :b  | :y1    | :y2    | :z1 | :z2 |
-|-----|-----|-----|--------|--------|-----|-----|
-| 1   | 1   | 0   | 0.5711 | 0.3597 | 3   | -2  |
-| 2   | 1   | 1   | 0.2429 | 0.6766 | 3   | -2  |
-| 3   | 0   | 1   | 0.2833 | 0.9467 | 3   | -2  |
-| 4   | 0   | 1   | 0.5037 | 0.5446 | 3   | -2  |
+| :x  | :a  | :b  | :y1     | :y2    | :z1 | :z2 |
+|-----|-----|-----|---------|--------|-----|-----|
+| 1   | 1   | 0   | 0.01489 | 0.3110 | 3   | -2  |
+| 2   | 1   | 1   | 0.6054  | 0.9281 | 3   | -2  |
+| 3   | 0   | 1   | 0.7271  | 0.6846 | 3   | -2  |
+| 4   | 0   | 1   | 0.6413  | 0.2423 | 3   | -2  |
 
 ``` clojure
 (api/pivot->longer pnl [:y1 :y2 :z1 :z2] {:target-columns [nil :times]
@@ -5548,16 +5641,16 @@ pnl
 
 \_unnamed \[8 6\]:
 
-| :x  | :a  | :b  | :times | y      | z   |
-|-----|-----|-----|--------|--------|-----|
-| 1   | 1   | 0   | 1      | 0.5711 | 3   |
-| 2   | 1   | 1   | 1      | 0.2429 | 3   |
-| 3   | 0   | 1   | 1      | 0.2833 | 3   |
-| 4   | 0   | 1   | 1      | 0.5037 | 3   |
-| 1   | 1   | 0   | 2      | 0.3597 | -2  |
-| 2   | 1   | 1   | 2      | 0.6766 | -2  |
-| 3   | 0   | 1   | 2      | 0.9467 | -2  |
-| 4   | 0   | 1   | 2      | 0.5446 | -2  |
+| :x  | :a  | :b  | :times | y       | z   |
+|-----|-----|-----|--------|---------|-----|
+| 1   | 1   | 0   | 1      | 0.01489 | 3   |
+| 2   | 1   | 1   | 1      | 0.6054  | 3   |
+| 3   | 0   | 1   | 1      | 0.7271  | 3   |
+| 4   | 0   | 1   | 1      | 0.6413  | 3   |
+| 1   | 1   | 0   | 2      | 0.3110  | -2  |
+| 2   | 1   | 1   | 2      | 0.9281  | -2  |
+| 3   | 0   | 1   | 2      | 0.6846  | -2  |
+| 4   | 0   | 1   | 2      | 0.2423  | -2  |
 
 #### Wider
 
@@ -5566,14 +5659,14 @@ pnl
 Arguments:
 
 -   dataset
--   columns selector - values from selected columns are converted to new columns
--   value columns - what are values
+-   `columns-selector` - values from selected columns are converted to new columns
+-   `value-columns` - what are values
 
-When multiple columns are used as columns selector, names are joined using `:separator` (default: "\_") option.
+When multiple columns are used as columns selector, names are joined using `:concat-columns-with` option. `:concat-columns-with` can be a string or function (default: "\_"). Function accepts sequence of names.
 
-When columns selector creates non unique set of values, they are folded using `:fold-fn` (default: `vec`) option.
+When `columns-selector` creates non unique set of values, they are folded using `:fold-fn` (default: `vec`) option.
 
-When value columns are a sequence, multiple observations as columns are created appending value column names into new columns. Column names are joined using `:value-separator` (default: "-") option.
+When `value-columns` is a sequence, multiple observations as columns are created appending value column names into new columns. Column names are joined using `:concat-value-with` option. `:concat-value-with` can be a string or function (default: "-"). Function accepts current column name and value.
 
 ------------------------------------------------------------------------
 
@@ -5802,6 +5895,32 @@ data/production.csv \[15 4\]:
 | 2013 | -1.559   | -1.628  | -0.7853  |
 | 2014 | -0.1170  | 0.03330 | 0.9784   |
 
+Joined with custom function
+
+``` clojure
+(api/pivot->wider production ["product" "country"] "production" {:concat-columns-with (comp str vec)})
+```
+
+data/production.csv \[15 4\]:
+
+| year | \["A" "AI"\] | \["B" "EI"\] | \["B" "AI"\] |
+|------|--------------|--------------|--------------|
+| 2000 | 1.637        | 1.405        | -0.02618     |
+| 2001 | 0.1587       | -0.5962      | -0.6886      |
+| 2002 | -1.568       | -0.2657      | 0.06249      |
+| 2003 | -0.4446      | 0.6526       | -0.7234      |
+| 2004 | -0.07134     | 0.6256       | 0.4725       |
+| 2005 | 1.612        | -1.345       | -0.9417      |
+| 2006 | -0.7043      | -0.9718      | -0.3478      |
+| 2007 | -1.536       | -1.697       | 0.5243       |
+| 2008 | 0.8391       | 0.04556      | 1.832        |
+| 2009 | -0.3742      | 1.193        | 0.1071       |
+| 2010 | -0.7116      | -1.606       | -0.3290      |
+| 2011 | 1.128        | -0.7724      | -1.783       |
+| 2012 | 1.457        | -2.503       | 0.6113       |
+| 2013 | -1.559       | -1.628       | -0.7853      |
+| 2014 | -0.1170      | 0.03330      | 0.9784       |
+
 ------------------------------------------------------------------------
 
 Multiple value columns
@@ -5877,6 +5996,237 @@ data/us\_rent\_income.csv \[52 6\]:
 | 26    | Michigan             | 824           | 3        | 26987           | 82         |
 | 27    | Minnesota            | 906           | 4        | 32734           | 189        |
 | 28    | Mississippi          | 740           | 5        | 22766           | 194        |
+
+Value concatenated by custom function
+
+``` clojure
+(api/pivot->wider income "variable" ["estimate" "moe"] {:concat-value-with (comp str vector)})
+```
+
+data/us\_rent\_income.csv \[52 6\]:
+
+<table>
+<colgroup>
+<col width="7%" />
+<col width="20%" />
+<col width="19%" />
+<col width="15%" />
+<col width="21%" />
+<col width="16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>GEOID</th>
+<th>NAME</th>
+<th>[&quot;rent&quot; &quot;estimate&quot;]</th>
+<th>[&quot;rent&quot; &quot;moe&quot;]</th>
+<th>[&quot;income&quot; &quot;estimate&quot;]</th>
+<th>[&quot;income&quot; &quot;moe&quot;]</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Alabama</td>
+<td>747</td>
+<td>3</td>
+<td>24476</td>
+<td>136</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Alaska</td>
+<td>1200</td>
+<td>13</td>
+<td>32940</td>
+<td>508</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>Arizona</td>
+<td>972</td>
+<td>4</td>
+<td>27517</td>
+<td>148</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>Arkansas</td>
+<td>709</td>
+<td>5</td>
+<td>23789</td>
+<td>165</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>California</td>
+<td>1358</td>
+<td>3</td>
+<td>29454</td>
+<td>109</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>Colorado</td>
+<td>1125</td>
+<td>5</td>
+<td>32401</td>
+<td>109</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>Connecticut</td>
+<td>1123</td>
+<td>5</td>
+<td>35326</td>
+<td>195</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>Delaware</td>
+<td>1076</td>
+<td>10</td>
+<td>31560</td>
+<td>247</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>District of Columbia</td>
+<td>1424</td>
+<td>17</td>
+<td>43198</td>
+<td>681</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>Florida</td>
+<td>1077</td>
+<td>3</td>
+<td>25952</td>
+<td>70</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>Georgia</td>
+<td>927</td>
+<td>3</td>
+<td>27024</td>
+<td>106</td>
+</tr>
+<tr class="even">
+<td>15</td>
+<td>Hawaii</td>
+<td>1507</td>
+<td>18</td>
+<td>32453</td>
+<td>218</td>
+</tr>
+<tr class="odd">
+<td>16</td>
+<td>Idaho</td>
+<td>792</td>
+<td>7</td>
+<td>25298</td>
+<td>208</td>
+</tr>
+<tr class="even">
+<td>17</td>
+<td>Illinois</td>
+<td>952</td>
+<td>3</td>
+<td>30684</td>
+<td>83</td>
+</tr>
+<tr class="odd">
+<td>18</td>
+<td>Indiana</td>
+<td>782</td>
+<td>3</td>
+<td>27247</td>
+<td>117</td>
+</tr>
+<tr class="even">
+<td>19</td>
+<td>Iowa</td>
+<td>740</td>
+<td>4</td>
+<td>30002</td>
+<td>143</td>
+</tr>
+<tr class="odd">
+<td>20</td>
+<td>Kansas</td>
+<td>801</td>
+<td>5</td>
+<td>29126</td>
+<td>208</td>
+</tr>
+<tr class="even">
+<td>21</td>
+<td>Kentucky</td>
+<td>713</td>
+<td>4</td>
+<td>24702</td>
+<td>159</td>
+</tr>
+<tr class="odd">
+<td>22</td>
+<td>Louisiana</td>
+<td>825</td>
+<td>4</td>
+<td>25086</td>
+<td>155</td>
+</tr>
+<tr class="even">
+<td>23</td>
+<td>Maine</td>
+<td>808</td>
+<td>7</td>
+<td>26841</td>
+<td>187</td>
+</tr>
+<tr class="odd">
+<td>24</td>
+<td>Maryland</td>
+<td>1311</td>
+<td>5</td>
+<td>37147</td>
+<td>152</td>
+</tr>
+<tr class="even">
+<td>25</td>
+<td>Massachusetts</td>
+<td>1173</td>
+<td>5</td>
+<td>34498</td>
+<td>199</td>
+</tr>
+<tr class="odd">
+<td>26</td>
+<td>Michigan</td>
+<td>824</td>
+<td>3</td>
+<td>26987</td>
+<td>82</td>
+</tr>
+<tr class="even">
+<td>27</td>
+<td>Minnesota</td>
+<td>906</td>
+<td>4</td>
+<td>32734</td>
+<td>189</td>
+</tr>
+<tr class="odd">
+<td>28</td>
+<td>Mississippi</td>
+<td>740</td>
+<td>5</td>
+<td>22766</td>
+<td>194</td>
+</tr>
+</tbody>
+</table>
 
 ------------------------------------------------------------------------
 
@@ -6928,31 +7278,31 @@ null \[27 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 3   | 1.500  | C   |
-| 1   | 7   | 0.5000 | A   |
-| 1   | 5   | 1.000  | B   |
-| 1   | 1   | 0.5000 | A   |
-| 1   | 3   | 1.500  | C   |
-| 1   | 7   | 0.5000 | A   |
-| 1   | 3   | 1.500  | C   |
-| 1   | 5   | 1.000  | B   |
-| 1   | 1   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
-| 1   | 1   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
-| 2   | 6   | 1.500  | C   |
-| 1   | 5   | 1.000  | B   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 9   | 1.500  | C   |
 | 2   | 6   | 1.500  | C   |
 | 1   | 1   | 0.5000 | A   |
-| 1   | 3   | 1.500  | C   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
 | 2   | 6   | 1.500  | C   |
 | 1   | 3   | 1.500  | C   |
 | 2   | 8   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
 | 2   | 6   | 1.500  | C   |
-| 2   | 6   | 1.500  | C   |
-| 2   | 6   | 1.500  | C   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 3   | 1.500  | C   |
 | 2   | 4   | 0.5000 | A   |
+| 1   | 3   | 1.500  | C   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 2   | 1.000  | B   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
 
 #### Union
 
@@ -6997,14 +7347,14 @@ union \[9 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 5   | 1.000  | B   |
-| 1   | 9   | 1.500  | C   |
-| 1   | 7   | 0.5000 | A   |
-| 2   | 6   | 1.500  | C   |
-| 1   | 1   | 0.5000 | A   |
-| 2   | 2   | 1.000  | B   |
 | 1   | 3   | 1.500  | C   |
+| 1   | 5   | 1.000  | B   |
 | 2   | 8   | 1.000  | B   |
+| 1   | 1   | 0.5000 | A   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
 | 2   | 4   | 0.5000 | A   |
 
 #### Intersection
@@ -7059,7 +7409,7 @@ This API doesn't provide any statistical, numerical or date/time functions. Use 
 | Namespace                              | functions                                 |
 |----------------------------------------|-------------------------------------------|
 | `tech.v2.datatype.functional`          | primitive oprations, reducers, statistics |
-| `tech.v2.datatype.datatime`            | date/time converters                      |
+| `tech.v2.datatype.datetime`            | date/time converters                      |
 | `tech.v2.datatype.datetime.operations` | date/time functions                       |
 | `tech.ml.dataset.pipeline`             | pipeline operations                       |
 
@@ -8435,9 +8785,9 @@ Other filters
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 1   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
 | 1   | 7   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
 
 ``` clojure
 (api/random DS (/ (api/row-count DS) 2)) ;; fraction of random rows
@@ -8445,13 +8795,13 @@ Other filters
 
 \_unnamed \[5 4\]:
 
-| :V1 | :V2 | :V3   | :V4 |
-|-----|-----|-------|-----|
-| 2   | 2   | 1.000 | B   |
-| 2   | 2   | 1.000 | B   |
-| 1   | 5   | 1.000 | B   |
-| 1   | 5   | 1.000 | B   |
-| 1   | 5   | 1.000 | B   |
+| :V1 | :V2 | :V3    | :V4 |
+|-----|-----|--------|-----|
+| 1   | 3   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 5   | 1.000  | B   |
 
 ``` clojure
 (api/by-rank DS :V1 zero?) ;; take top n entries

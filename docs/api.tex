@@ -110,7 +110,7 @@
 
 \title{Proposed API for tech.ml.dataset}
 \author{GenerateMe}
-\date{2020-05-29}
+\date{2020-05-30}
 
 \begin{document}
 \maketitle
@@ -394,7 +394,7 @@ Not sequential values are repeated row-count number of times.
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-Dataset created from map (keys = column name, second = value(s)). Works
+Dataset created from map (keys = column names, vals = value(s)). Works
 the same as sequence of pairs.
 
 \begin{Shaded}
@@ -1010,7 +1010,7 @@ Rows as sequence of sequences
 \end{Shaded}
 
 \begin{verbatim}
-([#object[java.time.LocalDate 0x6b8e53b4 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x1a2e9553 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+([#object[java.time.LocalDate 0x2ccf0101 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x36f67004 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -1024,13 +1024,13 @@ Rows as sequence of maps
 \end{Shaded}
 
 \begin{verbatim}
-({"date" #object[java.time.LocalDate 0xfdb402 "2012-01-01"],
+({"date" #object[java.time.LocalDate 0x72ce13be "2012-01-01"],
   "precipitation" 0.0,
   "temp_min" 5.0,
   "weather" "drizzle",
   "temp_max" 12.8,
   "wind" 4.7}
- {"date" #object[java.time.LocalDate 0x4e8443b2 "2012-01-02"],
+ {"date" #object[java.time.LocalDate 0x12d5f38 "2012-01-02"],
   "precipitation" 10.9,
   "temp_min" 2.8,
   "weather" "rain",
@@ -1091,6 +1091,21 @@ _unnamed [2 3]:
 |       |           | \|   2 \|   8 \|  1.000 \|   B \| |
 \end{verbatim}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/print-dataset (api/group-by DS }\AttributeTok{:V1}\NormalTok{) \{}\AttributeTok{:print-line-policy} \AttributeTok{:single}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+_unnamed [2 3]:
+
+| :name | :group-id |           :data |
+|-------|-----------|-----------------|
+|     1 |         0 | Group: 1 [5 4]: |
+|     2 |         1 | Group: 2 [4 4]: |
+\end{verbatim}
+
 \subsubsection{Group-by}\label{group-by}
 
 Grouping by is an operation which splits dataset into subdatasets and
@@ -1148,8 +1163,8 @@ Grouping is done by calling \texttt{group-by} function with arguments:
       \texttt{:as-seq} - return sequens of subdatasets
     \end{itemize}
   \item
-    \texttt{:limit-columns} - list of the columns which should be
-    returned during grouping by function.
+    \texttt{:select-keys} - list of the columns passed to a grouping
+    selector function
   \end{itemize}
 \end{itemize}
 
@@ -1167,7 +1182,8 @@ Grouping can be done by:
 \item
   map of keys (group names) and row indexes
 \item
-  value returned by function taking row as map
+  value returned by function taking row as map (limited to
+  \texttt{:select-keys})
 \end{itemize}
 
 Note: currently dataset inside dataset is printed recursively so it
@@ -1560,7 +1576,7 @@ Group: group-b {[}4 4{]}:
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-You can group by a result of gruping function which gets row as map and
+You can group by a result of grouping function which gets row as map and
 should return group name. When map is used as a group name, ungrouping
 restore original column names.
 
@@ -1762,7 +1778,7 @@ passed to grouping functions. It's done for performance purposes.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{(api/group-by DS }\KeywordTok{identity}\NormalTok{ \{}\AttributeTok{:result-type} \AttributeTok{:as-seq}
-                           \AttributeTok{:limit-columns}\NormalTok{ [}\AttributeTok{:V1}\NormalTok{]\})}
+                           \AttributeTok{:select-keys}\NormalTok{ [}\AttributeTok{:V1}\NormalTok{]\})}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1890,6 +1906,38 @@ Ordered by V3 {[}9 4{]}:
 1 & 3 & 1.500 & C\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Groups sorted descending by group name and named.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V3}\NormalTok{)}
+\NormalTok{    (api/ungroup \{}\AttributeTok{:order}\NormalTok{? }\AttributeTok{:desc}
+                  \AttributeTok{:dataset-name} \StringTok{"Ordered by V3 descending"}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+Ordered by V3 descending {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 3 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -2620,6 +2668,8 @@ separately. Selected columns are dropped.
 If you want to rename colums use \texttt{rename-columns} and pass map
 where keys are old names, values new ones.
 
+You can also pass mapping function with optional columns-selector
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{(api/rename-columns DS \{}\AttributeTok{:V1} \StringTok{"v1"}
@@ -2634,7 +2684,65 @@ where keys are old names, values new ones.
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@37fd7111}{\nolinkurl{java.lang.Object@37fd7111}}\tabularnewline
+\href{mailto:java.lang.Object@42c53e77}{\nolinkurl{java.lang.Object@42c53e77}}\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Map all names with function
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/rename-columns DS (}\KeywordTok{comp} \KeywordTok{str} \KeywordTok{second} \KeywordTok{name}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+1 & 2 & 3 & 4\tabularnewline
+\midrule
+\endhead
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Map selected names with function
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/rename-columns DS [}\AttributeTok{:V1} \AttributeTok{:V3}\NormalTok{] (}\KeywordTok{comp} \KeywordTok{str} \KeywordTok{second} \KeywordTok{name}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+1 & :V2 & 3 & :V4\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2670,7 +2778,7 @@ Function works on grouped dataset
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@6b42fddc}{\nolinkurl{java.lang.Object@6b42fddc}}\tabularnewline
+\href{mailto:java.lang.Object@3620c5b5}{\nolinkurl{java.lang.Object@3620c5b5}}\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2686,7 +2794,7 @@ v1 & v2 & {[}1 2 3{]} &
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@6b42fddc}{\nolinkurl{java.lang.Object@6b42fddc}}\tabularnewline
+\href{mailto:java.lang.Object@3620c5b5}{\nolinkurl{java.lang.Object@3620c5b5}}\tabularnewline
 \midrule
 \endhead
 2 & 2 & 1.000 & B\tabularnewline
@@ -2725,6 +2833,8 @@ function. Function accepts:
     \texttt{:cycle} (default) - repeat data
   \item
     \texttt{:na} - append missing values
+  \item
+    \texttt{:strict} - throws an exception when sizes mismatch
   \end{itemize}
 \end{itemize}
 
@@ -2776,15 +2886,15 @@ Replace one column (column is trimmed)
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-0.5133 & 1 & 0.5000 & A\tabularnewline
-0.1717 & 2 & 1.000 & B\tabularnewline
-0.3405 & 3 & 1.500 & C\tabularnewline
-0.3478 & 4 & 0.5000 & A\tabularnewline
-0.7119 & 5 & 1.000 & B\tabularnewline
-0.6968 & 6 & 1.500 & C\tabularnewline
-0.3737 & 7 & 0.5000 & A\tabularnewline
-0.6768 & 8 & 1.000 & B\tabularnewline
-0.2564 & 9 & 1.500 & C\tabularnewline
+0.8539 & 1 & 0.5000 & A\tabularnewline
+0.4742 & 2 & 1.000 & B\tabularnewline
+0.7157 & 3 & 1.500 & C\tabularnewline
+0.8046 & 4 & 0.5000 & A\tabularnewline
+0.3229 & 5 & 1.000 & B\tabularnewline
+0.5294 & 6 & 1.500 & C\tabularnewline
+0.9940 & 7 & 0.5000 & A\tabularnewline
+0.2443 & 8 & 1.000 & B\tabularnewline
+0.3377 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -2935,6 +3045,21 @@ appended.
 1 & 9 & 1.500 & C &\tabularnewline
 \bottomrule
 \end{longtable}
+
+Exception is thrown when \texttt{:strict} strategy is used and column
+size is not equal row count
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{try}
+\NormalTok{  (api/add-or-update-column DS }\AttributeTok{:V5}\NormalTok{ [}\AttributeTok{:r} \AttributeTok{:b}\NormalTok{] }\AttributeTok{:strict}\NormalTok{)}
+\NormalTok{  (}\KeywordTok{catch}\NormalTok{ Exception }\KeywordTok{e}\NormalTok{ (}\KeywordTok{str} \StringTok{"Exception caught: "}\NormalTok{(ex-message }\KeywordTok{e}\NormalTok{))))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+"Exception caught: Sequence size (2) should be exactly the same as dataset row count (9)"
+\end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -3210,7 +3335,7 @@ Arguments:
 \item
   a type like \texttt{:int64} or \texttt{:string}
 \item
-  or pair of datetime and conversion function
+  or pair of datetype and conversion function
 \end{itemize}
 
 After conversion additional infomation is given on problematic values.
@@ -3347,7 +3472,7 @@ Double array conversion.
 \end{Shaded}
 
 \begin{verbatim}
-#object["[J" 0x39b06445 "[J@39b06445"]
+#object["[J" 0x5658466f "[J@5658466f"]
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3363,7 +3488,7 @@ Function also works on grouped dataset
 \end{Shaded}
 
 \begin{verbatim}
-(#object["[J" 0x2d070f18 "[J@2d070f18"] #object["[J" 0x39b658c5 "[J@39b658c5"] #object["[J" 0x1f9a5378 "[J@1f9a5378"])
+(#object["[J" 0x2aca467 "[J@2aca467"] #object["[J" 0x2ee3aaaa "[J@2ee3aaaa"] #object["[J" 0x4471780c "[J@4471780c"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3378,8 +3503,8 @@ You can also cast the type to the other one (if casting is possible):
 \end{Shaded}
 
 \begin{verbatim}
-#object["[Ljava.lang.String;" 0x3e00e13d "[Ljava.lang.String;@3e00e13d"]
-#object["[F" 0x2504cf70 "[F@2504cf70"]
+#object["[Ljava.lang.String;" 0x39f94317 "[Ljava.lang.String;@39f94317"]
+#object["[F" 0x22fde92a "[F@22fde92a"]
 \end{verbatim}
 
 \subsubsection{Rows}\label{rows}
@@ -3398,7 +3523,7 @@ Rows can be selected or dropped using various selectors:
 \end{itemize}
 
 When predicate is used you may want to limit columns passed to the
-function (\texttt{limit-columns} option).
+function (\texttt{select-keys} option).
 
 Additionally you may want to precalculate some values which will be
 visible for predicate as additional columns. It's done internally by
@@ -3652,7 +3777,7 @@ Random row (single)
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 3 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3694,14 +3819,14 @@ Random \texttt{n} (default: row count) rows with repetition.
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 2 & 1.000 & B\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
 1 & 7 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
@@ -3724,10 +3849,10 @@ Five random rows with repetition
 \midrule
 \endhead
 2 & 8 & 1.000 & B\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3748,11 +3873,11 @@ Five random, non-repeating rows
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
+2 & 2 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
 1 & 1 & 0.5000 & A\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3798,15 +3923,15 @@ Shuffle dataset
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0.5000 & A\tabularnewline
 2 & 8 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3984,21 +4109,21 @@ Select 5 random rows from each group
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 7 & 0.5000 & A\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
 1 & 7 & 0.5000 & A\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -4013,7 +4138,7 @@ map.
 Where map is given as an input or result, keys are treated as column
 names.
 
-Grouped dataset is ungrouped after aggreation. This can be turned of by
+Grouped dataset is ungrouped after aggreation. This can be turned off by
 setting \texttt{:ungroup} to false. In case you want to pass additional
 ungrouping parameters add them to the options.
 
@@ -4224,7 +4349,7 @@ Possible order can be:
   custom comparator
 \end{itemize}
 
-\texttt{:limit-columns} limits row map provided to ordering functions.
+\texttt{:select-keys} limits row map provided to ordering functions.
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -4401,7 +4526,7 @@ Custom function can be used to provied ordering key. Here order by
 \begin{Highlighting}[]
 \NormalTok{(api/order-by DS [}\AttributeTok{:V4}\NormalTok{ (}\KeywordTok{fn}\NormalTok{ [row] (}\KeywordTok{*}\NormalTok{ (}\AttributeTok{:V1}\NormalTok{ row)}
 \NormalTok{                                  (}\AttributeTok{:V2}\NormalTok{ row)}
-\NormalTok{                                  (}\AttributeTok{:V3}\NormalTok{ row)))] [}\AttributeTok{:desc} \AttributeTok{:asc}\NormalTok{] \{}\AttributeTok{:limit-columns}\NormalTok{ [}\AttributeTok{:V1} \AttributeTok{:V2} \AttributeTok{:V3}\NormalTok{]\})}
+\NormalTok{                                  (}\AttributeTok{:V3}\NormalTok{ row)))] [}\AttributeTok{:desc} \AttributeTok{:asc}\NormalTok{] \{}\AttributeTok{:select-keys}\NormalTok{ [}\AttributeTok{:V1} \AttributeTok{:V2} \AttributeTok{:V3}\NormalTok{]\})}
 \end{Highlighting}
 \end{Shaded}
 
@@ -4427,7 +4552,7 @@ Custom function can be used to provied ordering key. Here order by
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 Custom comparator also can be used in case objects are not comparable by
-default. Let's define artificial one: if euclidean distance is lower
+default. Let's define artificial one: if Euclidean distance is lower
 than 2, compare along \texttt{z} else along \texttt{x} and \texttt{y}.
 We use first three columns for that.
 
@@ -4698,7 +4823,7 @@ Random
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 3 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
 2 & 8 & 1.000 & B\tabularnewline
 \bottomrule
 \end{longtable}
@@ -6689,9 +6814,8 @@ Arguments:
   \begin{itemize}
   \tightlist
   \item
-    \texttt{:target-columns} - column name(s) where source column names
-    are stored, or columns pattern (see below) (default:
-    \texttt{:\$column})
+    \texttt{:target-columns} - names of the columns created or columns
+    pattern (see below) (default: \texttt{:\$column})
   \item
     \texttt{:value-column-name} - name of the column for values
     (default: \texttt{:\$value})
@@ -8199,10 +8323,10 @@ data/anscombe.csv {[}44 3{]}:
 :x & :a & :b & :y1 & :y2 & :z1 & :z2\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0 & 0.5385 & 0.7497 & 3 & -2\tabularnewline
-2 & 1 & 1 & 0.05581 & 0.005098 & 3 & -2\tabularnewline
-3 & 0 & 1 & 0.9443 & 0.5554 & 3 & -2\tabularnewline
-4 & 0 & 1 & 0.2463 & 0.3304 & 3 & -2\tabularnewline
+1 & 1 & 0 & 0.2703 & 0.8536 & 3 & -2\tabularnewline
+2 & 1 & 1 & 0.9291 & 0.7585 & 3 & -2\tabularnewline
+3 & 0 & 1 & 0.3078 & 0.2058 & 3 & -2\tabularnewline
+4 & 0 & 1 & 0.9783 & 0.1207 & 3 & -2\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -8220,14 +8344,14 @@ data/anscombe.csv {[}44 3{]}:
 :x & :a & :b & :times & y & z\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0 & 1 & 0.5385 & 3\tabularnewline
-2 & 1 & 1 & 1 & 0.05581 & 3\tabularnewline
-3 & 0 & 1 & 1 & 0.9443 & 3\tabularnewline
-4 & 0 & 1 & 1 & 0.2463 & 3\tabularnewline
-1 & 1 & 0 & 2 & 0.7497 & -2\tabularnewline
-2 & 1 & 1 & 2 & 0.005098 & -2\tabularnewline
-3 & 0 & 1 & 2 & 0.5554 & -2\tabularnewline
-4 & 0 & 1 & 2 & 0.3304 & -2\tabularnewline
+1 & 1 & 0 & 1 & 0.2703 & 3\tabularnewline
+2 & 1 & 1 & 1 & 0.9291 & 3\tabularnewline
+3 & 0 & 1 & 1 & 0.3078 & 3\tabularnewline
+4 & 0 & 1 & 1 & 0.9783 & 3\tabularnewline
+1 & 1 & 0 & 2 & 0.8536 & -2\tabularnewline
+2 & 1 & 1 & 2 & 0.7585 & -2\tabularnewline
+3 & 0 & 1 & 2 & 0.2058 & -2\tabularnewline
+4 & 0 & 1 & 2 & 0.1207 & -2\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -8242,21 +8366,25 @@ Arguments:
 \item
   dataset
 \item
-  columns selector - values from selected columns are converted to new
-  columns
+  \texttt{columns-selector} - values from selected columns are converted
+  to new columns
 \item
-  value columns - what are values
+  \texttt{value-columns} - what are values
 \end{itemize}
 
 When multiple columns are used as columns selector, names are joined
-using \texttt{:separator} (default: ``\_``) option.
+using \texttt{:concat-columns-with} option.
+\texttt{:concat-columns-with} can be a string or function (default:
+``\_``). Function accepts sequence of names.
 
-When columns selector creates non unique set of values, they are folded
-using \texttt{:fold-fn} (default: \texttt{vec}) option.
+When \texttt{columns-selector} creates non unique set of values, they
+are folded using \texttt{:fold-fn} (default: \texttt{vec}) option.
 
-When value columns are a sequence, multiple observations as columns are
-created appending value column names into new columns. Column names are
-joined using \texttt{:value-separator} (default: ``-'') option.
+When \texttt{value-columns} is a sequence, multiple observations as
+columns are created appending value column names into new columns.
+Column names are joined using \texttt{:concat-value-with} option.
+\texttt{:concat-value-with} can be a string or function (default:
+``-''). Function accepts current column name and value.
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -8554,6 +8682,40 @@ year & A\_AI & B\_EI & B\_AI\tabularnewline
 \bottomrule
 \end{longtable}
 
+Joined with custom function
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/pivot->wider production [}\StringTok{"product"} \StringTok{"country"}\NormalTok{] }\StringTok{"production"}\NormalTok{ \{}\AttributeTok{:concat-columns-with}\NormalTok{ (}\KeywordTok{comp} \KeywordTok{str} \KeywordTok{vec}\NormalTok{)\})}
+\end{Highlighting}
+\end{Shaded}
+
+data/production.csv {[}15 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+year & {[}``A'' ``AI''{]} & {[}``B'' ``EI''{]} & {[}``B''
+``AI''{]}\tabularnewline
+\midrule
+\endhead
+2000 & 1.637 & 1.405 & -0.02618\tabularnewline
+2001 & 0.1587 & -0.5962 & -0.6886\tabularnewline
+2002 & -1.568 & -0.2657 & 0.06249\tabularnewline
+2003 & -0.4446 & 0.6526 & -0.7234\tabularnewline
+2004 & -0.07134 & 0.6256 & 0.4725\tabularnewline
+2005 & 1.612 & -1.345 & -0.9417\tabularnewline
+2006 & -0.7043 & -0.9718 & -0.3478\tabularnewline
+2007 & -1.536 & -1.697 & 0.5243\tabularnewline
+2008 & 0.8391 & 0.04556 & 1.832\tabularnewline
+2009 & -0.3742 & 1.193 & 0.1071\tabularnewline
+2010 & -0.7116 & -1.606 & -0.3290\tabularnewline
+2011 & 1.128 & -0.7724 & -1.783\tabularnewline
+2012 & 1.457 & -2.503 & 0.6113\tabularnewline
+2013 & -1.559 & -1.628 & -0.7853\tabularnewline
+2014 & -0.1170 & 0.03330 & 0.9784\tabularnewline
+\bottomrule
+\end{longtable}
+
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 Multiple value columns
@@ -8617,6 +8779,50 @@ data/us\_rent\_income.csv {[}52 6{]}:
 \toprule
 GEOID & NAME & estimate-rent & moe-rent & estimate-income &
 moe-income\tabularnewline
+\midrule
+\endhead
+1 & Alabama & 747 & 3 & 24476 & 136\tabularnewline
+2 & Alaska & 1200 & 13 & 32940 & 508\tabularnewline
+4 & Arizona & 972 & 4 & 27517 & 148\tabularnewline
+5 & Arkansas & 709 & 5 & 23789 & 165\tabularnewline
+6 & California & 1358 & 3 & 29454 & 109\tabularnewline
+8 & Colorado & 1125 & 5 & 32401 & 109\tabularnewline
+9 & Connecticut & 1123 & 5 & 35326 & 195\tabularnewline
+10 & Delaware & 1076 & 10 & 31560 & 247\tabularnewline
+11 & District of Columbia & 1424 & 17 & 43198 & 681\tabularnewline
+12 & Florida & 1077 & 3 & 25952 & 70\tabularnewline
+13 & Georgia & 927 & 3 & 27024 & 106\tabularnewline
+15 & Hawaii & 1507 & 18 & 32453 & 218\tabularnewline
+16 & Idaho & 792 & 7 & 25298 & 208\tabularnewline
+17 & Illinois & 952 & 3 & 30684 & 83\tabularnewline
+18 & Indiana & 782 & 3 & 27247 & 117\tabularnewline
+19 & Iowa & 740 & 4 & 30002 & 143\tabularnewline
+20 & Kansas & 801 & 5 & 29126 & 208\tabularnewline
+21 & Kentucky & 713 & 4 & 24702 & 159\tabularnewline
+22 & Louisiana & 825 & 4 & 25086 & 155\tabularnewline
+23 & Maine & 808 & 7 & 26841 & 187\tabularnewline
+24 & Maryland & 1311 & 5 & 37147 & 152\tabularnewline
+25 & Massachusetts & 1173 & 5 & 34498 & 199\tabularnewline
+26 & Michigan & 824 & 3 & 26987 & 82\tabularnewline
+27 & Minnesota & 906 & 4 & 32734 & 189\tabularnewline
+28 & Mississippi & 740 & 5 & 22766 & 194\tabularnewline
+\bottomrule
+\end{longtable}
+
+Value concatenated by custom function
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/pivot->wider income }\StringTok{"variable"}\NormalTok{ [}\StringTok{"estimate"} \StringTok{"moe"}\NormalTok{] \{}\AttributeTok{:concat-value-with}\NormalTok{ (}\KeywordTok{comp} \KeywordTok{str} \KeywordTok{vector}\NormalTok{)\})}
+\end{Highlighting}
+\end{Shaded}
+
+data/us\_rent\_income.csv {[}52 6{]}:
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+GEOID & NAME & {[}``rent'' ``estimate''{]} & {[}``rent'' ``moe''{]} &
+{[}``income'' ``estimate''{]} & {[}``income'' ``moe''{]}\tabularnewline
 \midrule
 \endhead
 1 & Alabama & 747 & 3 & 24476 & 136\tabularnewline
@@ -10069,31 +10275,31 @@ null {[}27 4{]}:
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 5 & 1.000 & B\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
 1 & 1 & 0.5000 & A\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -10152,14 +10358,14 @@ union {[}9 4{]}:
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 8 & 1.000 & B\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
 1 & 1 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
@@ -10241,7 +10447,7 @@ Namespace & functions\tabularnewline
 \endhead
 \texttt{tech.v2.datatype.functional} & primitive oprations, reducers,
 statistics\tabularnewline
-\texttt{tech.v2.datatype.datatime} & date/time converters\tabularnewline
+\texttt{tech.v2.datatype.datetime} & date/time converters\tabularnewline
 \texttt{tech.v2.datatype.datetime.operations} & date/time
 functions\tabularnewline
 \texttt{tech.ml.dataset.pipeline} & pipeline operations\tabularnewline
@@ -12187,9 +12393,9 @@ Other filters
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 5 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -12206,11 +12412,11 @@ Other filters
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 2 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 

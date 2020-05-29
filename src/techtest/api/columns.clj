@@ -8,13 +8,6 @@
             [techtest.api.dataset :refer [dataset]]
             [techtest.api.group-by :refer [grouped? process-group-data]]))
 
-(defn rename-columns
-  "Rename columns with provided old -> new name map"
-  [ds columns-map]
-  (if (grouped? ds)
-    (process-group-data ds #(ds/rename-columns % columns-map))
-    (ds/rename-columns ds columns-map)))
-
 (defn- filter-column-names
   "Filter column names"
   [ds columns-selector meta-field]
@@ -70,6 +63,30 @@
 
 ;;
 
+(defn- get-cols-mapping
+  [ds columns-selector columns-mapping]
+  (if (fn? columns-mapping)
+    (let [ds (if (grouped? ds)
+               (first (ds :data))
+               ds)
+          col-names (column-names ds columns-selector)]
+      (->> (map columns-mapping col-names)
+           (map vector col-names)
+           (remove (comp nil? second))
+           (into {})))
+    columns-mapping))
+
+(defn rename-columns
+  "Rename columns with provided old -> new name map"
+  ([ds columns-selector columns-map-fn] (rename-columns ds (get-cols-mapping ds columns-selector columns-map-fn)))
+  ([ds columns-mapping]
+   (let [colmap (get-cols-mapping ds :all columns-mapping)]
+     (if (grouped? ds)
+       (process-group-data ds #(ds/rename-columns % colmap))
+       (ds/rename-columns ds colmap)))))
+
+;;
+
 (defn- cycle-column
   [column col-cnt cnt]
   (let [q (quot cnt col-cnt)
@@ -86,6 +103,9 @@
 (defn- fix-column-size-column
   [column strategy cnt]
   (let [ec (dtype/ecount column)]
+    (when (and (= :strict strategy)
+               (not= cnt ec))
+      (throw (Exception. (str "Column size (" ec ") should be exactly the same as dataset row count (" cnt ")"))))
     (cond
       (> ec cnt) (dtype/sub-buffer column 0 cnt)
       (< ec cnt) (if (= strategy :cycle)
@@ -98,6 +118,9 @@
   [column strategy cnt]
   (let [column (take cnt column)
         seq-cnt (count column)]
+    (when (and (= :strict strategy)
+               (not= cnt seq-cnt))
+      (throw (Exception. (str "Sequence size (" seq-cnt ") should be exactly the same as dataset row count (" cnt ")"))))
     (if (< seq-cnt cnt)
       (if (= strategy :cycle)
         (take cnt (cycle column))
