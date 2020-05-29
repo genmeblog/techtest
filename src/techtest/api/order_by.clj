@@ -10,7 +10,7 @@
   [c]
   (cond
     (fn? c) c
-    (= :desc c) (comp - compare)
+    (= :desc c) #(compare %2 %1)
     :else compare))
 
 (defn asc-desc-comparator

@@ -590,7 +590,7 @@ Rows as sequence of sequences
 (take 2 (api/rows ds))
 ```
 
-    ([#object[java.time.LocalDate 0x4cae6ab2 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x4c5a7f72 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+    ([#object[java.time.LocalDate 0x50498353 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x5ea9e24e "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 
 ------------------------------------------------------------------------
 
@@ -600,13 +600,13 @@ Rows as sequence of maps
 (clojure.pprint/pprint (take 2 (api/rows ds :as-maps)))
 ```
 
-    ({"date" #object[java.time.LocalDate 0x2fb1c067 "2012-01-01"],
+    ({"date" #object[java.time.LocalDate 0x4d81f9c2 "2012-01-01"],
       "precipitation" 0.0,
       "temp_min" 5.0,
       "weather" "drizzle",
       "temp_max" 12.8,
       "wind" 4.7}
-     {"date" #object[java.time.LocalDate 0x6fd8e7ce "2012-01-02"],
+     {"date" #object[java.time.LocalDate 0x7e2f3a04 "2012-01-02"],
       "precipitation" 10.9,
       "temp_min" 2.8,
       "weather" "rain",
@@ -1702,7 +1702,7 @@ If you want to rename colums use `rename-columns` and pass map where keys are ol
 
 \_unnamed \[9 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@28df560a> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@348a8449> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 2   | 2   | 1.000     | B                           |
@@ -1730,7 +1730,7 @@ Function works on grouped dataset
 
 {1 Group: 1 \[5 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@41a6e58e> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@3f090441> |
 |-----|-----|-----------|-----------------------------|
 | 1   | 1   | 0.5000    | A                           |
 | 1   | 3   | 1.500     | C                           |
@@ -1740,7 +1740,7 @@ Function works on grouped dataset
 
 , 2 Group: 2 \[4 4\]:
 
-| v1  | v2  | \[1 2 3\] | <java.lang.Object@41a6e58e> |
+| v1  | v2  | \[1 2 3\] | <java.lang.Object@3f090441> |
 |-----|-----|-----------|-----------------------------|
 | 2   | 2   | 1.000     | B                           |
 | 2   | 4   | 0.5000    | A                           |
@@ -1796,15 +1796,15 @@ Replace one column (column is trimmed)
 
 | :V1    | :V2 | :V3    | :V4 |
 |--------|-----|--------|-----|
-| 0.1538 | 1   | 0.5000 | A   |
-| 0.6988 | 2   | 1.000  | B   |
-| 0.6930 | 3   | 1.500  | C   |
-| 0.1406 | 4   | 0.5000 | A   |
-| 0.7685 | 5   | 1.000  | B   |
-| 0.4075 | 6   | 1.500  | C   |
-| 0.1355 | 7   | 0.5000 | A   |
-| 0.9718 | 8   | 1.000  | B   |
-| 0.1779 | 9   | 1.500  | C   |
+| 0.4517 | 1   | 0.5000 | A   |
+| 0.2162 | 2   | 1.000  | B   |
+| 0.1938 | 3   | 1.500  | C   |
+| 0.4967 | 4   | 0.5000 | A   |
+| 0.8657 | 5   | 1.000  | B   |
+| 0.1060 | 6   | 1.500  | C   |
+| 0.2731 | 7   | 0.5000 | A   |
+| 0.9075 | 8   | 1.000  | B   |
+| 0.8942 | 9   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -2204,7 +2204,7 @@ Double array conversion.
 (api/->array DS :V1)
 ```
 
-    #object["[J" 0x19c75daa "[J@19c75daa"]
+    #object["[J" 0x19e980cb "[J@19e980cb"]
 
 ------------------------------------------------------------------------
 
@@ -2216,7 +2216,7 @@ Function also works on grouped dataset
     (api/->array :V2))
 ```
 
-    (#object["[J" 0x23eb10c2 "[J@23eb10c2"] #object["[J" 0x64579f3d "[J@64579f3d"] #object["[J" 0x45d26203 "[J@45d26203"])
+    (#object["[J" 0x5929179 "[J@5929179"] #object["[J" 0x1ad34b09 "[J@1ad34b09"] #object["[J" 0x221752af "[J@221752af"])
 
 ------------------------------------------------------------------------
 
@@ -2227,8 +2227,8 @@ You can also cast the type to the other one (if casting is possible):
 (api/->array DS :V1 :float32)
 ```
 
-    #object["[Ljava.lang.String;" 0x21c1045d "[Ljava.lang.String;@21c1045d"]
-    #object["[F" 0x3ac5a94b "[F@3ac5a94b"]
+    #object["[Ljava.lang.String;" 0x2678fd53 "[Ljava.lang.String;@2678fd53"]
+    #object["[F" 0x3d7cb7f5 "[F@3d7cb7f5"]
 
 ### Rows
 
@@ -2412,7 +2412,7 @@ Random row (single)
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 7   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2426,15 +2426,15 @@ Random `n` (default: row count) rows with repetition.
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
+| 2   | 2   | 1.000  | B   |
 | 2   | 6   | 1.500  | C   |
-| 2   | 8   | 1.000  | B   |
-| 1   | 3   | 1.500  | C   |
 | 1   | 5   | 1.000  | B   |
-| 1   | 1   | 0.5000 | A   |
+| 2   | 6   | 1.500  | C   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
+| 2   | 6   | 1.500  | C   |
 | 2   | 6   | 1.500  | C   |
 | 1   | 3   | 1.500  | C   |
-| 1   | 7   | 0.5000 | A   |
-| 1   | 5   | 1.000  | B   |
 
 ------------------------------------------------------------------------
 
@@ -2449,10 +2449,10 @@ Five random rows with repetition
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
 | 2   | 8   | 1.000  | B   |
-| 2   | 4   | 0.5000 | A   |
-| 1   | 7   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
+| 1   | 3   | 1.500  | C   |
 | 2   | 6   | 1.500  | C   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 7   | 0.5000 | A   |
 
 ------------------------------------------------------------------------
 
@@ -2466,11 +2466,11 @@ Five random, non-repeating rows
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 2   | 4   | 0.5000 | A   |
-| 2   | 8   | 1.000  | B   |
 | 1   | 3   | 1.500  | C   |
-| 1   | 9   | 1.500  | C   |
-| 2   | 2   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -2484,15 +2484,15 @@ Shuffle dataset
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 7   | 0.5000 | A   |
-| 1   | 9   | 1.500  | C   |
-| 1   | 5   | 1.000  | B   |
-| 2   | 8   | 1.000  | B   |
-| 2   | 2   | 1.000  | B   |
-| 1   | 3   | 1.500  | C   |
-| 1   | 1   | 0.5000 | A   |
-| 2   | 4   | 0.5000 | A   |
 | 2   | 6   | 1.500  | C   |
+| 2   | 8   | 1.000  | B   |
+| 1   | 1   | 0.5000 | A   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 9   | 1.500  | C   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 3   | 1.500  | C   |
 
 ------------------------------------------------------------------------
 
@@ -2546,20 +2546,20 @@ Select 5 random rows from each group
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
 | 1   | 1   | 0.5000 | A   |
-| 1   | 1   | 0.5000 | A   |
-| 1   | 1   | 0.5000 | A   |
 | 2   | 4   | 0.5000 | A   |
+| 1   | 7   | 0.5000 | A   |
 | 1   | 1   | 0.5000 | A   |
+| 1   | 1   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 8   | 1.000  | B   |
 | 2   | 2   | 1.000  | B   |
-| 2   | 8   | 1.000  | B   |
-| 2   | 8   | 1.000  | B   |
-| 2   | 8   | 1.000  | B   |
 | 2   | 2   | 1.000  | B   |
-| 1   | 3   | 1.500  | C   |
-| 1   | 3   | 1.500  | C   |
+| 1   | 5   | 1.000  | B   |
 | 1   | 9   | 1.500  | C   |
-| 2   | 6   | 1.500  | C   |
-| 2   | 6   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 3   | 1.500  | C   |
+| 1   | 3   | 1.500  | C   |
 
 ### Aggregate
 
@@ -2669,6 +2669,36 @@ Result of aggregating is automatically ungrouped, you can skip this step by stet
 | {:V3 1.0} | 0         | \_unnamed \[1 5\]: |
 | {:V3 0.5} | 1         | \_unnamed \[1 5\]: |
 | {:V3 1.5} | 2         | \_unnamed \[1 5\]: |
+
+#### Column
+
+You can perform columnar aggreagation also. `aggregate-columns` selects columns and apply aggregating function for each column separately.
+
+``` clojure
+(api/aggregate-columns DS [:V1 :V2 :V3] #(reduce + %))
+```
+
+\_unnamed \[1 3\]:
+
+| :V1 | :V2 | :V3   |
+|-----|-----|-------|
+| 13  | 45  | 9.000 |
+
+------------------------------------------------------------------------
+
+``` clojure
+(-> DS
+    (api/group-by [:V4])
+    (api/aggregate-columns [:V1 :V2 :V3] #(reduce + %)))
+```
+
+\_unnamed \[3 4\]:
+
+| :V4 | :V1 | :V2 | :V3   |
+|-----|-----|-----|-------|
+| B   | 5   | 15  | 3.000 |
+| C   | 4   | 18  | 4.500 |
+| A   | 4   | 12  | 1.500 |
 
 ### Order
 
@@ -3019,10 +3049,10 @@ Random
 
 \_unnamed \[2 4\]:
 
-| :V1 | :V2 | :V3    | :V4 |
-|-----|-----|--------|-----|
-| 2   | 4   | 0.5000 | A   |
-| 1   | 9   | 1.500  | C   |
+| :V1 | :V2 | :V3   | :V4 |
+|-----|-----|-------|-----|
+| 2   | 8   | 1.000 | B   |
+| 1   | 9   | 1.500 | C   |
 
 ------------------------------------------------------------------------
 
@@ -5399,12 +5429,12 @@ pnl
 
 \_unnamed \[4 7\]:
 
-| :x  | :a  | :b  | :y1      | :y2    | :z1 | :z2 |
-|-----|-----|-----|----------|--------|-----|-----|
-| 1   | 1   | 0   | 0.004576 | 0.6098 | 3   | -2  |
-| 2   | 1   | 1   | 0.7986   | 0.9293 | 3   | -2  |
-| 3   | 0   | 1   | 0.5844   | 0.3381 | 3   | -2  |
-| 4   | 0   | 1   | 0.3413   | 0.3795 | 3   | -2  |
+| :x  | :a  | :b  | :y1    | :y2     | :z1 | :z2 |
+|-----|-----|-----|--------|---------|-----|-----|
+| 1   | 1   | 0   | 0.8339 | 0.4118  | 3   | -2  |
+| 2   | 1   | 1   | 0.7581 | 0.3917  | 3   | -2  |
+| 3   | 0   | 1   | 0.9167 | 0.02565 | 3   | -2  |
+| 4   | 0   | 1   | 0.5667 | 0.3191  | 3   | -2  |
 
 ``` clojure
 (api/pivot->longer pnl [:y1 :y2 :z1 :z2] {:target-columns [nil :times]
@@ -5413,16 +5443,16 @@ pnl
 
 \_unnamed \[8 6\]:
 
-| :x  | :a  | :b  | :times | y        | z   |
-|-----|-----|-----|--------|----------|-----|
-| 1   | 1   | 0   | 1      | 0.004576 | 3   |
-| 2   | 1   | 1   | 1      | 0.7986   | 3   |
-| 3   | 0   | 1   | 1      | 0.5844   | 3   |
-| 4   | 0   | 1   | 1      | 0.3413   | 3   |
-| 1   | 1   | 0   | 2      | 0.6098   | -2  |
-| 2   | 1   | 1   | 2      | 0.9293   | -2  |
-| 3   | 0   | 1   | 2      | 0.3381   | -2  |
-| 4   | 0   | 1   | 2      | 0.3795   | -2  |
+| :x  | :a  | :b  | :times | y       | z   |
+|-----|-----|-----|--------|---------|-----|
+| 1   | 1   | 0   | 1      | 0.8339  | 3   |
+| 2   | 1   | 1   | 1      | 0.7581  | 3   |
+| 3   | 0   | 1   | 1      | 0.9167  | 3   |
+| 4   | 0   | 1   | 1      | 0.5667  | 3   |
+| 1   | 1   | 0   | 2      | 0.4118  | -2  |
+| 2   | 1   | 1   | 2      | 0.3917  | -2  |
+| 3   | 0   | 1   | 2      | 0.02565 | -2  |
+| 4   | 0   | 1   | 2      | 0.3191  | -2  |
 
 #### Wider
 
@@ -6569,31 +6599,31 @@ null \[27 4\]:
 
 | :V1 | :V2 | :V3    | :V4 |
 |-----|-----|--------|-----|
-| 1   | 9   | 1.500  | C   |
-| 1   | 9   | 1.500  | C   |
-| 1   | 3   | 1.500  | C   |
-| 2   | 4   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 8   | 1.000  | B   |
 | 1   | 1   | 0.5000 | A   |
-| 1   | 1   | 0.5000 | A   |
-| 1   | 9   | 1.500  | C   |
 | 2   | 2   | 1.000  | B   |
-| 2   | 8   | 1.000  | B   |
-| 1   | 1   | 0.5000 | A   |
-| 1   | 3   | 1.500  | C   |
-| 2   | 6   | 1.500  | C   |
-| 1   | 1   | 0.5000 | A   |
-| 1   | 7   | 0.5000 | A   |
-| 2   | 8   | 1.000  | B   |
-| 2   | 6   | 1.500  | C   |
-| 1   | 1   | 0.5000 | A   |
-| 1   | 1   | 0.5000 | A   |
 | 2   | 4   | 0.5000 | A   |
-| 2   | 6   | 1.500  | C   |
-| 1   | 1   | 0.5000 | A   |
-| 1   | 3   | 1.500  | C   |
+| 1   | 7   | 0.5000 | A   |
+| 1   | 5   | 1.000  | B   |
+| 2   | 2   | 1.000  | B   |
+| 1   | 5   | 1.000  | B   |
+| 1   | 9   | 1.500  | C   |
 | 2   | 8   | 1.000  | B   |
+| 1   | 1   | 0.5000 | A   |
+| 2   | 8   | 1.000  | B   |
+| 2   | 8   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 9   | 1.500  | C   |
+| 2   | 8   | 1.000  | B   |
+| 2   | 2   | 1.000  | B   |
 | 1   | 9   | 1.500  | C   |
 | 1   | 5   | 1.000  | B   |
+| 2   | 6   | 1.500  | C   |
+| 2   | 8   | 1.000  | B   |
+| 2   | 4   | 0.5000 | A   |
+| 1   | 9   | 1.500  | C   |
+| 1   | 3   | 1.500  | C   |
 
 Functions
 ---------
@@ -6609,87 +6639,6 @@ This API doesn't provide any statistical, numerical or date/time functions. Use 
 
 Other examples
 --------------
-
-### Flights
-
-``` clojure
-(defonce flights (api/dataset "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv"))
-```
-
-``` clojure
-flights
-```
-
-<https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv> \[253316 11\]:
-
-| year | month | day | dep\_delay | arr\_delay | carrier | origin | dest | air\_time | distance | hour |
-|------|-------|-----|------------|------------|---------|--------|------|-----------|----------|------|
-| 2014 | 1     | 1   | 14         | 13         | AA      | JFK    | LAX  | 359       | 2475     | 9    |
-| 2014 | 1     | 1   | -3         | 13         | AA      | JFK    | LAX  | 363       | 2475     | 11   |
-| 2014 | 1     | 1   | 2          | 9          | AA      | JFK    | LAX  | 351       | 2475     | 19   |
-| 2014 | 1     | 1   | -8         | -26        | AA      | LGA    | PBI  | 157       | 1035     | 7    |
-| 2014 | 1     | 1   | 2          | 1          | AA      | JFK    | LAX  | 350       | 2475     | 13   |
-| 2014 | 1     | 1   | 4          | 0          | AA      | EWR    | LAX  | 339       | 2454     | 18   |
-| 2014 | 1     | 1   | -2         | -18        | AA      | JFK    | LAX  | 338       | 2475     | 21   |
-| 2014 | 1     | 1   | -3         | -14        | AA      | JFK    | LAX  | 356       | 2475     | 15   |
-| 2014 | 1     | 1   | -1         | -17        | AA      | JFK    | MIA  | 161       | 1089     | 15   |
-| 2014 | 1     | 1   | -2         | -14        | AA      | JFK    | SEA  | 349       | 2422     | 18   |
-| 2014 | 1     | 1   | -5         | -17        | AA      | EWR    | MIA  | 161       | 1085     | 16   |
-| 2014 | 1     | 1   | 7          | -5         | AA      | JFK    | SFO  | 365       | 2586     | 17   |
-| 2014 | 1     | 1   | 3          | 1          | AA      | JFK    | BOS  | 39        | 187      | 12   |
-| 2014 | 1     | 1   | 142        | 133        | AA      | JFK    | LAX  | 345       | 2475     | 19   |
-| 2014 | 1     | 1   | -5         | -26        | AA      | JFK    | BOS  | 35        | 187      | 17   |
-| 2014 | 1     | 1   | 18         | 69         | AA      | JFK    | ORD  | 155       | 740      | 17   |
-| 2014 | 1     | 1   | 25         | 36         | AA      | JFK    | IAH  | 234       | 1417     | 16   |
-| 2014 | 1     | 1   | -1         | 1          | AA      | JFK    | AUS  | 232       | 1521     | 17   |
-| 2014 | 1     | 1   | 191        | 185        | AA      | EWR    | DFW  | 214       | 1372     | 16   |
-| 2014 | 1     | 1   | -7         | -6         | AA      | LGA    | ORD  | 142       | 733      | 5    |
-| 2014 | 1     | 1   | -7         | 0          | AA      | LGA    | ORD  | 143       | 733      | 6    |
-| 2014 | 1     | 1   | -8         | -17        | AA      | LGA    | ORD  | 139       | 733      | 6    |
-| 2014 | 1     | 1   | -2         | 15         | AA      | LGA    | ORD  | 145       | 733      | 7    |
-| 2014 | 1     | 1   | -3         | 1          | AA      | LGA    | ORD  | 139       | 733      | 8    |
-| 2014 | 1     | 1   | 44         | 42         | AA      | LGA    | ORD  | 141       | 733      | 10   |
-
-``` clojure
-(-> flights ;; take dataset (loaded from the net
-    (api/drop-missing) ;; remove rows with missing values
-    (api/select-rows #(= "AA" (get % "carrier"))) ;; filter rows by carrier="AA"
-    (api/group-by ["origin" "dest" "month"]) ;; group by several columns
-    (api/aggregate {:arr-delay-mean #(tech.v2.datatype.functional/mean (% "arr_delay")) ;; calculate mean of arr_delay...
-                    :dep-delay-mean #(tech.v2.datatype.functional/mean (% "dep_delay"))}) ;; ...and dep_delay
-    (api/order-by ["origin" "dest" "month"]) ;; order by some columns
-    )
-```
-
-\_unnamed \[200 5\]:
-
-| month | origin | dest | :arr-delay-mean | :dep-delay-mean |
-|-------|--------|------|-----------------|-----------------|
-| 1     | EWR    | DFW  | 6.428           | 10.01           |
-| 2     | EWR    | DFW  | 10.54           | 11.35           |
-| 3     | EWR    | DFW  | 12.87           | 8.080           |
-| 4     | EWR    | DFW  | 17.79           | 12.92           |
-| 5     | EWR    | DFW  | 18.49           | 18.68           |
-| 6     | EWR    | DFW  | 37.01           | 38.74           |
-| 7     | EWR    | DFW  | 20.25           | 21.15           |
-| 8     | EWR    | DFW  | 16.94           | 22.07           |
-| 9     | EWR    | DFW  | 5.865           | 13.06           |
-| 10    | EWR    | DFW  | 18.81           | 18.89           |
-| 1     | EWR    | LAX  | 1.367           | 7.500           |
-| 2     | EWR    | LAX  | 10.33           | 4.111           |
-| 3     | EWR    | LAX  | -4.400          | -6.800          |
-| 1     | EWR    | MIA  | 11.01           | 12.12           |
-| 2     | EWR    | MIA  | 1.564           | 4.756           |
-| 3     | EWR    | MIA  | -4.111          | 0.4444          |
-| 4     | EWR    | MIA  | 3.189           | 6.433           |
-| 5     | EWR    | MIA  | -2.538          | 6.344           |
-| 6     | EWR    | MIA  | 7.307           | 16.20           |
-| 7     | EWR    | MIA  | 25.22           | 26.35           |
-| 8     | EWR    | MIA  | -6.125          | 0.8462          |
-| 9     | EWR    | MIA  | -0.9063         | 0.3594          |
-| 10    | EWR    | MIA  | -4.475          | -3.787          |
-| 7     | EWR    | PHX  | -5.103          | 0.2759          |
-| 8     | EWR    | PHX  | 3.548           | 6.226           |
 
 ### Stocks
 
@@ -6810,7 +6759,9 @@ stocks
 
 ### data.table
 
-Snippets taken from [Introduction to `data.table`](https://rdatatable.gitlab.io/data.table/articles/datatable-intro.html)
+Below you can find comparizon between functionality of `data.table` and Clojure dataset API. I leave it without comments, please refer original document explaining details:
+
+[Introduction to `data.table`](https://rdatatable.gitlab.io/data.table/articles/datatable-intro.html)
 
 R
 
@@ -6858,7 +6809,9 @@ Clojure
 | 2014 | 1     | 1   | 2          | 1          | AA      | JFK    | LAX  | 350       | 2475     | 13   |
 | 2014 | 1     | 1   | 4          | 0          | AA      | EWR    | LAX  | 339       | 2454     | 18   |
 
-#### Shape of loaded data
+#### Basics
+
+##### Shape of loaded data
 
 R
 
@@ -6878,7 +6831,7 @@ Clojure
 
     [253316 11]
 
-#### What is `data.table`?
+##### What is `data.table`?
 
 R
 
@@ -6913,7 +6866,7 @@ class(DT$ID)
 Clojure
 
 ``` clojure
-(def DT (api/dataset {:ID ["b" "b" "b" "c" "c" "a"]
+(def DT (api/dataset {:ID ["b" "b" "b" "a" "a" "c"]
                       :a (range 1 7)
                       :b (range 7 13)
                       :c (range 13 19)}))
@@ -6930,17 +6883,15 @@ DT
 | b   | 1   | 7   | 13  |
 | b   | 2   | 8   | 14  |
 | b   | 3   | 9   | 15  |
-| c   | 4   | 10  | 16  |
-| c   | 5   | 11  | 17  |
-| a   | 6   | 12  | 18  |
+| a   | 4   | 10  | 16  |
+| a   | 5   | 11  | 17  |
+| c   | 6   | 12  | 18  |
 
 ``` clojure
 (-> :ID DT meta :datatype)
 ```
 
     :string
-
-#### Subset rows
 
 ##### Get all the flights with “JFK” as the origin airport in the month of June.
 
@@ -7049,8 +7000,6 @@ Clojure
 | 2014 | 2     | 3   | 231        | 268        | EV      | EWR    | XNA  | 184       | 1131     | 12   |
 | 2014 | 4     | 25  | -8         | -32        | EV      | EWR    | XNA  | 159       | 1131     | 6    |
 | 2014 | 2     | 19  | 21         | 10         | EV      | EWR    | XNA  | 176       | 1131     | 8    |
-
-#### Select column(s)
 
 ##### Select `arr_delay` column, but return it as a vector
 
@@ -7191,8 +7140,6 @@ Clojure
 | 2          | 1          |
 | 4          | 0          |
 
-#### Compute or do
-
 ##### How many trips have had total delay &lt; 0?
 
 R
@@ -7216,7 +7163,7 @@ Clojure
 
     141814
 
-or pure clojure
+or pure Clojure functions (much, much slower)
 
 ``` clojure
 (->> (map + (flights "arr_delay") (flights "dep_delay"))
@@ -7226,8 +7173,6 @@ or pure clojure
 
     141814
 
-#### Subset and do
-
 ##### Calculate the average arrival and departure delay for all flights with “JFK” as the origin airport in the month of June
 
 R
@@ -7235,11 +7180,12 @@ R
 ``` r
 ans <- flights[origin == "JFK" & month == 6L,
                .(m_arr = mean(arr_delay), m_dep = mean(dep_delay))]
-ans
+kable(ans)
 ```
 
-          m_arr    m_dep
-    1: 5.839349 9.807884
+|    m\_arr|    m\_dep|
+|---------:|---------:|
+|  5.839349|  9.807884|
 
 ------------------------------------------------------------------------
 
@@ -7291,10 +7237,6 @@ Clojure
 ```
 
     8422
-
-#### Columns by names
-
-Most of the R code is skipped since it doesn't bring anything API specific.
 
 ##### deselect columns using - or !
 
@@ -7351,7 +7293,7 @@ Clojure
 | 2014 | 1     | 1   | AA      | JFK    | LAX  | 350       | 2475     | 13   |
 | 2014 | 1     | 1   | AA      | EWR    | LAX  | 339       | 2454     | 18   |
 
-#### Grouping
+#### Aggregations
 
 ##### How can we get the number of trips corresponding to each origin airport?
 
@@ -7493,27 +7435,25 @@ Clojure
 (-> flights
     (api/select-rows #(= (get % "carrier") "AA"))
     (api/group-by ["origin" "dest" "month"])
-    (api/aggregate {:m_arr #(dfn/mean (% "arr_delay"))
-                    :m_dep #(dfn/mean (% "dep_delay"))})
+    (api/aggregate [#(dfn/mean (% "arr_delay"))
+                    #(dfn/mean (% "dep_delay"))])
     (api/head 10))
 ```
 
 \_unnamed \[10 5\]:
 
-| month | origin | dest | :m\_arr | :m\_dep |
-|-------|--------|------|---------|---------|
-| 9     | LGA    | DFW  | -8.788  | -0.2558 |
-| 10    | LGA    | DFW  | 3.500   | 4.553   |
-| 1     | JFK    | AUS  | 25.20   | 27.60   |
-| 4     | JFK    | AUS  | 4.367   | -0.1333 |
-| 5     | JFK    | AUS  | 6.767   | 14.73   |
-| 2     | JFK    | AUS  | 26.27   | 21.50   |
-| 3     | JFK    | AUS  | 8.194   | 2.710   |
-| 8     | JFK    | AUS  | 20.42   | 20.77   |
-| 1     | EWR    | LAX  | 1.367   | 7.500   |
-| 9     | JFK    | AUS  | 16.27   | 14.37   |
-
-#### Sorted by
+| month | origin | dest | :summary-0 | :summary-1 |
+|-------|--------|------|------------|------------|
+| 9     | LGA    | DFW  | -8.788     | -0.2558    |
+| 10    | LGA    | DFW  | 3.500      | 4.553      |
+| 1     | JFK    | AUS  | 25.20      | 27.60      |
+| 4     | JFK    | AUS  | 4.367      | -0.1333    |
+| 5     | JFK    | AUS  | 6.767      | 14.73      |
+| 2     | JFK    | AUS  | 26.27      | 21.50      |
+| 3     | JFK    | AUS  | 8.194      | 2.710      |
+| 8     | JFK    | AUS  | 20.42      | 20.77      |
+| 1     | EWR    | LAX  | 1.367      | 7.500      |
+| 9     | JFK    | AUS  | 16.27      | 14.37      |
 
 ##### So how can we directly order by all the grouping variables?
 
@@ -7547,23 +7487,328 @@ Clojure
 (-> flights
     (api/select-rows #(= (get % "carrier") "AA"))
     (api/group-by ["origin" "dest" "month"])
-    (api/aggregate {:m_arr #(dfn/mean (% "arr_delay"))
-                    :m_dep #(dfn/mean (% "dep_delay"))})
+    (api/aggregate [#(dfn/mean (% "arr_delay"))
+                    #(dfn/mean (% "dep_delay"))])
     (api/order-by ["origin" "dest" "month"])
     (api/head 10))
 ```
 
 \_unnamed \[10 5\]:
 
-| month | origin | dest | :m\_arr | :m\_dep |
-|-------|--------|------|---------|---------|
-| 1     | EWR    | DFW  | 6.428   | 10.01   |
-| 2     | EWR    | DFW  | 10.54   | 11.35   |
-| 3     | EWR    | DFW  | 12.87   | 8.080   |
-| 4     | EWR    | DFW  | 17.79   | 12.92   |
-| 5     | EWR    | DFW  | 18.49   | 18.68   |
-| 6     | EWR    | DFW  | 37.01   | 38.74   |
-| 7     | EWR    | DFW  | 20.25   | 21.15   |
-| 8     | EWR    | DFW  | 16.94   | 22.07   |
-| 9     | EWR    | DFW  | 5.865   | 13.06   |
-| 10    | EWR    | DFW  | 18.81   | 18.89   |
+| month | origin | dest | :summary-0 | :summary-1 |
+|-------|--------|------|------------|------------|
+| 1     | EWR    | DFW  | 6.428      | 10.01      |
+| 2     | EWR    | DFW  | 10.54      | 11.35      |
+| 3     | EWR    | DFW  | 12.87      | 8.080      |
+| 4     | EWR    | DFW  | 17.79      | 12.92      |
+| 5     | EWR    | DFW  | 18.49      | 18.68      |
+| 6     | EWR    | DFW  | 37.01      | 38.74      |
+| 7     | EWR    | DFW  | 20.25      | 21.15      |
+| 8     | EWR    | DFW  | 16.94      | 22.07      |
+| 9     | EWR    | DFW  | 5.865      | 13.06      |
+| 10    | EWR    | DFW  | 18.81      | 18.89      |
+
+##### Can `by` accept expressions as well or does it just take columns?
+
+R
+
+``` r
+ans <- flights[, .N, .(dep_delay>0, arr_delay>0)]
+kable(ans)
+```
+
+| dep\_delay | arr\_delay |       N|
+|:-----------|:-----------|-------:|
+| TRUE       | TRUE       |   72836|
+| FALSE      | TRUE       |   34583|
+| FALSE      | FALSE      |  119304|
+| TRUE       | FALSE      |   26593|
+
+------------------------------------------------------------------------
+
+Clojure
+
+``` clojure
+(-> flights
+    (api/group-by (fn [row]
+                    {:dep_delay (pos? (get row "dep_delay"))
+                     :arr_delay (pos? (get row "arr_delay"))}))
+    (api/aggregate {:N api/row-count}))
+```
+
+\_unnamed \[4 3\]:
+
+| :dep\_delay | :arr\_delay | :N     |
+|-------------|-------------|--------|
+| true        | false       | 26593  |
+| false       | true        | 34583  |
+| false       | false       | 119304 |
+| true        | true        | 72836  |
+
+##### Do we have to compute `mean()` for each column individually?
+
+R
+
+``` r
+kable(DT)
+```
+
+| ID  |    a|    b|    c|
+|:----|----:|----:|----:|
+| b   |    1|    7|   13|
+| b   |    2|    8|   14|
+| b   |    3|    9|   15|
+| a   |    4|   10|   16|
+| a   |    5|   11|   17|
+| c   |    6|   12|   18|
+
+``` r
+DT[, print(.SD), by = ID]
+```
+
+       a b  c
+    1: 1 7 13
+    2: 2 8 14
+    3: 3 9 15
+       a  b  c
+    1: 4 10 16
+    2: 5 11 17
+       a  b  c
+    1: 6 12 18
+
+    Empty data.table (0 rows and 1 cols): ID
+
+``` r
+kable(DT[, lapply(.SD, mean), by = ID])
+```
+
+| ID  |    a|     b|     c|
+|:----|----:|-----:|-----:|
+| b   |  2.0|   8.0|  14.0|
+| a   |  4.5|  10.5|  16.5|
+| c   |  6.0|  12.0|  18.0|
+
+------------------------------------------------------------------------
+
+Clojure
+
+``` clojure
+DT
+
+(api/group-by DT :ID {:result-type :as-map})
+```
+
+\_unnamed \[6 4\]:
+
+| :ID | :a  | :b  | :c  |
+|-----|-----|-----|-----|
+| b   | 1   | 7   | 13  |
+| b   | 2   | 8   | 14  |
+| b   | 3   | 9   | 15  |
+| a   | 4   | 10  | 16  |
+| a   | 5   | 11  | 17  |
+| c   | 6   | 12  | 18  |
+
+{"a" Group: a \[2 4\]:
+
+| :ID | :a  | :b  | :c  |
+|-----|-----|-----|-----|
+| a   | 4   | 10  | 16  |
+| a   | 5   | 11  | 17  |
+
+, "b" Group: b \[3 4\]:
+
+| :ID | :a  | :b  | :c  |
+|-----|-----|-----|-----|
+| b   | 1   | 7   | 13  |
+| b   | 2   | 8   | 14  |
+| b   | 3   | 9   | 15  |
+
+, "c" Group: c \[1 4\]:
+
+| :ID | :a  | :b  | :c  |
+|-----|-----|-----|-----|
+| c   | 6   | 12  | 18  |
+
+}
+
+``` clojure
+(-> DT
+    (api/group-by [:ID])
+    (api/aggregate-columns (complement #{:ID}) dfn/mean))
+```
+
+\_unnamed \[3 4\]:
+
+| :ID | :a    | :b    | :c    |
+|-----|-------|-------|-------|
+| a   | 4.500 | 10.50 | 16.50 |
+| b   | 2.000 | 8.000 | 14.00 |
+| c   | 6.000 | 12.00 | 18.00 |
+
+##### How can we specify just the columns we would like to compute the `mean()` on?
+
+R
+
+``` r
+kable(head(flights[carrier == "AA",                         ## Only on trips with carrier "AA"
+                   lapply(.SD, mean),                       ## compute the mean
+                   by = .(origin, dest, month),             ## for every 'origin,dest,month'
+                   .SDcols = c("arr_delay", "dep_delay")])) ## for just those specified in .SDcols
+```
+
+| origin | dest |  month|  arr\_delay|  dep\_delay|
+|:-------|:-----|------:|-----------:|-----------:|
+| JFK    | LAX  |      1|    6.590361|  14.2289157|
+| LGA    | PBI  |      1|   -7.758621|   0.3103448|
+| EWR    | LAX  |      1|    1.366667|   7.5000000|
+| JFK    | MIA  |      1|   15.720670|  18.7430168|
+| JFK    | SEA  |      1|   14.357143|  30.7500000|
+| EWR    | MIA  |      1|   11.011236|  12.1235955|
+
+------------------------------------------------------------------------
+
+Clojure
+
+``` clojure
+(-> flights
+    (api/select-rows #(= (get % "carrier") "AA"))
+    (api/group-by ["origin" "dest" "month"])
+    (api/aggregate-columns ["arr_delay" "dep_delay"] dfn/mean)
+    (api/head 6))
+```
+
+\_unnamed \[6 5\]:
+
+| month | origin | dest | dep\_delay | arr\_delay |
+|-------|--------|------|------------|------------|
+| 9     | LGA    | DFW  | -0.2558    | -8.788     |
+| 10    | LGA    | DFW  | 4.553      | 3.500      |
+| 1     | JFK    | AUS  | 27.60      | 25.20      |
+| 4     | JFK    | AUS  | -0.1333    | 4.367      |
+| 5     | JFK    | AUS  | 14.73      | 6.767      |
+| 2     | JFK    | AUS  | 21.50      | 26.27      |
+
+##### How can we return the first two rows for each month?
+
+R
+
+``` r
+ans <- flights[, head(.SD, 2), by = month]
+kable(head(ans))
+```
+
+|  month|  year|  day|  dep\_delay|  arr\_delay| carrier | origin | dest |  air\_time|  distance|  hour|
+|------:|-----:|----:|-----------:|-----------:|:--------|:-------|:-----|----------:|---------:|-----:|
+|      1|  2014|    1|          14|          13| AA      | JFK    | LAX  |        359|      2475|     9|
+|      1|  2014|    1|          -3|          13| AA      | JFK    | LAX  |        363|      2475|    11|
+|      2|  2014|    1|          -1|           1| AA      | JFK    | LAX  |        358|      2475|     8|
+|      2|  2014|    1|          -5|           3| AA      | JFK    | LAX  |        358|      2475|    11|
+|      3|  2014|    1|         -11|          36| AA      | JFK    | LAX  |        375|      2475|     8|
+|      3|  2014|    1|          -3|          14| AA      | JFK    | LAX  |        368|      2475|    11|
+
+------------------------------------------------------------------------
+
+Clojure
+
+``` clojure
+(-> flights
+    (api/group-by ["month"])
+    (api/head 2) ;; head applied on each group
+    (api/ungroup)
+    (api/head 6))
+```
+
+\_unnamed \[6 11\]:
+
+| dep\_delay | origin | air\_time | hour | arr\_delay | dest | distance | year | month | day | carrier |
+|------------|--------|-----------|------|------------|------|----------|------|-------|-----|---------|
+| -8         | LGA    | 113       | 18   | -23        | BNA  | 764      | 2014 | 4     | 1   | MQ      |
+| -8         | LGA    | 71        | 18   | -11        | RDU  | 431      | 2014 | 4     | 1   | MQ      |
+| 43         | JFK    | 288       | 17   | 5          | LAS  | 2248     | 2014 | 5     | 1   | AA      |
+| -1         | JFK    | 330       | 7    | -38        | SFO  | 2586     | 2014 | 5     | 1   | AA      |
+| -9         | JFK    | 324       | 8    | -5         | LAX  | 2475     | 2014 | 6     | 1   | AA      |
+| -10        | JFK    | 329       | 12   | -13        | LAX  | 2475     | 2014 | 6     | 1   | AA      |
+
+##### How can we concatenate columns a and b for each group in ID?
+
+R
+
+``` r
+kable(DT[, .(val = c(a,b)), by = ID])
+```
+
+| ID  |  val|
+|:----|----:|
+| b   |    1|
+| b   |    2|
+| b   |    3|
+| b   |    7|
+| b   |    8|
+| b   |    9|
+| a   |    4|
+| a   |    5|
+| a   |   10|
+| a   |   11|
+| c   |    6|
+| c   |   12|
+
+------------------------------------------------------------------------
+
+Clojure
+
+``` clojure
+(-> DT
+    (api/pivot->longer [:a :b] {:value-column-name :val})
+    (api/drop-columns [:$column :c]))
+```
+
+\_unnamed \[12 2\]:
+
+| :ID | :val |
+|-----|------|
+| b   | 1    |
+| b   | 2    |
+| b   | 3    |
+| a   | 4    |
+| a   | 5    |
+| c   | 6    |
+| b   | 7    |
+| b   | 8    |
+| b   | 9    |
+| a   | 10   |
+| a   | 11   |
+| c   | 12   |
+
+##### What if we would like to have all the values of column `a` and `b` concatenated, but returned as a list column?
+
+R
+
+``` r
+kable(DT[, .(val = list(c(a,b))), by = ID])
+```
+
+| ID  | val                 |
+|:----|:--------------------|
+| b   | c(1, 2, 3, 7, 8, 9) |
+| a   | c(4, 5, 10, 11)     |
+| c   | c(6, 12)            |
+
+------------------------------------------------------------------------
+
+Clojure
+
+``` clojure
+(-> DT
+    (api/pivot->longer [:a :b] {:value-column-name :val})
+    (api/drop-columns [:$column :c])
+    (api/fold-by :ID))
+```
+
+\_unnamed \[3 2\]:
+
+| :ID | :val            |
+|-----|-----------------|
+| a   | \[4 5 10 11\]   |
+| b   | \[1 2 3 7 8 9\] |
+| c   | \[6 12\]        |

@@ -11,7 +11,7 @@
 
 <meta name="author" content="GenerateMe" />
 
-<meta name="date" content="2020-05-28" />
+<meta name="date" content="2020-05-29" />
 
 <title>Proposed API for tech.ml.dataset</title>
 
@@ -313,7 +313,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Proposed API for tech.ml.dataset</h1>
 <h4 class="author">GenerateMe</h4>
-<h4 class="date">2020-05-28</h4>
+<h4 class="date">2020-05-29</h4>
 
 </div>
 
@@ -1264,17 +1264,17 @@ precipitation
 <hr />
 <p>Rows as sequence of sequences</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">take</span> <span class="dv">2</span> (api/rows ds))</code></pre></div>
-<pre><code>([#object[java.time.LocalDate 0x3917e95e &quot;2012-01-01&quot;] 0.0 12.8 5.0 4.7 &quot;drizzle&quot;] [#object[java.time.LocalDate 0x1b24dc0d &quot;2012-01-02&quot;] 10.9 10.6 2.8 4.5 &quot;rain&quot;])</code></pre>
+<pre><code>([#object[java.time.LocalDate 0x2bd6487c &quot;2012-01-01&quot;] 0.0 12.8 5.0 4.7 &quot;drizzle&quot;] [#object[java.time.LocalDate 0x19e6962b &quot;2012-01-02&quot;] 10.9 10.6 2.8 4.5 &quot;rain&quot;])</code></pre>
 <hr />
 <p>Rows as sequence of maps</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(clojure.pprint/pprint (<span class="kw">take</span> <span class="dv">2</span> (api/rows ds <span class="at">:as-maps</span>)))</code></pre></div>
-<pre><code>({&quot;date&quot; #object[java.time.LocalDate 0x11a38df5 &quot;2012-01-01&quot;],
+<pre><code>({&quot;date&quot; #object[java.time.LocalDate 0xe617f2 &quot;2012-01-01&quot;],
   &quot;precipitation&quot; 0.0,
   &quot;temp_min&quot; 5.0,
   &quot;weather&quot; &quot;drizzle&quot;,
   &quot;temp_max&quot; 12.8,
   &quot;wind&quot; 4.7}
- {&quot;date&quot; #object[java.time.LocalDate 0x272666c0 &quot;2012-01-02&quot;],
+ {&quot;date&quot; #object[java.time.LocalDate 0x34f386fc &quot;2012-01-02&quot;],
   &quot;precipitation&quot; 10.9,
   &quot;temp_min&quot; 2.8,
   &quot;weather&quot; &quot;rain&quot;,
@@ -3547,7 +3547,7 @@ precipitation
 <th>v1</th>
 <th>v2</th>
 <th>[1 2 3]</th>
-<th><a href="mailto:java.lang.Object@1fb15b52">java.lang.Object@1fb15b52</a></th>
+<th><a href="mailto:java.lang.Object@662f3613">java.lang.Object@662f3613</a></th>
 </tr>
 </thead>
 <tbody>
@@ -3623,7 +3623,7 @@ precipitation
 <th>v1</th>
 <th>v2</th>
 <th>[1 2 3]</th>
-<th><a href="mailto:java.lang.Object@7d75af7a">java.lang.Object@7d75af7a</a></th>
+<th><a href="mailto:java.lang.Object@da66a0f">java.lang.Object@da66a0f</a></th>
 </tr>
 </thead>
 <tbody>
@@ -3666,7 +3666,7 @@ precipitation
 <th>v1</th>
 <th>v2</th>
 <th>[1 2 3]</th>
-<th><a href="mailto:java.lang.Object@7d75af7a">java.lang.Object@7d75af7a</a></th>
+<th><a href="mailto:java.lang.Object@da66a0f">java.lang.Object@da66a0f</a></th>
 </tr>
 </thead>
 <tbody>
@@ -3807,55 +3807,55 @@ precipitation
 </thead>
 <tbody>
 <tr class="odd">
-<td>0.8703</td>
+<td>0.05607</td>
 <td>1</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
-<td>0.7826</td>
+<td>0.08424</td>
 <td>2</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="odd">
-<td>0.9914</td>
+<td>0.04908</td>
 <td>3</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="even">
-<td>0.2536</td>
+<td>0.8574</td>
 <td>4</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="odd">
-<td>0.2459</td>
+<td>0.9462</td>
 <td>5</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="even">
-<td>0.6644</td>
+<td>0.5715</td>
 <td>6</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="odd">
-<td>0.9444</td>
+<td>0.4893</td>
 <td>7</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
-<td>0.3138</td>
+<td>0.2295</td>
 <td>8</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="odd">
-<td>0.9748</td>
+<td>0.5130</td>
 <td>9</td>
 <td>1.500</td>
 <td>C</td>
@@ -5088,19 +5088,19 @@ precipitation
 <hr />
 <p>Double array conversion.</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/-&gt;array DS <span class="at">:V1</span>)</code></pre></div>
-<pre><code>#object[&quot;[J&quot; 0x5885a8e6 &quot;[J@5885a8e6&quot;]</code></pre>
+<pre><code>#object[&quot;[J&quot; 0x127c8cb5 &quot;[J@127c8cb5&quot;]</code></pre>
 <hr />
 <p>Function also works on grouped dataset</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
     (api/group-by <span class="at">:V3</span>)
     (api/-&gt;array <span class="at">:V2</span>))</code></pre></div>
-<pre><code>(#object[&quot;[J&quot; 0x7e51fbab &quot;[J@7e51fbab&quot;] #object[&quot;[J&quot; 0x500a6432 &quot;[J@500a6432&quot;] #object[&quot;[J&quot; 0x2f03b38c &quot;[J@2f03b38c&quot;])</code></pre>
+<pre><code>(#object[&quot;[J&quot; 0x5ab6c527 &quot;[J@5ab6c527&quot;] #object[&quot;[J&quot; 0x3508b181 &quot;[J@3508b181&quot;] #object[&quot;[J&quot; 0xf86e53b &quot;[J@f86e53b&quot;])</code></pre>
 <hr />
 <p>You can also cast the type to the other one (if casting is possible):</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/-&gt;array DS <span class="at">:V4</span> <span class="at">:string</span>)
 (api/-&gt;array DS <span class="at">:V1</span> <span class="at">:float32</span>)</code></pre></div>
-<pre><code>#object[&quot;[Ljava.lang.String;&quot; 0x2010d681 &quot;[Ljava.lang.String;@2010d681&quot;]
-#object[&quot;[F&quot; 0x444c2613 &quot;[F@444c2613&quot;]</code></pre>
+<pre><code>#object[&quot;[Ljava.lang.String;&quot; 0x399840e0 &quot;[Ljava.lang.String;@399840e0&quot;]
+#object[&quot;[F&quot; 0x229c8825 &quot;[F@229c8825&quot;]</code></pre>
 </div>
 </div>
 <div id="rows" class="section level3">
@@ -5425,9 +5425,9 @@ precipitation
 <tbody>
 <tr class="odd">
 <td>1</td>
-<td>5</td>
-<td>1.000</td>
-<td>B</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 </tbody>
 </table>
@@ -5446,34 +5446,22 @@ precipitation
 </thead>
 <tbody>
 <tr class="odd">
-<td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>2</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>2</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="odd">
 <td>2</td>
 <td>6</td>
 <td>1.500</td>
 <td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
 </tr>
 <tr class="even">
 <td>1</td>
@@ -5483,19 +5471,31 @@ precipitation
 </tr>
 <tr class="odd">
 <td>1</td>
-<td>7</td>
+<td>1</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
 <td>2</td>
 <td>2</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2</td>
-<td>6</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
@@ -5517,33 +5517,33 @@ precipitation
 <tbody>
 <tr class="odd">
 <td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>8</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>9</td>
+<td>6</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2</td>
 <td>2</td>
 <td>1.000</td>
 <td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 </tbody>
 </table>
@@ -5563,21 +5563,21 @@ precipitation
 <tbody>
 <tr class="odd">
 <td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
 <td>4</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
-<tr class="even">
-<td>1</td>
-<td>5</td>
+<tr class="odd">
+<td>2</td>
+<td>8</td>
 <td>1.000</td>
 <td>B</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
 </tr>
 <tr class="even">
 <td>1</td>
@@ -5587,7 +5587,7 @@ precipitation
 </tr>
 <tr class="odd">
 <td>1</td>
-<td>7</td>
+<td>1</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
@@ -5609,21 +5609,45 @@ precipitation
 <tbody>
 <tr class="odd">
 <td>2</td>
-<td>8</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="even">
 <td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 <tr class="odd">
 <td>1</td>
 <td>5</td>
 <td>1.000</td>
 <td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
 </tr>
 <tr class="even">
 <td>1</td>
@@ -5633,33 +5657,9 @@ precipitation
 </tr>
 <tr class="odd">
 <td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>2</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>3</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="even">
-<td>1</td>
 <td>7</td>
 <td>0.5000</td>
 <td>A</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>6</td>
-<td>1.500</td>
-<td>C</td>
 </tr>
 </tbody>
 </table>
@@ -5773,26 +5773,26 @@ precipitation
 </thead>
 <tbody>
 <tr class="odd">
-<td>1</td>
-<td>7</td>
+<td>2</td>
+<td>4</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
-<td>2</td>
-<td>4</td>
+<td>1</td>
+<td>7</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="odd">
-<td>1</td>
-<td>7</td>
+<td>2</td>
+<td>4</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
-<td>2</td>
-<td>4</td>
+<td>1</td>
+<td>1</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
@@ -5809,14 +5809,14 @@ precipitation
 <td>B</td>
 </tr>
 <tr class="odd">
-<td>2</td>
-<td>2</td>
+<td>1</td>
+<td>5</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="even">
-<td>2</td>
-<td>2</td>
+<td>1</td>
+<td>5</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
@@ -5833,26 +5833,26 @@ precipitation
 <td>B</td>
 </tr>
 <tr class="odd">
-<td>1</td>
-<td>9</td>
+<td>2</td>
+<td>6</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="even">
 <td>1</td>
-<td>3</td>
+<td>9</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="odd">
 <td>1</td>
-<td>3</td>
+<td>9</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="even">
-<td>1</td>
-<td>9</td>
+<td>2</td>
+<td>6</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
@@ -6035,6 +6035,63 @@ precipitation
 </tr>
 </tbody>
 </table>
+<div id="column" class="section level4">
+<h4>Column</h4>
+<p>You can perform columnar aggreagation also. <code>aggregate-columns</code> selects columns and apply aggregating function for each column separately.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/aggregate-columns DS [<span class="at">:V1</span> <span class="at">:V2</span> <span class="at">:V3</span>] #(<span class="kw">reduce</span> <span class="kw">+</span> <span class="va">%</span>))</code></pre></div>
+<p>_unnamed [1 3]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>13</td>
+<td>45</td>
+<td>9.000</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
+    (api/group-by [<span class="at">:V4</span>])
+    (api/aggregate-columns [<span class="at">:V1</span> <span class="at">:V2</span> <span class="at">:V3</span>] #(<span class="kw">reduce</span> <span class="kw">+</span> <span class="va">%</span>)))</code></pre></div>
+<p>_unnamed [3 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V4</th>
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>B</td>
+<td>5</td>
+<td>15</td>
+<td>3.000</td>
+</tr>
+<tr class="even">
+<td>C</td>
+<td>4</td>
+<td>18</td>
+<td>4.500</td>
+</tr>
+<tr class="odd">
+<td>A</td>
+<td>4</td>
+<td>12</td>
+<td>1.500</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="order" class="section level3">
 <h3>Order</h3>
@@ -6955,9 +7012,9 @@ precipitation
 </tr>
 <tr class="even">
 <td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
 </tr>
 </tbody>
 </table>
@@ -12501,8 +12558,8 @@ precipitation
 <td>1</td>
 <td>1</td>
 <td>0</td>
-<td>0.8948</td>
-<td>0.4357</td>
+<td>0.1333</td>
+<td>0.7617</td>
 <td>3</td>
 <td>-2</td>
 </tr>
@@ -12510,8 +12567,8 @@ precipitation
 <td>2</td>
 <td>1</td>
 <td>1</td>
-<td>0.6594</td>
-<td>0.6432</td>
+<td>0.03027</td>
+<td>0.7975</td>
 <td>3</td>
 <td>-2</td>
 </tr>
@@ -12519,8 +12576,8 @@ precipitation
 <td>3</td>
 <td>0</td>
 <td>1</td>
-<td>0.7212</td>
-<td>0.9740</td>
+<td>0.7494</td>
+<td>0.5815</td>
 <td>3</td>
 <td>-2</td>
 </tr>
@@ -12528,8 +12585,8 @@ precipitation
 <td>4</td>
 <td>0</td>
 <td>1</td>
-<td>0.09646</td>
-<td>0.01430</td>
+<td>0.8205</td>
+<td>0.9352</td>
 <td>3</td>
 <td>-2</td>
 </tr>
@@ -12555,7 +12612,7 @@ precipitation
 <td>1</td>
 <td>0</td>
 <td>1</td>
-<td>0.8948</td>
+<td>0.1333</td>
 <td>3</td>
 </tr>
 <tr class="even">
@@ -12563,7 +12620,7 @@ precipitation
 <td>1</td>
 <td>1</td>
 <td>1</td>
-<td>0.6594</td>
+<td>0.03027</td>
 <td>3</td>
 </tr>
 <tr class="odd">
@@ -12571,7 +12628,7 @@ precipitation
 <td>0</td>
 <td>1</td>
 <td>1</td>
-<td>0.7212</td>
+<td>0.7494</td>
 <td>3</td>
 </tr>
 <tr class="even">
@@ -12579,7 +12636,7 @@ precipitation
 <td>0</td>
 <td>1</td>
 <td>1</td>
-<td>0.09646</td>
+<td>0.8205</td>
 <td>3</td>
 </tr>
 <tr class="odd">
@@ -12587,7 +12644,7 @@ precipitation
 <td>1</td>
 <td>0</td>
 <td>2</td>
-<td>0.4357</td>
+<td>0.7617</td>
 <td>-2</td>
 </tr>
 <tr class="even">
@@ -12595,7 +12652,7 @@ precipitation
 <td>1</td>
 <td>1</td>
 <td>2</td>
-<td>0.6432</td>
+<td>0.7975</td>
 <td>-2</td>
 </tr>
 <tr class="odd">
@@ -12603,7 +12660,7 @@ precipitation
 <td>0</td>
 <td>1</td>
 <td>2</td>
-<td>0.9740</td>
+<td>0.5815</td>
 <td>-2</td>
 </tr>
 <tr class="even">
@@ -12611,7 +12668,7 @@ precipitation
 <td>0</td>
 <td>1</td>
 <td>2</td>
-<td>0.01430</td>
+<td>0.9352</td>
 <td>-2</td>
 </tr>
 </tbody>
@@ -17231,25 +17288,85 @@ ds2</code></pre></div>
 <tbody>
 <tr class="odd">
 <td>1</td>
-<td>7</td>
-<td>0.5000</td>
-<td>A</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 <tr class="even">
 <td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 <tr class="odd">
-<td>2</td>
-<td>4</td>
+<td>1</td>
+<td>1</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
 <td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
 <td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
@@ -17260,122 +17377,62 @@ ds2</code></pre></div>
 <td>B</td>
 </tr>
 <tr class="even">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
 <td>1</td>
 <td>9</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
-<tr class="odd">
-<td>1</td>
-<td>3</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
 <tr class="even">
 <td>2</td>
-<td>6</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>3</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>5</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>6</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>6</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>3</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>5</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>3</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>3</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>2</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>3</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>7</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>7</td>
+<td>4</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="odd">
 <td>2</td>
-<td>6</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>6</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>6</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>5</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>2</td>
+<td>8</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
@@ -17416,553 +17473,6 @@ ds2</code></pre></div>
 </div>
 <div id="other-examples" class="section level2">
 <h2>Other examples</h2>
-<div id="flights" class="section level3">
-<h3>Flights</h3>
-<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">defonce</span><span class="fu"> flights </span>(api/dataset <span class="st">&quot;https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv&quot;</span>))</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">flights</code></pre></div>
-<p><a href="https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv" class="uri">https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv</a> [253316 11]:</p>
-<table>
-<thead>
-<tr class="header">
-<th>year</th>
-<th>month</th>
-<th>day</th>
-<th>dep_delay</th>
-<th>arr_delay</th>
-<th>carrier</th>
-<th>origin</th>
-<th>dest</th>
-<th>air_time</th>
-<th>distance</th>
-<th>hour</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>14</td>
-<td>13</td>
-<td>AA</td>
-<td>JFK</td>
-<td>LAX</td>
-<td>359</td>
-<td>2475</td>
-<td>9</td>
-</tr>
-<tr class="even">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>-3</td>
-<td>13</td>
-<td>AA</td>
-<td>JFK</td>
-<td>LAX</td>
-<td>363</td>
-<td>2475</td>
-<td>11</td>
-</tr>
-<tr class="odd">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>2</td>
-<td>9</td>
-<td>AA</td>
-<td>JFK</td>
-<td>LAX</td>
-<td>351</td>
-<td>2475</td>
-<td>19</td>
-</tr>
-<tr class="even">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>-8</td>
-<td>-26</td>
-<td>AA</td>
-<td>LGA</td>
-<td>PBI</td>
-<td>157</td>
-<td>1035</td>
-<td>7</td>
-</tr>
-<tr class="odd">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>2</td>
-<td>1</td>
-<td>AA</td>
-<td>JFK</td>
-<td>LAX</td>
-<td>350</td>
-<td>2475</td>
-<td>13</td>
-</tr>
-<tr class="even">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>4</td>
-<td>0</td>
-<td>AA</td>
-<td>EWR</td>
-<td>LAX</td>
-<td>339</td>
-<td>2454</td>
-<td>18</td>
-</tr>
-<tr class="odd">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>-2</td>
-<td>-18</td>
-<td>AA</td>
-<td>JFK</td>
-<td>LAX</td>
-<td>338</td>
-<td>2475</td>
-<td>21</td>
-</tr>
-<tr class="even">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>-3</td>
-<td>-14</td>
-<td>AA</td>
-<td>JFK</td>
-<td>LAX</td>
-<td>356</td>
-<td>2475</td>
-<td>15</td>
-</tr>
-<tr class="odd">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>-1</td>
-<td>-17</td>
-<td>AA</td>
-<td>JFK</td>
-<td>MIA</td>
-<td>161</td>
-<td>1089</td>
-<td>15</td>
-</tr>
-<tr class="even">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>-2</td>
-<td>-14</td>
-<td>AA</td>
-<td>JFK</td>
-<td>SEA</td>
-<td>349</td>
-<td>2422</td>
-<td>18</td>
-</tr>
-<tr class="odd">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>-5</td>
-<td>-17</td>
-<td>AA</td>
-<td>EWR</td>
-<td>MIA</td>
-<td>161</td>
-<td>1085</td>
-<td>16</td>
-</tr>
-<tr class="even">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>7</td>
-<td>-5</td>
-<td>AA</td>
-<td>JFK</td>
-<td>SFO</td>
-<td>365</td>
-<td>2586</td>
-<td>17</td>
-</tr>
-<tr class="odd">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>3</td>
-<td>1</td>
-<td>AA</td>
-<td>JFK</td>
-<td>BOS</td>
-<td>39</td>
-<td>187</td>
-<td>12</td>
-</tr>
-<tr class="even">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>142</td>
-<td>133</td>
-<td>AA</td>
-<td>JFK</td>
-<td>LAX</td>
-<td>345</td>
-<td>2475</td>
-<td>19</td>
-</tr>
-<tr class="odd">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>-5</td>
-<td>-26</td>
-<td>AA</td>
-<td>JFK</td>
-<td>BOS</td>
-<td>35</td>
-<td>187</td>
-<td>17</td>
-</tr>
-<tr class="even">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>18</td>
-<td>69</td>
-<td>AA</td>
-<td>JFK</td>
-<td>ORD</td>
-<td>155</td>
-<td>740</td>
-<td>17</td>
-</tr>
-<tr class="odd">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>25</td>
-<td>36</td>
-<td>AA</td>
-<td>JFK</td>
-<td>IAH</td>
-<td>234</td>
-<td>1417</td>
-<td>16</td>
-</tr>
-<tr class="even">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>-1</td>
-<td>1</td>
-<td>AA</td>
-<td>JFK</td>
-<td>AUS</td>
-<td>232</td>
-<td>1521</td>
-<td>17</td>
-</tr>
-<tr class="odd">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>191</td>
-<td>185</td>
-<td>AA</td>
-<td>EWR</td>
-<td>DFW</td>
-<td>214</td>
-<td>1372</td>
-<td>16</td>
-</tr>
-<tr class="even">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>-7</td>
-<td>-6</td>
-<td>AA</td>
-<td>LGA</td>
-<td>ORD</td>
-<td>142</td>
-<td>733</td>
-<td>5</td>
-</tr>
-<tr class="odd">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>-7</td>
-<td>0</td>
-<td>AA</td>
-<td>LGA</td>
-<td>ORD</td>
-<td>143</td>
-<td>733</td>
-<td>6</td>
-</tr>
-<tr class="even">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>-8</td>
-<td>-17</td>
-<td>AA</td>
-<td>LGA</td>
-<td>ORD</td>
-<td>139</td>
-<td>733</td>
-<td>6</td>
-</tr>
-<tr class="odd">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>-2</td>
-<td>15</td>
-<td>AA</td>
-<td>LGA</td>
-<td>ORD</td>
-<td>145</td>
-<td>733</td>
-<td>7</td>
-</tr>
-<tr class="even">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>-3</td>
-<td>1</td>
-<td>AA</td>
-<td>LGA</td>
-<td>ORD</td>
-<td>139</td>
-<td>733</td>
-<td>8</td>
-</tr>
-<tr class="odd">
-<td>2014</td>
-<td>1</td>
-<td>1</td>
-<td>44</td>
-<td>42</td>
-<td>AA</td>
-<td>LGA</td>
-<td>ORD</td>
-<td>141</td>
-<td>733</td>
-<td>10</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> flights <span class="co">;; take dataset (loaded from the net</span>
-    (api/drop-missing) <span class="co">;; remove rows with missing values</span>
-    (api/select-rows #(<span class="kw">=</span> <span class="st">&quot;AA&quot;</span> (<span class="kw">get</span> <span class="va">%</span> <span class="st">&quot;carrier&quot;</span>))) <span class="co">;; filter rows by carrier=&quot;AA&quot;</span>
-    (api/group-by [<span class="st">&quot;origin&quot;</span> <span class="st">&quot;dest&quot;</span> <span class="st">&quot;month&quot;</span>]) <span class="co">;; group by several columns</span>
-    (api/aggregate {<span class="at">:arr-delay-mean</span> #(tech.v2.datatype.functional/mean (<span class="va">%</span> <span class="st">&quot;arr_delay&quot;</span>)) <span class="co">;; calculate mean of arr_delay...</span>
-                    <span class="at">:dep-delay-mean</span> #(tech.v2.datatype.functional/mean (<span class="va">%</span> <span class="st">&quot;dep_delay&quot;</span>))}) <span class="co">;; ...and dep_delay</span>
-    (api/order-by [<span class="st">&quot;origin&quot;</span> <span class="st">&quot;dest&quot;</span> <span class="st">&quot;month&quot;</span>]) <span class="co">;; order by some columns</span>
-    )</code></pre></div>
-<p>_unnamed [200 5]:</p>
-<table>
-<thead>
-<tr class="header">
-<th>month</th>
-<th>origin</th>
-<th>dest</th>
-<th>:arr-delay-mean</th>
-<th>:dep-delay-mean</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>1</td>
-<td>EWR</td>
-<td>DFW</td>
-<td>6.428</td>
-<td>10.01</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>EWR</td>
-<td>DFW</td>
-<td>10.54</td>
-<td>11.35</td>
-</tr>
-<tr class="odd">
-<td>3</td>
-<td>EWR</td>
-<td>DFW</td>
-<td>12.87</td>
-<td>8.080</td>
-</tr>
-<tr class="even">
-<td>4</td>
-<td>EWR</td>
-<td>DFW</td>
-<td>17.79</td>
-<td>12.92</td>
-</tr>
-<tr class="odd">
-<td>5</td>
-<td>EWR</td>
-<td>DFW</td>
-<td>18.49</td>
-<td>18.68</td>
-</tr>
-<tr class="even">
-<td>6</td>
-<td>EWR</td>
-<td>DFW</td>
-<td>37.01</td>
-<td>38.74</td>
-</tr>
-<tr class="odd">
-<td>7</td>
-<td>EWR</td>
-<td>DFW</td>
-<td>20.25</td>
-<td>21.15</td>
-</tr>
-<tr class="even">
-<td>8</td>
-<td>EWR</td>
-<td>DFW</td>
-<td>16.94</td>
-<td>22.07</td>
-</tr>
-<tr class="odd">
-<td>9</td>
-<td>EWR</td>
-<td>DFW</td>
-<td>5.865</td>
-<td>13.06</td>
-</tr>
-<tr class="even">
-<td>10</td>
-<td>EWR</td>
-<td>DFW</td>
-<td>18.81</td>
-<td>18.89</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>EWR</td>
-<td>LAX</td>
-<td>1.367</td>
-<td>7.500</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>EWR</td>
-<td>LAX</td>
-<td>10.33</td>
-<td>4.111</td>
-</tr>
-<tr class="odd">
-<td>3</td>
-<td>EWR</td>
-<td>LAX</td>
-<td>-4.400</td>
-<td>-6.800</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>EWR</td>
-<td>MIA</td>
-<td>11.01</td>
-<td>12.12</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>EWR</td>
-<td>MIA</td>
-<td>1.564</td>
-<td>4.756</td>
-</tr>
-<tr class="even">
-<td>3</td>
-<td>EWR</td>
-<td>MIA</td>
-<td>-4.111</td>
-<td>0.4444</td>
-</tr>
-<tr class="odd">
-<td>4</td>
-<td>EWR</td>
-<td>MIA</td>
-<td>3.189</td>
-<td>6.433</td>
-</tr>
-<tr class="even">
-<td>5</td>
-<td>EWR</td>
-<td>MIA</td>
-<td>-2.538</td>
-<td>6.344</td>
-</tr>
-<tr class="odd">
-<td>6</td>
-<td>EWR</td>
-<td>MIA</td>
-<td>7.307</td>
-<td>16.20</td>
-</tr>
-<tr class="even">
-<td>7</td>
-<td>EWR</td>
-<td>MIA</td>
-<td>25.22</td>
-<td>26.35</td>
-</tr>
-<tr class="odd">
-<td>8</td>
-<td>EWR</td>
-<td>MIA</td>
-<td>-6.125</td>
-<td>0.8462</td>
-</tr>
-<tr class="even">
-<td>9</td>
-<td>EWR</td>
-<td>MIA</td>
-<td>-0.9063</td>
-<td>0.3594</td>
-</tr>
-<tr class="odd">
-<td>10</td>
-<td>EWR</td>
-<td>MIA</td>
-<td>-4.475</td>
-<td>-3.787</td>
-</tr>
-<tr class="even">
-<td>7</td>
-<td>EWR</td>
-<td>PHX</td>
-<td>-5.103</td>
-<td>0.2759</td>
-</tr>
-<tr class="odd">
-<td>8</td>
-<td>EWR</td>
-<td>PHX</td>
-<td>3.548</td>
-<td>6.226</td>
-</tr>
-</tbody>
-</table>
-</div>
 <div id="stocks" class="section level3">
 <h3>Stocks</h3>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">defonce</span><span class="fu"> stocks </span>(api/dataset <span class="st">&quot;https://raw.githubusercontent.com/techascent/tech.ml.dataset/master/test/data/stocks.csv&quot;</span> {<span class="at">:key-fn</span> <span class="kw">keyword</span>}))</code></pre></div>
@@ -18392,7 +17902,8 @@ ds2</code></pre></div>
 </div>
 <div id="data.table" class="section level3">
 <h3>data.table</h3>
-<p>Snippets taken from <a href="https://rdatatable.gitlab.io/data.table/articles/datatable-intro.html">Introduction to <code>data.table</code></a></p>
+<p>Below you can find comparizon between functionality of <code>data.table</code> and Clojure dataset API. I leave it without comments, please refer original document explaining details:</p>
+<p><a href="https://rdatatable.gitlab.io/data.table/articles/datatable-intro.html">Introduction to <code>data.table</code></a></p>
 <p>R</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(data.table)
 <span class="kw">library</span>(knitr)
@@ -18602,8 +18113,10 @@ flights &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class=
 </tr>
 </tbody>
 </table>
-<div id="shape-of-loaded-data" class="section level4">
-<h4>Shape of loaded data</h4>
+<div id="basics" class="section level4">
+<h4>Basics</h4>
+<div id="shape-of-loaded-data" class="section level5">
+<h5>Shape of loaded data</h5>
 <p>R</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dim</span>(flights)</code></pre></div>
 <pre><code>[1] 253316     11</code></pre>
@@ -18612,8 +18125,8 @@ flights &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class=
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/shape flights)</code></pre></div>
 <pre><code>[253316 11]</code></pre>
 </div>
-<div id="what-is-data.table" class="section level4">
-<h4>What is <code>data.table</code>?</h4>
+<div id="what-is-data.table" class="section level5">
+<h5>What is <code>data.table</code>?</h5>
 <p>R</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">DT =<span class="st"> </span><span class="kw">data.table</span>(
   <span class="dt">ID =</span> <span class="kw">c</span>(<span class="st">&quot;b&quot;</span>,<span class="st">&quot;b&quot;</span>,<span class="st">&quot;b&quot;</span>,<span class="st">&quot;a&quot;</span>,<span class="st">&quot;a&quot;</span>,<span class="st">&quot;c&quot;</span>),
@@ -18675,7 +18188,7 @@ flights &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class=
 <pre><code>[1] &quot;character&quot;</code></pre>
 <hr />
 <p>Clojure</p>
-<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">def</span><span class="fu"> DT </span>(api/dataset {<span class="at">:ID</span> [<span class="st">&quot;b&quot;</span> <span class="st">&quot;b&quot;</span> <span class="st">&quot;b&quot;</span> <span class="st">&quot;c&quot;</span> <span class="st">&quot;c&quot;</span> <span class="st">&quot;a&quot;</span>]
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">def</span><span class="fu"> DT </span>(api/dataset {<span class="at">:ID</span> [<span class="st">&quot;b&quot;</span> <span class="st">&quot;b&quot;</span> <span class="st">&quot;b&quot;</span> <span class="st">&quot;a&quot;</span> <span class="st">&quot;a&quot;</span> <span class="st">&quot;c&quot;</span>]
                       <span class="at">:a</span> (<span class="kw">range</span> <span class="dv">1</span> <span class="dv">7</span>)
                       <span class="at">:b</span> (<span class="kw">range</span> <span class="dv">7</span> <span class="dv">13</span>)
                       <span class="at">:c</span> (<span class="kw">range</span> <span class="dv">13</span> <span class="dv">19</span>)}))</code></pre></div>
@@ -18710,19 +18223,19 @@ flights &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class=
 <td>15</td>
 </tr>
 <tr class="even">
-<td>c</td>
+<td>a</td>
 <td>4</td>
 <td>10</td>
 <td>16</td>
 </tr>
 <tr class="odd">
-<td>c</td>
+<td>a</td>
 <td>5</td>
 <td>11</td>
 <td>17</td>
 </tr>
 <tr class="even">
-<td>a</td>
+<td>c</td>
 <td>6</td>
 <td>12</td>
 <td>18</td>
@@ -18732,8 +18245,6 @@ flights &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class=
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> <span class="at">:ID</span> DT <span class="kw">meta</span> <span class="at">:datatype</span>)</code></pre></div>
 <pre><code>:string</code></pre>
 </div>
-<div id="subset-rows" class="section level4">
-<h4>Subset rows</h4>
 <div id="get-all-the-flights-with-jfk-as-the-origin-airport-in-the-month-of-june." class="section level5">
 <h5>Get all the flights with “JFK” as the origin airport in the month of June.</h5>
 <p>R</p>
@@ -19247,9 +18758,6 @@ flights &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class=
 </tbody>
 </table>
 </div>
-</div>
-<div id="select-columns" class="section level4">
-<h4>Select column(s)</h4>
 <div id="select-arr_delay-column-but-return-it-as-a-vector" class="section level5">
 <h5>Select <code>arr_delay</code> column, but return it as a vector</h5>
 <p>R</p>
@@ -19488,9 +18996,6 @@ flights &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class=
 </tbody>
 </table>
 </div>
-</div>
-<div id="compute-or-do" class="section level4">
-<h4>Compute or do</h4>
 <div id="how-many-trips-have-had-total-delay-0" class="section level5">
 <h5>How many trips have had total delay &lt; 0?</h5>
 <p>R</p>
@@ -19503,23 +19008,32 @@ ans</code></pre></div>
      (dfn/argfilter #(<span class="kw">&lt;</span> <span class="va">%</span> <span class="fl">0.0</span>))
      (dtype/ecount))</code></pre></div>
 <pre><code>141814</code></pre>
-<p>or pure clojure</p>
+<p>or pure Clojure functions (much, much slower)</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;&gt;</span> (<span class="kw">map</span> <span class="kw">+</span> (flights <span class="st">&quot;arr_delay&quot;</span>) (flights <span class="st">&quot;dep_delay&quot;</span>))
      (<span class="kw">filter</span> <span class="kw">neg?</span>)
      (<span class="kw">count</span>))</code></pre></div>
 <pre><code>141814</code></pre>
 </div>
-</div>
-<div id="subset-and-do" class="section level4">
-<h4>Subset and do</h4>
 <div id="calculate-the-average-arrival-and-departure-delay-for-all-flights-with-jfk-as-the-origin-airport-in-the-month-of-june" class="section level5">
 <h5>Calculate the average arrival and departure delay for all flights with “JFK” as the origin airport in the month of June</h5>
 <p>R</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ans &lt;-<span class="st"> </span>flights[origin <span class="op">==</span><span class="st"> &quot;JFK&quot;</span> <span class="op">&amp;</span><span class="st"> </span>month <span class="op">==</span><span class="st"> </span>6L,
                .(<span class="dt">m_arr =</span> <span class="kw">mean</span>(arr_delay), <span class="dt">m_dep =</span> <span class="kw">mean</span>(dep_delay))]
-ans</code></pre></div>
-<pre><code>      m_arr    m_dep
-1: 5.839349 9.807884</code></pre>
+<span class="kw">kable</span>(ans)</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="right">m_arr</th>
+<th align="right">m_dep</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">5.839349</td>
+<td align="right">9.807884</td>
+</tr>
+</tbody>
+</table>
 <hr />
 <p>Clojure</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> flights
@@ -19561,10 +19075,6 @@ ans</code></pre></div>
     (api/row-count))</code></pre></div>
 <pre><code>8422</code></pre>
 </div>
-</div>
-<div id="columns-by-names" class="section level4">
-<h4>Columns by names</h4>
-<p>Most of the R code is skipped since it doesn't bring anything API specific.</p>
 <div id="deselect-columns-using---or" class="section level5">
 <h5>deselect columns using - or !</h5>
 <p>R</p>
@@ -19830,8 +19340,8 @@ ans</code></pre></div>
 </table>
 </div>
 </div>
-<div id="grouping-1" class="section level4">
-<h4>Grouping</h4>
+<div id="aggregations" class="section level4">
+<h4>Aggregations</h4>
 <div id="how-can-we-get-the-number-of-trips-corresponding-to-each-origin-airport" class="section level5">
 <h5>How can we get the number of trips corresponding to each origin airport?</h5>
 <p>R</p>
@@ -20136,8 +19646,8 @@ ans</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> flights
     (api/select-rows #(<span class="kw">=</span> (<span class="kw">get</span> <span class="va">%</span> <span class="st">&quot;carrier&quot;</span>) <span class="st">&quot;AA&quot;</span>))
     (api/group-by [<span class="st">&quot;origin&quot;</span> <span class="st">&quot;dest&quot;</span> <span class="st">&quot;month&quot;</span>])
-    (api/aggregate {<span class="at">:m</span>_arr #(dfn/mean (<span class="va">%</span> <span class="st">&quot;arr_delay&quot;</span>))
-                    <span class="at">:m</span>_dep #(dfn/mean (<span class="va">%</span> <span class="st">&quot;dep_delay&quot;</span>))})
+    (api/aggregate [#(dfn/mean (<span class="va">%</span> <span class="st">&quot;arr_delay&quot;</span>))
+                    #(dfn/mean (<span class="va">%</span> <span class="st">&quot;dep_delay&quot;</span>))])
     (api/head <span class="dv">10</span>))</code></pre></div>
 <p>_unnamed [10 5]:</p>
 <table>
@@ -20146,8 +19656,8 @@ ans</code></pre></div>
 <th>month</th>
 <th>origin</th>
 <th>dest</th>
-<th>:m_arr</th>
-<th>:m_dep</th>
+<th>:summary-0</th>
+<th>:summary-1</th>
 </tr>
 </thead>
 <tbody>
@@ -20224,9 +19734,6 @@ ans</code></pre></div>
 </tbody>
 </table>
 </div>
-</div>
-<div id="sorted-by" class="section level4">
-<h4>Sorted by</h4>
 <div id="so-how-can-we-directly-order-by-all-the-grouping-variables" class="section level5">
 <h5>So how can we directly order by all the grouping variables?</h5>
 <p>R</p>
@@ -20322,8 +19829,8 @@ ans</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> flights
     (api/select-rows #(<span class="kw">=</span> (<span class="kw">get</span> <span class="va">%</span> <span class="st">&quot;carrier&quot;</span>) <span class="st">&quot;AA&quot;</span>))
     (api/group-by [<span class="st">&quot;origin&quot;</span> <span class="st">&quot;dest&quot;</span> <span class="st">&quot;month&quot;</span>])
-    (api/aggregate {<span class="at">:m</span>_arr #(dfn/mean (<span class="va">%</span> <span class="st">&quot;arr_delay&quot;</span>))
-                    <span class="at">:m</span>_dep #(dfn/mean (<span class="va">%</span> <span class="st">&quot;dep_delay&quot;</span>))})
+    (api/aggregate [#(dfn/mean (<span class="va">%</span> <span class="st">&quot;arr_delay&quot;</span>))
+                    #(dfn/mean (<span class="va">%</span> <span class="st">&quot;dep_delay&quot;</span>))])
     (api/order-by [<span class="st">&quot;origin&quot;</span> <span class="st">&quot;dest&quot;</span> <span class="st">&quot;month&quot;</span>])
     (api/head <span class="dv">10</span>))</code></pre></div>
 <p>_unnamed [10 5]:</p>
@@ -20333,8 +19840,8 @@ ans</code></pre></div>
 <th>month</th>
 <th>origin</th>
 <th>dest</th>
-<th>:m_arr</th>
-<th>:m_dep</th>
+<th>:summary-0</th>
+<th>:summary-1</th>
 </tr>
 </thead>
 <tbody>
@@ -20407,6 +19914,858 @@ ans</code></pre></div>
 <td>DFW</td>
 <td>18.81</td>
 <td>18.89</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="can-by-accept-expressions-as-well-or-does-it-just-take-columns" class="section level5">
+<h5>Can <code>by</code> accept expressions as well or does it just take columns?</h5>
+<p>R</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ans &lt;-<span class="st"> </span>flights[, .N, .(dep_delay<span class="op">&gt;</span><span class="dv">0</span>, arr_delay<span class="op">&gt;</span><span class="dv">0</span>)]
+<span class="kw">kable</span>(ans)</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">dep_delay</th>
+<th align="left">arr_delay</th>
+<th align="right">N</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">TRUE</td>
+<td align="left">TRUE</td>
+<td align="right">72836</td>
+</tr>
+<tr class="even">
+<td align="left">FALSE</td>
+<td align="left">TRUE</td>
+<td align="right">34583</td>
+</tr>
+<tr class="odd">
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="right">119304</td>
+</tr>
+<tr class="even">
+<td align="left">TRUE</td>
+<td align="left">FALSE</td>
+<td align="right">26593</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Clojure</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> flights
+    (api/group-by (<span class="kw">fn</span> [row]
+                    {<span class="at">:dep</span>_delay (<span class="kw">pos?</span> (<span class="kw">get</span> row <span class="st">&quot;dep_delay&quot;</span>))
+                     <span class="at">:arr</span>_delay (<span class="kw">pos?</span> (<span class="kw">get</span> row <span class="st">&quot;arr_delay&quot;</span>))}))
+    (api/aggregate {<span class="at">:N</span> api/row-count}))</code></pre></div>
+<p>_unnamed [4 3]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:dep_delay</th>
+<th>:arr_delay</th>
+<th>:N</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>true</td>
+<td>false</td>
+<td>26593</td>
+</tr>
+<tr class="even">
+<td>false</td>
+<td>true</td>
+<td>34583</td>
+</tr>
+<tr class="odd">
+<td>false</td>
+<td>false</td>
+<td>119304</td>
+</tr>
+<tr class="even">
+<td>true</td>
+<td>true</td>
+<td>72836</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="do-we-have-to-compute-mean-for-each-column-individually" class="section level5">
+<h5>Do we have to compute <code>mean()</code> for each column individually?</h5>
+<p>R</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">kable</span>(DT)</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">ID</th>
+<th align="right">a</th>
+<th align="right">b</th>
+<th align="right">c</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">b</td>
+<td align="right">1</td>
+<td align="right">7</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">b</td>
+<td align="right">2</td>
+<td align="right">8</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">b</td>
+<td align="right">3</td>
+<td align="right">9</td>
+<td align="right">15</td>
+</tr>
+<tr class="even">
+<td align="left">a</td>
+<td align="right">4</td>
+<td align="right">10</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td align="left">a</td>
+<td align="right">5</td>
+<td align="right">11</td>
+<td align="right">17</td>
+</tr>
+<tr class="even">
+<td align="left">c</td>
+<td align="right">6</td>
+<td align="right">12</td>
+<td align="right">18</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">DT[, <span class="kw">print</span>(.SD), by =<span class="st"> </span>ID]</code></pre></div>
+<pre><code>   a b  c
+1: 1 7 13
+2: 2 8 14
+3: 3 9 15
+   a  b  c
+1: 4 10 16
+2: 5 11 17
+   a  b  c
+1: 6 12 18</code></pre>
+<pre><code>Empty data.table (0 rows and 1 cols): ID</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">kable</span>(DT[, <span class="kw">lapply</span>(.SD, mean), <span class="dt">by =</span> ID])</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">ID</th>
+<th align="right">a</th>
+<th align="right">b</th>
+<th align="right">c</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">b</td>
+<td align="right">2.0</td>
+<td align="right">8.0</td>
+<td align="right">14.0</td>
+</tr>
+<tr class="even">
+<td align="left">a</td>
+<td align="right">4.5</td>
+<td align="right">10.5</td>
+<td align="right">16.5</td>
+</tr>
+<tr class="odd">
+<td align="left">c</td>
+<td align="right">6.0</td>
+<td align="right">12.0</td>
+<td align="right">18.0</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Clojure</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">DT
+
+(api/group-by DT <span class="at">:ID</span> {<span class="at">:result-type</span> <span class="at">:as-map</span>})</code></pre></div>
+<p>_unnamed [6 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:ID</th>
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>b</td>
+<td>1</td>
+<td>7</td>
+<td>13</td>
+</tr>
+<tr class="even">
+<td>b</td>
+<td>2</td>
+<td>8</td>
+<td>14</td>
+</tr>
+<tr class="odd">
+<td>b</td>
+<td>3</td>
+<td>9</td>
+<td>15</td>
+</tr>
+<tr class="even">
+<td>a</td>
+<td>4</td>
+<td>10</td>
+<td>16</td>
+</tr>
+<tr class="odd">
+<td>a</td>
+<td>5</td>
+<td>11</td>
+<td>17</td>
+</tr>
+<tr class="even">
+<td>c</td>
+<td>6</td>
+<td>12</td>
+<td>18</td>
+</tr>
+</tbody>
+</table>
+<p>{&quot;a&quot; Group: a [2 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:ID</th>
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>a</td>
+<td>4</td>
+<td>10</td>
+<td>16</td>
+</tr>
+<tr class="even">
+<td>a</td>
+<td>5</td>
+<td>11</td>
+<td>17</td>
+</tr>
+</tbody>
+</table>
+<p>, &quot;b&quot; Group: b [3 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:ID</th>
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>b</td>
+<td>1</td>
+<td>7</td>
+<td>13</td>
+</tr>
+<tr class="even">
+<td>b</td>
+<td>2</td>
+<td>8</td>
+<td>14</td>
+</tr>
+<tr class="odd">
+<td>b</td>
+<td>3</td>
+<td>9</td>
+<td>15</td>
+</tr>
+</tbody>
+</table>
+<p>, &quot;c&quot; Group: c [1 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:ID</th>
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>c</td>
+<td>6</td>
+<td>12</td>
+<td>18</td>
+</tr>
+</tbody>
+</table>
+<p>}</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DT
+    (api/group-by [<span class="at">:ID</span>])
+    (api/aggregate-columns (<span class="kw">complement</span> #{<span class="at">:ID</span>}) dfn/mean))</code></pre></div>
+<p>_unnamed [3 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:ID</th>
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>a</td>
+<td>4.500</td>
+<td>10.50</td>
+<td>16.50</td>
+</tr>
+<tr class="even">
+<td>b</td>
+<td>2.000</td>
+<td>8.000</td>
+<td>14.00</td>
+</tr>
+<tr class="odd">
+<td>c</td>
+<td>6.000</td>
+<td>12.00</td>
+<td>18.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="how-can-we-specify-just-the-columns-we-would-like-to-compute-the-mean-on" class="section level5">
+<h5>How can we specify just the columns we would like to compute the <code>mean()</code> on?</h5>
+<p>R</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">kable</span>(<span class="kw">head</span>(flights[carrier <span class="op">==</span><span class="st"> &quot;AA&quot;</span>,                         ## Only on trips with carrier &quot;AA&quot;
+                   <span class="kw">lapply</span>(.SD, mean),                       ## compute the mean
+                   <span class="dt">by =</span> .(origin, dest, month),             ## for every 'origin,dest,month'
+                   <span class="dt">.SDcols =</span> <span class="kw">c</span>(<span class="st">&quot;arr_delay&quot;</span>, <span class="st">&quot;dep_delay&quot;</span>)])) ## for just those specified in .SDcols</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">origin</th>
+<th align="left">dest</th>
+<th align="right">month</th>
+<th align="right">arr_delay</th>
+<th align="right">dep_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">JFK</td>
+<td align="left">LAX</td>
+<td align="right">1</td>
+<td align="right">6.590361</td>
+<td align="right">14.2289157</td>
+</tr>
+<tr class="even">
+<td align="left">LGA</td>
+<td align="left">PBI</td>
+<td align="right">1</td>
+<td align="right">-7.758621</td>
+<td align="right">0.3103448</td>
+</tr>
+<tr class="odd">
+<td align="left">EWR</td>
+<td align="left">LAX</td>
+<td align="right">1</td>
+<td align="right">1.366667</td>
+<td align="right">7.5000000</td>
+</tr>
+<tr class="even">
+<td align="left">JFK</td>
+<td align="left">MIA</td>
+<td align="right">1</td>
+<td align="right">15.720670</td>
+<td align="right">18.7430168</td>
+</tr>
+<tr class="odd">
+<td align="left">JFK</td>
+<td align="left">SEA</td>
+<td align="right">1</td>
+<td align="right">14.357143</td>
+<td align="right">30.7500000</td>
+</tr>
+<tr class="even">
+<td align="left">EWR</td>
+<td align="left">MIA</td>
+<td align="right">1</td>
+<td align="right">11.011236</td>
+<td align="right">12.1235955</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Clojure</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> flights
+    (api/select-rows #(<span class="kw">=</span> (<span class="kw">get</span> <span class="va">%</span> <span class="st">&quot;carrier&quot;</span>) <span class="st">&quot;AA&quot;</span>))
+    (api/group-by [<span class="st">&quot;origin&quot;</span> <span class="st">&quot;dest&quot;</span> <span class="st">&quot;month&quot;</span>])
+    (api/aggregate-columns [<span class="st">&quot;arr_delay&quot;</span> <span class="st">&quot;dep_delay&quot;</span>] dfn/mean)
+    (api/head <span class="dv">6</span>))</code></pre></div>
+<p>_unnamed [6 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>month</th>
+<th>origin</th>
+<th>dest</th>
+<th>dep_delay</th>
+<th>arr_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>9</td>
+<td>LGA</td>
+<td>DFW</td>
+<td>-0.2558</td>
+<td>-8.788</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>LGA</td>
+<td>DFW</td>
+<td>4.553</td>
+<td>3.500</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>JFK</td>
+<td>AUS</td>
+<td>27.60</td>
+<td>25.20</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>JFK</td>
+<td>AUS</td>
+<td>-0.1333</td>
+<td>4.367</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>JFK</td>
+<td>AUS</td>
+<td>14.73</td>
+<td>6.767</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>JFK</td>
+<td>AUS</td>
+<td>21.50</td>
+<td>26.27</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="how-can-we-return-the-first-two-rows-for-each-month" class="section level5">
+<h5>How can we return the first two rows for each month?</h5>
+<p>R</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ans &lt;-<span class="st"> </span>flights[, <span class="kw">head</span>(.SD, <span class="dv">2</span>), by =<span class="st"> </span>month]
+<span class="kw">kable</span>(<span class="kw">head</span>(ans))</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="right">month</th>
+<th align="right">year</th>
+<th align="right">day</th>
+<th align="right">dep_delay</th>
+<th align="right">arr_delay</th>
+<th align="left">carrier</th>
+<th align="left">origin</th>
+<th align="left">dest</th>
+<th align="right">air_time</th>
+<th align="right">distance</th>
+<th align="right">hour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">2014</td>
+<td align="right">1</td>
+<td align="right">14</td>
+<td align="right">13</td>
+<td align="left">AA</td>
+<td align="left">JFK</td>
+<td align="left">LAX</td>
+<td align="right">359</td>
+<td align="right">2475</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">2014</td>
+<td align="right">1</td>
+<td align="right">-3</td>
+<td align="right">13</td>
+<td align="left">AA</td>
+<td align="left">JFK</td>
+<td align="left">LAX</td>
+<td align="right">363</td>
+<td align="right">2475</td>
+<td align="right">11</td>
+</tr>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">2014</td>
+<td align="right">1</td>
+<td align="right">-1</td>
+<td align="right">1</td>
+<td align="left">AA</td>
+<td align="left">JFK</td>
+<td align="left">LAX</td>
+<td align="right">358</td>
+<td align="right">2475</td>
+<td align="right">8</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">2014</td>
+<td align="right">1</td>
+<td align="right">-5</td>
+<td align="right">3</td>
+<td align="left">AA</td>
+<td align="left">JFK</td>
+<td align="left">LAX</td>
+<td align="right">358</td>
+<td align="right">2475</td>
+<td align="right">11</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">2014</td>
+<td align="right">1</td>
+<td align="right">-11</td>
+<td align="right">36</td>
+<td align="left">AA</td>
+<td align="left">JFK</td>
+<td align="left">LAX</td>
+<td align="right">375</td>
+<td align="right">2475</td>
+<td align="right">8</td>
+</tr>
+<tr class="even">
+<td align="right">3</td>
+<td align="right">2014</td>
+<td align="right">1</td>
+<td align="right">-3</td>
+<td align="right">14</td>
+<td align="left">AA</td>
+<td align="left">JFK</td>
+<td align="left">LAX</td>
+<td align="right">368</td>
+<td align="right">2475</td>
+<td align="right">11</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Clojure</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> flights
+    (api/group-by [<span class="st">&quot;month&quot;</span>])
+    (api/head <span class="dv">2</span>) <span class="co">;; head applied on each group</span>
+    (api/ungroup)
+    (api/head <span class="dv">6</span>))</code></pre></div>
+<p>_unnamed [6 11]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>dep_delay</th>
+<th>origin</th>
+<th>air_time</th>
+<th>hour</th>
+<th>arr_delay</th>
+<th>dest</th>
+<th>distance</th>
+<th>year</th>
+<th>month</th>
+<th>day</th>
+<th>carrier</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>-8</td>
+<td>LGA</td>
+<td>113</td>
+<td>18</td>
+<td>-23</td>
+<td>BNA</td>
+<td>764</td>
+<td>2014</td>
+<td>4</td>
+<td>1</td>
+<td>MQ</td>
+</tr>
+<tr class="even">
+<td>-8</td>
+<td>LGA</td>
+<td>71</td>
+<td>18</td>
+<td>-11</td>
+<td>RDU</td>
+<td>431</td>
+<td>2014</td>
+<td>4</td>
+<td>1</td>
+<td>MQ</td>
+</tr>
+<tr class="odd">
+<td>43</td>
+<td>JFK</td>
+<td>288</td>
+<td>17</td>
+<td>5</td>
+<td>LAS</td>
+<td>2248</td>
+<td>2014</td>
+<td>5</td>
+<td>1</td>
+<td>AA</td>
+</tr>
+<tr class="even">
+<td>-1</td>
+<td>JFK</td>
+<td>330</td>
+<td>7</td>
+<td>-38</td>
+<td>SFO</td>
+<td>2586</td>
+<td>2014</td>
+<td>5</td>
+<td>1</td>
+<td>AA</td>
+</tr>
+<tr class="odd">
+<td>-9</td>
+<td>JFK</td>
+<td>324</td>
+<td>8</td>
+<td>-5</td>
+<td>LAX</td>
+<td>2475</td>
+<td>2014</td>
+<td>6</td>
+<td>1</td>
+<td>AA</td>
+</tr>
+<tr class="even">
+<td>-10</td>
+<td>JFK</td>
+<td>329</td>
+<td>12</td>
+<td>-13</td>
+<td>LAX</td>
+<td>2475</td>
+<td>2014</td>
+<td>6</td>
+<td>1</td>
+<td>AA</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="how-can-we-concatenate-columns-a-and-b-for-each-group-in-id" class="section level5">
+<h5>How can we concatenate columns a and b for each group in ID?</h5>
+<p>R</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">kable</span>(DT[, .(<span class="dt">val =</span> <span class="kw">c</span>(a,b)), <span class="dt">by =</span> ID])</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">ID</th>
+<th align="right">val</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">b</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">b</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">b</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">b</td>
+<td align="right">7</td>
+</tr>
+<tr class="odd">
+<td align="left">b</td>
+<td align="right">8</td>
+</tr>
+<tr class="even">
+<td align="left">b</td>
+<td align="right">9</td>
+</tr>
+<tr class="odd">
+<td align="left">a</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="left">a</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">a</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="left">a</td>
+<td align="right">11</td>
+</tr>
+<tr class="odd">
+<td align="left">c</td>
+<td align="right">6</td>
+</tr>
+<tr class="even">
+<td align="left">c</td>
+<td align="right">12</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Clojure</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DT
+    (api/pivot-&gt;longer [<span class="at">:a</span> <span class="at">:b</span>] {<span class="at">:value-column-name</span> <span class="at">:val</span>})
+    (api/drop-columns [:$column <span class="at">:c</span>]))</code></pre></div>
+<p>_unnamed [12 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:ID</th>
+<th>:val</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>b</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>b</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>b</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>a</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td>a</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td>c</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<td>b</td>
+<td>7</td>
+</tr>
+<tr class="even">
+<td>b</td>
+<td>8</td>
+</tr>
+<tr class="odd">
+<td>b</td>
+<td>9</td>
+</tr>
+<tr class="even">
+<td>a</td>
+<td>10</td>
+</tr>
+<tr class="odd">
+<td>a</td>
+<td>11</td>
+</tr>
+<tr class="even">
+<td>c</td>
+<td>12</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="what-if-we-would-like-to-have-all-the-values-of-column-a-and-b-concatenated-but-returned-as-a-list-column" class="section level5">
+<h5>What if we would like to have all the values of column <code>a</code> and <code>b</code> concatenated, but returned as a list column?</h5>
+<p>R</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">kable</span>(DT[, .(<span class="dt">val =</span> <span class="kw">list</span>(<span class="kw">c</span>(a,b))), <span class="dt">by =</span> ID])</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">ID</th>
+<th align="left">val</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">b</td>
+<td align="left">c(1, 2, 3, 7, 8, 9)</td>
+</tr>
+<tr class="even">
+<td align="left">a</td>
+<td align="left">c(4, 5, 10, 11)</td>
+</tr>
+<tr class="odd">
+<td align="left">c</td>
+<td align="left">c(6, 12)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Clojure</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DT
+    (api/pivot-&gt;longer [<span class="at">:a</span> <span class="at">:b</span>] {<span class="at">:value-column-name</span> <span class="at">:val</span>})
+    (api/drop-columns [:$column <span class="at">:c</span>])
+    (api/fold-by <span class="at">:ID</span>))</code></pre></div>
+<p>_unnamed [3 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:ID</th>
+<th>:val</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>a</td>
+<td>[4 5 10 11]</td>
+</tr>
+<tr class="even">
+<td>b</td>
+<td>[1 2 3 7 8 9]</td>
+</tr>
+<tr class="odd">
+<td>c</td>
+<td>[6 12]</td>
 </tr>
 </tbody>
 </table>

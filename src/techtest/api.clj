@@ -59,7 +59,8 @@
                          last)
 
 (exporter/export-symbols techtest.api.aggregate
-                         aggregate)
+                         aggregate
+                         aggregate-columns)
 
 (exporter/export-symbols techtest.api.order-by
                          order-by)

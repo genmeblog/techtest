@@ -1374,6 +1374,23 @@ Result of aggregating is automatically ungrouped, you can skip this step by stet
                                                               :ungroup? false}))
 ```
 
+#### Column
+
+You can perform columnar aggreagation also. `aggregate-columns` selects columns and apply aggregating function for each column separately.
+
+```{clojure results="asis"}
+(api/aggregate-columns DS [:V1 :V2 :V3] #(reduce + %))
+```
+
+---
+
+```{clojure results="asis"}
+(-> DS
+    (api/group-by [:V4])
+    (api/aggregate-columns [:V1 :V2 :V3] #(reduce + %)))
+```
+
+
 ### Order
 
 Ordering can be done by column(s) or any function operating on row. Possible order can be:
@@ -2737,27 +2754,6 @@ This API doesn't provide any statistical, numerical or date/time functions. Use 
 
 ## Other examples
 
-### Flights
-
-```{clojure results="hide"}
-(defonce flights (api/dataset "https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv"))
-```
-
-```{clojure results="asis"}
-flights
-```
-
-```{clojure results="asis"}
-(-> flights ;; take dataset (loaded from the net
-    (api/drop-missing) ;; remove rows with missing values
-    (api/select-rows #(= "AA" (get % "carrier"))) ;; filter rows by carrier="AA"
-    (api/group-by ["origin" "dest" "month"]) ;; group by several columns
-    (api/aggregate {:arr-delay-mean #(tech.v2.datatype.functional/mean (% "arr_delay")) ;; calculate mean of arr_delay...
-                    :dep-delay-mean #(tech.v2.datatype.functional/mean (% "dep_delay"))}) ;; ...and dep_delay
-    (api/order-by ["origin" "dest" "month"]) ;; order by some columns
-    )
-```
-
 ### Stocks
 
 ```{clojure results="hide"}
@@ -2787,7 +2783,9 @@ stocks
 
 ### data.table
 
-Snippets taken from [Introduction to `data.table`](https://rdatatable.gitlab.io/data.table/articles/datatable-intro.html)
+Below you can find comparizon between functionality of `data.table` and Clojure dataset API. I leave it without comments, please refer original document explaining details:
+
+[Introduction to `data.table`](https://rdatatable.gitlab.io/data.table/articles/datatable-intro.html)
 
 R
 
@@ -2815,7 +2813,9 @@ Clojure
 (api/head flights 6)
 ```
 
-#### Shape of loaded data
+#### Basics
+
+##### Shape of loaded data
 
 R
 
@@ -2831,7 +2831,7 @@ Clojure
 (api/shape flights)
 ```
 
-#### What is `data.table`?
+##### What is `data.table`?
 
 R
 
@@ -2853,7 +2853,7 @@ class(DT$ID)
 Clojure
 
 ```{clojure results="hide"}
-(def DT (api/dataset {:ID ["b" "b" "b" "c" "c" "a"]
+(def DT (api/dataset {:ID ["b" "b" "b" "a" "a" "c"]
                       :a (range 1 7)
                       :b (range 7 13)
                       :c (range 13 19)}))
@@ -2866,8 +2866,6 @@ DT
 ```{clojure}
 (-> :ID DT meta :datatype)
 ```
-
-#### Subset rows
 
 ##### Get all the flights with “JFK” as the origin airport in the month of June.
 
@@ -2924,8 +2922,6 @@ Clojure
     (api/order-by ["origin" "dest"] [:asc :desc])
     (api/head 6))
 ```
-
-#### Select column(s)
 
 ##### Select `arr_delay` column, but return it as a vector
 
@@ -3002,8 +2998,6 @@ Clojure
     (api/head 6))
 ```
 
-#### Compute or do
-
 ##### How many trips have had total delay < 0?
 
 R
@@ -3023,15 +3017,13 @@ Clojure
      (dtype/ecount))
 ```
 
-or pure clojure
+or pure Clojure functions (much, much slower)
 
 ```{clojure}
 (->> (map + (flights "arr_delay") (flights "dep_delay"))
      (filter neg?)
      (count))
 ```
-
-#### Subset and do
 
 ##### Calculate the average arrival and departure delay for all flights with “JFK” as the origin airport in the month of June
 
@@ -3040,7 +3032,7 @@ R
 ```{r}
 ans <- flights[origin == "JFK" & month == 6L,
                .(m_arr = mean(arr_delay), m_dep = mean(dep_delay))]
-ans
+kable(ans)
 ```
 
 ---
@@ -3082,10 +3074,6 @@ Clojure
     (api/row-count))
 ```
 
-#### Columns by names
-
-Most of the R code is skipped since it doesn't bring anything API specific.
-
 ##### deselect columns using - or !
 
 R
@@ -3112,7 +3100,7 @@ Clojure
     (api/head 6))
 ```
 
-#### Grouping
+#### Aggregations
 
 ##### How can we get the number of trips corresponding to each origin airport?
 
@@ -3193,12 +3181,10 @@ Clojure
 (-> flights
     (api/select-rows #(= (get % "carrier") "AA"))
     (api/group-by ["origin" "dest" "month"])
-    (api/aggregate {:m_arr #(dfn/mean (% "arr_delay"))
-                    :m_dep #(dfn/mean (% "dep_delay"))})
+    (api/aggregate [#(dfn/mean (% "arr_delay"))
+                    #(dfn/mean (% "dep_delay"))])
     (api/head 10))
 ```
-
-#### Sorted by
 
 ##### So how can we directly order by all the grouping variables?
 
@@ -3219,8 +3205,141 @@ Clojure
 (-> flights
     (api/select-rows #(= (get % "carrier") "AA"))
     (api/group-by ["origin" "dest" "month"])
-    (api/aggregate {:m_arr #(dfn/mean (% "arr_delay"))
-                    :m_dep #(dfn/mean (% "dep_delay"))})
+    (api/aggregate [#(dfn/mean (% "arr_delay"))
+                    #(dfn/mean (% "dep_delay"))])
     (api/order-by ["origin" "dest" "month"])
     (api/head 10))
 ```
+
+##### Can `by` accept expressions as well or does it just take columns?
+
+R
+
+```{r}
+ans <- flights[, .N, .(dep_delay>0, arr_delay>0)]
+kable(ans)
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(-> flights
+    (api/group-by (fn [row]
+                    {:dep_delay (pos? (get row "dep_delay"))
+                     :arr_delay (pos? (get row "arr_delay"))}))
+    (api/aggregate {:N api/row-count}))
+```
+
+##### Do we have to compute `mean()` for each column individually?
+
+R
+
+```{r}
+kable(DT)
+
+DT[, print(.SD), by = ID]
+```
+
+```{r}
+kable(DT[, lapply(.SD, mean), by = ID])
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+DT
+
+(api/group-by DT :ID {:result-type :as-map})
+```
+
+```{clojure results="asis"}
+(-> DT
+    (api/group-by [:ID])
+    (api/aggregate-columns (complement #{:ID}) dfn/mean))
+```
+
+##### How can we specify just the columns we would like to compute the `mean()` on?
+
+R
+
+```{r}
+kable(head(flights[carrier == "AA",                         ## Only on trips with carrier "AA"
+                   lapply(.SD, mean),                       ## compute the mean
+                   by = .(origin, dest, month),             ## for every 'origin,dest,month'
+                   .SDcols = c("arr_delay", "dep_delay")])) ## for just those specified in .SDcols
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(-> flights
+    (api/select-rows #(= (get % "carrier") "AA"))
+    (api/group-by ["origin" "dest" "month"])
+    (api/aggregate-columns ["arr_delay" "dep_delay"] dfn/mean)
+    (api/head 6))
+```
+
+##### How can we return the first two rows for each month?
+
+R
+
+```{r}
+ans <- flights[, head(.SD, 2), by = month]
+kable(head(ans))
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(-> flights
+    (api/group-by ["month"])
+    (api/head 2) ;; head applied on each group
+    (api/ungroup)
+    (api/head 6))
+```
+
+##### How can we concatenate columns a and b for each group in ID?
+
+R
+
+```{r}
+kable(DT[, .(val = c(a,b)), by = ID])
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(-> DT
+    (api/pivot->longer [:a :b] {:value-column-name :val})
+    (api/drop-columns [:$column :c]))
+```
+
+##### What if we would like to have all the values of column `a` and `b` concatenated, but returned as a list column?
+
+R
+
+```{r}
+kable(DT[, .(val = list(c(a,b))), by = ID])
+```
+
+---
+
+Clojure
+
+```{clojure results="asis"}
+(-> DT
+    (api/pivot->longer [:a :b] {:value-column-name :val})
+    (api/drop-columns [:$column :c])
+    (api/fold-by :ID))
+```
+

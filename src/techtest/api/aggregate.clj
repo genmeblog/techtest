@@ -1,7 +1,9 @@
 (ns techtest.api.aggregate
   (:require [techtest.api.utils :refer [iterable-sequence? ->str]]
+            [techtest.api.columns :refer [select-columns]]
             [techtest.api.group-by :refer [grouped? process-group-data ungroup]]
-            [techtest.api.dataset :refer [dataset]]))
+            [techtest.api.dataset :refer [dataset columns]]
+            [techtest.api :as api]))
 
 (defn- add-agg-result
   [tot-res k agg-res]
@@ -49,3 +51,15 @@
            (ungroup pds (merge {:add-group-as-column true} options))
            pds))
        (aggregate-map ds aggregator options)))))
+
+(defn aggregate-columns
+  "Aggregates each column separately"
+  ([ds columns-selector column-aggregator] (aggregate-columns ds columns-selector column-aggregator nil))
+  ([ds columns-selector column-aggregator options]
+   (aggregate ds #(reduce-kv (fn [res k v]
+                               (assoc res k (column-aggregator v)))
+                             {}
+                             (-> %
+                                 (api/select-columns columns-selector)
+                                 (api/columns :as-map)))
+              options)))
