@@ -15,3 +15,36 @@
   [v]
   (if (instance? clojure.lang.Named v) (name v) (str v)))
 
+(defn rank
+  "Sample ranks. See [R docs](https://www.rdocumentation.org/packages/base/versions/3.6.1/topics/rank).
+  Rank uses 0 based indexing.
+  
+  Possible tie strategies: `:average`, `:first`, `:last`, `:random`, `:min`, `:max`, `:dense`.
+  `:dense` is the same as in `data.table::frank` from R"
+  ([vs] (rank vs :average))
+  ([vs ties] (rank vs ties false))
+  ([vs ties desc?]
+   (let [cmp (if desc? #(compare %2 %1) compare)
+         indexed-sorted-map (group-by second (map-indexed vector (sort cmp vs)))]
+     (if (#{:first :last :random} ties)
+       (let [tie-sort (case ties
+                        :first (partial sort-by first clojure.core/<)
+                        :last (partial sort-by first clojure.core/>)
+                        :random shuffle)
+             sorted2-map (into {} (map (fn [[k v]] [k (tie-sort v)]) indexed-sorted-map))]
+         (first (reduce (fn [[res curr] v]
+                          (let [lst (curr v)]
+                            [(conj res (ffirst lst))
+                             (assoc curr v (rest lst))])) [[] sorted2-map] vs)))
+       (let [tie-fn (case ties
+                      :min ffirst
+                      :dense ffirst
+                      :max (comp first last)
+                      (fn ^double [v] (/ ^double (reduce #(+ ^double %1 ^double %2) (map first v)) (count v))))
+             m (map (fn [[k v]] [k (tie-fn v)]) indexed-sorted-map)
+             m (if (= ties :dense)
+                 (map-indexed (fn [id [k _]]
+                                [k id]) (sort-by second m))
+                 m)]
+         (map (into {} m) vs))))))
+

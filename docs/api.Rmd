@@ -1222,6 +1222,8 @@ Drop values lower than or equal `:V2` column mean in grouped dataset.
 
 There are several function to select first, last, random rows, or display head, tail of the dataset. All functions work on grouped dataset.
 
+All random functions accept `:seed` as an option if you want to fix returned result.
+
 ---
 
 First row
@@ -1244,6 +1246,14 @@ Random row (single)
 
 ```{clojure results="asis"}
 (api/rand-nth DS)
+```
+
+---
+
+Random row (single) with seed
+
+```{clojure results="asis"}
+(api/rand-nth DS {:seed 42})
 ```
 
 ---
@@ -1272,11 +1282,29 @@ Five random, non-repeating rows
 
 ---
 
+Five random, with seed
+
+```{clojure results="asis"}
+(api/random DS 5 {:seed 42})
+```
+
+
+---
+
 Shuffle dataset
 
 ```{clojure results="asis"}
 (api/shuffle DS)
 ```
+
+---
+
+Shuffle with seed
+
+```{clojure results="asis"}
+(api/shuffle DS {:seed 42})
+```
+
 
 ---
 
@@ -1292,6 +1320,32 @@ Last `n` rows (default 5)
 
 ```{clojure results="asis"}
 (api/tail DS)
+```
+
+---
+
+`by-rank` calculates rank on column(s). It's base on [R rank()](https://www.rdocumentation.org/packages/base/versions/3.6.1/topics/rank) with addition of `:dense` (default) tie strategy which give consecutive rank numbering.
+
+`:desc?` options (default: `true`) sorts input with descending order, giving top values under `0` value.
+
+`rank` is zero based and is defined at `techtest.api.utils` namespace.
+
+---
+
+```{clojure results="asis"}
+(api/by-rank DS :V3 zero?) ;; most V3 values
+```
+
+```{clojure results="asis"}
+(api/by-rank DS :V3 zero? {:desc? false}) ;; least V3 values
+```
+
+---
+
+Rank also works on multiple columns
+
+```{clojure results="asis"}
+(api/by-rank DS [:V1 :V3] zero? {:desc? false})
 ```
 
 ---
@@ -3459,3 +3513,103 @@ Clojure
     (api/fold-by :ID))
 ```
 
+### API tour
+
+Below snippets are taken from [A data.table and dplyr tour](https://atrebas.github.io/post/2019-03-03-datatable-dplyr/) written by Atrebas (permission granted).
+
+I keep structure and subtitles but I skip `data.table` and `dplyr` examples.
+
+Example data
+
+```{clojure results="hide"}
+(def DS (api/dataset {:V1 (take 9 (cycle [1 2]))
+                      :V2 (range 1 10)
+                      :V3 (take 9 (cycle [0.5 1.0 1.5]))
+                      :V4 (take 9 (cycle ["A" "B" "C"]))}))
+```
+
+```{clojure}
+(api/dataset? DS)
+(class DS)
+```
+
+```{clojure results="asis"}
+DS
+```
+
+#### Basic Operations
+
+##### Filter rows
+
+Filter rows using indices
+
+```{clojure results="asis"}
+(api/select-rows DS [2 3])
+```
+
+---
+
+Discard rows using negative indices
+
+In Clojure API we have separate function for that: `drop-rows`.
+
+```{clojure results="asis"}
+(api/drop-rows DS (range 2 7))
+```
+
+---
+
+Filter rows using a logical expression
+
+```{clojure results="asis"}
+(api/select-rows DS (comp #(> % 5) :V2))
+```
+
+```{clojure results="asis"}
+(api/select-rows DS (comp #{"A" "C"} :V4))
+```
+
+---
+
+Filter rows using multiple conditions
+
+```{clojure results="asis"}
+(api/select-rows DS #(and (= (:V1 %) 1)
+                          (= (:V4 %) "A")))
+```
+
+---
+
+Filter unique rows
+
+```{clojure results="asis"}
+(api/unique-by DS)
+```
+
+```{clojure results="asis"}
+(api/unique-by DS [:V1 :V4])
+```
+
+---
+
+Discard rows with missing values
+
+```{clojure results="asis"}
+(api/drop-missing DS)
+```
+
+---
+
+Other filters
+
+```{clojure results="asis"}
+(api/random DS 3) ;; 3 random rows
+```
+
+```{clojure results="asis"}
+(api/random DS (/ (api/row-count DS) 2)) ;; fraction of random rows
+```
+
+```{clojure results="asis"}
+(api/by-rank DS :V1 zero?) ;; take top n entries
+```

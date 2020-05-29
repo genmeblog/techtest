@@ -2,8 +2,9 @@
   (:refer-clojure :exclude [shuffle rand-nth first last])
   (:require [tech.ml.dataset :as ds]
 
-            [techtest.api.utils :refer [iterable-sequence?]]
-            [techtest.api.columns :refer [add-or-update-columns]]
+            [techtest.api.utils :refer [iterable-sequence? rank]]
+            [techtest.api.dataset :refer [rows]]
+            [techtest.api.columns :refer [add-or-update-columns select-columns column-names]]
             [techtest.api.group-by :refer [grouped? process-group-data]]
             [tech.v2.datatype.functional :as dfn]))
 
@@ -74,29 +75,63 @@
      (process-group-data ds (partial ds/tail n))
      (ds/tail n ds))))
 
+(defn- shuffle-seq
+  [seq rng]
+  (let [^java.util.Collection s seq
+        ar (java.util.ArrayList. s)]
+    (if rng
+      (java.util.Collections/shuffle ar rng)
+      (java.util.Collections/shuffle ar))
+    ar))
+
+(defn- shuffle-with-rng
+  [ds rng]
+  (ds/select-rows ds (shuffle-seq (range (ds/row-count ds)) rng)))
+
 (defn shuffle
-  [ds]
-  (if (grouped? ds)
-    (process-group-data ds ds/shuffle)
-    (ds/shuffle ds)))
+  ([ds] (shuffle ds nil))
+  ([ds {:keys [seed]}]
+   (let [rng (when seed (java.util.Random. seed))]
+     (if (grouped? ds)
+       (process-group-data ds #(shuffle-with-rng % rng))
+       (shuffle-with-rng ds rng)))))
+
+(defn- get-random-long
+  ^long [^long cnt ^java.util.Random rng]
+  (if rng
+    (mod (.nextLong rng) cnt)
+    (long (rand cnt))))
+
+(defn- process-random
+  [ds repeat? n rng]
+  (let [cnt (ds/row-count ds)
+        n (if (number? n) n cnt)
+        idxs (if repeat?
+               (repeatedly n #(get-random-long cnt rng))
+               (take (min cnt n) (shuffle-seq (range cnt) rng)))]
+    (ds/select-rows ds idxs)))
 
 (defn random
   ([ds] (random ds (ds/row-count ds)))
   ([ds n] (random ds n nil))
-  ([ds n {:keys [repeat?]
-          :or {repeat? true}
-          :as options}]
-   (if (grouped? ds)
-     (process-group-data ds #(random % n options))
-     (let [cnt (ds/row-count ds)
-           idxs (if repeat?
-                  (repeatedly n #(int (rand cnt)))
-                  (take (min cnt n) (clojure.core/shuffle (range cnt))))]
-       (ds/select-rows ds idxs)))))
+  ([ds n {:keys [repeat? seed]
+          :or {repeat? true}}]
+   (let [rng (when seed (java.util.Random. seed))]
+     (if (grouped? ds)
+       (process-group-data ds #(process-random % repeat? n rng))
+       (process-random ds repeat? n rng)))))
+
+(defn- process-rand-nth
+  [ds rng]
+  (ds/select-rows ds [(get-random-long (ds/row-count ds) rng)]))
 
 (defn rand-nth
-  [ds]
-  (random ds 1))
+  ([ds] (rand-nth ds nil))
+  ([ds {:keys [seed]}]
+   (let [rng (when seed (java.util.Random. seed))]
+     (if (grouped? ds)
+       (process-group-data ds #(process-rand-nth % rng))
+       (process-rand-nth ds rng)))))
 
 (defn first
   [ds]
@@ -110,3 +145,37 @@
     (process-group-data ds last)
     (let [idx (dec (ds/row-count ds))]
       (ds/select-rows ds [idx]))))
+
+
+(defn- rank-by-process
+  [ds rank-fn rank-predicate]
+  (->> ds
+       (rank-fn)
+       (map rank-predicate)
+       (select-rows ds)))
+
+(defn by-rank
+  "Select rows using `rank` on a column, ties are resolved using `:dense` method.
+
+  See [R docs](https://www.rdocumentation.org/packages/base/versions/3.6.1/topics/rank).
+  Rank uses 0 based indexing.
+  
+  Possible `:ties` strategies: `:average`, `:first`, `:last`, `:random`, `:min`, `:max`, `:dense`.
+  `:dense` is the same as in `data.table::frank` from R
+
+  `:desc?` set to true (default) order descending before calculating rank"
+  ([ds columns-selector rank-predicate] (by-rank ds columns-selector rank-predicate nil))
+  ([ds columns-selector rank-predicate {:keys [desc? ties]
+                                        :or {desc? true ties :dense}}]
+   (let [col-names (column-names (if (grouped? ds)
+                                   (clojure.core/first (ds :data))
+                                   ds) columns-selector)
+         rank-fn (if (= 1 (count col-names))
+                   (let [n (clojure.core/first col-names)]
+                     #(rank (% n) ties desc?))
+                   #(rank (->> (-> (select-columns % col-names)
+                                   (rows :as-seq))
+                               (map vec)) ties desc?))]
+     (if (grouped? ds)
+       (process-group-data ds #(rank-by-process % rank-fn rank-predicate))
+       (rank-by-process ds rank-fn rank-predicate)))))

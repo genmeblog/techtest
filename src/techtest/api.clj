@@ -56,7 +56,8 @@
                          random
                          rand-nth
                          first
-                         last)
+                         last
+                         by-rank)
 
 (exporter/export-symbols techtest.api.aggregate
                          aggregate
@@ -88,7 +89,13 @@
 (exporter/export-symbols techtest.api.join-concat-ds                         
                          left-join
                          right-join
-                         inner-join)
+                         inner-join
+                         full-join
+                         semi-join
+                         anti-join
+                         intersect
+                         difference
+                         union)
 
 ;;
 

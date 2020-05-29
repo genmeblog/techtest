@@ -1264,17 +1264,17 @@ precipitation
 <hr />
 <p>Rows as sequence of sequences</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">take</span> <span class="dv">2</span> (api/rows ds))</code></pre></div>
-<pre><code>([#object[java.time.LocalDate 0x71e3a51 &quot;2012-01-01&quot;] 0.0 12.8 5.0 4.7 &quot;drizzle&quot;] [#object[java.time.LocalDate 0x5f93126d &quot;2012-01-02&quot;] 10.9 10.6 2.8 4.5 &quot;rain&quot;])</code></pre>
+<pre><code>([#object[java.time.LocalDate 0x67b66072 &quot;2012-01-01&quot;] 0.0 12.8 5.0 4.7 &quot;drizzle&quot;] [#object[java.time.LocalDate 0x650f0c28 &quot;2012-01-02&quot;] 10.9 10.6 2.8 4.5 &quot;rain&quot;])</code></pre>
 <hr />
 <p>Rows as sequence of maps</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(clojure.pprint/pprint (<span class="kw">take</span> <span class="dv">2</span> (api/rows ds <span class="at">:as-maps</span>)))</code></pre></div>
-<pre><code>({&quot;date&quot; #object[java.time.LocalDate 0x49201796 &quot;2012-01-01&quot;],
+<pre><code>({&quot;date&quot; #object[java.time.LocalDate 0x4ff609a8 &quot;2012-01-01&quot;],
   &quot;precipitation&quot; 0.0,
   &quot;temp_min&quot; 5.0,
   &quot;weather&quot; &quot;drizzle&quot;,
   &quot;temp_max&quot; 12.8,
   &quot;wind&quot; 4.7}
- {&quot;date&quot; #object[java.time.LocalDate 0x52c81720 &quot;2012-01-02&quot;],
+ {&quot;date&quot; #object[java.time.LocalDate 0x15bed36c &quot;2012-01-02&quot;],
   &quot;precipitation&quot; 10.9,
   &quot;temp_min&quot; 2.8,
   &quot;weather&quot; &quot;rain&quot;,
@@ -3547,7 +3547,7 @@ precipitation
 <th>v1</th>
 <th>v2</th>
 <th>[1 2 3]</th>
-<th><a href="mailto:java.lang.Object@3914a72f">java.lang.Object@3914a72f</a></th>
+<th><a href="mailto:java.lang.Object@535514e4">java.lang.Object@535514e4</a></th>
 </tr>
 </thead>
 <tbody>
@@ -3623,7 +3623,7 @@ precipitation
 <th>v1</th>
 <th>v2</th>
 <th>[1 2 3]</th>
-<th><a href="mailto:java.lang.Object@39c0d4b2">java.lang.Object@39c0d4b2</a></th>
+<th><a href="mailto:java.lang.Object@2025098b">java.lang.Object@2025098b</a></th>
 </tr>
 </thead>
 <tbody>
@@ -3666,7 +3666,7 @@ precipitation
 <th>v1</th>
 <th>v2</th>
 <th>[1 2 3]</th>
-<th><a href="mailto:java.lang.Object@39c0d4b2">java.lang.Object@39c0d4b2</a></th>
+<th><a href="mailto:java.lang.Object@2025098b">java.lang.Object@2025098b</a></th>
 </tr>
 </thead>
 <tbody>
@@ -3807,55 +3807,55 @@ precipitation
 </thead>
 <tbody>
 <tr class="odd">
-<td>0.7862</td>
+<td>0.9531</td>
 <td>1</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
-<td>0.09135</td>
+<td>0.04924</td>
 <td>2</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="odd">
-<td>0.1066</td>
+<td>0.9793</td>
 <td>3</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="even">
-<td>0.1101</td>
+<td>0.07643</td>
 <td>4</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="odd">
-<td>0.5635</td>
+<td>0.8566</td>
 <td>5</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="even">
-<td>0.7287</td>
+<td>0.3783</td>
 <td>6</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="odd">
-<td>0.1448</td>
+<td>0.01921</td>
 <td>7</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
-<td>0.8717</td>
+<td>0.2260</td>
 <td>8</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="odd">
-<td>0.1912</td>
+<td>0.6378</td>
 <td>9</td>
 <td>1.500</td>
 <td>C</td>
@@ -5088,19 +5088,19 @@ precipitation
 <hr />
 <p>Double array conversion.</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/-&gt;array DS <span class="at">:V1</span>)</code></pre></div>
-<pre><code>#object[&quot;[J&quot; 0xbc7a4f9 &quot;[J@bc7a4f9&quot;]</code></pre>
+<pre><code>#object[&quot;[J&quot; 0x490c65d2 &quot;[J@490c65d2&quot;]</code></pre>
 <hr />
 <p>Function also works on grouped dataset</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
     (api/group-by <span class="at">:V3</span>)
     (api/-&gt;array <span class="at">:V2</span>))</code></pre></div>
-<pre><code>(#object[&quot;[J&quot; 0xe37e26b &quot;[J@e37e26b&quot;] #object[&quot;[J&quot; 0x7922d69 &quot;[J@7922d69&quot;] #object[&quot;[J&quot; 0x71d96155 &quot;[J@71d96155&quot;])</code></pre>
+<pre><code>(#object[&quot;[J&quot; 0x4904d5ab &quot;[J@4904d5ab&quot;] #object[&quot;[J&quot; 0x444acb91 &quot;[J@444acb91&quot;] #object[&quot;[J&quot; 0x7410cc34 &quot;[J@7410cc34&quot;])</code></pre>
 <hr />
 <p>You can also cast the type to the other one (if casting is possible):</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/-&gt;array DS <span class="at">:V4</span> <span class="at">:string</span>)
 (api/-&gt;array DS <span class="at">:V1</span> <span class="at">:float32</span>)</code></pre></div>
-<pre><code>#object[&quot;[Ljava.lang.String;&quot; 0xa93d7b8 &quot;[Ljava.lang.String;@a93d7b8&quot;]
-#object[&quot;[F&quot; 0x1197b8ab &quot;[F@1197b8ab&quot;]</code></pre>
+<pre><code>#object[&quot;[Ljava.lang.String;&quot; 0x78a83f04 &quot;[Ljava.lang.String;@78a83f04&quot;]
+#object[&quot;[F&quot; 0x63acd101 &quot;[F@63acd101&quot;]</code></pre>
 </div>
 </div>
 <div id="rows" class="section level3">
@@ -5365,6 +5365,7 @@ precipitation
 <div id="other" class="section level4">
 <h4>Other</h4>
 <p>There are several function to select first, last, random rows, or display head, tail of the dataset. All functions work on grouped dataset.</p>
+<p>All random functions accept <code>:seed</code> as an option if you want to fix returned result.</p>
 <hr />
 <p>First row</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/first DS)</code></pre></div>
@@ -5425,9 +5426,31 @@ precipitation
 <tbody>
 <tr class="odd">
 <td>1</td>
-<td>7</td>
+<td>1</td>
 <td>0.5000</td>
 <td>A</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Random row (single) with seed</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/rand-nth DS {<span class="at">:seed</span> <span class="dv">42</span>})</code></pre></div>
+<p>_unnamed [1 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 </tbody>
 </table>
@@ -5446,10 +5469,22 @@ precipitation
 </thead>
 <tbody>
 <tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
 <td>1</td>
 <td>7</td>
 <td>0.5000</td>
 <td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 <tr class="even">
 <td>1</td>
@@ -5458,38 +5493,26 @@ precipitation
 <td>B</td>
 </tr>
 <tr class="odd">
-<td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="odd">
 <td>1</td>
-<td>7</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>3</td>
+<td>9</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
+<tr class="even">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
 <tr class="odd">
 <td>1</td>
-<td>7</td>
+<td>1</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
-<td>2</td>
-<td>4</td>
+<td>1</td>
+<td>7</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
@@ -5516,32 +5539,32 @@ precipitation
 </thead>
 <tbody>
 <tr class="odd">
-<td>1</td>
-<td>3</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>9</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>2</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>2</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
 <td>2</td>
 <td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
@@ -5562,16 +5585,16 @@ precipitation
 </thead>
 <tbody>
 <tr class="odd">
-<td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 <tr class="even">
-<td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 <tr class="odd">
 <td>1</td>
@@ -5580,10 +5603,10 @@ precipitation
 <td>C</td>
 </tr>
 <tr class="even">
-<td>2</td>
-<td>8</td>
-<td>1.000</td>
-<td>B</td>
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
 </tr>
 <tr class="odd">
 <td>2</td>
@@ -5594,8 +5617,124 @@ precipitation
 </tbody>
 </table>
 <hr />
+<p>Five random, with seed</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/random DS <span class="dv">5</span> {<span class="at">:seed</span> <span class="dv">42</span>})</code></pre></div>
+<p>_unnamed [5 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<hr />
 <p>Shuffle dataset</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/shuffle DS)</code></pre></div>
+<p>_unnamed [9 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Shuffle with seed</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/shuffle DS {<span class="at">:seed</span> <span class="dv">42</span>})</code></pre></div>
 <p>_unnamed [9 4]:</p>
 <table>
 <thead>
@@ -5615,25 +5754,25 @@ precipitation
 </tr>
 <tr class="even">
 <td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
 <td>6</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
-<tr class="odd">
-<td>2</td>
-<td>8</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
 <tr class="even">
-<td>1</td>
-<td>1</td>
+<td>2</td>
+<td>4</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="odd">
 <td>2</td>
-<td>2</td>
+<td>8</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
@@ -5644,22 +5783,22 @@ precipitation
 <td>C</td>
 </tr>
 <tr class="odd">
-<td>2</td>
-<td>4</td>
+<td>1</td>
+<td>7</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
 <td>1</td>
-<td>9</td>
-<td>1.500</td>
-<td>C</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
 </tr>
 <tr class="odd">
 <td>1</td>
-<td>7</td>
-<td>0.5000</td>
-<td>A</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 </tbody>
 </table>
@@ -5756,6 +5895,103 @@ precipitation
 </tbody>
 </table>
 <hr />
+<p><code>by-rank</code> calculates rank on column(s). It's base on <a href="https://www.rdocumentation.org/packages/base/versions/3.6.1/topics/rank">R rank()</a> with addition of <code>:dense</code> (default) tie strategy which give consecutive rank numbering.</p>
+<p><code>:desc?</code> options (default: <code>true</code>) sorts input with descending order, giving top values under <code>0</code> value.</p>
+<p><code>rank</code> is zero based and is defined at <code>techtest.api.utils</code> namespace.</p>
+<hr />
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/by-rank DS <span class="at">:V3</span> <span class="kw">zero?</span>) <span class="co">;; most V3 values</span></code></pre></div>
+<p>_unnamed [3 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/by-rank DS <span class="at">:V3</span> <span class="kw">zero?</span> {<span class="at">:desc</span>? <span class="va">false</span>}) <span class="co">;; least V3 values</span></code></pre></div>
+<p>_unnamed [3 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Rank also works on multiple columns</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/by-rank DS [<span class="at">:V1</span> <span class="at">:V3</span>] <span class="kw">zero?</span> {<span class="at">:desc</span>? <span class="va">false</span>})</code></pre></div>
+<p>_unnamed [2 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+</tbody>
+</table>
+<hr />
 <p>Select 5 random rows from each group</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
     (api/group-by <span class="at">:V4</span>)
@@ -5780,6 +6016,18 @@ precipitation
 </tr>
 <tr class="even">
 <td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
 <td>7</td>
 <td>0.5000</td>
 <td>A</td>
@@ -5791,32 +6039,8 @@ precipitation
 <td>A</td>
 </tr>
 <tr class="even">
-<td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="odd">
 <td>1</td>
-<td>7</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>8</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>8</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>2</td>
+<td>5</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
@@ -5833,32 +6057,44 @@ precipitation
 <td>B</td>
 </tr>
 <tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
 <td>1</td>
-<td>9</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="even">
 <td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
 <td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>9</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="odd">
 <td>2</td>
 <td>6</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>9</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>9</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
@@ -7005,16 +7241,16 @@ precipitation
 </thead>
 <tbody>
 <tr class="odd">
-<td>1</td>
-<td>5</td>
+<td>2</td>
+<td>2</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="even">
-<td>2</td>
-<td>6</td>
-<td>1.500</td>
-<td>C</td>
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
 </tr>
 </tbody>
 </table>
@@ -12558,8 +12794,8 @@ precipitation
 <td>1</td>
 <td>1</td>
 <td>0</td>
-<td>0.9168</td>
-<td>0.03678</td>
+<td>0.3963</td>
+<td>0.3298</td>
 <td>3</td>
 <td>-2</td>
 </tr>
@@ -12567,8 +12803,8 @@ precipitation
 <td>2</td>
 <td>1</td>
 <td>1</td>
-<td>0.4605</td>
-<td>0.8348</td>
+<td>0.5690</td>
+<td>0.6330</td>
 <td>3</td>
 <td>-2</td>
 </tr>
@@ -12576,8 +12812,8 @@ precipitation
 <td>3</td>
 <td>0</td>
 <td>1</td>
-<td>0.7488</td>
-<td>0.8507</td>
+<td>0.2134</td>
+<td>0.8281</td>
 <td>3</td>
 <td>-2</td>
 </tr>
@@ -12585,8 +12821,8 @@ precipitation
 <td>4</td>
 <td>0</td>
 <td>1</td>
-<td>0.8486</td>
-<td>0.1844</td>
+<td>0.3529</td>
+<td>0.2028</td>
 <td>3</td>
 <td>-2</td>
 </tr>
@@ -12612,7 +12848,7 @@ precipitation
 <td>1</td>
 <td>0</td>
 <td>1</td>
-<td>0.9168</td>
+<td>0.3963</td>
 <td>3</td>
 </tr>
 <tr class="even">
@@ -12620,7 +12856,7 @@ precipitation
 <td>1</td>
 <td>1</td>
 <td>1</td>
-<td>0.4605</td>
+<td>0.5690</td>
 <td>3</td>
 </tr>
 <tr class="odd">
@@ -12628,7 +12864,7 @@ precipitation
 <td>0</td>
 <td>1</td>
 <td>1</td>
-<td>0.7488</td>
+<td>0.2134</td>
 <td>3</td>
 </tr>
 <tr class="even">
@@ -12636,7 +12872,7 @@ precipitation
 <td>0</td>
 <td>1</td>
 <td>1</td>
-<td>0.8486</td>
+<td>0.3529</td>
 <td>3</td>
 </tr>
 <tr class="odd">
@@ -12644,7 +12880,7 @@ precipitation
 <td>1</td>
 <td>0</td>
 <td>2</td>
-<td>0.03678</td>
+<td>0.3298</td>
 <td>-2</td>
 </tr>
 <tr class="even">
@@ -12652,7 +12888,7 @@ precipitation
 <td>1</td>
 <td>1</td>
 <td>2</td>
-<td>0.8348</td>
+<td>0.6330</td>
 <td>-2</td>
 </tr>
 <tr class="odd">
@@ -12660,7 +12896,7 @@ precipitation
 <td>0</td>
 <td>1</td>
 <td>2</td>
-<td>0.8507</td>
+<td>0.8281</td>
 <td>-2</td>
 </tr>
 <tr class="even">
@@ -12668,7 +12904,7 @@ precipitation
 <td>0</td>
 <td>1</td>
 <td>2</td>
-<td>0.1844</td>
+<td>0.2028</td>
 <td>-2</td>
 </tr>
 </tbody>
@@ -18116,7 +18352,55 @@ ds2</code></pre></div>
 <tbody>
 <tr class="odd">
 <td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
 <td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>8</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
@@ -18128,13 +18412,37 @@ ds2</code></pre></div>
 </tr>
 <tr class="odd">
 <td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
 <td>6</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="even">
 <td>2</td>
-<td>2</td>
+<td>8</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
@@ -18146,33 +18454,9 @@ ds2</code></pre></div>
 </tr>
 <tr class="even">
 <td>1</td>
-<td>5</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>6</td>
+<td>3</td>
 <td>1.500</td>
 <td>C</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
 </tr>
 <tr class="odd">
 <td>2</td>
@@ -18193,28 +18477,16 @@ ds2</code></pre></div>
 <td>A</td>
 </tr>
 <tr class="even">
-<td>1</td>
-<td>5</td>
-<td>1.000</td>
-<td>B</td>
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 <tr class="odd">
-<td>2</td>
-<td>2</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="even">
 <td>1</td>
 <td>1</td>
 <td>0.5000</td>
 <td>A</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>3</td>
-<td>1.500</td>
-<td>C</td>
 </tr>
 <tr class="even">
 <td>1</td>
@@ -18227,42 +18499,6 @@ ds2</code></pre></div>
 <td>8</td>
 <td>1.000</td>
 <td>B</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>2</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>5</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>3</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>6</td>
-<td>1.500</td>
-<td>C</td>
 </tr>
 </tbody>
 </table>
@@ -18389,21 +18625,21 @@ ds2</code></pre></div>
 <tbody>
 <tr class="odd">
 <td>1</td>
-<td>1</td>
+<td>7</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
 <td>1</td>
-<td>7</td>
+<td>1</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="odd">
-<td>2</td>
-<td>8</td>
-<td>1.000</td>
-<td>B</td>
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 <tr class="even">
 <td>2</td>
@@ -18412,32 +18648,32 @@ ds2</code></pre></div>
 <td>C</td>
 </tr>
 <tr class="odd">
-<td>1</td>
-<td>3</td>
-<td>1.500</td>
-<td>C</td>
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
 </tr>
 <tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
 <td>2</td>
 <td>4</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>1</td>
 <td>5</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
-<tr class="even">
-<td>2</td>
-<td>2</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
 <tr class="odd">
 <td>1</td>
-<td>9</td>
+<td>3</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
@@ -21843,6 +22079,587 @@ ans</code></pre></div>
 <tr class="odd">
 <td>c</td>
 <td>[6 12]</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="api-tour" class="section level3">
+<h3>API tour</h3>
+<p>Below snippets are taken from <a href="https://atrebas.github.io/post/2019-03-03-datatable-dplyr/">A data.table and dplyr tour</a> written by Atrebas (permission granted).</p>
+<p>I keep structure and subtitles but I skip <code>data.table</code> and <code>dplyr</code> examples.</p>
+<p>Example data</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">def</span><span class="fu"> DS </span>(api/dataset {<span class="at">:V1</span> (<span class="kw">take</span> <span class="dv">9</span> (<span class="kw">cycle</span> [<span class="dv">1</span> <span class="dv">2</span>]))
+                      <span class="at">:V2</span> (<span class="kw">range</span> <span class="dv">1</span> <span class="dv">10</span>)
+                      <span class="at">:V3</span> (<span class="kw">take</span> <span class="dv">9</span> (<span class="kw">cycle</span> [<span class="fl">0.5</span> <span class="fl">1.0</span> <span class="fl">1.5</span>]))
+                      <span class="at">:V4</span> (<span class="kw">take</span> <span class="dv">9</span> (<span class="kw">cycle</span> [<span class="st">&quot;A&quot;</span> <span class="st">&quot;B&quot;</span> <span class="st">&quot;C&quot;</span>]))}))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/dataset? DS)
+(<span class="kw">class</span> DS)</code></pre></div>
+<pre><code>true
+tech.ml.dataset.impl.dataset.Dataset</code></pre>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">DS</code></pre></div>
+<p>_unnamed [9 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<div id="basic-operations" class="section level4">
+<h4>Basic Operations</h4>
+<div id="filter-rows" class="section level5">
+<h5>Filter rows</h5>
+<p>Filter rows using indices</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/select-rows DS [<span class="dv">2</span> <span class="dv">3</span>])</code></pre></div>
+<p>_unnamed [2 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Discard rows using negative indices</p>
+<p>In Clojure API we have separate function for that: <code>drop-rows</code>.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/drop-rows DS (<span class="kw">range</span> <span class="dv">2</span> <span class="dv">7</span>))</code></pre></div>
+<p>_unnamed [4 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Filter rows using a logical expression</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/select-rows DS (<span class="kw">comp</span> #(<span class="kw">&gt;</span> <span class="va">%</span> <span class="dv">5</span>) <span class="at">:V2</span>))</code></pre></div>
+<p>_unnamed [4 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/select-rows DS (<span class="kw">comp</span> #{<span class="st">&quot;A&quot;</span> <span class="st">&quot;C&quot;</span>} <span class="at">:V4</span>))</code></pre></div>
+<p>_unnamed [6 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Filter rows using multiple conditions</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/select-rows DS #(<span class="kw">and</span> (<span class="kw">=</span> (<span class="at">:V1</span> <span class="va">%</span>) <span class="dv">1</span>)
+                          (<span class="kw">=</span> (<span class="at">:V4</span> <span class="va">%</span>) <span class="st">&quot;A&quot;</span>)))</code></pre></div>
+<p>_unnamed [2 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Filter unique rows</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/unique-by DS)</code></pre></div>
+<p>_unnamed [9 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/unique-by DS [<span class="at">:V1</span> <span class="at">:V4</span>])</code></pre></div>
+<p>_unnamed [6 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Discard rows with missing values</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/drop-missing DS)</code></pre></div>
+<p>_unnamed [9 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Other filters</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/random DS <span class="dv">3</span>) <span class="co">;; 3 random rows</span></code></pre></div>
+<p>_unnamed [3 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/random DS (<span class="kw">/</span> (api/row-count DS) <span class="dv">2</span>)) <span class="co">;; fraction of random rows</span></code></pre></div>
+<p>_unnamed [5 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/by-rank DS <span class="at">:V1</span> <span class="kw">zero?</span>) <span class="co">;; take top n entries</span></code></pre></div>
+<p>_unnamed [4 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+<th>:V3</th>
+<th>:V4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
 </tr>
 </tbody>
 </table>
