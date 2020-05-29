@@ -45,7 +45,8 @@
   ([ds-left ds-right columns-selector options]
    (let [rj (right-join ds-left ds-right columns-selector options)]
      (-> (->> rj
-              (ds/concat (left-join ds-left ds-right columns-selector options)))
+              (ds/concat (left-join ds-left ds-right columns-selector options))
+              (ds/unique-by identity))
          (with-meta (assoc (meta rj) :name "full-join"))))))
 
 (defn semi-join
@@ -66,4 +67,25 @@
                   (select-missing)
                   (drop-columns (vals (:right-column-names (meta lj)))))
               (ds/unique-by identity))
-         (vary-meta assoc :name "anit-join")))))
+         (vary-meta assoc :name "anti-join")))))
+
+(defn intersect
+  ([ds-left ds-right] (intersect ds-left ds-right nil))
+  ([ds-left ds-right options]
+   (-> (semi-join ds-left ds-right (distinct (clojure.core/concat (ds/column-names ds-left)
+                                                                  (ds/column-names ds-right))) options)
+       (vary-meta assoc :name "intersection"))))
+
+(defn difference
+  ([ds-left ds-right] (difference ds-left ds-right nil))
+  ([ds-left ds-right options]
+   (-> (anti-join ds-left ds-right (distinct (clojure.core/concat (ds/column-names ds-left)
+                                                                  (ds/column-names ds-right))) options)
+       (vary-meta assoc :name "difference"))))
+
+(defn union
+  [ds & datasets]
+  (-> (->> (apply ds/concat ds datasets)
+           (ds/unique-by identity))
+      (vary-meta assoc :name "union")))
+

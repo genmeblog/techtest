@@ -2632,7 +2632,9 @@ Joins accept left-side and right-side datasets and columns selector. Options are
 
 The difference between `tech.ml.dataset` join functions are: arguments order (first datasets) and possibility to join on multiple columns.
 
-Datasets used as examples
+Additionally set operations are defined: `union`, `intersect` and `difference`.
+
+Datasets used in examples:
 
 ```{clojure results="hide"}
 (def ds1 (api/dataset {:a [1 2 1 2 3 4 nil nil 4]
@@ -2818,6 +2820,42 @@ Return rows from ds1 not matching ds2
 ```{clojure results="asis"}
 (apply api/concat (repeatedly 3 #(api/random DS)))
 ```
+
+#### Union
+
+The same as `concat` but returns unique rows
+
+---
+
+```{clojure results="asis"}
+(apply api/union (api/drop-columns ds2 :d) (repeat 10 ds1))
+```
+
+---
+
+```{clojure results="asis"}
+(apply api/union (repeatedly 10 #(api/random DS)))
+```
+
+#### Intersection
+
+```{clojure results="asis"}
+(api/intersect (api/select-columns ds1 :b)
+               (api/select-columns ds2 :b))
+```
+
+#### Difference
+
+```{clojure results="asis"}
+(api/difference (api/select-columns ds1 :b)
+                (api/select-columns ds2 :b))
+```
+
+```{clojure results="asis"}
+(api/difference (api/select-columns ds2 :b)
+                (api/select-columns ds1 :b))
+```
+
 
 ## Functions
 
