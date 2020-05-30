@@ -4,7 +4,8 @@
 
             [techtest.api.join-separate :refer [join-columns]]
             [techtest.api.missing :refer [select-missing drop-missing]]
-            [techtest.api.columns :refer [column-names drop-columns]]))
+            [techtest.api.columns :refer [drop-columns]]
+            [techtest.api.utils :refer [column-names]]))
 
 ;; joins
 

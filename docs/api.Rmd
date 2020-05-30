@@ -1048,16 +1048,19 @@ Arguments:
 
 * `ds` - dataset
 * `column-name` - target column name
-* `map-fn` - mapping function
 * `columns-selector` - columns selected
+* `map-fn` - mapping function
 
 ---
 
 Let's add numerical columns together
 
 ```{clojure results="asis"}
-(api/map-columns DS :sum-of-numbers (fn [& rows]
-                                      (reduce + rows)) (api/column-names DS  #{:int64 :float64} :datatype))
+(api/map-columns DS
+                 :sum-of-numbers
+                 (api/column-names DS  #{:int64 :float64} :datatype)
+                 (fn [& rows]
+                   (reduce + rows)))
 ```
 
 The same works on grouped dataset
@@ -1065,8 +1068,10 @@ The same works on grouped dataset
 ```{clojure results="asis"}
 (-> DS
     (api/group-by :V4)
-    (api/map-columns :sum-of-numbers (fn [& rows]
-                                       (reduce + rows)) (api/column-names DS  #{:int64 :float64} :datatype))
+    (api/map-columns :sum-of-numbers
+                     (api/column-names DS  #{:int64 :float64} :datatype)
+                     (fn [& rows]
+                       (reduce + rows)))
     (api/ungroup))
 ```
 
@@ -1472,10 +1477,18 @@ Result of aggregating is automatically ungrouped, you can skip this step by stet
 
 #### Column
 
-You can perform columnar aggreagation also. `aggregate-columns` selects columns and apply aggregating function for each column separately.
+You can perform columnar aggreagation also. `aggregate-columns` selects columns and apply aggregating function (or sequence of functions) for each column separately.
 
 ```{clojure results="asis"}
 (api/aggregate-columns DS [:V1 :V2 :V3] #(reduce + %))
+```
+
+---
+
+```{clojure results="asis"}
+(api/aggregate-columns DS [:V1 :V2 :V3] [#(reduce + %)
+                                         #(reduce max %)
+                                         #(reduce * %)])
 ```
 
 ---
@@ -2519,7 +2532,7 @@ production
 Joined with custom function
 
 ```{clojure results="asis"}
-(api/pivot->wider production ["product" "country"] "production" {:concat-columns-with (comp str vec)})
+(api/pivot->wider production ["product" "country"] "production" {:concat-columns-with vec})
 ```
 
 ---
@@ -2541,7 +2554,8 @@ income
 Value concatenated by custom function
 
 ```{clojure results="asis"}
-(api/pivot->wider income "variable" ["estimate" "moe"] {:concat-value-with (comp str vector)})
+(api/pivot->wider income "variable" ["estimate" "moe"] {:concat-columns-with vec
+                                                        :concat-value-with vector})
 ```
 
 ---
@@ -3669,3 +3683,243 @@ Other filters
 ```{clojure results="asis"}
 (api/by-rank DS :V1 zero?) ;; take top n entries
 ```
+
+---
+
+Convenience functions
+
+```{clojure results="asis"}
+(api/select-rows DS (comp (partial re-matches #"^B") str :V4))
+```
+
+```{clojure results="asis"}
+(api/select-rows DS (comp #(<= 3 % 5) :V2))
+```
+
+```{clojure results="asis"}
+(api/select-rows DS (comp #(< 3 % 5) :V2))
+```
+
+```{clojure results="asis"}
+(api/select-rows DS (comp #(<= 3 % 5) :V2))
+```
+
+Last example skipped.
+
+##### Sort rows
+
+Sort rows by column
+
+```{clojure results="asis"}
+(api/order-by DS :V3)
+```
+
+---
+
+Sort rows in decreasing order
+
+```{clojure results="asis"}
+(api/order-by DS :V3 :desc)
+```
+
+---
+
+Sort rows based on several columns
+
+```{clojure results="asis"}
+(api/order-by DS [:V1 :V2] [:asc :desc])
+```
+
+##### Select columns
+
+Select one column using an index (not recommended)
+
+```{clojure}
+(nth (api/columns DS :as-seq) 2) ;; as column (iterable)
+```
+
+```{clojure results="asis"}
+(api/dataset [(nth (api/columns DS :as-seq) 2)])
+```
+
+---
+
+Select one column using column name
+
+```{clojure results="asis"}
+(api/select-columns DS :V2) ;; as dataset
+```
+
+```{clojure results="asis"}
+(api/select-columns DS [:V2]) ;; as dataset
+```
+
+```{clojure}
+(DS :V2) ;; as column (iterable)
+```
+
+---
+
+Select several columns
+
+```{clojure results="asis"}
+(api/select-columns DS [:V2 :V3 :V4])
+```
+
+---
+
+Exclude columns
+
+```{clojure results="asis"}
+(api/select-columns DS (complement #{:V2 :V3 :V4}))
+```
+
+```{clojure results="asis"}
+(api/drop-columns DS [:V2 :V3 :V4])
+```
+
+---
+
+Other seletions
+
+```{clojure results="asis"}
+(->> (range 1 3)
+     (map (comp keyword (partial format "V%d")))
+     (api/select-columns DS))
+```
+
+```{clojure results="asis"}
+(api/reorder-columns DS :V4)
+```
+
+```{clojure results="asis"}
+(api/select-columns DS #(clojure.string/starts-with? (name %) "V"))
+```
+
+```{clojure results="asis"}
+(api/select-columns DS #(clojure.string/ends-with? (name %) "3"))
+```
+
+```{clojure results="asis"}
+(api/select-columns DS #"..2") ;; regex converts to string using `str` function
+```
+
+```{clojure results="asis"}
+(api/select-columns DS #{:V1 "X"})
+```
+
+```{clojure results="asis"}
+(api/select-columns DS #(not (clojure.string/starts-with? (name %) "V2")))
+```
+
+##### Summarise data
+
+Summarise one column
+
+```{clojure}
+(reduce + (DS :V1)) ;; using pure Clojure, as value
+```
+
+```{clojure results="asis"}
+(api/aggregate-columns DS :V1 dfn/sum) ;; as dataset
+```
+
+```{clojure results="asis"}
+(api/aggregate DS {:sumV1 #(dfn/sum (% :V1))})
+```
+
+---
+
+Summarize several columns
+
+```{clojure results="asis"}
+(api/aggregate DS [#(dfn/sum (% :V1))
+                   #(dfn/standard-deviation (% :V3))])
+```
+
+```{clojure results="asis"}
+(api/aggregate-columns DS [:V1 :V3] [dfn/sum
+                                     dfn/standard-deviation])
+```
+
+
+---
+
+Summarise several columns and assign column names
+
+```{clojure results="asis"}
+(api/aggregate DS {:sumv1 #(dfn/sum (% :V1))
+                   :sdv3 #(dfn/standard-deviation (% :V3))})
+```
+
+---
+
+Summarise a subset of rows
+
+```{clojure results="asis"}
+(-> DS
+    (api/select-rows (range 4))
+    (api/aggregate-columns :V1 dfn/sum))
+```
+
+##### Additional helpers
+
+
+```{clojure results="asis"}
+(-> DS
+    (api/first)
+    (api/select-columns :V3)) ;; select first row from `:V3` column
+```
+
+```{clojure results="asis"}
+(-> DS
+    (api/last)
+    (api/select-columns :V3)) ;; select last row from `:V3` column
+```
+
+```{clojure results="asis"}
+(-> DS
+    (api/select-rows 4)
+    (api/select-columns :V3)) ;; select forth row from `:V3` column
+```
+
+```{clojure results="asis"}
+(-> DS
+    (api/select :V3 4)) ;; select forth row from `:V3` column
+```
+
+```{clojure results="asis"}
+(-> DS
+    (api/unique-by :V4)
+    (api/aggregate api/row-count)) ;; number of unique rows in `:V4` column, as dataset
+```
+
+
+```{clojure}
+(-> DS
+    (api/unique-by :V4)
+    (api/row-count)) ;; number of unique rows in `:V4` column, as value
+```
+
+```{clojure}
+(-> DS
+    (api/unique-by)
+    (api/row-count)) ;; number of unique rows in dataset, as value
+```
+
+##### Add/update/delete columns
+
+Modify a column
+
+```{clojure results="asis"}
+(api/map-columns DS :V1 [:V1] #(dfn/pow % 2))
+```
+
+```{clojure results="hide"}
+(def DS (api/add-or-update-column DS :V1 (dfn/pow (DS :V1) 2)))
+```
+
+```{clojure results="asis"}
+DS
+```
+

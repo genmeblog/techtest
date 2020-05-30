@@ -2,9 +2,9 @@
   (:refer-clojure :exclude [shuffle rand-nth first last])
   (:require [tech.ml.dataset :as ds]
 
-            [techtest.api.utils :refer [iterable-sequence? rank]]
+            [techtest.api.utils :refer [iterable-sequence? rank column-names]]
             [techtest.api.dataset :refer [rows]]
-            [techtest.api.columns :refer [add-or-update-columns select-columns column-names]]
+            [techtest.api.columns :refer [add-or-update-columns select-columns]]
             [techtest.api.group-by :refer [grouped? process-group-data]]
             [tech.v2.datatype.functional :as dfn]))
 
@@ -126,7 +126,7 @@
 
 (defn- process-rand-nth
   [ds rng]
-  (ds/select-rows ds [(get-random-long (ds/row-count ds) rng)]))
+  (ds/select-rows ds (get-random-long (ds/row-count ds) rng)))
 
 (defn rand-nth
   ([ds] (rand-nth ds nil))

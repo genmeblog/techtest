@@ -1,8 +1,7 @@
 (ns techtest.api.order-by
   (:require [tech.ml.dataset :as ds]
             
-            [techtest.api.utils :refer [iterable-sequence?]]
-            [techtest.api.columns :refer [column-names]]
+            [techtest.api.utils :refer [iterable-sequence? column-names]]
             [techtest.api.group-by :refer [grouped? process-group-data]]))
 
 (set! *unchecked-math* :warn-on-boxed)

@@ -2,9 +2,9 @@
   (:require [tech.ml.dataset :as ds]
             [clojure.string :as str]
 
-            [techtest.api.utils :refer [iterable-sequence?]]
+            [techtest.api.utils :refer [iterable-sequence? column-names]]
             [techtest.api.group-by :refer [grouped? process-group-data]]
-            [techtest.api.columns :refer [select-columns column-names drop-columns]]))
+            [techtest.api.columns :refer [select-columns drop-columns]]))
 
 (defn- process-join-columns
   [ds target-column join-function col-names options drop-columns?]

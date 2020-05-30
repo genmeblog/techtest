@@ -1,9 +1,9 @@
 (ns techtest.api.unique-by
   (:require [tech.ml.dataset :as ds]
             
-            [techtest.api.utils :refer [iterable-sequence?]]
+            [techtest.api.utils :refer [iterable-sequence? column-names]]
             [techtest.api.dataset :refer [dataset]]
-            [techtest.api.columns :refer [select-columns column-names]]
+            [techtest.api.columns :refer [select-columns]]
             [techtest.api.group-by :refer [grouped? process-group-data ungroup]]))
 
 (defn- strategy-first [_ idxs] (clojure.core/first idxs))

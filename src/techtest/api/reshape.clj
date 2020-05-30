@@ -5,8 +5,8 @@
             [tech.v2.datatype :as dtype]
             [clojure.string :as str]
 
-            [techtest.api.utils :refer [iterable-sequence?]]
-            [techtest.api.columns :refer [column-names drop-columns convert-column-type
+            [techtest.api.utils :refer [iterable-sequence? column-names]]
+            [techtest.api.columns :refer [drop-columns convert-column-type
                                           reorder-columns rename-columns select-columns]]
             [techtest.api.join-separate :refer [join-columns separate-column]]
             [techtest.api.unique-by :refer [strategy-fold unique-by]]
@@ -150,4 +150,3 @@
            (-> (separate-column result join-name rest-cols identity {:drop-column? true})
                (reorder-columns rest-cols)))
          (ds/set-dataset-name (ds/dataset-name ds))))))
-

@@ -16,6 +16,9 @@
                          dataset->str
                          concat)
 
+(exporter/export-symbols techtest.api.utils
+                         column-names)
+
 (exporter/export-symbols techtest.api.dataset
                          dataset?
                          dataset
@@ -36,7 +39,6 @@
                          groups->map)
 
 (exporter/export-symbols techtest.api.columns
-                         column-names
                          select-columns
                          drop-columns
                          rename-columns

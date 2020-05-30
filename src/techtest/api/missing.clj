@@ -5,8 +5,8 @@
             [tech.v2.datatype.bitmap :as bitmap]
             [tech.v2.datatype :as dtype]
             
-            [techtest.api.utils :refer [iterable-sequence?]]
-            [techtest.api.columns :refer [select-columns column-names]]
+            [techtest.api.utils :refer [iterable-sequence? column-names]]
+            [techtest.api.columns :refer [select-columns]]
             [techtest.api.group-by :refer [grouped? process-group-data]])
   (:import [org.roaringbitmap RoaringBitmap]))
 

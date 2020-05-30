@@ -4,35 +4,9 @@
             [tech.ml.dataset.column :as col]
             [tech.v2.datatype :as dtype]
 
-            [techtest.api.utils :refer [iterable-sequence?]]
+            [techtest.api.utils :refer [column-names iterable-sequence?]]
             [techtest.api.dataset :refer [dataset]]
             [techtest.api.group-by :refer [grouped? process-group-data]]))
-
-(defn- filter-column-names
-  "Filter column names"
-  [ds columns-selector meta-field]
-  (let [field-fn (if (= :all meta-field)
-                   identity
-                   (or meta-field :name))]
-    (->> ds
-         (ds/columns)
-         (map meta)
-         (filter (comp columns-selector field-fn))
-         (map :name))))
-
-(defn column-names
-  ([ds] (ds/column-names ds))
-  ([ds columns-selector] (column-names ds columns-selector :name))
-  ([ds columns-selector meta-field]
-   (if (= :all columns-selector)
-     (ds/column-names ds)
-     (let [csel-fn (cond
-                     (map? columns-selector) (set (keys columns-selector))
-                     (iterable-sequence? columns-selector) (set columns-selector)
-                     (instance? java.util.regex.Pattern columns-selector) #(re-matches columns-selector (str %))
-                     (fn? columns-selector) columns-selector
-                     :else #{columns-selector})]
-       (filter-column-names ds csel-fn meta-field)))))
 
 (defn- select-or-drop-columns
   "Select or drop columns."
@@ -162,10 +136,10 @@
    (reduce-kv (fn [ds k v] (add-or-update-column ds k v size-strategy)) ds columns-map)))
 
 (defn map-columns
-  [ds column-name map-fn columns-selector]
+  [ds column-name columns-selector map-fn]
   (if (grouped? ds)
-    (process-group-data ds #(map-columns % column-name map-fn columns-selector))
-    (apply ds/column-map ds column-name map-fn (column-names ds columns-selector))))
+    (process-group-data ds #(map-columns % column-name columns-selector map-fn))
+    (apply ds/column-map ds column-name map-fn (when columns-selector (column-names ds columns-selector)))))
 
 (defn reorder-columns
   "Reorder columns using column selector(s). When column names are incomplete, the missing will be attached at the end."

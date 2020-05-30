@@ -3,8 +3,7 @@
             [tech.ml.dataset.column :as col]
             [tech.v2.datatype :as dtype]
             
-            [techtest.api.columns :refer [column-names]]
-            [techtest.api.utils :refer [iterable-sequence? ->str]]
+            [techtest.api.utils :refer [iterable-sequence? ->str column-names]]
             [techtest.api.dataset :refer [dataset]])
   (:refer-clojure :exclude [group-by]))
 

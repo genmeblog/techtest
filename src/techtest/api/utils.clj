@@ -1,4 +1,5 @@
-(ns techtest.api.utils)
+(ns techtest.api.utils
+  (:require [tech.ml.dataset :as ds]))
 
 ;;;;;;;;;;;;
 ;; HELPERS
@@ -48,3 +49,30 @@
                  m)]
          (map (into {} m) vs))))))
 
+;;
+
+(defn- filter-column-names
+  "Filter column names"
+  [ds columns-selector meta-field]
+  (let [field-fn (if (= :all meta-field)
+                   identity
+                   (or meta-field :name))]
+    (->> ds
+         (ds/columns)
+         (map meta)
+         (filter (comp columns-selector field-fn))
+         (map :name))))
+
+(defn column-names
+  ([ds] (ds/column-names ds))
+  ([ds columns-selector] (column-names ds columns-selector :name))
+  ([ds columns-selector meta-field]
+   (if (= :all columns-selector)
+     (ds/column-names ds)
+     (let [csel-fn (cond
+                     (map? columns-selector) (set (keys columns-selector))
+                     (iterable-sequence? columns-selector) (set columns-selector)
+                     (instance? java.util.regex.Pattern columns-selector) #(re-matches columns-selector (str %))
+                     (fn? columns-selector) columns-selector
+                     :else #{columns-selector})]
+       (filter-column-names ds csel-fn meta-field)))))

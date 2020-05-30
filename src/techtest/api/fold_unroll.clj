@@ -2,7 +2,8 @@
   (:require [tech.ml.dataset :as ds]
 
             [techtest.api.unique-by :refer [unique-by]]
-            [techtest.api.columns :refer [column-names select-columns reorder-columns]]
+            [techtest.api.columns :refer [select-columns reorder-columns]]
+            [techtest.api.utils :refer [column-names]]
             [techtest.api.group-by :refer [grouped? process-group-data]]))
 
 (defn fold-by
