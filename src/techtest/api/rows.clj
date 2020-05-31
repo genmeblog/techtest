@@ -36,16 +36,18 @@
 (defn- select-or-drop-rows
   "Select or drop rows."
   ([f ds rows-selector] (select-or-drop-rows f ds rows-selector nil))
-  ([f ds rows-selector {:keys [select-keys pre]}]
-   (let [selected-keys (when select-keys (column-names (if (grouped? ds)
-                                                         (clojure.core/first (ds :data))
-                                                         ds) select-keys))]
+  ([f ds rows-selector {:keys [select-keys pre result-type]}]
+   (let [selected-keys (column-names ds select-keys)]
      (if (grouped? ds)
        (let [pre-ds (map #(add-or-update-columns % pre) (ds :data))
-             indices (map #(find-indexes % rows-selector selected-keys) pre-ds)]       
-         (ds/add-or-update-column ds :data (map #(select-or-drop-rows f %1 %2) (ds :data) indices)))
-       
-       (f ds (find-indexes (add-or-update-columns ds pre) rows-selector selected-keys))))))
+             indices (map #(find-indexes % rows-selector selected-keys) pre-ds)]
+         (if (= result-type :as-indexes)
+           (map seq indices)
+           (ds/add-or-update-column ds :data (map #(select-or-drop-rows f %1 %2) (ds :data) indices))))
+       (let [indices (find-indexes (add-or-update-columns ds pre) rows-selector selected-keys)]
+         (if (= result-type :as-indexes)
+           (seq indices)
+           (f ds indices)))))))
 
 (defn- select-or-drop-rows-docstring
   [op]

@@ -1,18 +1,18 @@
 (ns techtest.api.aggregate
-  (:require [techtest.api.utils :refer [iterable-sequence? ->str]]
+  (:require [techtest.api.utils :refer [iterable-sequence? ->str column-names]]
             [techtest.api.group-by :refer [grouped? process-group-data ungroup]]
-            [techtest.api.dataset :refer [dataset]]
-            [techtest.api :as api]
-            [tech.ml.dataset.column :as col]))
+            [techtest.api.dataset :refer [dataset]]))
+
+(defn- add-agg-result-from-seq
+  [tot-res k agg-res]
+  (reduce (fn [b [id v]]
+            (conj b [(keyword (str (->str k) "-" (->str id))) v])) tot-res agg-res))
 
 (defn- add-agg-result
   [tot-res k agg-res]
   (cond
-    (map? agg-res) (reduce conj tot-res agg-res)
-    (iterable-sequence? agg-res) (->> agg-res
-                                      (map-indexed vector)
-                                      (reduce (fn [b [id v]]
-                                                (conj b [(keyword (str (->str k) "-" id)) v])) tot-res))
+    (map? agg-res) (add-agg-result-from-seq tot-res k agg-res)  ;(reduce conj tot-res agg-res)
+    (iterable-sequence? agg-res) (add-agg-result-from-seq tot-res k (map-indexed vector agg-res))
     :else (conj tot-res [k agg-res])))
 
 (defn- aggregate-map
@@ -58,13 +58,9 @@
   ([ds columns-selector column-aggregators options]
    (let [aggregators (if (iterable-sequence? column-aggregators)
                        (cycle column-aggregators)
-                       (repeat column-aggregators))]
-     (aggregate ds #(reduce (fn [res [aggr col]]
-                              (assoc res (col/column-name col) (aggr col)))
-                            {}
-                            (map vector
-                                 aggregators
-                                 (-> %
-                                     (api/select-columns columns-selector)
-                                     (api/columns))))
+                       (repeat column-aggregators))
+         colnames (column-names ds columns-selector)]
+     (aggregate ds (into {} (map (fn [aggr col-name]
+                                   [col-name #(aggr (% col-name))])
+                                 aggregators colnames))
                 options))))

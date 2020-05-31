@@ -60,9 +60,7 @@
   ([ds columns-or-fn] (order-by ds columns-or-fn nil))
   ([ds columns-or-fn comparators] (order-by ds columns-or-fn comparators nil))
   ([ds columns-or-fn comparators {:keys [select-keys]}]
-   (let [selected-keys (when select-keys (column-names (if (grouped? ds)
-                                                         (clojure.core/first (ds :data))
-                                                         ds) select-keys))
+   (let [selected-keys (column-names ds select-keys)
          comparators (or comparators (if (iterable-sequence? columns-or-fn)
                                        (repeat (count columns-or-fn) :asc)
                                        [:asc]))

@@ -110,7 +110,7 @@
 
 \title{Proposed API for tech.ml.dataset}
 \author{GenerateMe}
-\date{2020-05-30}
+\date{2020-06-01}
 
 \begin{document}
 \maketitle
@@ -1010,7 +1010,7 @@ Rows as sequence of sequences
 \end{Shaded}
 
 \begin{verbatim}
-([#object[java.time.LocalDate 0x75bf3698 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x60ad4ff5 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+([#object[java.time.LocalDate 0x1e1b4a9b "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x13703875 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -1024,13 +1024,13 @@ Rows as sequence of maps
 \end{Shaded}
 
 \begin{verbatim}
-({"date" #object[java.time.LocalDate 0x422b3c72 "2012-01-01"],
+({"date" #object[java.time.LocalDate 0x336b67d4 "2012-01-01"],
   "precipitation" 0.0,
   "temp_min" 5.0,
   "weather" "drizzle",
   "temp_max" 12.8,
   "wind" 4.7}
- {"date" #object[java.time.LocalDate 0x775fd53c "2012-01-02"],
+ {"date" #object[java.time.LocalDate 0x49c7ff5d "2012-01-02"],
   "precipitation" 10.9,
   "temp_min" 2.8,
   "weather" "rain",
@@ -1192,11 +1192,30 @@ to show just group names and groups.
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-List of columns in groupd dataset
+List of columns in grouped dataset
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{(api/column-names (api/group-by DS }\AttributeTok{:V1}\NormalTok{))}
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V1}\NormalTok{)}
+\NormalTok{    (api/column-names))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(:V1 :V2 :V3 :V4)
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+List of columns in grouped dataset treated as regular dataset
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V1}\NormalTok{)}
+\NormalTok{    (api/as-regular-dataset)}
+\NormalTok{    (api/column-names))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -2279,6 +2298,9 @@ used. \texttt{columns-selector} can be one of the following:
   regex - to apply pattern on column names or datatype
 \item
   filter predicate - to filter column names or datatype
+\item
+  \texttt{type} namespaced keyword for specific datatype or group of
+  datatypes
 \end{itemize}
 
 Column name can be anything.
@@ -2295,6 +2317,21 @@ Column name can be anything.
   \texttt{:datatype} - to operated on column types
 \item
   \texttt{:all} - if you want to process all metadata
+\end{itemize}
+
+Datatype groups are:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{:type/numerical} - any numerical type
+\item
+  \texttt{:type/float} - floating point number (\texttt{:float32} and
+  \texttt{:float64})
+\item
+  \texttt{:type/integer} - any integer
+\item
+  \texttt{:type/datetime} - any datetime type
 \end{itemize}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -2397,6 +2434,18 @@ we want to get integer columns only.
 (:V1 :V2)
 \end{verbatim}
 
+or
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/column-names DS }\AttributeTok{:type/integer}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(:V1 :V2)
+\end{verbatim}
+
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 And finally we can use predicate to select names. Let's select double
@@ -2404,7 +2453,19 @@ precision columns.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{(api/column-names DS #(}\KeywordTok{=} \AttributeTok{:float64} \VariableTok{%}\NormalTok{) }\AttributeTok{:datatype}\NormalTok{)}
+\NormalTok{(api/column-names DS #\{}\AttributeTok{:float64}\NormalTok{\} }\AttributeTok{:datatype}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(:V3)
+\end{verbatim}
+
+or
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/column-names DS }\AttributeTok{:type/float64} \AttributeTok{:datatype}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -2420,7 +2481,7 @@ function. Works only on a predicate.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{(api/column-names DS (}\KeywordTok{complement}\NormalTok{ #\{}\AttributeTok{:V1}\NormalTok{\}))}
-\NormalTok{(api/column-names DS (}\KeywordTok{complement}\NormalTok{ #(}\KeywordTok{=} \AttributeTok{:float64} \VariableTok{%}\NormalTok{)) }\AttributeTok{:datatype}\NormalTok{)}
+\NormalTok{(api/column-names DS (}\KeywordTok{complement}\NormalTok{ #\{}\AttributeTok{:float64}\NormalTok{\}) }\AttributeTok{:datatype}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -2684,7 +2745,7 @@ You can also pass mapping function with optional columns-selector
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@ca3faad}{\nolinkurl{java.lang.Object@ca3faad}}\tabularnewline
+\href{mailto:java.lang.Object@7c3f0bfa}{\nolinkurl{java.lang.Object@7c3f0bfa}}\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2778,7 +2839,7 @@ Function works on grouped dataset
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@7d37d30}{\nolinkurl{java.lang.Object@7d37d30}}\tabularnewline
+\href{mailto:java.lang.Object@7b93efb6}{\nolinkurl{java.lang.Object@7b93efb6}}\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2794,7 +2855,7 @@ v1 & v2 & {[}1 2 3{]} &
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@7d37d30}{\nolinkurl{java.lang.Object@7d37d30}}\tabularnewline
+\href{mailto:java.lang.Object@7b93efb6}{\nolinkurl{java.lang.Object@7b93efb6}}\tabularnewline
 \midrule
 \endhead
 2 & 2 & 1.000 & B\tabularnewline
@@ -2886,15 +2947,15 @@ Replace one column (column is trimmed)
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-0.4212 & 1 & 0.5000 & A\tabularnewline
-0.01862 & 2 & 1.000 & B\tabularnewline
-0.4185 & 3 & 1.500 & C\tabularnewline
-0.4456 & 4 & 0.5000 & A\tabularnewline
-0.7543 & 5 & 1.000 & B\tabularnewline
-0.7168 & 6 & 1.500 & C\tabularnewline
-0.1660 & 7 & 0.5000 & A\tabularnewline
-0.7774 & 8 & 1.000 & B\tabularnewline
-0.3410 & 9 & 1.500 & C\tabularnewline
+0.8284 & 1 & 0.5000 & A\tabularnewline
+0.2794 & 2 & 1.000 & B\tabularnewline
+0.4280 & 3 & 1.500 & C\tabularnewline
+0.9230 & 4 & 0.5000 & A\tabularnewline
+0.8369 & 5 & 1.000 & B\tabularnewline
+0.8839 & 6 & 1.500 & C\tabularnewline
+0.5740 & 7 & 0.5000 & A\tabularnewline
+0.04703 & 8 & 1.000 & B\tabularnewline
+0.06775 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3058,7 +3119,7 @@ size is not equal row count
 \end{Shaded}
 
 \begin{verbatim}
-"Exception caught: Sequence size (2) should be exactly the same as dataset row count (9)"
+"Exception caught: Column size (2) should be exactly the same as dataset row count (9)"
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3158,11 +3219,124 @@ names, vals are columns.
 \bottomrule
 \end{longtable}
 
+\paragraph{Update}\label{update}
+
+If you want to modify specific column(s) you can call
+\texttt{update-columns}. Arguments:
+
+\begin{itemize}
+\tightlist
+\item
+  dataset
+\item
+  one of:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{columns-selector} and function (or sequence of functions)
+  \item
+    map where keys are column names and vals are function
+  \end{itemize}
+\end{itemize}
+
+Functions accept column and have to return column or sequence
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Reverse of columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/update-columns DS }\AttributeTok{:all} \KeywordTok{reverse}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 9 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Apply dec/inc on numerical columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/update-columns DS }\AttributeTok{:type/numerical}\NormalTok{ [(}\KeywordTok{partial} \KeywordTok{map} \KeywordTok{dec}\NormalTok{)}
+\NormalTok{                                        (}\KeywordTok{partial} \KeywordTok{map} \KeywordTok{inc}\NormalTok{)])}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+0 & 2 & -0.5000 & A\tabularnewline
+1 & 3 & 0.000 & B\tabularnewline
+0 & 4 & 0.5000 & C\tabularnewline
+1 & 5 & -0.5000 & A\tabularnewline
+0 & 6 & 0.000 & B\tabularnewline
+1 & 7 & 0.5000 & C\tabularnewline
+0 & 8 & -0.5000 & A\tabularnewline
+1 & 9 & 0.000 & B\tabularnewline
+0 & 10 & 0.5000 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+You can also assing function to a column by packing operations into the
+map.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/update-columns DS \{}\AttributeTok{:V1} \KeywordTok{reverse}
+                        \AttributeTok{:V2}\NormalTok{ (}\KeywordTok{comp}\NormalTok{ shuffle }\KeywordTok{seq}\NormalTok{)\})}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 6 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 9 & 0.5000 & A\tabularnewline
+1 & 7 & 1.000 & B\tabularnewline
+2 & 1 & 1.500 & C\tabularnewline
+1 & 8 & 0.5000 & A\tabularnewline
+2 & 5 & 1.000 & B\tabularnewline
+1 & 4 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
 \paragraph{Map}\label{map}
 
-The other way of creating or updating column is to map columns as
-regular \texttt{map} function. The arity of mapping function should be
-the same as number of selected columns.
+The other way of creating or updating column is to map rows as regular
+\texttt{map} function. The arity of mapping function should be the same
+as number of selected columns.
 
 Arguments:
 
@@ -3308,10 +3482,10 @@ at the end.
 \paragraph{Type conversion}\label{type-conversion}
 
 To convert column into given datatype can be done using
-\texttt{convert-column-type} function. Not all the types can be
-converted automatically also some types require slow parsing (every
-conversion from string). In case where conversion is not possible you
-can pass conversion function.
+\texttt{convert-types} function. Not all the types can be converted
+automatically also some types require slow parsing (every conversion
+from string). In case where conversion is not possible you can pass
+conversion function.
 
 Arguments:
 
@@ -3328,19 +3502,19 @@ Arguments:
     \texttt{coltype-map} in case when you want to convert several
     columns, keys are column names, vals are new types
   \item
-    \texttt{colname} and \texttt{new-type} - column name and new
-    datatype
+    \texttt{column-selector} and \texttt{new-types} - column name and
+    new datatype (or datatypes as sequence)
   \end{itemize}
 \end{itemize}
 
-\texttt{new-type} can be:
+\texttt{new-types} can be:
 
 \begin{itemize}
 \tightlist
 \item
-  a type like \texttt{:int64} or \texttt{:string}
+  a type like \texttt{:int64} or \texttt{:string} or sequence of types
 \item
-  or pair of datetype and conversion function
+  or sequence of pair of datetype and conversion function
 \end{itemize}
 
 After conversion additional infomation is given on problematic values.
@@ -3356,7 +3530,7 @@ Basic conversion
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
-\NormalTok{    (api/convert-column-type }\AttributeTok{:V1} \AttributeTok{:float64}\NormalTok{)}
+\NormalTok{    (api/convert-types }\AttributeTok{:V1} \AttributeTok{:float64}\NormalTok{)}
 \NormalTok{    (api/info }\AttributeTok{:columns}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
@@ -3384,7 +3558,7 @@ See that this way we can map column to any value.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
-\NormalTok{    (api/convert-column-type }\AttributeTok{:V4}\NormalTok{ [}\AttributeTok{:int16}\NormalTok{ #(Integer/parseInt }\VariableTok{%} \DecValTok{16}\NormalTok{)]))}
+\NormalTok{    (api/convert-types }\AttributeTok{:V4}\NormalTok{ [[}\AttributeTok{:int16}\NormalTok{ #(Integer/parseInt }\VariableTok{%} \DecValTok{16}\NormalTok{)]]))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -3414,10 +3588,10 @@ You can process several columns at once
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
-\NormalTok{    (api/convert-column-type \{}\AttributeTok{:V1} \AttributeTok{:float64}
-                              \AttributeTok{:V2} \AttributeTok{:object}
-                              \AttributeTok{:V3}\NormalTok{ [}\AttributeTok{:boolean}\NormalTok{ #(}\KeywordTok{<} \VariableTok{%} \FloatTok{1.0}\NormalTok{)]}
-                              \AttributeTok{:V4} \AttributeTok{:object}\NormalTok{\})}
+\NormalTok{    (api/convert-types \{}\AttributeTok{:V1} \AttributeTok{:float64}
+                        \AttributeTok{:V2} \AttributeTok{:object}
+                        \AttributeTok{:V3}\NormalTok{ [}\AttributeTok{:boolean}\NormalTok{ #(}\KeywordTok{<} \VariableTok{%} \FloatTok{1.0}\NormalTok{)]}
+                        \AttributeTok{:V4} \AttributeTok{:object}\NormalTok{\})}
 \NormalTok{    (api/info }\AttributeTok{:columns}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
@@ -3439,13 +3613,40 @@ You can process several columns at once
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
+Convert one type into another
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/convert-types }\AttributeTok{:type/numerical} \AttributeTok{:int16}\NormalTok{)}
+\NormalTok{    (api/info }\AttributeTok{:columns}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed :column info {[}4 6{]}:
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+:name & :size & :datatype & :unparsed-indexes & :unparsed-data &
+:categorical?\tabularnewline
+\midrule
+\endhead
+:V1 & 9 & :int16 & \{\} & {[}{]} &\tabularnewline
+:V2 & 9 & :int16 & \{\} & {[}{]} &\tabularnewline
+:V3 & 9 & :int16 & \{\} & {[}{]} &\tabularnewline
+:V4 & 9 & :string & & & true\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
 Function works on the grouped dataset
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
 \NormalTok{    (api/group-by }\AttributeTok{:V1}\NormalTok{)}
-\NormalTok{    (api/convert-column-type }\AttributeTok{:V1} \AttributeTok{:float32}\NormalTok{)}
+\NormalTok{    (api/convert-types }\AttributeTok{:V1} \AttributeTok{:float32}\NormalTok{)}
 \NormalTok{    (api/ungroup)}
 \NormalTok{    (api/info }\AttributeTok{:columns}\NormalTok{))}
 \end{Highlighting}
@@ -3477,7 +3678,7 @@ Double array conversion.
 \end{Shaded}
 
 \begin{verbatim}
-#object["[J" 0x75bbeec8 "[J@75bbeec8"]
+#object["[J" 0x42a554b9 "[J@42a554b9"]
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3493,7 +3694,7 @@ Function also works on grouped dataset
 \end{Shaded}
 
 \begin{verbatim}
-(#object["[J" 0x3535a0ed "[J@3535a0ed"] #object["[J" 0xcf55b3b "[J@cf55b3b"] #object["[J" 0xc35edea "[J@c35edea"])
+(#object["[J" 0x2d315f58 "[J@2d315f58"] #object["[J" 0x3f865ecd "[J@3f865ecd"] #object["[J" 0x1eae8016 "[J@1eae8016"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3508,8 +3709,8 @@ You can also cast the type to the other one (if casting is possible):
 \end{Shaded}
 
 \begin{verbatim}
-#object["[Ljava.lang.String;" 0x3696da42 "[Ljava.lang.String;@3696da42"]
-#object["[F" 0x2d9291be "[F@2d9291be"]
+#object["[Ljava.lang.String;" 0x66d413a3 "[Ljava.lang.String;@66d413a3"]
+#object["[F" 0x7dd09b25 "[F@7dd09b25"]
 \end{verbatim}
 
 \subsubsection{Rows}\label{rows}
@@ -3824,15 +4025,15 @@ Random \texttt{n} (default: row count) rows with repetition.
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 5 & 1.000 & B\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3853,11 +4054,11 @@ Five random rows with repetition
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 2 & 1.000 & B\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
 1 & 7 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3878,11 +4079,11 @@ Five random, non-repeating rows
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 5 & 1.000 & B\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3928,15 +4129,15 @@ Shuffle dataset
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0.5000 & A\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
 1 & 7 & 0.5000 & A\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
 2 & 8 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -4114,21 +4315,21 @@ Select 5 random rows from each group
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 7 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
 1 & 1 & 0.5000 & A\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -4230,11 +4431,30 @@ You can combine all variants and rename default prefix
 
 \begin{longtable}[]{@{}lllll@{}}
 \toprule
-:V2-value-0-0 & :V2-value-0-1 & :V2-value-0-2 & :sum-v1 &
-:prod-v3\tabularnewline
+\begin{minipage}[b]{0.15\columnwidth}\raggedright\strut
+:V2-value-0-0\strut
+\end{minipage} & \begin{minipage}[b]{0.15\columnwidth}\raggedright\strut
+:V2-value-0-1\strut
+\end{minipage} & \begin{minipage}[b]{0.15\columnwidth}\raggedright\strut
+:V2-value-0-2\strut
+\end{minipage} & \begin{minipage}[b]{0.20\columnwidth}\raggedright\strut
+:V2-value-1-sum-v1\strut
+\end{minipage} & \begin{minipage}[b]{0.21\columnwidth}\raggedright\strut
+:V2-value-1-prod-v3\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
-1 & 2 & 3 & 13 & 0.4219\tabularnewline
+\begin{minipage}[t]{0.15\columnwidth}\raggedright\strut
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.15\columnwidth}\raggedright\strut
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.15\columnwidth}\raggedright\strut
+3\strut
+\end{minipage} & \begin{minipage}[t]{0.20\columnwidth}\raggedright\strut
+13\strut
+\end{minipage} & \begin{minipage}[t]{0.21\columnwidth}\raggedright\strut
+0.4219\strut
+\end{minipage}\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -4256,13 +4476,60 @@ Processing grouped dataset
 
 \begin{longtable}[]{@{}llllll@{}}
 \toprule
-:V4 & :V2-value-0-0 & :V2-value-0-1 & :V2-value-0-2 & :sum-v1 &
-:prod-v3\tabularnewline
+\begin{minipage}[b]{0.05\columnwidth}\raggedright\strut
+:V4\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright\strut
+:V2-value-0-0\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright\strut
+:V2-value-0-1\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright\strut
+:V2-value-0-2\strut
+\end{minipage} & \begin{minipage}[b]{0.18\columnwidth}\raggedright\strut
+:V2-value-1-sum-v1\strut
+\end{minipage} & \begin{minipage}[b]{0.19\columnwidth}\raggedright\strut
+:V2-value-1-prod-v3\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
-B & 2 & 5 & 8 & 5 & 1.000\tabularnewline
-C & 3 & 6 & 9 & 4 & 3.375\tabularnewline
-A & 1 & 4 & 7 & 4 & 0.1250\tabularnewline
+\begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+B\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+5\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+8\strut
+\end{minipage} & \begin{minipage}[t]{0.18\columnwidth}\raggedright\strut
+5\strut
+\end{minipage} & \begin{minipage}[t]{0.19\columnwidth}\raggedright\strut
+1.000\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+C\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+3\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+6\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+9\strut
+\end{minipage} & \begin{minipage}[t]{0.18\columnwidth}\raggedright\strut
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.19\columnwidth}\raggedright\strut
+3.375\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.05\columnwidth}\raggedright\strut
+A\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+7\strut
+\end{minipage} & \begin{minipage}[t]{0.18\columnwidth}\raggedright\strut
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.19\columnwidth}\raggedright\strut
+0.1250\strut
+\end{minipage}\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -4849,8 +5116,8 @@ Random
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 2 & 1.000 & B\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -8349,10 +8616,10 @@ data/anscombe.csv {[}44 3{]}:
 :x & :a & :b & :y1 & :y2 & :z1 & :z2\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0 & 0.6760 & 0.1799 & 3 & -2\tabularnewline
-2 & 1 & 1 & 0.3435 & 0.6426 & 3 & -2\tabularnewline
-3 & 0 & 1 & 0.4568 & 0.8009 & 3 & -2\tabularnewline
-4 & 0 & 1 & 0.9421 & 0.9790 & 3 & -2\tabularnewline
+1 & 1 & 0 & 0.8680 & 0.3047 & 3 & -2\tabularnewline
+2 & 1 & 1 & 0.9778 & 0.8507 & 3 & -2\tabularnewline
+3 & 0 & 1 & 0.5632 & 0.7646 & 3 & -2\tabularnewline
+4 & 0 & 1 & 0.3847 & 0.02462 & 3 & -2\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -8370,14 +8637,14 @@ data/anscombe.csv {[}44 3{]}:
 :x & :a & :b & :times & y & z\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0 & 1 & 0.6760 & 3\tabularnewline
-2 & 1 & 1 & 1 & 0.3435 & 3\tabularnewline
-3 & 0 & 1 & 1 & 0.4568 & 3\tabularnewline
-4 & 0 & 1 & 1 & 0.9421 & 3\tabularnewline
-1 & 1 & 0 & 2 & 0.1799 & -2\tabularnewline
-2 & 1 & 1 & 2 & 0.6426 & -2\tabularnewline
-3 & 0 & 1 & 2 & 0.8009 & -2\tabularnewline
-4 & 0 & 1 & 2 & 0.9790 & -2\tabularnewline
+1 & 1 & 0 & 1 & 0.8680 & 3\tabularnewline
+2 & 1 & 1 & 1 & 0.9778 & 3\tabularnewline
+3 & 0 & 1 & 1 & 0.5632 & 3\tabularnewline
+4 & 0 & 1 & 1 & 0.3847 & 3\tabularnewline
+1 & 1 & 0 & 2 & 0.3047 & -2\tabularnewline
+2 & 1 & 1 & 2 & 0.8507 & -2\tabularnewline
+3 & 0 & 1 & 2 & 0.7646 & -2\tabularnewline
+4 & 0 & 1 & 2 & 0.02462 & -2\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -8848,9 +9115,8 @@ data/us\_rent\_income.csv {[}52 6{]}:
 
 \begin{longtable}[]{@{}llllll@{}}
 \toprule
-GEOID & NAME & {[}{[}``rent''{]} ``estimate''{]} & {[}{[}``rent''{]}
-``moe''{]} & {[}{[}``income''{]} ``estimate''{]} & {[}{[}``income''{]}
-``moe''{]}\tabularnewline
+GEOID & NAME & {[}``rent'' ``estimate''{]} & {[}``rent'' ``moe''{]} &
+{[}``income'' ``estimate''{]} & {[}``income'' ``moe''{]}\tabularnewline
 \midrule
 \endhead
 1 & Alabama & 747 & 3 & 24476 & 136\tabularnewline
@@ -10303,31 +10569,31 @@ null {[}27 4{]}:
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
+1 & 7 & 0.5000 & A\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
 1 & 1 & 0.5000 & A\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
 2 & 8 & 1.000 & B\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -10386,15 +10652,15 @@ union {[}9 4{]}:
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 7 & 0.5000 & A\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
 1 & 1 & 0.5000 & A\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
 2 & 8 & 1.000 & B\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -12421,9 +12687,9 @@ Other filters
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 6 & 1.500 & C\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
 1 & 7 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -12440,11 +12706,11 @@ Other filters
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 4 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -13318,5 +13584,2232 @@ Modify a column
 1.000 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Add one column
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/map-columns DS }\AttributeTok{:v5}\NormalTok{ [}\AttributeTok{:V1}\NormalTok{] dfn/log)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4 & :v5\tabularnewline
+\midrule
+\endhead
+1.000 & 1 & 0.5000 & A & 0.000\tabularnewline
+4.000 & 2 & 1.000 & B & 1.386\tabularnewline
+1.000 & 3 & 1.500 & C & 0.000\tabularnewline
+4.000 & 4 & 0.5000 & A & 1.386\tabularnewline
+1.000 & 5 & 1.000 & B & 0.000\tabularnewline
+4.000 & 6 & 1.500 & C & 1.386\tabularnewline
+1.000 & 7 & 0.5000 & A & 0.000\tabularnewline
+4.000 & 8 & 1.000 & B & 1.386\tabularnewline
+1.000 & 9 & 1.500 & C & 0.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(api/add-or-update-column DS }\AttributeTok{:v5}\NormalTok{ (dfn/log (DS }\AttributeTok{:V1}\NormalTok{))))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DS}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4 & :v5\tabularnewline
+\midrule
+\endhead
+1.000 & 1 & 0.5000 & A & 0.000\tabularnewline
+4.000 & 2 & 1.000 & B & 1.386\tabularnewline
+1.000 & 3 & 1.500 & C & 0.000\tabularnewline
+4.000 & 4 & 0.5000 & A & 1.386\tabularnewline
+1.000 & 5 & 1.000 & B & 0.000\tabularnewline
+4.000 & 6 & 1.500 & C & 1.386\tabularnewline
+1.000 & 7 & 0.5000 & A & 0.000\tabularnewline
+4.000 & 8 & 1.000 & B & 1.386\tabularnewline
+1.000 & 9 & 1.500 & C & 0.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Add several columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(api/add-or-update-columns DS \{}\AttributeTok{:v6}\NormalTok{ (dfn/sqrt (DS }\AttributeTok{:V1}\NormalTok{))}
+                                       \AttributeTok{:v7} \StringTok{"X"}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DS}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 7{]}:
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4 & :v5 & :v6 & :v7\tabularnewline
+\midrule
+\endhead
+1.000 & 1 & 0.5000 & A & 0.000 & 1.000 & X\tabularnewline
+4.000 & 2 & 1.000 & B & 1.386 & 2.000 & X\tabularnewline
+1.000 & 3 & 1.500 & C & 0.000 & 1.000 & X\tabularnewline
+4.000 & 4 & 0.5000 & A & 1.386 & 2.000 & X\tabularnewline
+1.000 & 5 & 1.000 & B & 0.000 & 1.000 & X\tabularnewline
+4.000 & 6 & 1.500 & C & 1.386 & 2.000 & X\tabularnewline
+1.000 & 7 & 0.5000 & A & 0.000 & 1.000 & X\tabularnewline
+4.000 & 8 & 1.000 & B & 1.386 & 2.000 & X\tabularnewline
+1.000 & 9 & 1.500 & C & 0.000 & 1.000 & X\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Create one column and remove the others
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset \{}\AttributeTok{:v8}\NormalTok{ (dfn/+ (DS }\AttributeTok{:V3}\NormalTok{) }\DecValTok{1}\NormalTok{)\})}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 1{]}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+:v8\tabularnewline
+\midrule
+\endhead
+1.500\tabularnewline
+2.000\tabularnewline
+2.500\tabularnewline
+1.500\tabularnewline
+2.000\tabularnewline
+2.500\tabularnewline
+1.500\tabularnewline
+2.000\tabularnewline
+2.500\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Remove one column
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(api/drop-columns DS }\AttributeTok{:v5}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DS}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 6{]}:
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4 & :v6 & :v7\tabularnewline
+\midrule
+\endhead
+1.000 & 1 & 0.5000 & A & 1.000 & X\tabularnewline
+4.000 & 2 & 1.000 & B & 2.000 & X\tabularnewline
+1.000 & 3 & 1.500 & C & 1.000 & X\tabularnewline
+4.000 & 4 & 0.5000 & A & 2.000 & X\tabularnewline
+1.000 & 5 & 1.000 & B & 1.000 & X\tabularnewline
+4.000 & 6 & 1.500 & C & 2.000 & X\tabularnewline
+1.000 & 7 & 0.5000 & A & 1.000 & X\tabularnewline
+4.000 & 8 & 1.000 & B & 2.000 & X\tabularnewline
+1.000 & 9 & 1.500 & C & 1.000 & X\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Remove several columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(api/drop-columns DS [}\AttributeTok{:v6} \AttributeTok{:v7}\NormalTok{]))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DS}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V3 & :V4\tabularnewline
+\midrule
+\endhead
+1.000 & 1 & 0.5000 & A\tabularnewline
+4.000 & 2 & 1.000 & B\tabularnewline
+1.000 & 3 & 1.500 & C\tabularnewline
+4.000 & 4 & 0.5000 & A\tabularnewline
+1.000 & 5 & 1.000 & B\tabularnewline
+4.000 & 6 & 1.500 & C\tabularnewline
+1.000 & 7 & 0.5000 & A\tabularnewline
+4.000 & 8 & 1.000 & B\tabularnewline
+1.000 & 9 & 1.500 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Remove columns using a vector of colnames
+
+We use set here.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(api/select-columns DS (}\KeywordTok{complement}\NormalTok{ #\{}\AttributeTok{:V3}\NormalTok{\})))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DS}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+1.000 & 1 & A\tabularnewline
+4.000 & 2 & B\tabularnewline
+1.000 & 3 & C\tabularnewline
+4.000 & 4 & A\tabularnewline
+1.000 & 5 & B\tabularnewline
+4.000 & 6 & C\tabularnewline
+1.000 & 7 & A\tabularnewline
+4.000 & 8 & B\tabularnewline
+1.000 & 9 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Replace values for rows matching a condition
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(api/map-columns DS }\AttributeTok{:V2}\NormalTok{ [}\AttributeTok{:V2}\NormalTok{] #(}\KeywordTok{if}\NormalTok{ (}\KeywordTok{<} \VariableTok{%} \FloatTok{4.0}\NormalTok{) }\FloatTok{0.0} \VariableTok{%}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DS}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+1.000 & 0 & A\tabularnewline
+4.000 & 0 & B\tabularnewline
+1.000 & 0 & C\tabularnewline
+4.000 & 4 & A\tabularnewline
+1.000 & 5 & B\tabularnewline
+4.000 & 6 & C\tabularnewline
+1.000 & 7 & A\tabularnewline
+4.000 & 8 & B\tabularnewline
+1.000 & 9 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subparagraph{by}\label{by}
+
+By group
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by [}\AttributeTok{:V4}\NormalTok{])}
+\NormalTok{    (api/aggregate \{}\AttributeTok{:sumV2}\NormalTok{ #(dfn/sum (}\VariableTok{%} \AttributeTok{:V2}\NormalTok{))\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V4 & :sumV2\tabularnewline
+\midrule
+\endhead
+B & 13.00\tabularnewline
+C & 15.00\tabularnewline
+A & 11.00\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+By several groups
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by [}\AttributeTok{:V4} \AttributeTok{:V1}\NormalTok{])}
+\NormalTok{    (api/aggregate \{}\AttributeTok{:sumV2}\NormalTok{ #(dfn/sum (}\VariableTok{%} \AttributeTok{:V2}\NormalTok{))\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}6 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V4 & :V1 & :sumV2\tabularnewline
+\midrule
+\endhead
+A & 4.000 & 4.000\tabularnewline
+A & 1.000 & 7.000\tabularnewline
+B & 1.000 & 5.000\tabularnewline
+B & 4.000 & 8.000\tabularnewline
+C & 4.000 & 6.000\tabularnewline
+C & 1.000 & 9.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Calling function in by
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by (}\KeywordTok{fn}\NormalTok{ [row]}
+\NormalTok{                    (clojure.string/lower-case (}\AttributeTok{:V4}\NormalTok{ row))))}
+\NormalTok{    (api/aggregate \{}\AttributeTok{:sumV1}\NormalTok{ #(dfn/sum (}\VariableTok{%} \AttributeTok{:V1}\NormalTok{))\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:\$group-name & :sumV1\tabularnewline
+\midrule
+\endhead
+a & 6.000\tabularnewline
+b & 9.000\tabularnewline
+c & 6.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Assigning column name in by
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by (}\KeywordTok{fn}\NormalTok{ [row]}
+\NormalTok{                    \{}\AttributeTok{:abc}\NormalTok{ (clojure.string/lower-case (}\AttributeTok{:V4}\NormalTok{ row))\}))}
+\NormalTok{    (api/aggregate \{}\AttributeTok{:sumV1}\NormalTok{ #(dfn/sum (}\VariableTok{%} \AttributeTok{:V1}\NormalTok{))\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:abc & :sumV1\tabularnewline
+\midrule
+\endhead
+a & 6.000\tabularnewline
+b & 9.000\tabularnewline
+c & 6.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by (}\KeywordTok{fn}\NormalTok{ [row]}
+\NormalTok{                    (clojure.string/lower-case (}\AttributeTok{:V4}\NormalTok{ row))))}
+\NormalTok{    (api/aggregate \{}\AttributeTok{:sumV1}\NormalTok{ #(dfn/sum (}\VariableTok{%} \AttributeTok{:V1}\NormalTok{))\} \{}\AttributeTok{:add-group-as-column} \AttributeTok{:abc}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:abc & :sumV1\tabularnewline
+\midrule
+\endhead
+a & 6.000\tabularnewline
+b & 9.000\tabularnewline
+c & 6.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Using a condition in by
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by #(}\KeywordTok{=}\NormalTok{ (}\AttributeTok{:V4} \VariableTok{%}\NormalTok{) }\StringTok{"A"}\NormalTok{))}
+\NormalTok{    (api/aggregate #(dfn/sum (}\VariableTok{%} \AttributeTok{:V1}\NormalTok{))))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}2 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:\$group-name & :summary\tabularnewline
+\midrule
+\endhead
+false & 15.00\tabularnewline
+true & 6.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+By on a subset of rows
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/select-rows (}\KeywordTok{range} \DecValTok{5}\NormalTok{))}
+\NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/aggregate \{}\AttributeTok{:sumV1}\NormalTok{ #(dfn/sum (}\VariableTok{%} \AttributeTok{:V1}\NormalTok{))\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:\$group-name & :sumV1\tabularnewline
+\midrule
+\endhead
+A & 5.000\tabularnewline
+B & 5.000\tabularnewline
+C & 1.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Count number of observations for each group
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/aggregate api/row-count))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:\$group-name & :summary\tabularnewline
+\midrule
+\endhead
+A & 3\tabularnewline
+B & 3\tabularnewline
+C & 3\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Add a column with number of observations for each group
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by [}\AttributeTok{:V1}\NormalTok{])}
+\NormalTok{    (api/add-or-update-column }\AttributeTok{:n}\NormalTok{ api/row-count)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:V1 & :V2 & :V4 & :n\tabularnewline
+\midrule
+\endhead
+4.000 & 0 & B & 4\tabularnewline
+4.000 & 4 & A & 4\tabularnewline
+4.000 & 6 & C & 4\tabularnewline
+4.000 & 8 & B & 4\tabularnewline
+1.000 & 0 & A & 5\tabularnewline
+1.000 & 0 & C & 5\tabularnewline
+1.000 & 5 & B & 5\tabularnewline
+1.000 & 7 & A & 5\tabularnewline
+1.000 & 9 & C & 5\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Retrieve the first/last/nth observation for each group
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by [}\AttributeTok{:V4}\NormalTok{])}
+\NormalTok{    (api/aggregate-columns }\AttributeTok{:V2} \KeywordTok{first}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V4 & :V2\tabularnewline
+\midrule
+\endhead
+B & 0\tabularnewline
+C & 0\tabularnewline
+A & 0\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by [}\AttributeTok{:V4}\NormalTok{])}
+\NormalTok{    (api/aggregate-columns }\AttributeTok{:V2} \KeywordTok{last}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V4 & :V2\tabularnewline
+\midrule
+\endhead
+B & 8\tabularnewline
+C & 9\tabularnewline
+A & 7\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by [}\AttributeTok{:V4}\NormalTok{])}
+\NormalTok{    (api/aggregate-columns }\AttributeTok{:V2}\NormalTok{ #(}\KeywordTok{nth} \VariableTok{%} \DecValTok{1}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V4 & :V2\tabularnewline
+\midrule
+\endhead
+B & 5\tabularnewline
+C & 6\tabularnewline
+A & 4\tabularnewline
+\bottomrule
+\end{longtable}
+
+\paragraph{Going further}\label{going-further}
+
+\subparagraph{Advanced columns
+manipulation}\label{advanced-columns-manipulation}
+
+Summarise all the columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{;; custom max function which works on every type}
+\NormalTok{(api/aggregate-columns DS }\AttributeTok{:all}\NormalTok{ (}\KeywordTok{fn}\NormalTok{ [col] (}\KeywordTok{first}\NormalTok{ (}\KeywordTok{sort}\NormalTok{ #(}\KeywordTok{compare} \VariableTok{%2} \VariableTok{%1}\NormalTok{) col))))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+4.000 & 9 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Summarise several columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/aggregate-columns DS [}\AttributeTok{:V1} \AttributeTok{:V2}\NormalTok{] dfn/mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V1 & :V2\tabularnewline
+\midrule
+\endhead
+2.333 & 4.333\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Summarise several columns by group
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by [}\AttributeTok{:V4}\NormalTok{])}
+\NormalTok{    (api/aggregate-columns [}\AttributeTok{:V1} \AttributeTok{:V2}\NormalTok{] dfn/mean))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V4 & :V1 & :V2\tabularnewline
+\midrule
+\endhead
+B & 3.000 & 4.333\tabularnewline
+C & 2.000 & 5.000\tabularnewline
+A & 2.000 & 3.667\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Summarise with more than one function by group
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by [}\AttributeTok{:V4}\NormalTok{])}
+\NormalTok{    (api/aggregate-columns [}\AttributeTok{:V1} \AttributeTok{:V2}\NormalTok{] (}\KeywordTok{fn}\NormalTok{ [col]}
+\NormalTok{                                       \{}\AttributeTok{:sum}\NormalTok{ (dfn/sum col)}
+                                        \AttributeTok{:mean}\NormalTok{ (dfn/mean col)\})))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 5{]}:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule
+:V4 & :V1-sum & :V1-mean & :V2-sum & :V2-mean\tabularnewline
+\midrule
+\endhead
+B & 9.000 & 3.000 & 13.00 & 4.333\tabularnewline
+C & 6.000 & 2.000 & 15.00 & 5.000\tabularnewline
+A & 6.000 & 2.000 & 11.00 & 3.667\tabularnewline
+\bottomrule
+\end{longtable}
+
+Summarise using a condition
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/select-columns }\AttributeTok{:type/numerical}\NormalTok{)}
+\NormalTok{    (api/aggregate-columns }\AttributeTok{:all}\NormalTok{ dfn/mean))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V1 & :V2\tabularnewline
+\midrule
+\endhead
+2.333 & 4.333\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Modify all the columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/update-columns DS }\AttributeTok{:all} \KeywordTok{reverse}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+1.000 & 9 & C\tabularnewline
+4.000 & 8 & B\tabularnewline
+1.000 & 7 & A\tabularnewline
+4.000 & 6 & C\tabularnewline
+1.000 & 5 & B\tabularnewline
+4.000 & 4 & A\tabularnewline
+1.000 & 0 & C\tabularnewline
+4.000 & 0 & B\tabularnewline
+1.000 & 0 & A\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Modify several columns (dropping the others)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/select-columns [}\AttributeTok{:V1} \AttributeTok{:V2}\NormalTok{])}
+\NormalTok{    (api/update-columns }\AttributeTok{:all}\NormalTok{ dfn/sqrt))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V1 & :V2\tabularnewline
+\midrule
+\endhead
+1.000 & 0.000\tabularnewline
+2.000 & 0.000\tabularnewline
+1.000 & 0.000\tabularnewline
+2.000 & 2.000\tabularnewline
+1.000 & 2.236\tabularnewline
+2.000 & 2.449\tabularnewline
+1.000 & 2.646\tabularnewline
+2.000 & 2.828\tabularnewline
+1.000 & 3.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/select-columns (}\KeywordTok{complement}\NormalTok{ #\{}\AttributeTok{:V4}\NormalTok{\}))}
+\NormalTok{    (api/update-columns }\AttributeTok{:all}\NormalTok{ dfn/exp))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V1 & :V2\tabularnewline
+\midrule
+\endhead
+2.718 & 1.000\tabularnewline
+54.60 & 1.000\tabularnewline
+2.718 & 1.000\tabularnewline
+54.60 & 54.60\tabularnewline
+2.718 & 148.4\tabularnewline
+54.60 & 403.4\tabularnewline
+2.718 & 1097\tabularnewline
+54.60 & 2981\tabularnewline
+2.718 & 8103\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Modify several columns (keeping the others)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(api/update-columns DS [}\AttributeTok{:V1} \AttributeTok{:V2}\NormalTok{] dfn/sqrt))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DS}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+1.000 & 0.000 & A\tabularnewline
+2.000 & 0.000 & B\tabularnewline
+1.000 & 0.000 & C\tabularnewline
+2.000 & 2.000 & A\tabularnewline
+1.000 & 2.236 & B\tabularnewline
+2.000 & 2.449 & C\tabularnewline
+1.000 & 2.646 & A\tabularnewline
+2.000 & 2.828 & B\tabularnewline
+1.000 & 3.000 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(api/update-columns DS (}\KeywordTok{complement}\NormalTok{ #\{}\AttributeTok{:V4}\NormalTok{\}) #(dfn/pow }\VariableTok{%} \DecValTok{2}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DS}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+1.000 & 0.000 & A\tabularnewline
+4.000 & 0.000 & B\tabularnewline
+1.000 & 0.000 & C\tabularnewline
+4.000 & 4.000 & A\tabularnewline
+1.000 & 5.000 & B\tabularnewline
+4.000 & 6.000 & C\tabularnewline
+1.000 & 7.000 & A\tabularnewline
+4.000 & 8.000 & B\tabularnewline
+1.000 & 9.000 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Modify columns using a condition (dropping the others)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/select-columns }\AttributeTok{:type/numerical}\NormalTok{)}
+\NormalTok{    (api/update-columns }\AttributeTok{:all}\NormalTok{ #(dfn/- }\VariableTok{%} \DecValTok{1}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V1 & :V2\tabularnewline
+\midrule
+\endhead
+0.000 & -1.000\tabularnewline
+3.000 & -1.000\tabularnewline
+0.000 & -1.000\tabularnewline
+3.000 & 3.000\tabularnewline
+0.000 & 4.000\tabularnewline
+3.000 & 5.000\tabularnewline
+0.000 & 6.000\tabularnewline
+3.000 & 7.000\tabularnewline
+0.000 & 8.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Modify columns using a condition (keeping the others)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(api/convert-types DS }\AttributeTok{:type/numerical} \AttributeTok{:int32}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DS}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 0 & A\tabularnewline
+4 & 0 & B\tabularnewline
+1 & 0 & C\tabularnewline
+4 & 4 & A\tabularnewline
+1 & 5 & B\tabularnewline
+4 & 5 & C\tabularnewline
+1 & 7 & A\tabularnewline
+4 & 8 & B\tabularnewline
+1 & 9 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Use a complex expression
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by [}\AttributeTok{:V4}\NormalTok{])}
+\NormalTok{    (api/head }\DecValTok{2}\NormalTok{)}
+\NormalTok{    (api/add-or-update-column }\AttributeTok{:V2} \StringTok{"X"}\NormalTok{)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}6 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+4 & X & B\tabularnewline
+1 & X & B\tabularnewline
+1 & X & C\tabularnewline
+4 & X & C\tabularnewline
+1 & X & A\tabularnewline
+4 & X & A\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Use multiple expressions
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset (}\KeywordTok{let}\NormalTok{ [x (dfn/+ (DS }\AttributeTok{:V1}\NormalTok{) (dfn/sum (DS }\AttributeTok{:V2}\NormalTok{)))]}
+\NormalTok{               (}\KeywordTok{println}\NormalTok{ (}\KeywordTok{seq}\NormalTok{ (DS }\AttributeTok{:V1}\NormalTok{)))}
+\NormalTok{               (}\KeywordTok{println}\NormalTok{ (api/info (api/select-columns DS }\AttributeTok{:V1}\NormalTok{)))}
+\NormalTok{               \{}\AttributeTok{:A}\NormalTok{ (}\KeywordTok{range} \DecValTok{1}\NormalTok{ (}\KeywordTok{inc}\NormalTok{ (api/row-count DS)))}
+                \AttributeTok{:B}\NormalTok{ x\}))}
+\end{Highlighting}
+\end{Shaded}
+
+(1 4 1 4 1 4 1 4 1) \_unnamed: descriptive-stats {[}1 9{]}:
+
+\begin{longtable}[]{@{}lllllllll@{}}
+\toprule
+\begin{minipage}[b]{0.09\columnwidth}\raggedright\strut
+:col-name\strut
+\end{minipage} & \begin{minipage}[b]{0.09\columnwidth}\raggedright\strut
+:datatype\strut
+\end{minipage} & \begin{minipage}[b]{0.08\columnwidth}\raggedright\strut
+:n-valid\strut
+\end{minipage} & \begin{minipage}[b]{0.10\columnwidth}\raggedright\strut
+:n-missing\strut
+\end{minipage} & \begin{minipage}[b]{0.06\columnwidth}\raggedright\strut
+:min\strut
+\end{minipage} & \begin{minipage}[b]{0.06\columnwidth}\raggedright\strut
+:mean\strut
+\end{minipage} & \begin{minipage}[b]{0.06\columnwidth}\raggedright\strut
+:max\strut
+\end{minipage} & \begin{minipage}[b]{0.16\columnwidth}\raggedright\strut
+:standard-deviation\strut
+\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright\strut
+:skew\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+:V1\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+:int32\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright\strut
+9\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+0\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+1.000\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+2.333\strut
+\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright\strut
+4.000\strut
+\end{minipage} & \begin{minipage}[t]{0.16\columnwidth}\raggedright\strut
+1.581\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+0.2711\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\_unnamed {[}9 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:A & :B\tabularnewline
+\midrule
+\endhead
+1 & 39.00\tabularnewline
+2 & 42.00\tabularnewline
+3 & 39.00\tabularnewline
+4 & 42.00\tabularnewline
+5 & 39.00\tabularnewline
+6 & 42.00\tabularnewline
+7 & 39.00\tabularnewline
+8 & 42.00\tabularnewline
+9 & 39.00\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subparagraph{Chain expressions}\label{chain-expressions}
+
+Expression chaining using \textgreater{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by [}\AttributeTok{:V4}\NormalTok{])}
+\NormalTok{    (api/aggregate \{}\AttributeTok{:V1sum}\NormalTok{ #(dfn/sum (}\VariableTok{%} \AttributeTok{:V1}\NormalTok{))\})}
+\NormalTok{    (api/select-rows #(}\KeywordTok{>}\NormalTok{ (}\AttributeTok{:V1sum} \VariableTok{%}\NormalTok{) }\DecValTok{5}\NormalTok{) ))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V4 & :V1sum\tabularnewline
+\midrule
+\endhead
+B & 9.000\tabularnewline
+C & 6.000\tabularnewline
+A & 6.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by [}\AttributeTok{:V4}\NormalTok{])}
+\NormalTok{    (api/aggregate \{}\AttributeTok{:V1sum}\NormalTok{ #(dfn/sum (}\VariableTok{%} \AttributeTok{:V1}\NormalTok{))\})}
+\NormalTok{    (api/order-by }\AttributeTok{:V1sum} \AttributeTok{:desc}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V4 & :V1sum\tabularnewline
+\midrule
+\endhead
+B & 9.000\tabularnewline
+C & 6.000\tabularnewline
+A & 6.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subparagraph{Indexing and Keys}\label{indexing-and-keys}
+
+Set the key/index (order)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(api/order-by DS }\AttributeTok{:V4}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DS}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 0 & A\tabularnewline
+4 & 4 & A\tabularnewline
+1 & 7 & A\tabularnewline
+4 & 0 & B\tabularnewline
+1 & 5 & B\tabularnewline
+4 & 8 & B\tabularnewline
+1 & 0 & C\tabularnewline
+4 & 5 & C\tabularnewline
+1 & 9 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+Select the matching rows
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/select-rows DS #(}\KeywordTok{=}\NormalTok{ (}\AttributeTok{:V4} \VariableTok{%}\NormalTok{) }\StringTok{"A"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 0 & A\tabularnewline
+4 & 4 & A\tabularnewline
+1 & 7 & A\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/select-rows DS (}\KeywordTok{comp}\NormalTok{ #\{}\StringTok{"A"} \StringTok{"C"}\NormalTok{\} }\AttributeTok{:V4}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}6 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 0 & A\tabularnewline
+4 & 4 & A\tabularnewline
+1 & 7 & A\tabularnewline
+1 & 0 & C\tabularnewline
+4 & 5 & C\tabularnewline
+1 & 9 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Select the first matching row
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/select-rows #(}\KeywordTok{=}\NormalTok{ (}\AttributeTok{:V4} \VariableTok{%}\NormalTok{) }\StringTok{"B"}\NormalTok{))}
+\NormalTok{    (api/first))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+4 & 0 & B\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/unique-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/select-rows (}\KeywordTok{comp}\NormalTok{ #\{}\StringTok{"B"} \StringTok{"C"}\NormalTok{\} }\AttributeTok{:V4}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}2 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+4 & 0 & B\tabularnewline
+1 & 0 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Select the last matching row
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/select-rows #(}\KeywordTok{=}\NormalTok{ (}\AttributeTok{:V4} \VariableTok{%}\NormalTok{) }\StringTok{"A"}\NormalTok{))}
+\NormalTok{    (api/last))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 7 & A\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Nomatch argument
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/select-rows DS (}\KeywordTok{comp}\NormalTok{ #\{}\StringTok{"A"} \StringTok{"D"}\NormalTok{\} }\AttributeTok{:V4}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 0 & A\tabularnewline
+4 & 4 & A\tabularnewline
+1 & 7 & A\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Apply a function on the matching rows
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/select-rows (}\KeywordTok{comp}\NormalTok{ #\{}\StringTok{"A"} \StringTok{"C"}\NormalTok{\} }\AttributeTok{:V4}\NormalTok{))}
+\NormalTok{    (api/aggregate-columns }\AttributeTok{:V1}\NormalTok{ (}\KeywordTok{fn}\NormalTok{ [col]}
+\NormalTok{                                 \{}\AttributeTok{:sum}\NormalTok{ (dfn/sum col)\})))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}1 1{]}:
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+:V1-sum\tabularnewline
+\midrule
+\endhead
+12.00\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Modify values for matching rows
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{            (api/map-columns }\AttributeTok{:V1}\NormalTok{ [}\AttributeTok{:V1} \AttributeTok{:V4}\NormalTok{] #(}\KeywordTok{if}\NormalTok{ (}\KeywordTok{=} \VariableTok{%2} \StringTok{"A"}\NormalTok{) }\DecValTok{0} \VariableTok{%1}\NormalTok{))}
+\NormalTok{            (api/order-by }\AttributeTok{:V4}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DS}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+0 & 0 & A\tabularnewline
+0 & 4 & A\tabularnewline
+0 & 7 & A\tabularnewline
+4 & 0 & B\tabularnewline
+1 & 5 & B\tabularnewline
+4 & 8 & B\tabularnewline
+1 & 0 & C\tabularnewline
+4 & 5 & C\tabularnewline
+1 & 9 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Use keys in by
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/select-rows (}\KeywordTok{comp}\NormalTok{ (}\KeywordTok{complement}\NormalTok{ #\{}\StringTok{"B"}\NormalTok{\}) }\AttributeTok{:V4}\NormalTok{))}
+\NormalTok{    (api/group-by [}\AttributeTok{:V4}\NormalTok{])}
+\NormalTok{    (api/aggregate-columns }\AttributeTok{:V1}\NormalTok{ dfn/sum))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}2 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V4 & :V1\tabularnewline
+\midrule
+\endhead
+C & 6.000\tabularnewline
+A & 0.000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Set keys/indices for multiple columns (ordered)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/order-by DS [}\AttributeTok{:V4} \AttributeTok{:V1}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+0 & 0 & A\tabularnewline
+0 & 4 & A\tabularnewline
+0 & 7 & A\tabularnewline
+1 & 5 & B\tabularnewline
+4 & 0 & B\tabularnewline
+4 & 8 & B\tabularnewline
+1 & 0 & C\tabularnewline
+1 & 9 & C\tabularnewline
+4 & 5 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Subset using multiple keys/indices
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/select-rows #(}\KeywordTok{and}\NormalTok{ (}\KeywordTok{=}\NormalTok{ (}\AttributeTok{:V1} \VariableTok{%}\NormalTok{) }\DecValTok{1}\NormalTok{)}
+\NormalTok{                           (}\KeywordTok{=}\NormalTok{ (}\AttributeTok{:V4} \VariableTok{%}\NormalTok{) }\StringTok{"C"}\NormalTok{))))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}2 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 0 & C\tabularnewline
+1 & 9 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/select-rows #(}\KeywordTok{and}\NormalTok{ (}\KeywordTok{=}\NormalTok{ (}\AttributeTok{:V1} \VariableTok{%}\NormalTok{) }\DecValTok{1}\NormalTok{)}
+\NormalTok{                           (#\{}\StringTok{"B"} \StringTok{"C"}\NormalTok{\} (}\AttributeTok{:V4} \VariableTok{%}\NormalTok{)))))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+1 & 5 & B\tabularnewline
+1 & 0 & C\tabularnewline
+1 & 9 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/select-rows #(}\KeywordTok{and}\NormalTok{ (}\KeywordTok{=}\NormalTok{ (}\AttributeTok{:V1} \VariableTok{%}\NormalTok{) }\DecValTok{1}\NormalTok{)}
+\NormalTok{                           (#\{}\StringTok{"B"} \StringTok{"C"}\NormalTok{\} (}\AttributeTok{:V4} \VariableTok{%}\NormalTok{))) \{}\AttributeTok{:result-type} \AttributeTok{:as-indexes}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(4 6 8)
+\end{verbatim}
+
+\subparagraph{set*() modifications}\label{set-modifications}
+
+Replace values
+
+There is no mutating operations \texttt{tech.ml.dataset} or easy way to
+set value.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(api/update-columns DS }\AttributeTok{:V2}\NormalTok{ #(map-indexed (}\KeywordTok{fn}\NormalTok{ [idx v]}
+\NormalTok{                                                   (}\KeywordTok{if}\NormalTok{ (}\KeywordTok{zero?}\NormalTok{ idx) }\DecValTok{3}\NormalTok{ v)) }\VariableTok{%}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DS}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+0 & 3 & A\tabularnewline
+0 & 4 & A\tabularnewline
+0 & 7 & A\tabularnewline
+4 & 0 & B\tabularnewline
+1 & 5 & B\tabularnewline
+4 & 8 & B\tabularnewline
+1 & 0 & C\tabularnewline
+4 & 5 & C\tabularnewline
+1 & 9 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Reorder rows
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(api/order-by DS [}\AttributeTok{:V4} \AttributeTok{:V1}\NormalTok{] [}\AttributeTok{:asc} \AttributeTok{:desc}\NormalTok{]))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DS}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & :V2 & :V4\tabularnewline
+\midrule
+\endhead
+0 & 3 & A\tabularnewline
+0 & 4 & A\tabularnewline
+0 & 7 & A\tabularnewline
+4 & 0 & B\tabularnewline
+4 & 8 & B\tabularnewline
+1 & 5 & B\tabularnewline
+4 & 5 & C\tabularnewline
+1 & 0 & C\tabularnewline
+1 & 9 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Modify colnames
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(api/rename-columns DS \{}\AttributeTok{:V2} \StringTok{"v2"}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DS}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V1 & v2 & :V4\tabularnewline
+\midrule
+\endhead
+0 & 3 & A\tabularnewline
+0 & 4 & A\tabularnewline
+0 & 7 & A\tabularnewline
+4 & 0 & B\tabularnewline
+4 & 8 & B\tabularnewline
+1 & 5 & B\tabularnewline
+4 & 5 & C\tabularnewline
+1 & 0 & C\tabularnewline
+1 & 9 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(api/rename-columns DS \{}\StringTok{"v2"} \AttributeTok{:V2}\NormalTok{\})) }\CommentTok{;; revert back}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Reorder columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ DS }\NormalTok{(api/reorder-columns DS }\AttributeTok{:V4} \AttributeTok{:V1} \AttributeTok{:V2}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DS}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V4 & :V1 & :V2\tabularnewline
+\midrule
+\endhead
+A & 0 & 3\tabularnewline
+A & 0 & 4\tabularnewline
+A & 0 & 7\tabularnewline
+B & 4 & 0\tabularnewline
+B & 4 & 8\tabularnewline
+B & 1 & 5\tabularnewline
+C & 4 & 5\tabularnewline
+C & 1 & 0\tabularnewline
+C & 1 & 9\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subparagraph{Advanced use of by}\label{advanced-use-of-by}
+
+Select first/last/\ldots{} row by group
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/first)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V4 & :V1 & :V2\tabularnewline
+\midrule
+\endhead
+A & 0 & 3\tabularnewline
+B & 4 & 0\tabularnewline
+C & 4 & 5\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/select-rows [}\DecValTok{0} \DecValTok{2}\NormalTok{])}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}6 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V4 & :V1 & :V2\tabularnewline
+\midrule
+\endhead
+A & 0 & 3\tabularnewline
+A & 0 & 7\tabularnewline
+B & 4 & 0\tabularnewline
+B & 1 & 5\tabularnewline
+C & 4 & 5\tabularnewline
+C & 1 & 9\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/tail }\DecValTok{2}\NormalTok{)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}6 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V4 & :V1 & :V2\tabularnewline
+\midrule
+\endhead
+A & 0 & 4\tabularnewline
+A & 0 & 7\tabularnewline
+B & 4 & 8\tabularnewline
+B & 1 & 5\tabularnewline
+C & 1 & 0\tabularnewline
+C & 1 & 9\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Select rows using a nested query
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/order-by }\AttributeTok{:V2}\NormalTok{)}
+\NormalTok{    (api/first)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V4 & :V1 & :V2\tabularnewline
+\midrule
+\endhead
+A & 0 & 3\tabularnewline
+B & 4 & 0\tabularnewline
+C & 1 & 0\tabularnewline
+\bottomrule
+\end{longtable}
+
+Add a group counter column
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/group-by [}\AttributeTok{:V4} \AttributeTok{:V1}\NormalTok{])}
+\NormalTok{    (api/ungroup \{}\AttributeTok{:add-group-id-as-column} \AttributeTok{:Grp}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 4{]}:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+:Grp & :V4 & :V1 & :V2\tabularnewline
+\midrule
+\endhead
+0 & A & 0 & 3\tabularnewline
+0 & A & 0 & 4\tabularnewline
+0 & A & 0 & 7\tabularnewline
+1 & B & 1 & 5\tabularnewline
+2 & C & 1 & 0\tabularnewline
+2 & C & 1 & 9\tabularnewline
+3 & B & 4 & 0\tabularnewline
+3 & B & 4 & 8\tabularnewline
+4 & C & 4 & 5\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Get row number of first (and last) observation by group
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/add-or-update-column }\AttributeTok{:row-id}\NormalTok{ (}\KeywordTok{range}\NormalTok{))}
+\NormalTok{    (api/select-columns [}\AttributeTok{:V4} \AttributeTok{:row-id}\NormalTok{])}
+\NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}9 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V4 & :row-id\tabularnewline
+\midrule
+\endhead
+A & 0\tabularnewline
+A & 1\tabularnewline
+A & 2\tabularnewline
+B & 3\tabularnewline
+B & 4\tabularnewline
+B & 5\tabularnewline
+C & 6\tabularnewline
+C & 7\tabularnewline
+C & 8\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/add-or-update-column }\AttributeTok{:row-id}\NormalTok{ (}\KeywordTok{range}\NormalTok{))}
+\NormalTok{    (api/select-columns [}\AttributeTok{:V4} \AttributeTok{:row-id}\NormalTok{])}
+\NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/first)}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V4 & :row-id\tabularnewline
+\midrule
+\endhead
+A & 0\tabularnewline
+B & 3\tabularnewline
+C & 6\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/add-or-update-column }\AttributeTok{:row-id}\NormalTok{ (}\KeywordTok{range}\NormalTok{))}
+\NormalTok{    (api/select-columns [}\AttributeTok{:V4} \AttributeTok{:row-id}\NormalTok{])}
+\NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/select-rows [}\DecValTok{0} \DecValTok{2}\NormalTok{])}
+\NormalTok{    (api/ungroup))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}6 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V4 & :row-id\tabularnewline
+\midrule
+\endhead
+A & 0\tabularnewline
+A & 2\tabularnewline
+B & 3\tabularnewline
+B & 5\tabularnewline
+C & 6\tabularnewline
+C & 8\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Handle list-columns by group
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS}
+\NormalTok{    (api/select-columns [}\AttributeTok{:V1} \AttributeTok{:V4}\NormalTok{])}
+\NormalTok{    (api/fold-by }\AttributeTok{:V4}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V4 & :V1\tabularnewline
+\midrule
+\endhead
+B & {[}4 4 1{]}\tabularnewline
+C & {[}4 1 1{]}\tabularnewline
+A & {[}0 0 0{]}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ DS    }
+\NormalTok{    (api/group-by }\AttributeTok{:V4}\NormalTok{)}
+\NormalTok{    (api/unmark-group))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:name & :group-id & :data\tabularnewline
+\midrule
+\endhead
+A & 0 & Group: A {[}3 3{]}:\tabularnewline
+B & 1 & Group: B {[}3 3{]}:\tabularnewline
+C & 2 & Group: C {[}3 3{]}:\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Grouping sets (multiple by at once)
+
+Not available.
+
+\paragraph{Miscellaneous}\label{miscellaneous}
+
+\subparagraph{Read / Write data}\label{read-write-data}
+
+Write data to a csv file
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/write-csv! DS }\StringTok{"DF.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+nil
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Write data to a tab-delimited file
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/write-csv! DS }\StringTok{"DF.txt"}\NormalTok{ \{}\AttributeTok{:separator} \CharTok{\textbackslash{}tab}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+nil
+\end{verbatim}
+
+or
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/write-csv! DS }\StringTok{"DF.tsv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+nil
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Read a csv / tab-delimited file
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset }\StringTok{"DF.csv"}\NormalTok{ \{}\AttributeTok{:key-fn} \KeywordTok{keyword}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+DF.csv {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V4 & :V1 & :V2\tabularnewline
+\midrule
+\endhead
+A & 0 & 3\tabularnewline
+A & 0 & 4\tabularnewline
+A & 0 & 7\tabularnewline
+B & 4 & 0\tabularnewline
+B & 4 & 8\tabularnewline
+B & 1 & 5\tabularnewline
+C & 4 & 5\tabularnewline
+C & 1 & 0\tabularnewline
+C & 1 & 9\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset }\StringTok{"DF.txt"}\NormalTok{ \{}\AttributeTok{:key-fn} \KeywordTok{keyword}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+DF.txt {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V4 & :V1 & :V2\tabularnewline
+\midrule
+\endhead
+A & 0 & 3\tabularnewline
+A & 0 & 4\tabularnewline
+A & 0 & 7\tabularnewline
+B & 4 & 0\tabularnewline
+B & 4 & 8\tabularnewline
+B & 1 & 5\tabularnewline
+C & 4 & 5\tabularnewline
+C & 1 & 0\tabularnewline
+C & 1 & 9\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset }\StringTok{"DF.tsv"}\NormalTok{ \{}\AttributeTok{:key-fn} \KeywordTok{keyword}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+DF.tsv {[}9 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V4 & :V1 & :V2\tabularnewline
+\midrule
+\endhead
+A & 0 & 3\tabularnewline
+A & 0 & 4\tabularnewline
+A & 0 & 7\tabularnewline
+B & 4 & 0\tabularnewline
+B & 4 & 8\tabularnewline
+B & 1 & 5\tabularnewline
+C & 4 & 5\tabularnewline
+C & 1 & 0\tabularnewline
+C & 1 & 9\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Read a csv file selecting / droping columns
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset }\StringTok{"DF.csv"}\NormalTok{ \{}\AttributeTok{:key-fn} \KeywordTok{keyword}
+                       \AttributeTok{:column-whitelist}\NormalTok{ [}\StringTok{"V1"} \StringTok{"V4"}\NormalTok{]\})}
+\end{Highlighting}
+\end{Shaded}
+
+DF.csv {[}9 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V1 & :V4\tabularnewline
+\midrule
+\endhead
+0 & A\tabularnewline
+0 & A\tabularnewline
+0 & A\tabularnewline
+4 & B\tabularnewline
+4 & B\tabularnewline
+1 & B\tabularnewline
+4 & C\tabularnewline
+1 & C\tabularnewline
+1 & C\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/dataset }\StringTok{"DF.csv"}\NormalTok{ \{}\AttributeTok{:key-fn} \KeywordTok{keyword}
+                       \AttributeTok{:column-blacklist}\NormalTok{ [}\StringTok{"V4"}\NormalTok{]\})}
+\end{Highlighting}
+\end{Shaded}
+
+DF.csv {[}9 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V1 & :V2\tabularnewline
+\midrule
+\endhead
+0 & 3\tabularnewline
+0 & 4\tabularnewline
+0 & 7\tabularnewline
+4 & 0\tabularnewline
+4 & 8\tabularnewline
+1 & 5\tabularnewline
+4 & 5\tabularnewline
+1 & 0\tabularnewline
+1 & 9\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Read and rbind several files
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{apply}\NormalTok{ api/concat (}\KeywordTok{map}\NormalTok{ api/dataset [}\StringTok{"DF.csv"} \StringTok{"DF.csv"}\NormalTok{]))}
+\end{Highlighting}
+\end{Shaded}
+
+null {[}18 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+V4 & V1 & V2\tabularnewline
+\midrule
+\endhead
+A & 0 & 3\tabularnewline
+A & 0 & 4\tabularnewline
+A & 0 & 7\tabularnewline
+B & 4 & 0\tabularnewline
+B & 4 & 8\tabularnewline
+B & 1 & 5\tabularnewline
+C & 4 & 5\tabularnewline
+C & 1 & 0\tabularnewline
+C & 1 & 9\tabularnewline
+A & 0 & 3\tabularnewline
+A & 0 & 4\tabularnewline
+A & 0 & 7\tabularnewline
+B & 4 & 0\tabularnewline
+B & 4 & 8\tabularnewline
+B & 1 & 5\tabularnewline
+C & 4 & 5\tabularnewline
+C & 1 & 0\tabularnewline
+C & 1 & 9\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subparagraph{Reshape data}\label{reshape-data}
+
+Melt data (from wide to long)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\BuiltInTok{def}\FunctionTok{ mDS }\NormalTok{(api/pivot->longer DS [}\AttributeTok{:V1} \AttributeTok{:V2}\NormalTok{] \{}\AttributeTok{:target-columns} \AttributeTok{:variable}
+                                          \AttributeTok{:value-column-name} \AttributeTok{:value}\NormalTok{\}))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mDS}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}18 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V4 & :variable & :value\tabularnewline
+\midrule
+\endhead
+A & :V1 & 0\tabularnewline
+A & :V1 & 0\tabularnewline
+A & :V1 & 0\tabularnewline
+B & :V1 & 4\tabularnewline
+B & :V1 & 4\tabularnewline
+B & :V1 & 1\tabularnewline
+C & :V1 & 4\tabularnewline
+C & :V1 & 1\tabularnewline
+C & :V1 & 1\tabularnewline
+A & :V2 & 3\tabularnewline
+A & :V2 & 4\tabularnewline
+A & :V2 & 7\tabularnewline
+B & :V2 & 0\tabularnewline
+B & :V2 & 8\tabularnewline
+B & :V2 & 5\tabularnewline
+C & :V2 & 5\tabularnewline
+C & :V2 & 0\tabularnewline
+C & :V2 & 9\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Cast data (from long to wide)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ mDS}
+\NormalTok{    (api/pivot->wider }\AttributeTok{:variable} \AttributeTok{:value}\NormalTok{ \{}\AttributeTok{:fold-fn} \KeywordTok{vec}\NormalTok{\})}
+\NormalTok{    (api/update-columns [}\AttributeTok{:V1} \AttributeTok{:V2}\NormalTok{] (}\KeywordTok{partial} \KeywordTok{map} \KeywordTok{count}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V4 & :V1 & :V2\tabularnewline
+\midrule
+\endhead
+C & 3 & 3\tabularnewline
+B & 3 & 3\tabularnewline
+A & 3 & 3\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ mDS}
+\NormalTok{    (api/pivot->wider }\AttributeTok{:variable} \AttributeTok{:value}\NormalTok{ \{}\AttributeTok{:fold-fn} \KeywordTok{vec}\NormalTok{\})}
+\NormalTok{    (api/update-columns [}\AttributeTok{:V1} \AttributeTok{:V2}\NormalTok{] (}\KeywordTok{partial} \KeywordTok{map}\NormalTok{ dfn/sum)))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V4 & :V1 & :V2\tabularnewline
+\midrule
+\endhead
+C & 6.000 & 14.00\tabularnewline
+B & 9.000 & 13.00\tabularnewline
+A & 0.000 & 14.00\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ mDS}
+\NormalTok{    (api/map-columns }\AttributeTok{:value}\NormalTok{ #(}\KeywordTok{if}\NormalTok{ (}\KeywordTok{>} \VariableTok{%} \DecValTok{5}\NormalTok{) }\AttributeTok{:true} \AttributeTok{:false}\NormalTok{)) }\CommentTok{;; should be just perdicate, but no option to name `false`}
+\NormalTok{    (api/pivot->wider }\AttributeTok{:value} \AttributeTok{:variable}\NormalTok{ \{}\AttributeTok{:fold-fn} \KeywordTok{vec}\NormalTok{\})}
+\NormalTok{    (api/update-columns [}\AttributeTok{:true} \AttributeTok{:false}\NormalTok{] (}\KeywordTok{partial} \KeywordTok{map}\NormalTok{ #(}\KeywordTok{if}\NormalTok{ (}\KeywordTok{sequential?} \VariableTok{%}\NormalTok{) (}\KeywordTok{count} \VariableTok{%}\NormalTok{) }\DecValTok{1}\NormalTok{))))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V4 & :false & :true\tabularnewline
+\midrule
+\endhead
+A & 5 & 1\tabularnewline
+B & 5 & 1\tabularnewline
+C & 5 & 1\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Split
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(api/group-by DS }\AttributeTok{:V4}\NormalTok{ \{}\AttributeTok{:result-type} \AttributeTok{:as-map}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\{``A'' Group: A {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V4 & :V1 & :V2\tabularnewline
+\midrule
+\endhead
+A & 0 & 3\tabularnewline
+A & 0 & 4\tabularnewline
+A & 0 & 7\tabularnewline
+\bottomrule
+\end{longtable}
+
+, ``B'' Group: B {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V4 & :V1 & :V2\tabularnewline
+\midrule
+\endhead
+B & 4 & 0\tabularnewline
+B & 4 & 8\tabularnewline
+B & 1 & 5\tabularnewline
+\bottomrule
+\end{longtable}
+
+, ``C'' Group: C {[}3 3{]}:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+:V4 & :V1 & :V2\tabularnewline
+\midrule
+\endhead
+C & 4 & 5\tabularnewline
+C & 1 & 0\tabularnewline
+C & 1 & 9\tabularnewline
+\bottomrule
+\end{longtable}
+
+\}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Split and transpose a vector/column
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\KeywordTok{->}\NormalTok{ \{}\AttributeTok{:a}\NormalTok{ [}\StringTok{"A:a"} \StringTok{"B:b"} \StringTok{"C:c"}\NormalTok{]\}}
+\NormalTok{    (api/dataset)}
+\NormalTok{    (api/separate-column }\AttributeTok{:a}\NormalTok{ [}\AttributeTok{:V1} \AttributeTok{:V2}\NormalTok{] }\StringTok{":"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\_unnamed {[}3 2{]}:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+:V1 & :V2\tabularnewline
+\midrule
+\endhead
+A & a\tabularnewline
+B & b\tabularnewline
+C & c\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subparagraph{Other}\label{other-1}
 
 \end{document}

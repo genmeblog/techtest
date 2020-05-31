@@ -62,9 +62,7 @@
   ([ds columns-selector {:keys [strategy select-keys]
                          :or {strategy :first}
                          :as options}]
-   (let [selected-keys (when select-keys (column-names (if (grouped? ds)
-                                                         (clojure.core/first (ds :data))
-                                                         ds) select-keys))
+   (let [selected-keys (column-names ds select-keys)
          ufn (unique-by-fn strategy columns-selector selected-keys options)]
 
      (if (grouped? ds)

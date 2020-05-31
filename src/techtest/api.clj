@@ -45,8 +45,9 @@
                          add-or-update-column
                          add-or-update-columns
                          map-columns
+                         update-columns
                          reorder-columns
-                         convert-column-type
+                         convert-types
                          ->array)
 
 (exporter/export-symbols techtest.api.rows

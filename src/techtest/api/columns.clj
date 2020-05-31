@@ -40,10 +40,7 @@
 (defn- get-cols-mapping
   [ds columns-selector columns-mapping]
   (if (fn? columns-mapping)
-    (let [ds (if (grouped? ds)
-               (first (ds :data))
-               ds)
-          col-names (column-names ds columns-selector)]
+    (let [col-names (column-names ds columns-selector)]
       (->> (map columns-mapping col-names)
            (map vector col-names)
            (remove (comp nil? second))
@@ -59,14 +56,12 @@
        (process-group-data ds #(ds/rename-columns % colmap))
        (ds/rename-columns ds colmap)))))
 
-;;
-
 (defn- cycle-column
   [column col-cnt cnt]
   (let [q (quot cnt col-cnt)
         r (rem cnt col-cnt)
         col-name (col/column-name column)
-        tmp-ds (->> (dataset [column])
+        tmp-ds (->> (dataset {col-name column})
                     (repeat q)
                     (apply ds/concat))]
     (if (zero? r)
@@ -113,6 +108,7 @@
   [column-name column size-strategy]
   (cond
     (col/is-column? column) #(fix-column-size fix-column-size-column % column-name column size-strategy)
+    (dtype/reader? column) (prepare-add-or-update-column-fn column-name (col/new-column column-name column) size-strategy)
     (iterable-sequence? column) #(fix-column-size fix-column-size-seq % column-name column size-strategy)
     (fn? column) #(add-or-update-column % column-name (column %) size-strategy)
     :else #(ds/add-or-update-column % column-name (repeat (ds/row-count %) column))))
@@ -135,11 +131,29 @@
   ([ds columns-map size-strategy]
    (reduce-kv (fn [ds k v] (add-or-update-column ds k v size-strategy)) ds columns-map)))
 
+(defn- process-update-columns
+  [ds lst]
+  (reduce (fn [ds [c f]]
+            (ds/update-column ds c f)) ds lst))
+
+(defn update-columns
+  ([ds columns-map] (update-columns ds (keys columns-map) (vals columns-map)))
+  ([ds columns-selector update-functions]
+   (let [col-names (column-names ds columns-selector)
+         fns (if (iterable-sequence? update-functions)
+               (cycle update-functions)
+               (repeat update-functions))
+         lst (map vector col-names fns)]
+     (if (grouped? ds)
+       (process-group-data #(process-update-columns % lst))
+       (process-update-columns ds lst)))))
+
 (defn map-columns
-  [ds column-name columns-selector map-fn]
-  (if (grouped? ds)
-    (process-group-data ds #(map-columns % column-name columns-selector map-fn))
-    (apply ds/column-map ds column-name map-fn (when columns-selector (column-names ds columns-selector)))))
+  ([ds column-name map-fn] (map-columns ds column-name column-name map-fn))
+  ([ds column-name columns-selector map-fn]
+   (if (grouped? ds)
+     (process-group-data ds #(map-columns % column-name columns-selector map-fn))
+     (apply ds/column-map ds column-name map-fn (when columns-selector (column-names ds columns-selector))))))
 
 (defn reorder-columns
   "Reorder columns using column selector(s). When column names are incomplete, the missing will be attached at the end."
@@ -155,29 +169,37 @@
   [ds colname new-type]
   (ds/column-cast ds colname new-type))
 
-(defn convert-column-type
+(defn- process-convert-column-type
+  [ds colname new-type]
+  (if (iterable-sequence? new-type)
+    (try-convert-to-type ds colname new-type)
+    (if (= :object new-type)
+      (try-convert-to-type ds colname [:object identity])
+      (let [col (ds colname)]
+        (condp = (dtype/get-datatype col)
+          :string (ds/add-or-update-column ds colname (col/parse-column new-type col))
+          :object (if (string? (dtype/get-value col 0))
+                    (-> (try-convert-to-type ds colname :string)
+                        (ds/column colname)
+                        (->> (col/parse-column new-type)
+                             (ds/add-or-update-column ds colname)))
+                    (try-convert-to-type ds colname new-type))
+          (try-convert-to-type ds colname new-type))))))
+
+(defn convert-types
   "Convert type of the column to the other type."
   ([ds coltype-map]
    (reduce (fn [ds [colname new-type]]
-             (convert-column-type ds colname new-type)) ds coltype-map))
-  ([ds colname new-type]
-   (if (grouped? ds)
-     (process-group-data ds #(convert-column-type % colname new-type))
-
-     (if (iterable-sequence? new-type)
-       (try-convert-to-type ds colname new-type)
-       (if (= :object new-type)
-         (try-convert-to-type ds colname [:object identity])
-         (let [col (ds colname)]
-           (condp = (dtype/get-datatype col)
-             :string (ds/add-or-update-column ds colname (col/parse-column new-type col))
-             :object (if (string? (dtype/get-value col 0))
-                       (-> (try-convert-to-type ds colname :string)
-                           (ds/column colname)
-                           (->> (col/parse-column new-type)
-                                (ds/add-or-update-column ds colname)))
-                       (try-convert-to-type ds colname new-type))
-             (try-convert-to-type ds colname new-type))))))))
+             (process-convert-column-type ds colname new-type)) ds coltype-map))
+  ([ds columns-selector new-types]
+   (let [colnames (column-names ds columns-selector)
+         types (if (iterable-sequence? new-types)
+                 (cycle new-types)
+                 (repeat new-types))
+         ct (map vector colnames types)]
+     (if (grouped? ds)
+       (process-group-data ds #(convert-types % ct))
+       (convert-types ds ct)))))
 
 (defn ->array
   "Convert numerical column(s) to java array"
@@ -189,5 +211,3 @@
        (if (and datatype (not= datatype (dtype/get-datatype c)))
          (dtype/make-array-of-type datatype c)
          (dtype/->array-copy c))))))
-
-

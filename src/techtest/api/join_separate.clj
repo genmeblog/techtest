@@ -20,9 +20,7 @@
                                        :as options}]
    
    (let [missing-subst-fn #(map (fn [v] (or v missing-subst)) %)
-         col-names (column-names (if (grouped? ds)
-                                   (first (ds :data))
-                                   ds) columns-selector)
+         col-names (column-names ds columns-selector)
          join-function (comp (cond
                                (= :map result-type) #(zipmap col-names %)
                                (= :seq result-type) seq

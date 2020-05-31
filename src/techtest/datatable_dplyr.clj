@@ -154,257 +154,257 @@ DT
                     :V4 (r.base/rep (r/bra 'LETTERS (r/colon 1 3)) 3)))
 
 
-(r.base/class DF)
-;; => [1] "tbl_df"     "tbl"        "data.frame"
+                (r.base/class DF)
+                ;; => [1] "tbl_df"     "tbl"        "data.frame"
 
-DF
-;; => # A tibble: 9 x 4
-;;         V1    V2    V3 V4   
-;;      <dbl> <int> <dbl> <chr>
-;;    1     1     1   0.5 A    
-;;    2     2     2   1   B    
-;;    3     1     3   1.5 C    
-;;    4     2     4   0.5 A    
-;;    5     1     5   1   B    
-;;    6     2     6   1.5 C    
-;;    7     1     7   0.5 A    
-;;    8     2     8   1   B    
-;;    9     1     9   1.5 C
+                DF
+                ;; => # A tibble: 9 x 4
+                ;;         V1    V2    V3 V4   
+                ;;      <dbl> <int> <dbl> <chr>
+                ;;    1     1     1   0.5 A    
+                ;;    2     2     2   1   B    
+                ;;    3     1     3   1.5 C    
+                ;;    4     2     4   0.5 A    
+                ;;    5     1     5   1   B    
+                ;;    6     2     6   1.5 C    
+                ;;    7     1     7   0.5 A    
+                ;;    8     2     8   1   B    
+                ;;    9     1     9   1.5 C
 
-;; ---- tech.ml.dataset
+                ;; ---- tech.ml.dataset
 
-(def DS (ds/name-values-seq->dataset {:V1 (take 9 (cycle [1 2]))
-                                      :V2 (range 1 10)
-                                      :V3 (take 9 (cycle [0.5 1.0 1.5]))
-                                      :V4 (take 9 (cycle [\A \B \C]))}))
+                (def DS (ds/name-values-seq->dataset {:V1 (take 9 (cycle [1 2]))
+                                                      :V2 (range 1 10)
+                                                      :V3 (take 9 (cycle [0.5 1.0 1.5]))
+                                                      :V4 (take 9 (cycle [\A \B \C]))}))
 
-(class DS)
-;; => tech.ml.dataset.impl.dataset.Dataset
-DS
-;; => _unnamed [9 4]:
-;;    | :V1 | :V2 |    :V3 | :V4 |
-;;    |-----+-----+--------+-----|
-;;    |   1 |   1 | 0.5000 |   A |
-;;    |   2 |   2 |  1.000 |   B |
-;;    |   1 |   3 |  1.500 |   C |
-;;    |   2 |   4 | 0.5000 |   A |
-;;    |   1 |   5 |  1.000 |   B |
-;;    |   2 |   6 |  1.500 |   C |
-;;    |   1 |   7 | 0.5000 |   A |
-;;    |   2 |   8 |  1.000 |   B |
-;;    |   1 |   9 |  1.500 |   C |
+                (class DS)
+                ;; => tech.ml.dataset.impl.dataset.Dataset
+                DS
+                ;; => _unnamed [9 4]:
+                ;;    | :V1 | :V2 |    :V3 | :V4 |
+                ;;    |-----+-----+--------+-----|
+                ;;    |   1 |   1 | 0.5000 |   A |
+                ;;    |   2 |   2 |  1.000 |   B |
+                ;;    |   1 |   3 |  1.500 |   C |
+                ;;    |   2 |   4 | 0.5000 |   A |
+                ;;    |   1 |   5 |  1.000 |   B |
+                ;;    |   2 |   6 |  1.500 |   C |
+                ;;    |   1 |   7 | 0.5000 |   A |
+                ;;    |   2 |   8 |  1.000 |   B |
+                ;;    |   1 |   9 |  1.500 |   C |
 
-;; TODO (tech.ml.dataset): char datatype? (now inferred as Object)
-(col/metadata (DS :V4))
-;; => {:name :V4, :size 9, :datatype :object}
+                ;; TODO (tech.ml.dataset): char datatype? (now inferred as Object)
+                (col/metadata (DS :V4))
+                ;; => {:name :V4, :size 9, :datatype :object}
 
-;; # Basic operations
+                ;; # Basic operations
 
-;; ## Filter rows
+                ;; ## Filter rows
 
-;; ### Filter rows using indices
+                ;; ### Filter rows using indices
 
-;; ---- data.table
+                ;; ---- data.table
 
-;; DT[3:4,]
-;; DT[3:4] # same
+                ;; DT[3:4,]
+                ;; DT[3:4] # same
 
-;; we use symbolic call here since there is a bug about interpreting R empty symbol
-(r '(bra ~DT (colon 3 4) nil))
-;; =>    V1 V2  V3 V4
-;;    1:  1  3 1.5  C
-;;    2:  2  4 0.5  A
+                ;; we use symbolic call here since there is a bug about interpreting R empty symbol
+                (r '(bra ~DT (colon 3 4) nil))
+                ;; =>    V1 V2  V3 V4
+                ;;    1:  1  3 1.5  C
+                ;;    2:  2  4 0.5  A
 
-(r/bra DT (r/colon 3 4))
-;; =>    V1 V2  V3 V4
-;;    1:  1  3 1.5  C
-;;    2:  2  4 0.5  A
+                (r/bra DT (r/colon 3 4))
+                ;; =>    V1 V2  V3 V4
+                ;;    1:  1  3 1.5  C
+                ;;    2:  2  4 0.5  A
 
-;; ---- dplyr
+                ;; ---- dplyr
 
-;; DF[3:4,]
-;; slice(DF, 3:4) # same
+                ;; DF[3:4,]
+                ;; slice(DF, 3:4) # same
 
-(r '(bra ~DF (colon 3 4) nil))
-;; => # A tibble: 2 x 4
-;;         V1    V2    V3 V4   
-;;      <dbl> <int> <dbl> <chr>
-;;    1     1     3   1.5 C    
-;;    2     2     4   0.5 A
+                (r '(bra ~DF (colon 3 4) nil))
+                ;; => # A tibble: 2 x 4
+                ;;         V1    V2    V3 V4   
+                ;;      <dbl> <int> <dbl> <chr>
+                ;;    1     1     3   1.5 C    
+                ;;    2     2     4   0.5 A
 
-(dpl/slice DF (r/colon 3 4))
-;; => # A tibble: 2 x 4
-;;         V1    V2    V3 V4   
-;;      <dbl> <int> <dbl> <chr>
-;;    1     1     3   1.5 C    
-;;    2     2     4   0.5 A
+                (dpl/slice DF (r/colon 3 4))
+                ;; => # A tibble: 2 x 4
+                ;;         V1    V2    V3 V4   
+                ;;      <dbl> <int> <dbl> <chr>
+                ;;    1     1     3   1.5 C    
+                ;;    2     2     4   0.5 A
 
-;; ------ tech.ml.datatable
+                ;; ------ tech.ml.datatable
 
-;; NOTE: row ids start at `0`
-(ds/select-rows DS [2 3])
-;; => _unnamed [2 4]:
-;;    | :V1 | :V2 |    :V3 | :V4 |
-;;    |-----+-----+--------+-----|
-;;    |   1 |   3 |  1.500 |   C |
-;;    |   2 |   4 | 0.5000 |   A |
+                ;; NOTE: row ids start at `0`
+                (ds/select-rows DS [2 3])
+                ;; => _unnamed [2 4]:
+                ;;    | :V1 | :V2 |    :V3 | :V4 |
+                ;;    |-----+-----+--------+-----|
+                ;;    |   1 |   3 |  1.500 |   C |
+                ;;    |   2 |   4 | 0.5000 |   A |
 
-;; ### Discard rows using negative indices
+                ;; ### Discard rows using negative indices
 
-;; ---- data.table
+                ;; ---- data.table
 
-;; DT[!3:7,]
-;; DT[-(3:7)] # same
+                ;; DT[!3:7,]
+                ;; DT[-(3:7)] # same
 
-(r '(bra ~DT (! (colon 3 7)) nil))
-;; =>    V1 V2  V3 V4
-;;    1:  1  1 0.5  A
-;;    2:  2  2 1.0  B
-;;    3:  2  8 1.0  B
-;;    4:  1  9 1.5  C
+                (r '(bra ~DT (! (colon 3 7)) nil))
+                ;; =>    V1 V2  V3 V4
+                ;;    1:  1  1 0.5  A
+                ;;    2:  2  2 1.0  B
+                ;;    3:  2  8 1.0  B
+                ;;    4:  1  9 1.5  C
 
-(r/bra DT (r/r- (r/colon 3 7)))
-;; =>    V1 V2  V3 V4
-;;    1:  1  1 0.5  A
-;;    2:  2  2 1.0  B
-;;    3:  2  8 1.0  B
-;;    4:  1  9 1.5  C
+                (r/bra DT (r/r- (r/colon 3 7)))
+                ;; =>    V1 V2  V3 V4
+                ;;    1:  1  1 0.5  A
+                ;;    2:  2  2 1.0  B
+                ;;    3:  2  8 1.0  B
+                ;;    4:  1  9 1.5  C
 
-;; ---- dplyr
+                ;; ---- dplyr
 
-;; DF[-(3:7),]
-;; slice(DF, -(3:7)) # same
+                ;; DF[-(3:7),]
+                ;; slice(DF, -(3:7)) # same
 
-;; TODO (clojisr): (symbolic) unary `-` on `colon` doesn't work (workaround below)
-(r '(bra ~DF (- [(colon 3 7)]) nil))
-;; => # A tibble: 4 x 4
-;;         V1    V2    V3 V4   
-;;      <dbl> <int> <dbl> <chr>
-;;    1     1     1   0.5 A    
-;;    2     2     2   1   B    
-;;    3     2     8   1   B    
-;;    4     1     9   1.5 C
+                ;; TODO (clojisr): (symbolic) unary `-` on `colon` doesn't work (workaround below)
+                (r '(bra ~DF (- [(colon 3 7)]) nil))
+                ;; => # A tibble: 4 x 4
+                ;;         V1    V2    V3 V4   
+                ;;      <dbl> <int> <dbl> <chr>
+                ;;    1     1     1   0.5 A    
+                ;;    2     2     2   1   B    
+                ;;    3     2     8   1   B    
+                ;;    4     1     9   1.5 C
 
-(dpl/slice DF (r/r- (r/colon 3 7)))
-;; => # A tibble: 4 x 4
-;;         V1    V2    V3 V4   
-;;      <dbl> <int> <dbl> <chr>
-;;    1     1     1   0.5 A    
-;;    2     2     2   1   B    
-;;    3     2     8   1   B    
-;;    4     1     9   1.5 C    
+                (dpl/slice DF (r/r- (r/colon 3 7)))
+                ;; => # A tibble: 4 x 4
+                ;;         V1    V2    V3 V4   
+                ;;      <dbl> <int> <dbl> <chr>
+                ;;    1     1     1   0.5 A    
+                ;;    2     2     2   1   B    
+                ;;    3     2     8   1   B    
+                ;;    4     1     9   1.5 C    
 
-;; ---- tech.ml.dataset
+                ;; ---- tech.ml.dataset
 
-(ds/drop-rows DS (range 2 7))
-;; => _unnamed [4 4]:
-;;    | :V1 | :V2 |    :V3 | :V4 |
-;;    |-----+-----+--------+-----|
-;;    |   1 |   1 | 0.5000 |   A |
-;;    |   2 |   2 |  1.000 |   B |
-;;    |   2 |   8 |  1.000 |   B |
-;;    |   1 |   9 |  1.500 |   C |
+                (ds/drop-rows DS (range 2 7))
+                ;; => _unnamed [4 4]:
+                ;;    | :V1 | :V2 |    :V3 | :V4 |
+                ;;    |-----+-----+--------+-----|
+                ;;    |   1 |   1 | 0.5000 |   A |
+                ;;    |   2 |   2 |  1.000 |   B |
+                ;;    |   2 |   8 |  1.000 |   B |
+                ;;    |   1 |   9 |  1.500 |   C |
 
-;; ### Filter rows using a logical expression
+                ;; ### Filter rows using a logical expression
 
-;; ---- data.table
+                ;; ---- data.table
 
-;; DT[V2 > 5]
-;; DT[V4 %chin% c("A", "C")] # fast %in% for character
+                ;; DT[V2 > 5]
+                ;; DT[V4 %chin% c("A", "C")] # fast %in% for character
 
-(r/bra DT '(> V2 5))
-;; =>    V1 V2  V3 V4
-;;    1:  2  6 1.5  C
-;;    2:  1  7 0.5  A
-;;    3:  2  8 1.0  B
-;;    4:  1  9 1.5  C
+                (r/bra DT '(> V2 5))
+                ;; =>    V1 V2  V3 V4
+                ;;    1:  2  6 1.5  C
+                ;;    2:  1  7 0.5  A
+                ;;    3:  2  8 1.0  B
+                ;;    4:  1  9 1.5  C
 
-;; TODO (clojisr): add %chin% as binary operation
-(r/bra DT '((rsymbol "%chin%") V4 ["A" "C"]))
-;; =>    V1 V2  V3 V4
-;;    1:  1  1 0.5  A
-;;    2:  1  3 1.5  C
-;;    3:  2  4 0.5  A
-;;    4:  2  6 1.5  C
-;;    5:  1  7 0.5  A
-;;    6:  1  9 1.5  C
+                ;; TODO (clojisr): add %chin% as binary operation
+                (r/bra DT '((rsymbol "%chin%") V4 ["A" "C"]))
+                ;; =>    V1 V2  V3 V4
+                ;;    1:  1  1 0.5  A
+                ;;    2:  1  3 1.5  C
+                ;;    3:  2  4 0.5  A
+                ;;    4:  2  6 1.5  C
+                ;;    5:  1  7 0.5  A
+                ;;    6:  1  9 1.5  C
 
-;; ---- dplyr
+                ;; ---- dplyr
 
-;; filter(DF, V2 > 5)
-;; filter(DF, V4 %in% c("A", "C"))
+                ;; filter(DF, V2 > 5)
+                ;; filter(DF, V4 %in% c("A", "C"))
 
-(dpl/filter DF '(> V2 5))
-;; => # A tibble: 4 x 4
-;;         V1    V2    V3 V4   
-;;      <dbl> <int> <dbl> <chr>
-;;    1     2     6   1.5 C    
-;;    2     1     7   0.5 A    
-;;    3     2     8   1   B    
-;;    4     1     9   1.5 C
+                (dpl/filter DF '(> V2 5))
+                ;; => # A tibble: 4 x 4
+                ;;         V1    V2    V3 V4   
+                ;;      <dbl> <int> <dbl> <chr>
+                ;;    1     2     6   1.5 C    
+                ;;    2     1     7   0.5 A    
+                ;;    3     2     8   1   B    
+                ;;    4     1     9   1.5 C
 
-(dpl/filter DF '(%in% V4 ["A" "C"]))
-;; => # A tibble: 6 x 4
-;;         V1    V2    V3 V4   
-;;      <dbl> <int> <dbl> <chr>
-;;    1     1     1   0.5 A    
-;;    2     1     3   1.5 C    
-;;    3     2     4   0.5 A    
-;;    4     2     6   1.5 C    
-;;    5     1     7   0.5 A    
-;;    6     1     9   1.5 C
+                (dpl/filter DF '(%in% V4 ["A" "C"]))
+                ;; => # A tibble: 6 x 4
+                ;;         V1    V2    V3 V4   
+                ;;      <dbl> <int> <dbl> <chr>
+                ;;    1     1     1   0.5 A    
+                ;;    2     1     3   1.5 C    
+                ;;    3     2     4   0.5 A    
+                ;;    4     2     6   1.5 C    
+                ;;    5     1     7   0.5 A    
+                ;;    6     1     9   1.5 C
 
-;; ---- tech.ml.dataset
+                ;; ---- tech.ml.dataset
 
-(ds/filter-column #(> ^long % 5) :V2 DS)
-;; => _unnamed [4 4]:
-;;    | :V1 | :V2 |    :V3 | :V4 |
-;;    |-----+-----+--------+-----|
-;;    |   2 |   6 |  1.500 |   C |
-;;    |   1 |   7 | 0.5000 |   A |
-;;    |   2 |   8 |  1.000 |   B |
-;;    |   1 |   9 |  1.500 |   C |
+                (ds/filter-column #(> ^long % 5) :V2 DS)
+                ;; => _unnamed [4 4]:
+                ;;    | :V1 | :V2 |    :V3 | :V4 |
+                ;;    |-----+-----+--------+-----|
+                ;;    |   2 |   6 |  1.500 |   C |
+                ;;    |   1 |   7 | 0.5000 |   A |
+                ;;    |   2 |   8 |  1.000 |   B |
+                ;;    |   1 |   9 |  1.500 |   C |
 
-(ds/filter-column #{\A \C} :V4 DS)
-;; => _unnamed [6 4]:
-;;    | :V1 | :V2 |    :V3 | :V4 |
-;;    |-----+-----+--------+-----|
-;;    |   1 |   1 | 0.5000 |   A |
-;;    |   1 |   3 |  1.500 |   C |
-;;    |   2 |   4 | 0.5000 |   A |
-;;    |   2 |   6 |  1.500 |   C |
-;;    |   1 |   7 | 0.5000 |   A |
-;;    |   1 |   9 |  1.500 |   C |
+                (ds/filter-column #{\A \C} :V4 DS)
+                ;; => _unnamed [6 4]:
+                ;;    | :V1 | :V2 |    :V3 | :V4 |
+                ;;    |-----+-----+--------+-----|
+                ;;    |   1 |   1 | 0.5000 |   A |
+                ;;    |   1 |   3 |  1.500 |   C |
+                ;;    |   2 |   4 | 0.5000 |   A |
+                ;;    |   2 |   6 |  1.500 |   C |
+                ;;    |   1 |   7 | 0.5000 |   A |
+                ;;    |   1 |   9 |  1.500 |   C |
 
-;; ### Filter rows using multiple conditions
+                ;; ### Filter rows using multiple conditions
 
-;; ---- data.table
+                ;; ---- data.table
 
-;; DT[V1 == 1 & V4 == "A"]
+                ;; DT[V1 == 1 & V4 == "A"]
 
-(r/bra DT '(& (== V1 1)
-              (== V4 "A")))
-;; =>    V1 V2  V3 V4
-;;    1:  1  1 0.5  A
-;;    2:  1  7 0.5  A
+                (r/bra DT '(& (== V1 1)
+                              (== V4 "A")))
+                ;; =>    V1 V2  V3 V4
+                ;;    1:  1  1 0.5  A
+                ;;    2:  1  7 0.5  A
 
-;; ---- dplyr
+                ;; ---- dplyr
 
-;; filter(DF, V1 == 1, V4 == "A")
+                ;; filter(DF, V1 == 1, V4 == "A")
 
-(dpl/filter DF '(== V1 1) '(== V4 "A"))
-;; => # A tibble: 2 x 4
-;;         V1    V2    V3 V4   
-;;      <dbl> <int> <dbl> <chr>
-;;    1     1     1   0.5 A    
-;;    2     1     7   0.5 A
+                (dpl/filter DF '(== V1 1) '(== V4 "A"))
+                ;; => # A tibble: 2 x 4
+                ;;         V1    V2    V3 V4   
+                ;;      <dbl> <int> <dbl> <chr>
+                ;;    1     1     1   0.5 A    
+                ;;    2     1     7   0.5 A
 
-;; ---- tech.ml.dataset
+                ;; ---- tech.ml.dataset
 
-(ds/filter #(and (= (:V1 %) 1)
-                 (= (:V4 %) \A)) DS)
-;; => _unnamed [2 4]:
-;;    | :V1 | :V2 |    :V3 | :V4 |
+                (ds/filter #(and (= (:V1 %) 1)
+                                 (= (:V4 %) \A)) DS)
+                ;; => _unnamed [2 4]:
+                ;;    | :V1 | :V2 |    :V3 | :V4 |
 ;;    |-----+-----+--------+-----|
 ;;    |   1 |   1 | 0.5000 |   A |
 ;;    |   1 |   7 | 0.5000 |   A |

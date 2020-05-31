@@ -29,9 +29,7 @@
 (defn unroll
   ([ds columns-selector] (unroll ds columns-selector nil))
   ([ds columns-selector options]
-   (let [colnames (column-names (if (grouped? ds)
-                                  (first (ds :data))
-                                  ds) columns-selector)
+   (let [colnames (column-names ds columns-selector)
          colnames-set (set colnames)]
      (if (grouped? ds)
        (process-group-data ds #(process-unroll % colnames-set colnames options))

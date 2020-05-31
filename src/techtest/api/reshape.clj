@@ -6,7 +6,7 @@
             [clojure.string :as str]
 
             [techtest.api.utils :refer [iterable-sequence? column-names]]
-            [techtest.api.columns :refer [drop-columns convert-column-type
+            [techtest.api.columns :refer [drop-columns convert-types
                                           reorder-columns rename-columns select-columns]]
             [techtest.api.join-separate :refer [join-columns separate-column]]
             [techtest.api.unique-by :refer [strategy-fold unique-by]]
@@ -64,7 +64,7 @@
                                  (apply ds/concat))
                             (ds/metadata ds)) final-ds
        (if drop-missing? (drop-missing final-ds cols-to-add) final-ds)
-       (if datatypes (convert-column-type final-ds datatypes) final-ds)
+       (if datatypes (convert-types final-ds datatypes) final-ds)
        (reorder-columns final-ds (ds/column-names ds-template) (remove nil? target-columns))))))
 
 (defn- drop-join-leftovers
@@ -79,10 +79,12 @@
 
 (defn- process-column-name
   [concat-columns-with names]
-  (cond
-    (string? concat-columns-with) (str/join concat-columns-with names)
-    (fn? concat-columns-with) (concat-columns-with names)
-    :else names))
+  (if (> (count names) 1)
+    (cond
+      (string? concat-columns-with) (str/join concat-columns-with names)
+      (fn? concat-columns-with) (concat-columns-with names)
+      :else names)
+    (first names)))
 
 (defn- process-target-name
   [value concat-value-with col-name]

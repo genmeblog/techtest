@@ -50,6 +50,17 @@
          (map (into {} m) vs))))))
 
 ;;
+(def ^:private type-sets
+  {:datetime #{:local-date :local-time :local-date-time :instant :duration}
+   :integer #{:int16 :int32 :int64}
+   :float #{:float32 :float64}
+   :numerical #{:int16 :int32 :int64 :float32 :float64}})
+
+(defn prepare-datatype-set
+  [datatype-columns-selector]
+  (let [k (-> datatype-columns-selector name keyword)]
+    (get type-sets k #{k})))
+
 
 (defn- filter-column-names
   "Filter column names"
@@ -64,15 +75,19 @@
          (map :name))))
 
 (defn column-names
-  ([ds] (ds/column-names ds))
+  ([ds] (column-names ds :all))
   ([ds columns-selector] (column-names ds columns-selector :name))
   ([ds columns-selector meta-field]
-   (if (= :all columns-selector)
-     (ds/column-names ds)
-     (let [csel-fn (cond
-                     (map? columns-selector) (set (keys columns-selector))
-                     (iterable-sequence? columns-selector) (set columns-selector)
-                     (instance? java.util.regex.Pattern columns-selector) #(re-matches columns-selector (str %))
-                     (fn? columns-selector) columns-selector
-                     :else #{columns-selector})]
-       (filter-column-names ds csel-fn meta-field)))))
+   (when columns-selector
+     (let [ds (if (:grouped? (meta ds)) (first (ds :data)) ds)]
+       (cond (= :all columns-selector) (ds/column-names ds)
+             (and (keyword? columns-selector)
+                  (= "type" (namespace columns-selector))) (column-names ds (prepare-datatype-set columns-selector) :datatype)
+             :else (let [csel-fn (cond
+                                   (set? columns-selector) columns-selector
+                                   (map? columns-selector) (set (keys columns-selector))
+                                   (iterable-sequence? columns-selector) (set columns-selector)
+                                   (instance? java.util.regex.Pattern columns-selector) #(re-matches columns-selector (str %))
+                                   (fn? columns-selector) columns-selector
+                                   :else #{columns-selector})]
+                     (filter-column-names ds csel-fn meta-field)))))))
