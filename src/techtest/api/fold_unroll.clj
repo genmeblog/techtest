@@ -18,13 +18,13 @@
                             (let [opts (assoc options
                                               :datatype (get-in options [:datatypes colname] :object))]
                               [colname (-> ds
-                                           (select-columns (complement (disj colnames-set colname)))
+                                           (select-columns (complement (partial contains? (disj colnames-set colname))))
                                            (ds/unroll-column colname opts))])) colnames)]
     (-> (fn [[_ curr] [n uds]]
           [_ (ds/add-column curr (uds n))])
         (reduce unrolled-dss)
         (second)
-        (reorder-columns (complement colnames-set)))))
+        (reorder-columns (complement (partial contains? colnames-set))))))
 
 (defn unroll
   ([ds columns-selector] (unroll ds columns-selector nil))

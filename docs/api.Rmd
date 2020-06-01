@@ -4730,10 +4730,9 @@ Cast data (from long to wide)
 
 ```{clojure results="asis"}
 (-> mDS
-    (api/map-columns :value #(if (> % 5) :true :false)) ;; should be just perdicate, but no option to name `false`
+    (api/map-columns :value #(> % 5))
     (api/pivot->wider :value :variable {:fold-fn vec})
-    (api/update-columns [:true :false] (partial map #(if (sequential? %) (count %) 1))))
-
+    (api/update-columns [true false] (partial map #(if (sequential? %) (count %) 1))))
 ```
 
 ---
@@ -4755,3 +4754,8 @@ Split and transpose a vector/column
 ```
 
 ##### Other
+
+Skipped
+
+#### Join/Bind data sets
+

@@ -22,7 +22,11 @@
    (let [[group-by-selector target-names] (if (fn? columns-selector)
                                             [columns-selector (ds/column-names ds)]
                                             (let [group-by-names (column-names ds columns-selector)]
-                                              [group-by-names (column-names ds (complement (set group-by-names)))]))
+                                              [group-by-names (->> group-by-names
+                                                                   (set)
+                                                                   (partial contains?)
+                                                                   (complement)
+                                                                   (column-names ds))]))
          fold-fn (or fold-fn vec)]
      (-> (techtest.api.group-by/group-by ds group-by-selector)
          (process-group-data (fn [ds]

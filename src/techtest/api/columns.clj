@@ -161,7 +161,10 @@
   (let [selected-cols (->> columns-selectors
                            (map (partial column-names ds))
                            (apply clojure.core/concat (column-names ds columns-selector)))
-        rest-cols (column-names ds (complement (set selected-cols)))]
+        rest-cols (column-names ds (->> selected-cols
+                                        (set)
+                                        (partial contains?)
+                                        (complement)))]
     (ds/select-columns ds (clojure.core/concat selected-cols rest-cols))))
 ;;
 

@@ -111,7 +111,11 @@
                    (drop-join-leftovers join-name))] ;; drop unnecessary leftovers
       (if (> (ds/row-count data) starting-ds-count) ;; in case when there were multiple values, create vectors
         (if fold-fn
-          (strategy-fold data (column-names data (complement (set target-names))) fold-fn {:add-group-as-column true})
+          (strategy-fold data (->> target-names
+                                   (set)
+                                   (partial contains?)
+                                   (complement)
+                                   (column-names data)) fold-fn {:add-group-as-column true})
           (do (println "WARNING: multiple values in result detected, data should be rolled in.")
               data))
         data))))
@@ -125,6 +129,7 @@
          single-value? (= (count value-names) 1) ;; maybe this is one column? (different name creation rely on this)
          rest-cols (->> (clojure.core/concat col-names value-names)
                         (set)
+                        (partial contains?)
                         (complement)
                         (column-names ds)) ;; the columns used in join
          join-on-single? (= (count rest-cols) 1) ;; mayve this is one column? (different join column creation)

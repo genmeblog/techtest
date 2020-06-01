@@ -78,16 +78,17 @@
   ([ds] (column-names ds :all))
   ([ds columns-selector] (column-names ds columns-selector :name))
   ([ds columns-selector meta-field]
-   (when columns-selector
+   (when-not (nil? columns-selector)
      (let [ds (if (:grouped? (meta ds)) (first (ds :data)) ds)]
        (cond (= :all columns-selector) (ds/column-names ds)
              (and (keyword? columns-selector)
                   (= "type" (namespace columns-selector))) (column-names ds (prepare-datatype-set columns-selector) :datatype)
              :else (let [csel-fn (cond
-                                   (set? columns-selector) columns-selector
+                                   (set? columns-selector) #(contains? columns-selector %)
                                    (map? columns-selector) (set (keys columns-selector))
                                    (iterable-sequence? columns-selector) (set columns-selector)
                                    (instance? java.util.regex.Pattern columns-selector) #(re-matches columns-selector (str %))
                                    (fn? columns-selector) columns-selector
-                                   :else #{columns-selector})]
+                                   :else #{columns-selector})
+                         csel-fn (if (set? csel-fn) #(contains? csel-fn %) csel-fn)]
                      (filter-column-names ds csel-fn meta-field)))))))
