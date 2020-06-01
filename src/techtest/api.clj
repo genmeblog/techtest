@@ -42,8 +42,8 @@
                          select-columns
                          drop-columns
                          rename-columns
-                         add-or-update-column
-                         add-or-update-columns
+                         add-or-replace-column
+                         add-or-replace-columns
                          map-columns
                          update-columns
                          reorder-columns
@@ -98,7 +98,9 @@
                          anti-join
                          intersect
                          difference
-                         union)
+                         union
+                         bind
+                         append)
 
 ;;
 

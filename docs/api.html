@@ -1264,17 +1264,17 @@ precipitation
 <hr />
 <p>Rows as sequence of sequences</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">take</span> <span class="dv">2</span> (api/rows ds))</code></pre></div>
-<pre><code>([#object[java.time.LocalDate 0x1277e49 &quot;2012-01-01&quot;] 0.0 12.8 5.0 4.7 &quot;drizzle&quot;] [#object[java.time.LocalDate 0x5ce3d5ee &quot;2012-01-02&quot;] 10.9 10.6 2.8 4.5 &quot;rain&quot;])</code></pre>
+<pre><code>([#object[java.time.LocalDate 0x91320ec &quot;2012-01-01&quot;] 0.0 12.8 5.0 4.7 &quot;drizzle&quot;] [#object[java.time.LocalDate 0x7e02d63a &quot;2012-01-02&quot;] 10.9 10.6 2.8 4.5 &quot;rain&quot;])</code></pre>
 <hr />
 <p>Rows as sequence of maps</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(clojure.pprint/pprint (<span class="kw">take</span> <span class="dv">2</span> (api/rows ds <span class="at">:as-maps</span>)))</code></pre></div>
-<pre><code>({&quot;date&quot; #object[java.time.LocalDate 0x664cdf1a &quot;2012-01-01&quot;],
+<pre><code>({&quot;date&quot; #object[java.time.LocalDate 0x3114efc7 &quot;2012-01-01&quot;],
   &quot;precipitation&quot; 0.0,
   &quot;temp_min&quot; 5.0,
   &quot;weather&quot; &quot;drizzle&quot;,
   &quot;temp_max&quot; 12.8,
   &quot;wind&quot; 4.7}
- {&quot;date&quot; #object[java.time.LocalDate 0x38267da &quot;2012-01-02&quot;],
+ {&quot;date&quot; #object[java.time.LocalDate 0x5f7d26e3 &quot;2012-01-02&quot;],
   &quot;precipitation&quot; 10.9,
   &quot;temp_min&quot; 2.8,
   &quot;weather&quot; &quot;rain&quot;,
@@ -3651,7 +3651,7 @@ precipitation
 <th>v1</th>
 <th>v2</th>
 <th>[1 2 3]</th>
-<th><a href="mailto:java.lang.Object@58ef2514">java.lang.Object@58ef2514</a></th>
+<th><a href="mailto:java.lang.Object@7825b786">java.lang.Object@7825b786</a></th>
 </tr>
 </thead>
 <tbody>
@@ -3867,7 +3867,7 @@ precipitation
 <th>v1</th>
 <th>v2</th>
 <th>[1 2 3]</th>
-<th><a href="mailto:java.lang.Object@1c9bd4c5">java.lang.Object@1c9bd4c5</a></th>
+<th><a href="mailto:java.lang.Object@54b2f58">java.lang.Object@54b2f58</a></th>
 </tr>
 </thead>
 <tbody>
@@ -3910,7 +3910,7 @@ precipitation
 <th>v1</th>
 <th>v2</th>
 <th>[1 2 3]</th>
-<th><a href="mailto:java.lang.Object@1c9bd4c5">java.lang.Object@1c9bd4c5</a></th>
+<th><a href="mailto:java.lang.Object@54b2f58">java.lang.Object@54b2f58</a></th>
 </tr>
 </thead>
 <tbody>
@@ -3944,7 +3944,7 @@ precipitation
 </div>
 <div id="add-or-update" class="section level4">
 <h4>Add or update</h4>
-<p>To add (or update existing) column call <code>add-or-update-column</code> function. Function accepts:</p>
+<p>To add (or replace existing) column call <code>add-or-replace-column</code> function. Function accepts:</p>
 <ul>
 <li><code>ds</code> - a dataset</li>
 <li><code>column-name</code> - if it's existing column name, column will be replaced</li>
@@ -3959,7 +3959,7 @@ precipitation
 <p>Function works on grouped dataset.</p>
 <hr />
 <p>Add single value as column</p>
-<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-update-column DS <span class="at">:V5</span> <span class="st">&quot;X&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-replace-column DS <span class="at">:V5</span> <span class="st">&quot;X&quot;</span>)</code></pre></div>
 <p>_unnamed [9 5]:</p>
 <table>
 <thead>
@@ -4039,7 +4039,7 @@ precipitation
 </table>
 <hr />
 <p>Replace one column (column is trimmed)</p>
-<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-update-column DS <span class="at">:V1</span> (<span class="kw">repeatedly</span> <span class="kw">rand</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-replace-column DS <span class="at">:V1</span> (<span class="kw">repeatedly</span> <span class="kw">rand</span>))</code></pre></div>
 <p>_unnamed [9 4]:</p>
 <table>
 <thead>
@@ -4052,55 +4052,55 @@ precipitation
 </thead>
 <tbody>
 <tr class="odd">
-<td>0.9921</td>
+<td>0.5903</td>
 <td>1</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
-<td>0.5468</td>
+<td>0.2797</td>
 <td>2</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="odd">
-<td>0.7807</td>
+<td>0.2616</td>
 <td>3</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="even">
-<td>0.6651</td>
+<td>0.4338</td>
 <td>4</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="odd">
-<td>0.2515</td>
+<td>0.3306</td>
 <td>5</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="even">
-<td>0.7127</td>
+<td>0.6609</td>
 <td>6</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="odd">
-<td>0.3046</td>
+<td>0.8483</td>
 <td>7</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
-<td>0.7595</td>
+<td>0.8286</td>
 <td>8</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="odd">
-<td>0.9921</td>
+<td>0.6581</td>
 <td>9</td>
 <td>1.500</td>
 <td>C</td>
@@ -4109,7 +4109,7 @@ precipitation
 </table>
 <hr />
 <p>Copy column</p>
-<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-update-column DS <span class="at">:V5</span> (DS <span class="at">:V1</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-replace-column DS <span class="at">:V5</span> (DS <span class="at">:V1</span>))</code></pre></div>
 <p>_unnamed [9 5]:</p>
 <table>
 <thead>
@@ -4189,7 +4189,7 @@ precipitation
 </table>
 <hr />
 <p>When function is used, argument is whole dataset and the result should be column, sequence or single value</p>
-<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-update-column DS <span class="at">:row-count</span> api/row-count) </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-replace-column DS <span class="at">:row-count</span> api/row-count) </code></pre></div>
 <p>_unnamed [9 5]:</p>
 <table>
 <thead>
@@ -4271,7 +4271,7 @@ precipitation
 <p>Above example run on grouped dataset, applies function on each group separately.</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
     (api/group-by <span class="at">:V1</span>)
-    (api/add-or-update-column <span class="at">:row-count</span> api/row-count)
+    (api/add-or-replace-column <span class="at">:row-count</span> api/row-count)
     (api/ungroup))</code></pre></div>
 <p>_unnamed [9 5]:</p>
 <table>
@@ -4352,7 +4352,7 @@ precipitation
 </table>
 <hr />
 <p>When column which is added is longer than row count in dataset, column is trimmed. When column is shorter, it's cycled or missing values are appended.</p>
-<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-update-column DS <span class="at">:V5</span> [<span class="at">:r</span> <span class="at">:b</span>])</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-replace-column DS <span class="at">:V5</span> [<span class="at">:r</span> <span class="at">:b</span>])</code></pre></div>
 <p>_unnamed [9 5]:</p>
 <table>
 <thead>
@@ -4430,7 +4430,7 @@ precipitation
 </tr>
 </tbody>
 </table>
-<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-update-column DS <span class="at">:V5</span> [<span class="at">:r</span> <span class="at">:b</span>] <span class="at">:na</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-replace-column DS <span class="at">:V5</span> [<span class="at">:r</span> <span class="at">:b</span>] <span class="at">:na</span>)</code></pre></div>
 <p>_unnamed [9 5]:</p>
 <table>
 <thead>
@@ -4510,14 +4510,14 @@ precipitation
 </table>
 <p>Exception is thrown when <code>:strict</code> strategy is used and column size is not equal row count</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">try</span>
-  (api/add-or-update-column DS <span class="at">:V5</span> [<span class="at">:r</span> <span class="at">:b</span>] <span class="at">:strict</span>)
+  (api/add-or-replace-column DS <span class="at">:V5</span> [<span class="at">:r</span> <span class="at">:b</span>] <span class="at">:strict</span>)
   (<span class="kw">catch</span> Exception <span class="kw">e</span> (<span class="kw">str</span> <span class="st">&quot;Exception caught: &quot;</span>(ex-message <span class="kw">e</span>))))</code></pre></div>
 <pre><code>&quot;Exception caught: Column size (2) should be exactly the same as dataset row count (9)&quot;</code></pre>
 <hr />
 <p>Tha same applies for grouped dataset</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
     (api/group-by <span class="at">:V3</span>)
-    (api/add-or-update-column <span class="at">:V5</span> [<span class="at">:r</span> <span class="at">:b</span>] <span class="at">:na</span>)
+    (api/add-or-replace-column <span class="at">:V5</span> [<span class="at">:r</span> <span class="at">:b</span>] <span class="at">:na</span>)
     (api/ungroup))</code></pre></div>
 <p>_unnamed [9 5]:</p>
 <table>
@@ -4600,7 +4600,7 @@ precipitation
 <p>Let's use other column to fill groups</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
     (api/group-by <span class="at">:V3</span>)
-    (api/add-or-update-column <span class="at">:V5</span> (DS <span class="at">:V2</span>))
+    (api/add-or-replace-column <span class="at">:V5</span> (DS <span class="at">:V2</span>))
     (api/ungroup))</code></pre></div>
 <p>_unnamed [9 5]:</p>
 <table>
@@ -4680,8 +4680,8 @@ precipitation
 </tbody>
 </table>
 <hr />
-<p>In case you want to add or update several columns you can call <code>add-or-update-columns</code> and provide map where keys are column names, vals are columns.</p>
-<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-update-columns DS {<span class="at">:V1</span> #(<span class="kw">map</span> <span class="kw">inc</span> (<span class="va">%</span> <span class="at">:V1</span>))
+<p>In case you want to add or update several columns you can call <code>add-or-replace-columns</code> and provide map where keys are column names, vals are columns.</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/add-or-replace-columns DS {<span class="at">:V1</span> #(<span class="kw">map</span> <span class="kw">inc</span> (<span class="va">%</span> <span class="at">:V1</span>))
                                <span class="at">:V5</span> #(<span class="kw">map</span> (<span class="kw">comp</span> <span class="kw">keyword</span> <span class="kw">str</span>) (<span class="va">%</span> <span class="at">:V4</span>))
                                <span class="at">:V6</span> <span class="dv">11</span>})</code></pre></div>
 <p>_unnamed [9 6]:</p>
@@ -4942,55 +4942,55 @@ precipitation
 <tbody>
 <tr class="odd">
 <td>1</td>
-<td>6</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>3</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>5</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>7</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>8</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="odd">
-<td>1</td>
 <td>9</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
 <td>2</td>
+<td>6</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>8</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>7</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
 <td>2</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="odd">
 <td>1</td>
-<td>1</td>
+<td>4</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
@@ -5620,19 +5620,19 @@ precipitation
 <hr />
 <p>Double array conversion.</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/-&gt;array DS <span class="at">:V1</span>)</code></pre></div>
-<pre><code>#object[&quot;[J&quot; 0x35d4a42d &quot;[J@35d4a42d&quot;]</code></pre>
+<pre><code>#object[&quot;[J&quot; 0x7b2e0d2d &quot;[J@7b2e0d2d&quot;]</code></pre>
 <hr />
 <p>Function also works on grouped dataset</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
     (api/group-by <span class="at">:V3</span>)
     (api/-&gt;array <span class="at">:V2</span>))</code></pre></div>
-<pre><code>(#object[&quot;[J&quot; 0x6bd515f0 &quot;[J@6bd515f0&quot;] #object[&quot;[J&quot; 0x7f8e8298 &quot;[J@7f8e8298&quot;] #object[&quot;[J&quot; 0x3837099c &quot;[J@3837099c&quot;])</code></pre>
+<pre><code>(#object[&quot;[J&quot; 0x1bc56f49 &quot;[J@1bc56f49&quot;] #object[&quot;[J&quot; 0x458099cc &quot;[J@458099cc&quot;] #object[&quot;[J&quot; 0x24807ccb &quot;[J@24807ccb&quot;])</code></pre>
 <hr />
 <p>You can also cast the type to the other one (if casting is possible):</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/-&gt;array DS <span class="at">:V4</span> <span class="at">:string</span>)
 (api/-&gt;array DS <span class="at">:V1</span> <span class="at">:float32</span>)</code></pre></div>
-<pre><code>#object[&quot;[Ljava.lang.String;&quot; 0x5c612a9a &quot;[Ljava.lang.String;@5c612a9a&quot;]
-#object[&quot;[F&quot; 0x4765c46b &quot;[F@4765c46b&quot;]</code></pre>
+<pre><code>#object[&quot;[Ljava.lang.String;&quot; 0x66674ae0 &quot;[Ljava.lang.String;@66674ae0&quot;]
+#object[&quot;[F&quot; 0x7d63c05e &quot;[F@7d63c05e&quot;]</code></pre>
 </div>
 </div>
 <div id="rows" class="section level3">
@@ -5644,7 +5644,7 @@ precipitation
 <li>filter by predicate (argument is row as a map)</li>
 </ul>
 <p>When predicate is used you may want to limit columns passed to the function (<code>select-keys</code> option).</p>
-<p>Additionally you may want to precalculate some values which will be visible for predicate as additional columns. It's done internally by calling <code>add-or-update-columns</code> on a dataset. <code>:pre</code> is used as a column definitions.</p>
+<p>Additionally you may want to precalculate some values which will be visible for predicate as additional columns. It's done internally by calling <code>add-or-replace-columns</code> on a dataset. <code>:pre</code> is used as a column definitions.</p>
 <div id="select-1" class="section level4">
 <h4>Select</h4>
 <p>Select fourth row</p>
@@ -5957,10 +5957,10 @@ precipitation
 </thead>
 <tbody>
 <tr class="odd">
-<td>1</td>
-<td>3</td>
-<td>1.500</td>
-<td>C</td>
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
 </tr>
 </tbody>
 </table>
@@ -6002,6 +6002,30 @@ precipitation
 <tbody>
 <tr class="odd">
 <td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
 <td>7</td>
 <td>0.5000</td>
 <td>A</td>
@@ -6014,33 +6038,9 @@ precipitation
 </tr>
 <tr class="odd">
 <td>2</td>
-<td>6</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="even">
-<td>2</td>
 <td>2</td>
 <td>1.000</td>
 <td>B</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>9</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>2</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
 </tr>
 <tr class="even">
 <td>1</td>
@@ -6049,10 +6049,10 @@ precipitation
 <td>A</td>
 </tr>
 <tr class="odd">
-<td>2</td>
-<td>8</td>
-<td>1.000</td>
-<td>B</td>
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 </tbody>
 </table>
@@ -6071,34 +6071,34 @@ precipitation
 </thead>
 <tbody>
 <tr class="odd">
-<td>1</td>
-<td>9</td>
+<td>2</td>
+<td>6</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="even">
 <td>1</td>
-<td>9</td>
+<td>3</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="odd">
-<td>1</td>
-<td>9</td>
+<td>2</td>
+<td>6</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
 <tr class="even">
-<td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
 </tr>
 <tr class="odd">
-<td>1</td>
-<td>7</td>
-<td>0.5000</td>
-<td>A</td>
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 </tbody>
 </table>
@@ -6123,6 +6123,18 @@ precipitation
 <td>C</td>
 </tr>
 <tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
 <td>1</td>
 <td>9</td>
 <td>1.500</td>
@@ -6130,21 +6142,9 @@ precipitation
 </tr>
 <tr class="odd">
 <td>1</td>
-<td>7</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>2</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>8</td>
-<td>1.000</td>
-<td>B</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 </tbody>
 </table>
@@ -6210,25 +6210,25 @@ precipitation
 <tbody>
 <tr class="odd">
 <td>1</td>
-<td>5</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>8</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
 <tr class="even">
 <td>1</td>
 <td>7</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>1</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
@@ -6246,21 +6246,21 @@ precipitation
 </tr>
 <tr class="odd">
 <td>2</td>
-<td>8</td>
-<td>1.000</td>
-<td>B</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
 </tr>
 <tr class="even">
-<td>2</td>
-<td>2</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
 <td>1</td>
 <td>9</td>
 <td>1.500</td>
 <td>C</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
 </tr>
 </tbody>
 </table>
@@ -6541,38 +6541,50 @@ precipitation
 </thead>
 <tbody>
 <tr class="odd">
-<td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>7</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
 <td>2</td>
 <td>4</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
+<tr class="even">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
 <tr class="odd">
 <td>1</td>
-<td>7</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
 <tr class="even">
 <td>2</td>
-<td>8</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
@@ -6584,19 +6596,7 @@ precipitation
 </tr>
 <tr class="even">
 <td>2</td>
-<td>8</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>5</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="even">
 <td>2</td>
-<td>8</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
@@ -6607,8 +6607,8 @@ precipitation
 <td>C</td>
 </tr>
 <tr class="even">
-<td>1</td>
-<td>9</td>
+<td>2</td>
+<td>6</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
@@ -6625,8 +6625,8 @@ precipitation
 <td>C</td>
 </tr>
 <tr class="odd">
-<td>2</td>
-<td>6</td>
+<td>1</td>
+<td>3</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
@@ -7809,14 +7809,14 @@ precipitation
 </thead>
 <tbody>
 <tr class="odd">
-<td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
 </tr>
 <tr class="even">
-<td>2</td>
-<td>6</td>
+<td>1</td>
+<td>3</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
@@ -13362,8 +13362,8 @@ precipitation
 <td>1</td>
 <td>1</td>
 <td>0</td>
-<td>0.8884</td>
-<td>0.7280</td>
+<td>0.7801</td>
+<td>0.008004</td>
 <td>3</td>
 <td>-2</td>
 </tr>
@@ -13371,8 +13371,8 @@ precipitation
 <td>2</td>
 <td>1</td>
 <td>1</td>
-<td>0.8919</td>
-<td>0.1095</td>
+<td>0.5749</td>
+<td>0.9061</td>
 <td>3</td>
 <td>-2</td>
 </tr>
@@ -13380,8 +13380,8 @@ precipitation
 <td>3</td>
 <td>0</td>
 <td>1</td>
-<td>0.5881</td>
-<td>0.0008743</td>
+<td>0.4282</td>
+<td>0.7811</td>
 <td>3</td>
 <td>-2</td>
 </tr>
@@ -13389,8 +13389,8 @@ precipitation
 <td>4</td>
 <td>0</td>
 <td>1</td>
-<td>0.7886</td>
-<td>0.2553</td>
+<td>0.9679</td>
+<td>0.03564</td>
 <td>3</td>
 <td>-2</td>
 </tr>
@@ -13416,7 +13416,7 @@ precipitation
 <td>1</td>
 <td>0</td>
 <td>1</td>
-<td>0.8884</td>
+<td>0.7801</td>
 <td>3</td>
 </tr>
 <tr class="even">
@@ -13424,7 +13424,7 @@ precipitation
 <td>1</td>
 <td>1</td>
 <td>1</td>
-<td>0.8919</td>
+<td>0.5749</td>
 <td>3</td>
 </tr>
 <tr class="odd">
@@ -13432,7 +13432,7 @@ precipitation
 <td>0</td>
 <td>1</td>
 <td>1</td>
-<td>0.5881</td>
+<td>0.4282</td>
 <td>3</td>
 </tr>
 <tr class="even">
@@ -13440,7 +13440,7 @@ precipitation
 <td>0</td>
 <td>1</td>
 <td>1</td>
-<td>0.7886</td>
+<td>0.9679</td>
 <td>3</td>
 </tr>
 <tr class="odd">
@@ -13448,7 +13448,7 @@ precipitation
 <td>1</td>
 <td>0</td>
 <td>2</td>
-<td>0.7280</td>
+<td>0.008004</td>
 <td>-2</td>
 </tr>
 <tr class="even">
@@ -13456,7 +13456,7 @@ precipitation
 <td>1</td>
 <td>1</td>
 <td>2</td>
-<td>0.1095</td>
+<td>0.9061</td>
 <td>-2</td>
 </tr>
 <tr class="odd">
@@ -13464,7 +13464,7 @@ precipitation
 <td>0</td>
 <td>1</td>
 <td>2</td>
-<td>0.0008743</td>
+<td>0.7811</td>
 <td>-2</td>
 </tr>
 <tr class="even">
@@ -13472,7 +13472,7 @@ precipitation
 <td>0</td>
 <td>1</td>
 <td>2</td>
-<td>0.2553</td>
+<td>0.03564</td>
 <td>-2</td>
 </tr>
 </tbody>
@@ -16135,7 +16135,7 @@ precipitation
 <p>Step 1 - convert all choices into rows and add artificial column to all values which are not missing.</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">def</span><span class="fu"> multi2 </span>(<span class="kw">-&gt;</span> multi
                 (api/pivot-&gt;longer (<span class="kw">complement</span> #{<span class="at">:id</span>}))
-                (api/add-or-update-column <span class="at">:checked</span> <span class="va">true</span>)))</code></pre></div>
+                (api/add-or-replace-column <span class="at">:checked</span> <span class="va">true</span>)))</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">multi2</code></pre></div>
 <p>_unnamed [8 4]:</p>
 <table>
@@ -17041,7 +17041,14 @@ precipitation
 <p>Dataset join and concatenation functions.</p>
 <p>Joins accept left-side and right-side datasets and columns selector. Options are the same as in <code>tech.ml.dataset</code> functions.</p>
 <p>The difference between <code>tech.ml.dataset</code> join functions are: arguments order (first datasets) and possibility to join on multiple columns.</p>
-<p>Additionally set operations are defined: <code>union</code>, <code>intersect</code> and <code>difference</code>.</p>
+<p>Additionally set operations are defined: <code>intersect</code> and <code>difference</code>.</p>
+<p>To concat two datasets rowwise you can choose:</p>
+<ul>
+<li><code>concat</code> - concats rows for matching columns, the number of columns should be equal.</li>
+<li><code>union</code> - like concat but returns unique values</li>
+<li><code>bind</code> - concats rows add missing, empty columns</li>
+</ul>
+<p>To add two datasets columnwise use <code>bind</code>. The number of rows should be equal.</p>
 <p>Datasets used in examples:</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">def</span><span class="fu"> ds1 </span>(api/dataset {<span class="at">:a</span> [<span class="dv">1</span> <span class="dv">2</span> <span class="dv">1</span> <span class="dv">2</span> <span class="dv">3</span> <span class="dv">4</span> <span class="va">nil</span> <span class="va">nil</span> <span class="dv">4</span>]
                        <span class="at">:b</span> (<span class="kw">range</span> <span class="dv">101</span> <span class="dv">110</span>)
@@ -19250,76 +19257,16 @@ ds2</code></pre></div>
 </thead>
 <tbody>
 <tr class="odd">
-<td>1</td>
-<td>5</td>
-<td>1.000</td>
-<td>B</td>
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 <tr class="even">
-<td>2</td>
-<td>2</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
 <td>1</td>
 <td>9</td>
 <td>1.500</td>
 <td>C</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>7</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>6</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>9</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>6</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="odd">
-<td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>8</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>6</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>8</td>
-<td>1.000</td>
-<td>B</td>
 </tr>
 <tr class="odd">
 <td>1</td>
@@ -19340,6 +19287,18 @@ ds2</code></pre></div>
 <td>B</td>
 </tr>
 <tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
 <td>1</td>
 <td>9</td>
 <td>1.500</td>
@@ -19347,21 +19306,9 @@ ds2</code></pre></div>
 </tr>
 <tr class="odd">
 <td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="odd">
 <td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
+<td>1.000</td>
+<td>B</td>
 </tr>
 <tr class="even">
 <td>1</td>
@@ -19370,6 +19317,66 @@ ds2</code></pre></div>
 <td>B</td>
 </tr>
 <tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
+</tr>
+<tr class="odd">
 <td>2</td>
 <td>8</td>
 <td>1.000</td>
@@ -19377,9 +19384,9 @@ ds2</code></pre></div>
 </tr>
 <tr class="even">
 <td>1</td>
-<td>7</td>
-<td>0.5000</td>
-<td>A</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
 </tr>
 <tr class="odd">
 <td>1</td>
@@ -19388,16 +19395,16 @@ ds2</code></pre></div>
 <td>A</td>
 </tr>
 <tr class="even">
-<td>1</td>
-<td>7</td>
-<td>0.5000</td>
-<td>A</td>
+<td>2</td>
+<td>6</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 <tr class="odd">
-<td>2</td>
-<td>8</td>
-<td>1.000</td>
-<td>B</td>
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 </tbody>
 </table>
@@ -19405,7 +19412,6 @@ ds2</code></pre></div>
 <div id="union" class="section level4">
 <h4>Union</h4>
 <p>The same as <code>concat</code> but returns unique rows</p>
-<hr />
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">apply</span> api/union (api/drop-columns ds2 <span class="at">:d</span>) (<span class="kw">repeat</span> <span class="dv">10</span> ds1))</code></pre></div>
 <p>union [18 3]:</p>
 <table>
@@ -19523,40 +19529,28 @@ ds2</code></pre></div>
 </thead>
 <tbody>
 <tr class="odd">
-<td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
+<td>1</td>
+<td>3</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 <tr class="even">
-<td>1</td>
-<td>5</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>2</td>
-<td>1.000</td>
-<td>B</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="odd">
 <td>2</td>
 <td>6</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
+<tr class="odd">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
 <tr class="even">
-<td>1</td>
-<td>3</td>
-<td>1.500</td>
-<td>C</td>
+<td>2</td>
+<td>4</td>
+<td>0.5000</td>
+<td>A</td>
 </tr>
 <tr class="odd">
 <td>1</td>
@@ -19566,15 +19560,378 @@ ds2</code></pre></div>
 </tr>
 <tr class="even">
 <td>1</td>
+<td>1</td>
+<td>0.5000</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>1</td>
 <td>9</td>
 <td>1.500</td>
 <td>C</td>
 </tr>
+</tbody>
+</table>
+</div>
+<div id="bind" class="section level4">
+<h4>Bind</h4>
+<p><code>bind</code> adds empty columns during concat</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/bind ds1 ds2)</code></pre></div>
+<p>null [18 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+<th>:d</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>101</td>
+<td>a</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>102</td>
+<td>b</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>103</td>
+<td>s</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>104</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>105</td>
+<td>t</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>106</td>
+<td>r</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>107</td>
+<td>a</td>
+<td></td>
+</tr>
+<tr class="even">
+<td></td>
+<td>108</td>
+<td>c</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>109</td>
+<td>t</td>
+<td></td>
+</tr>
+<tr class="even">
+<td></td>
+<td>110</td>
+<td>d</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>109</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>108</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>107</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>106</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>105</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>104</td>
+<td>b</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>103</td>
+<td>l</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>102</td>
+<td>e</td>
+<td>X</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/bind ds2 ds1)</code></pre></div>
+<p>null [18 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+<th>:d</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>110</td>
+<td>d</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>109</td>
+<td>a</td>
+<td>X</td>
+</tr>
 <tr class="odd">
 <td>2</td>
-<td>8</td>
-<td>1.000</td>
-<td>B</td>
+<td>108</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>107</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>106</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>105</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>104</td>
+<td>b</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>103</td>
+<td>l</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>102</td>
+<td>e</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>101</td>
+<td>a</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>102</td>
+<td>b</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>103</td>
+<td>s</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>104</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>105</td>
+<td>t</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>106</td>
+<td>r</td>
+<td></td>
+</tr>
+<tr class="even">
+<td></td>
+<td>107</td>
+<td>a</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>108</td>
+<td>c</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>109</td>
+<td>t</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="append" class="section level4">
+<h4>Append</h4>
+<p><code>append</code> concats columns</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/append ds1 ds2)</code></pre></div>
+<p>_unnamed [9 7]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+<th>:a</th>
+<th>:b</th>
+<th>:c</th>
+<th>:d</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>101</td>
+<td>a</td>
+<td></td>
+<td>110</td>
+<td>d</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>102</td>
+<td>b</td>
+<td>1</td>
+<td>109</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>103</td>
+<td>s</td>
+<td>2</td>
+<td>108</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>104</td>
+<td></td>
+<td>5</td>
+<td>107</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>105</td>
+<td>t</td>
+<td>4</td>
+<td>106</td>
+<td>t</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>106</td>
+<td>r</td>
+<td>3</td>
+<td>105</td>
+<td>a</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>107</td>
+<td>a</td>
+<td>2</td>
+<td>104</td>
+<td>b</td>
+<td>X</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>108</td>
+<td>c</td>
+<td>1</td>
+<td>103</td>
+<td>l</td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>109</td>
+<td>t</td>
+<td></td>
+<td>102</td>
+<td>e</td>
+<td>X</td>
 </tr>
 </tbody>
 </table>
@@ -19635,6 +19992,7 @@ ds2</code></pre></div>
 </tr>
 </tbody>
 </table>
+<hr />
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/difference (api/select-columns ds2 <span class="at">:b</span>)
                 (api/select-columns ds1 <span class="at">:b</span>))</code></pre></div>
 <p>difference [1 1]:</p>
@@ -23461,16 +23819,16 @@ tech.ml.dataset.impl.dataset.Dataset</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td>2</td>
-<td>4</td>
-<td>0.5000</td>
-<td>A</td>
+<td>1</td>
+<td>9</td>
+<td>1.500</td>
+<td>C</td>
 </tr>
 <tr class="even">
 <td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
+<td>5</td>
+<td>1.000</td>
+<td>B</td>
 </tr>
 <tr class="odd">
 <td>1</td>
@@ -23493,32 +23851,32 @@ tech.ml.dataset.impl.dataset.Dataset</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
+<tr class="even">
 <td>1</td>
 <td>7</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
-<tr class="even">
-<td>1</td>
-<td>9</td>
-<td>1.500</td>
-<td>C</td>
-</tr>
 <tr class="odd">
-<td>1</td>
-<td>1</td>
-<td>0.5000</td>
-<td>A</td>
-</tr>
-<tr class="even">
 <td>2</td>
 <td>4</td>
 <td>0.5000</td>
 <td>A</td>
 </tr>
+<tr class="even">
+<td>2</td>
+<td>8</td>
+<td>1.000</td>
+<td>B</td>
+</tr>
 <tr class="odd">
-<td>1</td>
-<td>5</td>
+<td>2</td>
+<td>2</td>
 <td>1.000</td>
 <td>B</td>
 </tr>
@@ -24788,7 +25146,7 @@ tech.ml.dataset.impl.dataset.Dataset</code></pre>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">def</span><span class="fu"> DS </span>(api/add-or-update-column DS <span class="at">:V1</span> (dfn/pow (DS <span class="at">:V1</span>) <span class="dv">2</span>)))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">def</span><span class="fu"> DS </span>(api/add-or-replace-column DS <span class="at">:V1</span> (dfn/pow (DS <span class="at">:V1</span>) <span class="dv">2</span>)))</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">DS</code></pre></div>
 <p>_unnamed [9 4]:</p>
 <table>
@@ -24937,7 +25295,7 @@ tech.ml.dataset.impl.dataset.Dataset</code></pre>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">def</span><span class="fu"> DS </span>(api/add-or-update-column DS <span class="at">:v5</span> (dfn/log (DS <span class="at">:V1</span>))))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">def</span><span class="fu"> DS </span>(api/add-or-replace-column DS <span class="at">:v5</span> (dfn/log (DS <span class="at">:V1</span>))))</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">DS</code></pre></div>
 <p>_unnamed [9 5]:</p>
 <table>
@@ -25018,7 +25376,7 @@ tech.ml.dataset.impl.dataset.Dataset</code></pre>
 </table>
 <hr />
 <p>Add several columns</p>
-<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">def</span><span class="fu"> DS </span>(api/add-or-update-columns DS {<span class="at">:v6</span> (dfn/sqrt (DS <span class="at">:V1</span>))
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">def</span><span class="fu"> DS </span>(api/add-or-replace-columns DS {<span class="at">:v6</span> (dfn/sqrt (DS <span class="at">:V1</span>))
                                        <span class="at">:v7</span> <span class="st">&quot;X&quot;</span>}))</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">DS</code></pre></div>
 <p>_unnamed [9 7]:</p>
@@ -25690,7 +26048,7 @@ tech.ml.dataset.impl.dataset.Dataset</code></pre>
 <p>Add a column with number of observations for each group</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
     (api/group-by [<span class="at">:V1</span>])
-    (api/add-or-update-column <span class="at">:n</span> api/row-count)
+    (api/add-or-replace-column <span class="at">:n</span> api/row-count)
     (api/ungroup))</code></pre></div>
 <p>_unnamed [9 4]:</p>
 <table>
@@ -26376,7 +26734,7 @@ tech.ml.dataset.impl.dataset.Dataset</code></pre>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
     (api/group-by [<span class="at">:V4</span>])
     (api/head <span class="dv">2</span>)
-    (api/add-or-update-column <span class="at">:V2</span> <span class="st">&quot;X&quot;</span>)
+    (api/add-or-replace-column <span class="at">:V2</span> <span class="st">&quot;X&quot;</span>)
     (api/ungroup))</code></pre></div>
 <p>_unnamed [6 3]:</p>
 <table>
@@ -27518,7 +27876,7 @@ tech.ml.dataset.impl.dataset.Dataset</code></pre>
 <hr />
 <p>Get row number of first (and last) observation by group</p>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
-    (api/add-or-update-column <span class="at">:row-id</span> (<span class="kw">range</span>))
+    (api/add-or-replace-column <span class="at">:row-id</span> (<span class="kw">range</span>))
     (api/select-columns [<span class="at">:V4</span> <span class="at">:row-id</span>])
     (api/group-by <span class="at">:V4</span>)
     (api/ungroup))</code></pre></div>
@@ -27570,7 +27928,7 @@ tech.ml.dataset.impl.dataset.Dataset</code></pre>
 </tbody>
 </table>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
-    (api/add-or-update-column <span class="at">:row-id</span> (<span class="kw">range</span>))
+    (api/add-or-replace-column <span class="at">:row-id</span> (<span class="kw">range</span>))
     (api/select-columns [<span class="at">:V4</span> <span class="at">:row-id</span>])
     (api/group-by <span class="at">:V4</span>)
     (api/first)
@@ -27599,7 +27957,7 @@ tech.ml.dataset.impl.dataset.Dataset</code></pre>
 </tbody>
 </table>
 <div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> DS
-    (api/add-or-update-column <span class="at">:row-id</span> (<span class="kw">range</span>))
+    (api/add-or-replace-column <span class="at">:row-id</span> (<span class="kw">range</span>))
     (api/select-columns [<span class="at">:V4</span> <span class="at">:row-id</span>])
     (api/group-by <span class="at">:V4</span>)
     (api/select-rows [<span class="dv">0</span> <span class="dv">2</span>])
@@ -28415,6 +28773,1002 @@ tech.ml.dataset.impl.dataset.Dataset</code></pre>
 </div>
 <div id="other-1" class="section level5">
 <h5>Other</h5>
+<p>Skipped</p>
+</div>
+</div>
+<div id="joinbind-data-sets" class="section level4">
+<h4>Join/Bind data sets</h4>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">def</span><span class="fu"> x </span>(api/dataset {<span class="st">&quot;Id&quot;</span> [<span class="st">&quot;A&quot;</span> <span class="st">&quot;B&quot;</span> <span class="st">&quot;C&quot;</span> <span class="st">&quot;C&quot;</span>]
+                     <span class="st">&quot;X1&quot;</span> [<span class="dv">1</span> <span class="dv">3</span> <span class="dv">5</span> <span class="dv">7</span>]
+                     <span class="st">&quot;XY&quot;</span> [<span class="st">&quot;x2&quot;</span> <span class="st">&quot;x4&quot;</span> <span class="st">&quot;x6&quot;</span> <span class="st">&quot;x8&quot;</span>]}))
+(<span class="bu">def</span><span class="fu"> y </span>(api/dataset {<span class="st">&quot;Id&quot;</span> [<span class="st">&quot;A&quot;</span> <span class="st">&quot;B&quot;</span> <span class="st">&quot;B&quot;</span> <span class="st">&quot;D&quot;</span>]
+                     <span class="st">&quot;Y1&quot;</span> [<span class="dv">1</span> <span class="dv">3</span> <span class="dv">5</span> <span class="dv">7</span>]
+                     <span class="st">&quot;XY&quot;</span> [<span class="st">&quot;y1&quot;</span> <span class="st">&quot;y3&quot;</span> <span class="st">&quot;y5&quot;</span> <span class="st">&quot;y7&quot;</span>]}))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">x y</code></pre></div>
+<p>_unnamed [4 3]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Id</th>
+<th>X1</th>
+<th>XY</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>1</td>
+<td>x2</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>3</td>
+<td>x4</td>
+</tr>
+<tr class="odd">
+<td>C</td>
+<td>5</td>
+<td>x6</td>
+</tr>
+<tr class="even">
+<td>C</td>
+<td>7</td>
+<td>x8</td>
+</tr>
+</tbody>
+</table>
+<p>_unnamed [4 3]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Id</th>
+<th>Y1</th>
+<th>XY</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>1</td>
+<td>y1</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>3</td>
+<td>y3</td>
+</tr>
+<tr class="odd">
+<td>B</td>
+<td>5</td>
+<td>y5</td>
+</tr>
+<tr class="even">
+<td>D</td>
+<td>7</td>
+<td>y7</td>
+</tr>
+</tbody>
+</table>
+<div id="join-1" class="section level5">
+<h5>Join</h5>
+<p>Join matching rows from y to x</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/left-join x y <span class="st">&quot;Id&quot;</span>)</code></pre></div>
+<p>left-outer-join [5 6]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Id</th>
+<th>X1</th>
+<th>XY</th>
+<th>right.Id</th>
+<th>Y1</th>
+<th>right.XY</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>1</td>
+<td>x2</td>
+<td>A</td>
+<td>1</td>
+<td>y1</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>3</td>
+<td>x4</td>
+<td>B</td>
+<td>3</td>
+<td>y3</td>
+</tr>
+<tr class="odd">
+<td>B</td>
+<td>3</td>
+<td>x4</td>
+<td>B</td>
+<td>5</td>
+<td>y5</td>
+</tr>
+<tr class="even">
+<td>C</td>
+<td>5</td>
+<td>x6</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>C</td>
+<td>7</td>
+<td>x8</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Join matching rows from x to y</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/right-join x y <span class="st">&quot;Id&quot;</span>)</code></pre></div>
+<p>right-outer-join [4 6]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Id</th>
+<th>X1</th>
+<th>XY</th>
+<th>right.Id</th>
+<th>Y1</th>
+<th>right.XY</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>1</td>
+<td>x2</td>
+<td>A</td>
+<td>1</td>
+<td>y1</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>3</td>
+<td>x4</td>
+<td>B</td>
+<td>3</td>
+<td>y3</td>
+</tr>
+<tr class="odd">
+<td>B</td>
+<td>3</td>
+<td>x4</td>
+<td>B</td>
+<td>5</td>
+<td>y5</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td></td>
+<td>D</td>
+<td>7</td>
+<td>y7</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Join matching rows from both x and y</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/inner-join x y <span class="st">&quot;Id&quot;</span>)</code></pre></div>
+<p>inner-join [3 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Id</th>
+<th>X1</th>
+<th>XY</th>
+<th>Y1</th>
+<th>right.XY</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>1</td>
+<td>x2</td>
+<td>1</td>
+<td>y1</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>3</td>
+<td>x4</td>
+<td>3</td>
+<td>y3</td>
+</tr>
+<tr class="odd">
+<td>B</td>
+<td>3</td>
+<td>x4</td>
+<td>5</td>
+<td>y5</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Join keeping all the rows</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/full-join x y <span class="st">&quot;Id&quot;</span>)</code></pre></div>
+<p>full-join [6 6]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Id</th>
+<th>X1</th>
+<th>XY</th>
+<th>right.Id</th>
+<th>Y1</th>
+<th>right.XY</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>1</td>
+<td>x2</td>
+<td>A</td>
+<td>1</td>
+<td>y1</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>3</td>
+<td>x4</td>
+<td>B</td>
+<td>3</td>
+<td>y3</td>
+</tr>
+<tr class="odd">
+<td>B</td>
+<td>3</td>
+<td>x4</td>
+<td>B</td>
+<td>5</td>
+<td>y5</td>
+</tr>
+<tr class="even">
+<td>C</td>
+<td>5</td>
+<td>x6</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>C</td>
+<td>7</td>
+<td>x8</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td></td>
+<td>D</td>
+<td>7</td>
+<td>y7</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Return rows from x matching y</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/semi-join x y <span class="st">&quot;Id&quot;</span>)</code></pre></div>
+<p>semi-join [2 3]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Id</th>
+<th>X1</th>
+<th>XY</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>1</td>
+<td>x2</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>3</td>
+<td>x4</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Return rows from x not matching y</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/anti-join x y <span class="st">&quot;Id&quot;</span>)</code></pre></div>
+<p>anti-join [2 3]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Id</th>
+<th>X1</th>
+<th>XY</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>C</td>
+<td>5</td>
+<td>x6</td>
+</tr>
+<tr class="even">
+<td>C</td>
+<td>7</td>
+<td>x8</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="more-joins" class="section level5">
+<h5>More joins</h5>
+<p>Select columns while joining</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/right-join (api/select-columns x [<span class="st">&quot;Id&quot;</span> <span class="st">&quot;X1&quot;</span>])
+                (api/select-columns y [<span class="st">&quot;Id&quot;</span> <span class="st">&quot;XY&quot;</span>])
+                <span class="st">&quot;Id&quot;</span>)</code></pre></div>
+<p>right-outer-join [4 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Id</th>
+<th>X1</th>
+<th>right.Id</th>
+<th>XY</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>1</td>
+<td>A</td>
+<td>y1</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>3</td>
+<td>B</td>
+<td>y3</td>
+</tr>
+<tr class="odd">
+<td>B</td>
+<td>3</td>
+<td>B</td>
+<td>y5</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td>D</td>
+<td>y7</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/right-join (api/select-columns x [<span class="st">&quot;Id&quot;</span> <span class="st">&quot;XY&quot;</span>])
+                (api/select-columns y [<span class="st">&quot;Id&quot;</span> <span class="st">&quot;XY&quot;</span>])
+                <span class="st">&quot;Id&quot;</span>)</code></pre></div>
+<p>right-outer-join [4 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Id</th>
+<th>XY</th>
+<th>right.Id</th>
+<th>right.XY</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>x2</td>
+<td>A</td>
+<td>y1</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>x4</td>
+<td>B</td>
+<td>y3</td>
+</tr>
+<tr class="odd">
+<td>B</td>
+<td>x4</td>
+<td>B</td>
+<td>y5</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td>D</td>
+<td>y7</td>
+</tr>
+</tbody>
+</table>
+<p>Aggregate columns while joining</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> y
+    (api/group-by [<span class="st">&quot;Id&quot;</span>])
+    (api/aggregate {<span class="st">&quot;sumY1&quot;</span> #(dfn/sum (<span class="va">%</span> <span class="st">&quot;Y1&quot;</span>))})
+    (api/right-join x <span class="st">&quot;Id&quot;</span>)
+    (api/add-or-replace-column <span class="st">&quot;X1Y1&quot;</span> (<span class="kw">fn</span> [ds] (dfn/* (ds <span class="st">&quot;sumY1&quot;</span>)
+                                                    (ds <span class="st">&quot;X1&quot;</span>))))
+    (api/select-columns [<span class="st">&quot;right.Id&quot;</span> <span class="st">&quot;X1Y1&quot;</span>]))</code></pre></div>
+<p>right-outer-join [4 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>right.Id</th>
+<th>X1Y1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>24.00</td>
+</tr>
+<tr class="odd">
+<td>C</td>
+<td>NAN</td>
+</tr>
+<tr class="even">
+<td>C</td>
+<td>NAN</td>
+</tr>
+</tbody>
+</table>
+<p>Update columns while joining</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> x
+    (api/select-columns [<span class="st">&quot;Id&quot;</span> <span class="st">&quot;X1&quot;</span>])
+    (api/map-columns <span class="st">&quot;SqX1&quot;</span> <span class="st">&quot;X1&quot;</span> (<span class="kw">fn</span> [x] (<span class="kw">*</span> x x)))
+    (api/right-join y <span class="st">&quot;Id&quot;</span>)
+    (api/drop-columns [<span class="st">&quot;X1&quot;</span> <span class="st">&quot;Id&quot;</span>]))</code></pre></div>
+<p>right-outer-join [4 4]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>SqX1</th>
+<th>right.Id</th>
+<th>Y1</th>
+<th>XY</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>A</td>
+<td>1</td>
+<td>y1</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>B</td>
+<td>3</td>
+<td>y3</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>B</td>
+<td>5</td>
+<td>y5</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>D</td>
+<td>7</td>
+<td>y7</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Adds a list column with rows from y matching x (nest-join)</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> (api/left-join x y <span class="st">&quot;Id&quot;</span>)
+    (api/drop-columns [<span class="st">&quot;right.Id&quot;</span>])
+    (api/fold-by (api/column-names x)))</code></pre></div>
+<p>_unnamed [4 5]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>XY</th>
+<th>X1</th>
+<th>Id</th>
+<th>Y1</th>
+<th>right.XY</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>x4</td>
+<td>3</td>
+<td>B</td>
+<td>[3 5]</td>
+<td>[&quot;y3&quot; &quot;y5&quot;]</td>
+</tr>
+<tr class="even">
+<td>x6</td>
+<td>5</td>
+<td>C</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr class="odd">
+<td>x8</td>
+<td>7</td>
+<td>C</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr class="even">
+<td>x2</td>
+<td>1</td>
+<td>A</td>
+<td>[1]</td>
+<td>[&quot;y1&quot;]</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Some joins are skipped</p>
+<hr />
+<p>Cross join</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">def</span><span class="fu"> cjds </span>(api/dataset {<span class="at">:V1</span> [[<span class="dv">2</span> <span class="dv">1</span> <span class="dv">1</span>]]
+                        <span class="at">:V2</span> [[<span class="dv">3</span> <span class="dv">2</span>]]}))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">cjds</code></pre></div>
+<p>_unnamed [1 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>[2 1 1]</td>
+<td>[3 2]</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">reduce</span> #(api/unroll <span class="va">%1</span> <span class="va">%2</span>) cjds (api/column-names cjds))</code></pre></div>
+<p>_unnamed [6 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;</span> (<span class="kw">reduce</span> #(api/unroll <span class="va">%1</span> <span class="va">%2</span>) cjds (api/column-names cjds))
+    (api/unique-by))</code></pre></div>
+<p>_unnamed [4 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="bind-1" class="section level5">
+<h5>Bind</h5>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">def</span><span class="fu"> x </span>(api/dataset {<span class="at">:V1</span> [<span class="dv">1</span> <span class="dv">2</span> <span class="dv">3</span>]}))
+(<span class="bu">def</span><span class="fu"> y </span>(api/dataset {<span class="at">:V1</span> [<span class="dv">4</span> <span class="dv">5</span> <span class="dv">6</span>]}))
+(<span class="bu">def</span><span class="fu"> z </span>(api/dataset {<span class="at">:V1</span> [<span class="dv">7</span> <span class="dv">8</span> <span class="dv">9</span>]
+                     <span class="at">:V2</span> [<span class="dv">0</span> <span class="dv">0</span> <span class="dv">0</span>]}))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">x y z</code></pre></div>
+<p>_unnamed [3 1]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+</tr>
+<tr class="even">
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p>_unnamed [3 1]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>4</td>
+</tr>
+<tr class="even">
+<td>5</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+</tr>
+</tbody>
+</table>
+<p>_unnamed [3 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>7</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Bind rows</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/bind x y)</code></pre></div>
+<p>null [6 1]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+</tr>
+<tr class="even">
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+</tr>
+<tr class="even">
+<td>4</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+</tr>
+<tr class="even">
+<td>6</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/bind x z)</code></pre></div>
+<p>null [6 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Bind rows using a list</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="kw">-&gt;&gt;</span> [x y]
+     (map-indexed #(api/add-or-replace-column <span class="va">%2</span> <span class="at">:id</span> (<span class="kw">repeat</span> <span class="va">%1</span>)))
+     (<span class="kw">apply</span> api/bind))</code></pre></div>
+<p>null [6 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Bind columns</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/append x y)</code></pre></div>
+<p>_unnamed [3 2]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+<th>:V1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>6</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="set-operations" class="section level5">
+<h5>Set operations</h5>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(<span class="bu">def</span><span class="fu"> x </span>(api/dataset {<span class="at">:V1</span> [<span class="dv">1</span> <span class="dv">2</span> <span class="dv">2</span> <span class="dv">3</span> <span class="dv">3</span>]}))
+(<span class="bu">def</span><span class="fu"> y </span>(api/dataset {<span class="at">:V1</span> [<span class="dv">2</span> <span class="dv">2</span> <span class="dv">3</span> <span class="dv">4</span> <span class="dv">4</span>]}))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">x y</code></pre></div>
+<p>_unnamed [5 1]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+</tr>
+<tr class="even">
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+</tr>
+<tr class="even">
+<td>3</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p>_unnamed [5 1]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+</tr>
+<tr class="even">
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+</tr>
+<tr class="even">
+<td>4</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Intersection</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/intersect x y)</code></pre></div>
+<p>intersection [2 1]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+</tr>
+<tr class="even">
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Difference</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/difference x y)</code></pre></div>
+<p>difference [1 1]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Union</p>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/union x y)</code></pre></div>
+<p>union [4 1]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+</tr>
+<tr class="even">
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+</tr>
+<tr class="even">
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode clojure"><code class="sourceCode clojure">(api/concat x y)</code></pre></div>
+<p>null [10 1]:</p>
+<table>
+<thead>
+<tr class="header">
+<th>:V1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+</tr>
+<tr class="even">
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+</tr>
+<tr class="even">
+<td>3</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+</tr>
+<tr class="even">
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+</tr>
+<tr class="even">
+<td>3</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+</tr>
+<tr class="even">
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Equality not implemented</p>
 </div>
 </div>
 </div>

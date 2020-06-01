@@ -4,7 +4,7 @@
 
             [techtest.api.utils :refer [iterable-sequence? rank column-names]]
             [techtest.api.dataset :refer [rows]]
-            [techtest.api.columns :refer [add-or-update-columns select-columns]]
+            [techtest.api.columns :refer [add-or-replace-columns select-columns]]
             [techtest.api.group-by :refer [grouped? process-group-data]]
             [tech.v2.datatype.functional :as dfn]))
 
@@ -39,12 +39,12 @@
   ([f ds rows-selector {:keys [select-keys pre result-type]}]
    (let [selected-keys (column-names ds select-keys)]
      (if (grouped? ds)
-       (let [pre-ds (map #(add-or-update-columns % pre) (ds :data))
+       (let [pre-ds (map #(add-or-replace-columns % pre) (ds :data))
              indices (map #(find-indexes % rows-selector selected-keys) pre-ds)]
          (if (= result-type :as-indexes)
            (map seq indices)
            (ds/add-or-update-column ds :data (map #(select-or-drop-rows f %1 %2) (ds :data) indices))))
-       (let [indices (find-indexes (add-or-update-columns ds pre) rows-selector selected-keys)]
+       (let [indices (find-indexes (add-or-replace-columns ds pre) rows-selector selected-keys)]
          (if (= result-type :as-indexes)
            (seq indices)
            (f ds indices)))))))

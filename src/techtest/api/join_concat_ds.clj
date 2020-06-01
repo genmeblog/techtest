@@ -1,7 +1,10 @@
 (ns techtest.api.join-concat-ds
   (:refer-clojure :exclude [concat])
   (:require [tech.ml.dataset :as ds]
+            [tech.ml.dataset.column :as col]
 
+            [clojure.set :as s]
+            
             [techtest.api.join-separate :refer [join-columns]]
             [techtest.api.missing :refer [select-missing drop-missing]]
             [techtest.api.columns :refer [drop-columns]]
@@ -90,3 +93,27 @@
            (ds/unique-by identity))
       (vary-meta assoc :name "union")))
 
+(defn- add-empty-missing-column
+  [ds name]
+  (let [cnt (ds/row-count ds)]
+    (ds/add-column ds (col/new-column name (repeat cnt nil) nil (range cnt)))))
+
+(defn- add-empty-missing-columns
+  [ds-left ds-right]
+  (let [cols-l (set (ds/column-names ds-left))
+        cols-r (set (ds/column-names ds-right))
+        diff-l (s/difference cols-r cols-l)
+        diff-r (s/difference cols-l cols-r)
+        ds-left+ (reduce add-empty-missing-column ds-left diff-l)
+        ds-right+ (reduce add-empty-missing-column ds-right diff-r)]
+    (ds/concat ds-left+ ds-right+)))
+
+(defn bind
+  [ds & datasets]
+  (reduce #(add-empty-missing-columns %1 %2) ds datasets))
+
+;;
+
+(defn append
+  [ds & datasets]
+  (reduce #(ds/append-columns %1 (ds/columns %2)) ds datasets))

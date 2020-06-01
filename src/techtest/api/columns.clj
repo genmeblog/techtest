@@ -102,34 +102,34 @@
        (f column strategy)
        (ds/add-or-update-column ds column-name)))
 
-(declare add-or-update-column)
+(declare add-or-replace-column)
 
-(defn- prepare-add-or-update-column-fn
+(defn- prepare-add-or-replace-column-fn
   [column-name column size-strategy]
   (cond
     (col/is-column? column) #(fix-column-size fix-column-size-column % column-name column size-strategy)
-    (dtype/reader? column) (prepare-add-or-update-column-fn column-name (col/new-column column-name column) size-strategy)
+    (dtype/reader? column) (prepare-add-or-replace-column-fn column-name (col/new-column column-name column) size-strategy)
     (iterable-sequence? column) #(fix-column-size fix-column-size-seq % column-name column size-strategy)
-    (fn? column) #(add-or-update-column % column-name (column %) size-strategy)
+    (fn? column) #(add-or-replace-column % column-name (column %) size-strategy)
     :else #(ds/add-or-update-column % column-name (repeat (ds/row-count %) column))))
 
-(defn add-or-update-column
+(defn add-or-replace-column
   "Add or update (modify) column under `column-name`.
 
   `column` can be sequence of values or generator function (which gets `ds` as input)."
-  ([ds column-name column] (add-or-update-column ds column-name column nil))
+  ([ds column-name column] (add-or-replace-column ds column-name column nil))
   ([ds column-name column size-strategy]
-   (let [process-fn (prepare-add-or-update-column-fn column-name column (or size-strategy :cycle))]
+   (let [process-fn (prepare-add-or-replace-column-fn column-name column (or size-strategy :cycle))]
      
      (if (grouped? ds)
        (process-group-data ds process-fn)
        (process-fn ds)))))
 
-(defn add-or-update-columns
+(defn add-or-replace-columns
   "Add or updade (modify) columns defined in `columns-map` (mapping: name -> column) "
-  ([ds columns-map] (add-or-update-columns ds columns-map nil))
+  ([ds columns-map] (add-or-replace-columns ds columns-map nil))
   ([ds columns-map size-strategy]
-   (reduce-kv (fn [ds k v] (add-or-update-column ds k v size-strategy)) ds columns-map)))
+   (reduce-kv (fn [ds k v] (add-or-replace-column ds k v size-strategy)) ds columns-map)))
 
 (defn- process-update-columns
   [ds lst]
@@ -153,7 +153,7 @@
   ([ds column-name columns-selector map-fn]
    (if (grouped? ds)
      (process-group-data ds #(map-columns % column-name columns-selector map-fn))
-     (apply ds/column-map ds column-name map-fn (when columns-selector (column-names ds columns-selector))))))
+     (apply ds/column-map ds column-name map-fn (column-names ds columns-selector)))))
 
 (defn reorder-columns
   "Reorder columns using column selector(s). When column names are incomplete, the missing will be attached at the end."
@@ -214,3 +214,4 @@
        (if (and datatype (not= datatype (dtype/get-datatype c)))
          (dtype/make-array-of-type datatype c)
          (dtype/->array-copy c))))))
+

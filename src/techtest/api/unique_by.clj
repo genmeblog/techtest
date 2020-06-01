@@ -1,10 +1,14 @@
 (ns techtest.api.unique-by
   (:require [tech.ml.dataset :as ds]
+            [tech.v2.datatype.protocols :as dtype-proto]
             
             [techtest.api.utils :refer [iterable-sequence? column-names]]
             [techtest.api.dataset :refer [dataset]]
             [techtest.api.columns :refer [select-columns]]
-            [techtest.api.group-by :refer [grouped? process-group-data ungroup]]))
+            [techtest.api.group-by :refer [grouped? process-group-data ungroup]]
+            [tech.ml.dataset.column :as col]
+            [tech.v2.datatype :as dtype]
+            [tech.v2.datatype.bitmap :as bitmap]))
 
 (defn- strategy-first [_ idxs] (clojure.core/first idxs))
 (defn- strategy-last [_ idxs] (clojure.core/last idxs))
@@ -14,6 +18,19 @@
   {:first strategy-first
    :last strategy-last
    :random strategy-random})
+
+(defn- remove-missing-from-column
+  "The same as remove rows"
+  [col]
+  (let [cnt (dtype/ecount col)
+        m (col/missing col)]
+    (if (and (pos? cnt)
+             (seq m))
+      (col/select col (-> cnt
+                          (range)
+                          (bitmap/->bitmap)
+                          (dtype-proto/set-and-not m)))
+      col)))
 
 (defn strategy-fold
   ([ds columns-selector] (strategy-fold ds columns-selector nil))
@@ -32,7 +49,8 @@
          (process-group-data (fn [ds]
                                (as-> ds ds
                                  (select-columns ds target-names)
-                                 (dataset [(zipmap target-names (map fold-fn (ds/columns ds)))]))))
+                                 (dataset [(zipmap target-names
+                                                   (map (comp fold-fn remove-missing-from-column) (ds/columns ds)))]))))
          (ungroup ungroup-options)))))
 
 (defn- unique-by-fn
