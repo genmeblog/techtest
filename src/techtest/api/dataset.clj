@@ -2,7 +2,8 @@
   (:require [tech.ml.dataset :as ds]
             [tech.ml.dataset.column :as col]
             [tech.ml.protocols.dataset :as prot]
-
+            [tech.ml.dataset.parse.name-values-seq :as nvs]
+            
             [techtest.api.utils :refer [iterable-sequence?]]))
 
 ;;;;;;;;;;;;;;;;;;;;;
@@ -44,7 +45,7 @@
           :as options}]
    (cond
      (dataset? data) data
-     (map? data) (apply ds/name-values-seq->dataset (fix-map-dataset data) [:dataset-name (:dataset-name options)])
+     (map? data) (nvs/parse-nvs (fix-map-dataset data) options)
      (and (iterable-sequence? data)
           (every? iterable-sequence? data)
           (every? #(= 2 (count %)) data)) (dataset (apply array-map (mapcat identity data)) options)
@@ -100,4 +101,3 @@
 (defn print-dataset
   ([ds] (println (ds/dataset->str ds)))
   ([ds options] (println (ds/dataset->str ds options))))
-

@@ -110,7 +110,7 @@
 
 \title{Proposed API for tech.ml.dataset}
 \author{GenerateMe}
-\date{2020-06-01}
+\date{2020-06-08}
 
 \begin{document}
 \maketitle
@@ -1010,7 +1010,7 @@ Rows as sequence of sequences
 \end{Shaded}
 
 \begin{verbatim}
-([#object[java.time.LocalDate 0x14785a82 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x12117576 "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
+([#object[java.time.LocalDate 0x33919656 "2012-01-01"] 0.0 12.8 5.0 4.7 "drizzle"] [#object[java.time.LocalDate 0x10559cee "2012-01-02"] 10.9 10.6 2.8 4.5 "rain"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -1024,13 +1024,13 @@ Rows as sequence of maps
 \end{Shaded}
 
 \begin{verbatim}
-({"date" #object[java.time.LocalDate 0x668dc50d "2012-01-01"],
+({"date" #object[java.time.LocalDate 0x49ee017a "2012-01-01"],
   "precipitation" 0.0,
   "temp_min" 5.0,
   "weather" "drizzle",
   "temp_max" 12.8,
   "wind" 4.7}
- {"date" #object[java.time.LocalDate 0x20c24753 "2012-01-02"],
+ {"date" #object[java.time.LocalDate 0x17b1ae61 "2012-01-02"],
   "precipitation" 10.9,
   "temp_min" 2.8,
   "weather" "rain",
@@ -2745,7 +2745,7 @@ You can also pass mapping function with optional columns-selector
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@2dea7cc9}{\nolinkurl{java.lang.Object@2dea7cc9}}\tabularnewline
+\href{mailto:java.lang.Object@7aa4f45c}{\nolinkurl{java.lang.Object@7aa4f45c}}\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2839,7 +2839,7 @@ Function works on grouped dataset
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@11de58ca}{\nolinkurl{java.lang.Object@11de58ca}}\tabularnewline
+\href{mailto:java.lang.Object@750f62d}{\nolinkurl{java.lang.Object@750f62d}}\tabularnewline
 \midrule
 \endhead
 1 & 1 & 0.5000 & A\tabularnewline
@@ -2855,7 +2855,7 @@ v1 & v2 & {[}1 2 3{]} &
 \begin{longtable}[]{@{}llll@{}}
 \toprule
 v1 & v2 & {[}1 2 3{]} &
-\href{mailto:java.lang.Object@11de58ca}{\nolinkurl{java.lang.Object@11de58ca}}\tabularnewline
+\href{mailto:java.lang.Object@750f62d}{\nolinkurl{java.lang.Object@750f62d}}\tabularnewline
 \midrule
 \endhead
 2 & 2 & 1.000 & B\tabularnewline
@@ -2947,15 +2947,15 @@ Replace one column (column is trimmed)
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-0.6539 & 1 & 0.5000 & A\tabularnewline
-0.8858 & 2 & 1.000 & B\tabularnewline
-0.6848 & 3 & 1.500 & C\tabularnewline
-0.1551 & 4 & 0.5000 & A\tabularnewline
-0.9750 & 5 & 1.000 & B\tabularnewline
-0.1657 & 6 & 1.500 & C\tabularnewline
-0.02121 & 7 & 0.5000 & A\tabularnewline
-0.02609 & 8 & 1.000 & B\tabularnewline
-0.5347 & 9 & 1.500 & C\tabularnewline
+0.4024 & 1 & 0.5000 & A\tabularnewline
+0.04098 & 2 & 1.000 & B\tabularnewline
+0.6877 & 3 & 1.500 & C\tabularnewline
+0.1190 & 4 & 0.5000 & A\tabularnewline
+0.07758 & 5 & 1.000 & B\tabularnewline
+0.5785 & 6 & 1.500 & C\tabularnewline
+0.2261 & 7 & 0.5000 & A\tabularnewline
+0.4710 & 8 & 1.000 & B\tabularnewline
+0.9927 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -3321,13 +3321,13 @@ map.
 \midrule
 \endhead
 1 & 6 & 0.5000 & A\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 8 & 1.500 & C\tabularnewline
-2 & 5 & 0.5000 & A\tabularnewline
-1 & 4 & 1.000 & B\tabularnewline
-2 & 7 & 1.500 & C\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
 2 & 9 & 1.000 & B\tabularnewline
+1 & 5 & 1.500 & C\tabularnewline
+2 & 8 & 0.5000 & A\tabularnewline
+1 & 7 & 1.000 & B\tabularnewline
+2 & 2 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+2 & 4 & 1.000 & B\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
@@ -3678,7 +3678,7 @@ Double array conversion.
 \end{Shaded}
 
 \begin{verbatim}
-#object["[J" 0x18a72478 "[J@18a72478"]
+#object["[J" 0x57affdd4 "[J@57affdd4"]
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3694,7 +3694,7 @@ Function also works on grouped dataset
 \end{Shaded}
 
 \begin{verbatim}
-(#object["[J" 0x5fd9c66a "[J@5fd9c66a"] #object["[J" 0x5c4811e9 "[J@5c4811e9"] #object["[J" 0x52a15994 "[J@52a15994"])
+(#object["[J" 0x536f3e4b "[J@536f3e4b"] #object["[J" 0x5e3986ed "[J@5e3986ed"] #object["[J" 0x7c1697aa "[J@7c1697aa"])
 \end{verbatim}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -3709,8 +3709,8 @@ You can also cast the type to the other one (if casting is possible):
 \end{Shaded}
 
 \begin{verbatim}
-#object["[Ljava.lang.String;" 0x671ba381 "[Ljava.lang.String;@671ba381"]
-#object["[F" 0x7c1fed17 "[F@7c1fed17"]
+#object["[Ljava.lang.String;" 0x6342ec39 "[Ljava.lang.String;@6342ec39"]
+#object["[F" 0x7846604f "[F@7846604f"]
 \end{verbatim}
 
 \subsubsection{Rows}\label{rows}
@@ -4025,14 +4025,14 @@ Random \texttt{n} (default: row count) rows with repetition.
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 8 & 1.000 & B\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
 \bottomrule
 \end{longtable}
@@ -4054,11 +4054,11 @@ Five random rows with repetition
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
+1 & 3 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
 1 & 1 & 0.5000 & A\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -4080,10 +4080,10 @@ Five random, non-repeating rows
 \midrule
 \endhead
 1 & 9 & 1.500 & C\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
 2 & 8 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -4129,15 +4129,15 @@ Shuffle dataset
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 3 & 1.500 & C\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 5 & 1.000 & B\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
 2 & 8 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -4316,20 +4316,20 @@ Select 5 random rows from each group
 \midrule
 \endhead
 2 & 4 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
 1 & 1 & 0.5000 & A\tabularnewline
 1 & 1 & 0.5000 & A\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-2 & 2 & 1.000 & B\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -5117,7 +5117,7 @@ Random
 \midrule
 \endhead
 2 & 2 & 1.000 & B\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -8616,10 +8616,10 @@ data/anscombe.csv {[}44 3{]}:
 :x & :a & :b & :y1 & :y2 & :z1 & :z2\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0 & 0.3598 & 0.7480 & 3 & -2\tabularnewline
-2 & 1 & 1 & 0.9623 & 0.5149 & 3 & -2\tabularnewline
-3 & 0 & 1 & 0.9573 & 0.4752 & 3 & -2\tabularnewline
-4 & 0 & 1 & 0.2818 & 0.1022 & 3 & -2\tabularnewline
+1 & 1 & 0 & 0.02672 & 0.2959 & 3 & -2\tabularnewline
+2 & 1 & 1 & 0.2594 & 0.1853 & 3 & -2\tabularnewline
+3 & 0 & 1 & 0.9944 & 0.9585 & 3 & -2\tabularnewline
+4 & 0 & 1 & 0.8436 & 0.8792 & 3 & -2\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -8637,14 +8637,14 @@ data/anscombe.csv {[}44 3{]}:
 :x & :a & :b & :times & y & z\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0 & 1 & 0.3598 & 3\tabularnewline
-2 & 1 & 1 & 1 & 0.9623 & 3\tabularnewline
-3 & 0 & 1 & 1 & 0.9573 & 3\tabularnewline
-4 & 0 & 1 & 1 & 0.2818 & 3\tabularnewline
-1 & 1 & 0 & 2 & 0.7480 & -2\tabularnewline
-2 & 1 & 1 & 2 & 0.5149 & -2\tabularnewline
-3 & 0 & 1 & 2 & 0.4752 & -2\tabularnewline
-4 & 0 & 1 & 2 & 0.1022 & -2\tabularnewline
+1 & 1 & 0 & 1 & 0.02672 & 3\tabularnewline
+2 & 1 & 1 & 1 & 0.2594 & 3\tabularnewline
+3 & 0 & 1 & 1 & 0.9944 & 3\tabularnewline
+4 & 0 & 1 & 1 & 0.8436 & 3\tabularnewline
+1 & 1 & 0 & 2 & 0.2959 & -2\tabularnewline
+2 & 1 & 1 & 2 & 0.1853 & -2\tabularnewline
+3 & 0 & 1 & 2 & 0.9585 & -2\tabularnewline
+4 & 0 & 1 & 2 & 0.8792 & -2\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -10585,31 +10585,31 @@ null {[}27 4{]}:
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0.5000 & A\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
 2 & 8 & 1.000 & B\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
 1 & 7 & 0.5000 & A\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
-2 & 8 & 1.000 & B\tabularnewline
 1 & 7 & 0.5000 & A\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
 2 & 6 & 1.500 & C\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
-1 & 1 & 0.5000 & A\tabularnewline
 2 & 2 & 1.000 & B\tabularnewline
 2 & 8 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+2 & 8 & 1.000 & B\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 5 & 1.000 & B\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
-1 & 3 & 1.500 & C\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -10666,15 +10666,15 @@ union {[}9 4{]}:
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 2 & 1.000 & B\tabularnewline
-2 & 4 & 0.5000 & A\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
 1 & 5 & 1.000 & B\tabularnewline
 1 & 3 & 1.500 & C\tabularnewline
 2 & 8 & 1.000 & B\tabularnewline
 1 & 7 & 0.5000 & A\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
 1 & 1 & 0.5000 & A\tabularnewline
+2 & 2 & 1.000 & B\tabularnewline
+2 & 4 & 0.5000 & A\tabularnewline
+2 & 6 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -12806,9 +12806,9 @@ Other filters
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-2 & 2 & 1.000 & B\tabularnewline
+1 & 7 & 0.5000 & A\tabularnewline
 1 & 9 & 1.500 & C\tabularnewline
-1 & 9 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -12825,11 +12825,11 @@ Other filters
 :V1 & :V2 & :V3 & :V4\tabularnewline
 \midrule
 \endhead
-1 & 1 & 0.5000 & A\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
-2 & 6 & 1.500 & C\tabularnewline
+1 & 3 & 1.500 & C\tabularnewline
 2 & 4 & 0.5000 & A\tabularnewline
-1 & 7 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
+1 & 1 & 0.5000 & A\tabularnewline
+1 & 9 & 1.500 & C\tabularnewline
 \bottomrule
 \end{longtable}
 
